@@ -53,7 +53,7 @@ export const searchCards = async (query) => {
 
         // Use simple name: search - works reliably
         const encodedQuery = encodeURIComponent(cleanQuery);
-        url = `${POKEMON_API}/cards?q=name:${encodedQuery}&orderBy=-set.releaseDate&pageSize=20`;
+        url = `${POKEMON_API}/cards?q=name:${encodedQuery}&orderBy=-set.releaseDate&pageSize=100`;
       }
 
       const headers = {
