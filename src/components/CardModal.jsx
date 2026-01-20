@@ -39,14 +39,14 @@ const CardModal = ({ card, isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-fade-in"
       onClick={handleBackdropClick}
     >
-      <div className="relative w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl animate-slide-up bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-2 border-slate-200 dark:border-slate-700">
+      <div className="relative w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl animate-slide-up bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border border-slate-200 dark:border-slate-700">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 bg-adaptive-card hover:bg-adaptive-hover rounded-lg transition-colors group"
+          className="absolute top-4 right-4 z-10 p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors group border border-slate-200 dark:border-slate-700"
           aria-label="Close modal"
         >
           <X className="w-5 h-5 text-adaptive-secondary group-hover:text-adaptive-primary" />
@@ -55,7 +55,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
         {/* Scrollable Content */}
         <div className="overflow-y-auto max-h-[90vh]">
           {/* Header Section */}
-          <div className="relative p-8 border-b border-adaptive bg-gradient-to-br from-slate-100/50 to-white/50 dark:from-slate-800/50 dark:to-slate-900/50">
+          <div className="relative p-8 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left: Card Image */}
               <div className="flex items-center justify-center">
@@ -86,7 +86,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
                 </div>
 
                 {/* Current Price Display */}
-                <div className="p-6 bg-adaptive-card rounded-xl border border-adaptive">
+                <div className="p-6 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="text-sm text-adaptive-secondary mb-1">Market Price</p>
@@ -102,13 +102,13 @@ const CardModal = ({ card, isOpen, onClose }) => {
 
                   {/* Price Range */}
                   <div className="grid grid-cols-2 gap-3 mt-4">
-                    <div className="p-3 bg-adaptive-card rounded-lg border border-adaptive">
+                    <div className="p-3 bg-white dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
                       <p className="text-xs text-adaptive-tertiary mb-1">Low</p>
                       <p className="text-lg font-semibold text-green-500">
                         {formatPrice(card.prices.tcgplayer.low)}
                       </p>
                     </div>
-                    <div className="p-3 bg-adaptive-card rounded-lg border border-adaptive">
+                    <div className="p-3 bg-white dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
                       <p className="text-xs text-adaptive-tertiary mb-1">High</p>
                       <p className="text-lg font-semibold text-red-500">
                         {formatPrice(card.prices.tcgplayer.high)}
@@ -122,7 +122,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
                   <button className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold rounded-xl transition-colors shadow-lg">
                     Add to Collection
                   </button>
-                  <button className="px-4 py-3 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-secondary rounded-xl transition-colors border border-adaptive">
+                  <button className="px-4 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-adaptive-secondary rounded-xl transition-colors border border-slate-200 dark:border-slate-700">
                     <ExternalLink className="w-5 h-5" />
                   </button>
                 </div>
@@ -131,7 +131,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
           </div>
 
           {/* Tabs Section */}
-          <div className="border-b border-adaptive">
+          <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
             <div className="flex gap-1 px-8 pt-6">
               {['overview', 'chart', 'compare', 'details'].map((tab) => (
                 <button
@@ -139,8 +139,8 @@ const CardModal = ({ card, isOpen, onClose }) => {
                   onClick={() => setActiveTab(tab)}
                   className={`px-6 py-3 rounded-t-lg font-medium capitalize transition-all ${
                     activeTab === tab
-                      ? 'bg-adaptive-card text-adaptive-primary border-t border-x border-adaptive'
-                      : 'text-adaptive-secondary hover:text-adaptive-primary hover:bg-adaptive-card/50'
+                      ? 'bg-slate-100 dark:bg-slate-800 text-adaptive-primary border-t border-x border-slate-200 dark:border-slate-700'
+                      : 'text-adaptive-secondary hover:text-adaptive-primary hover:bg-slate-50 dark:hover:bg-slate-800/50'
                   }`}
                 >
                   {tab}
@@ -150,7 +150,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
           </div>
 
           {/* Tab Content */}
-          <div className="p-8 bg-white/50 dark:bg-slate-900/30">
+          <div className="p-8 bg-white dark:bg-slate-900">
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 <div>
