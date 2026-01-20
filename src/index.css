@@ -95,6 +95,95 @@
   .light-mode .search-glow:focus-within {
     box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.4);
   }
+
+  /* Modal Styles */
+  .modal-backdrop {
+    @apply bg-slate-950/80;
+  }
+
+  .light-mode .modal-backdrop {
+    @apply bg-slate-900/40;
+  }
+
+  .modal-container {
+    @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700;
+  }
+
+  .light-mode .modal-container {
+    @apply bg-white border-slate-200;
+  }
+
+  .modal-header {
+    @apply bg-slate-800/50 border-slate-700;
+  }
+
+  .light-mode .modal-header {
+    @apply bg-slate-50 border-slate-200;
+  }
+
+  .modal-tabs {
+    @apply bg-slate-900 border-slate-700;
+  }
+
+  .light-mode .modal-tabs {
+    @apply bg-white border-slate-200;
+  }
+
+  .modal-content {
+    @apply bg-slate-900;
+  }
+
+  .light-mode .modal-content {
+    @apply bg-white;
+  }
+
+  .modal-card {
+    @apply bg-slate-800/60 border-slate-700;
+  }
+
+  .light-mode .modal-card {
+    @apply bg-white border-slate-200;
+  }
+
+  .modal-button {
+    @apply bg-slate-800 border-slate-700 hover:bg-slate-700;
+  }
+
+  .light-mode .modal-button {
+    @apply bg-slate-100 border-slate-200 hover:bg-slate-200;
+  }
+
+  .modal-price-box {
+    @apply bg-slate-800/60 border-slate-700;
+  }
+
+  .light-mode .modal-price-box {
+    @apply bg-slate-50 border-slate-200;
+  }
+
+  .modal-price-card {
+    @apply bg-slate-700/50 border-slate-600;
+  }
+
+  .light-mode .modal-price-card {
+    @apply bg-white border-slate-200;
+  }
+
+  .tab-active {
+    @apply bg-slate-800 text-adaptive-primary border-slate-700;
+  }
+
+  .light-mode .tab-active {
+    @apply bg-slate-100 text-adaptive-primary border-slate-200;
+  }
+
+  .tab-inactive {
+    @apply text-adaptive-secondary hover:text-adaptive-primary hover:bg-slate-800/50;
+  }
+
+  .light-mode .tab-inactive {
+    @apply text-adaptive-secondary hover:text-adaptive-primary hover:bg-slate-50;
+  }
 }
 
 @layer utilities {

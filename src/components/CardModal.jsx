@@ -39,14 +39,14 @@ const CardModal = ({ card, isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 modal-backdrop backdrop-blur-sm animate-fade-in"
       onClick={handleBackdropClick}
     >
-      <div className="relative w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl animate-slide-up bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border border-slate-200 dark:border-slate-700">
+      <div className="relative w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl animate-slide-up modal-container border">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors group border border-slate-200 dark:border-slate-700"
+          className="absolute top-4 right-4 z-10 p-2 modal-button rounded-lg transition-colors group border"
           aria-label="Close modal"
         >
           <X className="w-5 h-5 text-adaptive-secondary group-hover:text-adaptive-primary" />
@@ -55,7 +55,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
         {/* Scrollable Content */}
         <div className="overflow-y-auto max-h-[90vh]">
           {/* Header Section */}
-          <div className="relative p-8 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+          <div className="relative p-8 modal-header border-b">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left: Card Image */}
               <div className="flex items-center justify-center">
@@ -86,7 +86,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
                 </div>
 
                 {/* Current Price Display */}
-                <div className="p-6 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="p-6 modal-price-box rounded-xl border">
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="text-sm text-adaptive-secondary mb-1">Market Price</p>
@@ -102,13 +102,13 @@ const CardModal = ({ card, isOpen, onClose }) => {
 
                   {/* Price Range */}
                   <div className="grid grid-cols-2 gap-3 mt-4">
-                    <div className="p-3 bg-white dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+                    <div className="p-3 modal-price-card rounded-lg border">
                       <p className="text-xs text-adaptive-tertiary mb-1">Low</p>
                       <p className="text-lg font-semibold text-green-500">
                         {formatPrice(card.prices.tcgplayer.low)}
                       </p>
                     </div>
-                    <div className="p-3 bg-white dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+                    <div className="p-3 modal-price-card rounded-lg border">
                       <p className="text-xs text-adaptive-tertiary mb-1">High</p>
                       <p className="text-lg font-semibold text-red-500">
                         {formatPrice(card.prices.tcgplayer.high)}
@@ -122,7 +122,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
                   <button className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold rounded-xl transition-colors shadow-lg">
                     Add to Collection
                   </button>
-                  <button className="px-4 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-adaptive-secondary rounded-xl transition-colors border border-slate-200 dark:border-slate-700">
+                  <button className="px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border">
                     <ExternalLink className="w-5 h-5" />
                   </button>
                 </div>
@@ -131,7 +131,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
           </div>
 
           {/* Tabs Section */}
-          <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+          <div className="modal-tabs border-b">
             <div className="flex gap-1 px-8 pt-6">
               {['overview', 'chart', 'compare', 'details'].map((tab) => (
                 <button
@@ -139,8 +139,8 @@ const CardModal = ({ card, isOpen, onClose }) => {
                   onClick={() => setActiveTab(tab)}
                   className={`px-6 py-3 rounded-t-lg font-medium capitalize transition-all ${
                     activeTab === tab
-                      ? 'bg-slate-100 dark:bg-slate-800 text-adaptive-primary border-t border-x border-slate-200 dark:border-slate-700'
-                      : 'text-adaptive-secondary hover:text-adaptive-primary hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                      ? 'tab-active border-t border-x'
+                      : 'tab-inactive'
                   }`}
                 >
                   {tab}
@@ -150,7 +150,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
           </div>
 
           {/* Tab Content */}
-          <div className="p-8 bg-white dark:bg-slate-900">
+          <div className="p-8 modal-content">
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 <div>
@@ -252,7 +252,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
 
 // Helper Components
 const StatCard = ({ label, value, trend, color = 'text-blue-500' }) => (
-  <div className="p-5 bg-white dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+  <div className="p-5 modal-card rounded-xl border shadow-sm hover:shadow-md transition-shadow">
     <p className="text-xs font-semibold text-adaptive-secondary mb-2 uppercase tracking-wide">{label}</p>
     <p className={`text-2xl font-bold ${color}`}>{value}</p>
     {trend && (
@@ -262,14 +262,14 @@ const StatCard = ({ label, value, trend, color = 'text-blue-500' }) => (
 );
 
 const InfoCard = ({ label, value }) => (
-  <div className="p-4 bg-white dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+  <div className="p-4 modal-card rounded-lg border shadow-sm">
     <p className="text-xs font-semibold text-adaptive-tertiary mb-1 uppercase tracking-wide">{label}</p>
     <p className="text-sm font-bold text-adaptive-primary truncate">{value}</p>
   </div>
 );
 
 const PriceCompareRow = ({ platform, price, verified, estimated }) => (
-  <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-800/60 rounded-lg hover:shadow-sm transition-all border border-slate-200 dark:border-slate-700">
+  <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border">
     <div className="flex items-center gap-3">
       <span className="text-adaptive-primary font-semibold">{platform}</span>
       {verified && (
@@ -290,7 +290,7 @@ const PriceCompareRow = ({ platform, price, verified, estimated }) => (
 );
 
 const DetailRow = ({ label, value }) => (
-  <div className="flex justify-between items-center p-4 bg-white dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700">
+  <div className="flex justify-between items-center p-4 modal-card rounded-lg border">
     <span className="text-adaptive-secondary font-semibold uppercase text-xs tracking-wide">{label}</span>
     <span className="text-adaptive-primary font-bold">{value}</span>
   </div>
