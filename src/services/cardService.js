@@ -43,15 +43,17 @@ export const searchCards = async (query) => {
         // Get some popular/recent cards
         url = `${POKEMON_API}/cards?orderBy=-set.releaseDate&pageSize=12`;
       } else {
-        // Clean the query - remove quotes and special characters
-        const cleanQuery = query.replace(/['"]/g, '').trim();
+        // Extract the main Pokemon name from the query
+        // Remove common prefixes like "Team Rocket's", keep the Pokemon name
+        const cleanQuery = query
+          .replace(/['"]/g, '')
+          .replace(/^(team rocket'?s?|giovanni'?s?|lt\.? surge'?s?|mistys?|brocks?)\s+/i, '')
+          .trim()
+          .toLowerCase();
 
-        // Use wildcard search - name:mewtwo* matches "Mewtwo", "Mewtwo V", "Mewtwo EX", etc.
-        // For multi-word searches like "team rocket mewtwo", just search for the last word
-        // This gives better results than exact phrase matching
-        const searchTerm = cleanQuery.split(' ').pop(); // Get last word
-        const encodedQuery = encodeURIComponent(searchTerm);
-        url = `${POKEMON_API}/cards?q=name:${encodedQuery}*&orderBy=-set.releaseDate&pageSize=20`;
+        // Use simple name: search - works reliably
+        const encodedQuery = encodeURIComponent(cleanQuery);
+        url = `${POKEMON_API}/cards?q=name:${encodedQuery}&orderBy=-set.releaseDate&pageSize=20`;
       }
 
       const headers = {
