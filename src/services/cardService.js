@@ -230,7 +230,8 @@ async function transformCards(cards) {
     // Try to fetch real eBay prices (async)
     let ebayData = null;
     try {
-      ebayData = await getEbayPriceAPI(card.name, card.set?.name || '');
+      // Pass card number for more accurate eBay searches (e.g., "4/102")
+      ebayData = await getEbayPriceAPI(card.name, card.set?.name || '', card.number || '');
     } catch (error) {
       console.warn('eBay API error for', card.name, error);
     }

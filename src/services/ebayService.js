@@ -54,87 +54,61 @@ export async function getEbayPrice(cardName, cardSet) {
   }
 }
 
-// Alternative: Use eBay Finding API (Free tier: 5,000 calls/day)
-export async function getEbayPriceAPI(cardName, cardSet) {
-  const APP_ID = import.meta.env.VITE_EBAY_APP_ID;
-  const IS_SANDBOX = import.meta.env.VITE_EBAY_SANDBOX === 'true';
-
-  if (!APP_ID) {
-    console.warn('eBay APP_ID not configured');
-    return null;
-  }
-
-  const cacheKey = `${cardName}_${cardSet}`;
+// Use eBay Finding API via backend proxy (avoids CORS issues)
+export async function getEbayPriceAPI(cardName, cardSet, cardNumber = '') {
+  const cacheKey = `${cardName}_${cardSet}_${cardNumber}`;
   const cached = EBAY_CACHE.get(cacheKey);
 
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    console.log(`✅ Using cached eBay data for: ${cardName} (${cached.data.count} sales)`);
     return cached.data;
   }
 
   try {
     await rateLimit();
 
-    const keywords = encodeURIComponent(`${cardName} ${cardSet} pokemon card`);
+    // Build API endpoint URL (use Vercel function in production, local in dev)
+    const isProduction = window.location.hostname !== 'localhost';
+    const apiBase = isProduction
+      ? window.location.origin
+      : 'http://localhost:3000';
 
-    // Use sandbox or production endpoint
-    const baseUrl = IS_SANDBOX
-      ? 'https://svcs.sandbox.ebay.com/services/search/FindingService/v1'
-      : 'https://svcs.ebay.com/services/search/FindingService/v1';
+    const params = new URLSearchParams({
+      cardName,
+      ...(cardSet && { cardSet }),
+      ...(cardNumber && { cardNumber })
+    });
 
-    const url = `${baseUrl}` +
-      `?OPERATION-NAME=findCompletedItems` +
-      `&SERVICE-VERSION=1.0.0` +
-      `&SECURITY-APPNAME=${APP_ID}` +
-      `&RESPONSE-DATA-FORMAT=JSON` +
-      `&REST-PAYLOAD` +
-      `&keywords=${keywords}` +
-      `&itemFilter(0).name=SoldItemsOnly` +
-      `&itemFilter(0).value=true` +
-      `&itemFilter(1).name=Condition` +
-      `&itemFilter(1).value=3000` + // New condition
-      `&sortOrder=EndTimeSoonest` +
-      `&paginationInput.entriesPerPage=50`;
+    const url = `${apiBase}/api/ebay-prices?${params}`;
 
-    console.log(`🔍 Fetching eBay prices (${IS_SANDBOX ? 'SANDBOX' : 'PRODUCTION'}):`, cardName);
+    console.log(`🔍 Fetching eBay prices via backend:`, cardName);
 
     const response = await fetch(url);
     const data = await response.json();
-    
-    const searchResult = data.findCompletedItemsResponse?.[0]?.searchResult?.[0];
-    
-    if (!searchResult || searchResult['@count'] === '0') {
+
+    if (!data.found) {
+      console.log(`❌ No eBay results found for: ${data.searchTerms || cardName}`);
       return null;
     }
-    
-    const items = searchResult.item || [];
-    const prices = items
-      .map(item => parseFloat(item.sellingStatus?.[0]?.currentPrice?.[0]?.__value__ || 0))
-      .filter(price => price > 0);
-    
-    if (prices.length === 0) return null;
-    
-    // Calculate statistics
-    prices.sort((a, b) => a - b);
-    const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
-    const median = prices[Math.floor(prices.length / 2)];
-    const recent = prices.slice(-5); // Last 5 sales
-    
+
     const result = {
-      avg: parseFloat(avg.toFixed(2)),
-      median: parseFloat(median.toFixed(2)),
-      recent,
-      count: prices.length,
+      avg: data.avg,
+      median: data.median,
+      recent: data.recent,
+      count: data.count,
       lastUpdated: Date.now()
     };
-    
+
+    console.log(`✅ Found ${data.count} eBay sales for "${cardName}": $${data.avg} avg`);
+
     // Cache the result
     EBAY_CACHE.set(cacheKey, {
       data: result,
       timestamp: Date.now()
     });
-    
+
     return result;
-    
+
   } catch (error) {
     console.error('Error fetching eBay API data:', error);
     return null;
