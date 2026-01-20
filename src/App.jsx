@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import Stats from './components/Stats';
 import SearchBar from './components/SearchBar';
 import CardGrid from './components/CardGrid';
 import { useCardSearch } from './hooks/useCardSearch';
@@ -22,12 +21,10 @@ function App() {
   return (
     <div className="min-h-screen">
       <Header />
-      
+
       <main>
         <Hero />
-        
-        <Stats />
-        
+
         {/* Search Section */}
         <section className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
