@@ -17,7 +17,6 @@ After deploying to Vercel, you need to add these environment variables in your V
 EBAY_APP_ID=HarisLil-shinypul-PRD-9b427e586-89ae2762
 EBAY_DEV_ID=8907c71a-5c56-45de-a49e-964dbadbde5d
 EBAY_CERT_ID=PRD-b427e5862c6d-1910-499a-b822-ccdd
-EBAY_SANDBOX=false
 ```
 
 ### eBay Compliance Token

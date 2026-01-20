@@ -25,7 +25,6 @@ export default async function handler(req, res) {
 
     // Get eBay credentials from environment variables
     const APP_ID = process.env.EBAY_APP_ID;
-    const IS_SANDBOX = process.env.EBAY_SANDBOX === 'true';
 
     if (!APP_ID) {
       return res.status(500).json({ error: 'eBay API not configured' });
@@ -44,10 +43,8 @@ export default async function handler(req, res) {
 
     const keywords = encodeURIComponent(searchTerms);
 
-    // Use sandbox or production endpoint
-    const baseUrl = IS_SANDBOX
-      ? 'https://svcs.sandbox.ebay.com/services/search/FindingService/v1'
-      : 'https://svcs.ebay.com/services/search/FindingService/v1';
+    // eBay Production API endpoint
+    const baseUrl = 'https://svcs.ebay.com/services/search/FindingService/v1';
 
     const url = `${baseUrl}` +
       `?OPERATION-NAME=findCompletedItems` +
