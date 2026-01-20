@@ -31,12 +31,14 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'eBay API not configured' });
     }
 
-    // Build search terms
-    let searchTerms = `${cardName} pokemon`;
-    if (cardNumber) {
-      searchTerms += ` ${cardNumber}`;
-    }
-    if (cardSet) {
+    // Build search terms - keep it simple for better match rates
+    // Don't include card number or set as they're too restrictive
+    let searchTerms = `${cardName} pokemon card`;
+
+    // Only add set name if the card name is very common (like "Pikachu")
+    // to help narrow down results
+    const commonNames = ['pikachu', 'charizard', 'mewtwo', 'mew', 'eevee'];
+    if (cardSet && commonNames.some(name => cardName.toLowerCase().includes(name))) {
       searchTerms += ` ${cardSet}`;
     }
 
