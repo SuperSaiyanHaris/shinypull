@@ -13,12 +13,12 @@ const Hero = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-4xl mx-auto mb-12 animate-fade-in">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-display text-slate-100 mb-6 leading-tight text-balance">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-display text-adaptive-primary mb-6 leading-tight text-balance">
             Pull the best prices.{' '}
             <span className="shiny-gradient">Shine brighter.</span>
           </h2>
-          <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto text-balance">
-            Track your <span className="text-amber-400 font-semibold">shiny</span> Pokemon card collection with real-time prices from Pokemon TCG API.
+          <p className="text-xl text-adaptive-secondary mb-8 max-w-2xl mx-auto text-balance">
+            Track your <span className="text-amber-500 dark:text-amber-400 font-semibold">shiny</span> Pokemon card collection with real-time prices from Pokemon TCG API.
             Search thousands of cards and never miss a sparkle.
           </p>
         </div>
@@ -45,10 +45,10 @@ const Hero = () => {
 
 const FeaturePill = ({ icon, text }) => (
   <div className="flex items-center gap-2 px-4 py-2 glass-effect rounded-full border border-amber-500/20 hover:border-amber-400/40 transition-colors">
-    <div className="text-amber-400">
+    <div className="text-amber-500 dark:text-amber-400">
       {icon}
     </div>
-    <span className="text-sm font-medium text-slate-300">
+    <span className="text-sm font-medium text-adaptive-secondary">
       {text}
     </span>
   </div>
