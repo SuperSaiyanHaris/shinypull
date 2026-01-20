@@ -206,9 +206,10 @@ const CardModal = ({ card, isOpen, onClose }) => {
                     verified
                   />
                   <PriceCompareRow
-                    platform="eBay (estimated)"
+                    platform={card.prices.ebay.verified ? "eBay API" : "eBay (estimated)"}
                     price={card.prices.ebay.avg}
-                    estimated
+                    verified={card.prices.ebay.verified}
+                    estimated={!card.prices.ebay.verified}
                   />
                   <PriceCompareRow
                     platform="Cardmarket (estimated)"

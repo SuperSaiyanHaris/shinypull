@@ -139,9 +139,10 @@ const CardItem = ({ card, index }) => {
               verified
             />
             <PriceCompareRow
-              platform="eBay (est.)"
+              platform={card.prices.ebay.verified ? "eBay" : "eBay (est.)"}
               price={card.prices.ebay.avg}
-              estimated
+              verified={card.prices.ebay.verified}
+              estimated={!card.prices.ebay.verified}
             />
             <PriceCompareRow
               platform="Cardmarket (est.)"
@@ -149,7 +150,9 @@ const CardItem = ({ card, index }) => {
               estimated
             />
             <p className="text-xs text-slate-500 mt-3 text-center">
-              Verified prices from Pokemon TCG API. Others estimated.
+              {card.prices.ebay.verified
+                ? "✓ Live prices from Pokemon TCG & eBay APIs"
+                : "Verified prices from Pokemon TCG API. Others estimated."}
             </p>
           </div>
         )}

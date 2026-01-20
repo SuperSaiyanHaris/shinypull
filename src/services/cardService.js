@@ -43,9 +43,13 @@ export const searchCards = async (query) => {
         // Get some popular/recent cards
         url = `${POKEMON_API}/cards?orderBy=-set.releaseDate&pageSize=12`;
       } else {
+        // Clean and encode the query properly for Pokemon TCG API
+        // Remove special characters that cause issues, keep only alphanumeric and spaces
+        const cleanQuery = query.replace(/['"]/g, '').trim();
+        const encodedQuery = encodeURIComponent(cleanQuery);
+
         // Search by card name OR number (supports both)
         // The API's search syntax: name:pikachu OR number:25
-        const encodedQuery = encodeURIComponent(query);
         url = `${POKEMON_API}/cards?q=(name:${encodedQuery}* OR number:${encodedQuery}*)&orderBy=-set.releaseDate&pageSize=20`;
       }
 
