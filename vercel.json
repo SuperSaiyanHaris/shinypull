@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "supersaiyanharis",
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/ebay-deletion-notification",
+      "dest": "/api/ebay-deletion-notification.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
