@@ -4,7 +4,8 @@
 
 // IMPORTANT: Set this verification token in your eBay Developer Portal
 // AND as an environment variable in Vercel
-const VERIFICATION_TOKEN = process.env.EBAY_VERIFICATION_TOKEN || 'shinypull_ebay_2024';
+// eBay requires 32-80 characters for the verification token
+const VERIFICATION_TOKEN = process.env.EBAY_VERIFICATION_TOKEN || 'shinypull_ebay_verification_token_2024_prod_secure';
 
 export default async function handler(req, res) {
   // Only accept POST requests
