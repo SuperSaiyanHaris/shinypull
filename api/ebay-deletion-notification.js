@@ -2,13 +2,44 @@
 // This endpoint receives notifications when eBay users delete their accounts
 // Deploy this to Vercel/Netlify for production compliance
 
+import crypto from 'crypto';
+
 // IMPORTANT: Set this verification token in your eBay Developer Portal
 // AND as an environment variable in Vercel
 // eBay requires 32-80 characters for the verification token
 const VERIFICATION_TOKEN = process.env.EBAY_VERIFICATION_TOKEN || 'shinypull_ebay_verification_token_2024_prod_secure';
 
 export default async function handler(req, res) {
-  // Only accept POST requests
+  // Handle GET request for challenge code validation (eBay's initial verification)
+  if (req.method === 'GET') {
+    const challengeCode = req.query.challenge_code;
+
+    if (!challengeCode) {
+      return res.status(400).json({ error: 'Missing challenge_code parameter' });
+    }
+
+    // Build the endpoint URL (use the actual deployed URL)
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const endpointUrl = `${protocol}://${host}${req.url.split('?')[0]}`;
+
+    // Create SHA-256 hash of: challengeCode + verificationToken + endpoint
+    const hashString = challengeCode + VERIFICATION_TOKEN + endpointUrl;
+    const challengeResponse = crypto.createHash('sha256').update(hashString).digest('hex');
+
+    console.log('eBay Challenge Received:', {
+      challengeCode,
+      endpointUrl,
+      timestamp: new Date().toISOString()
+    });
+
+    // Return the challenge response as required by eBay
+    return res.status(200).json({
+      challengeResponse
+    });
+  }
+
+  // Handle POST requests for actual deletion notifications
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
