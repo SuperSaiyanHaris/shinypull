@@ -43,13 +43,15 @@ export const searchCards = async (query) => {
         // Get some popular/recent cards
         url = `${POKEMON_API}/cards?orderBy=-set.releaseDate&pageSize=12`;
       } else {
-        // Clean the query - remove special characters that cause API issues
+        // Clean the query - remove quotes that might interfere
         const cleanQuery = query.replace(/['"]/g, '').trim();
 
-        // Build the search query - search by name with wildcard
-        // Don't encode the entire query syntax, just the search term
-        const encodedName = encodeURIComponent(cleanQuery);
-        url = `${POKEMON_API}/cards?q=name:${encodedName}*&orderBy=-set.releaseDate&pageSize=20`;
+        // Pokemon TCG API requires quotes around phrases with spaces
+        // Format: name:"team rocket mewtwo" (handles multi-word searches)
+        // Encode the quoted phrase: name:%22team%20rocket%20mewtwo%22
+        const quotedName = `"${cleanQuery}"`;
+        const encodedQuery = encodeURIComponent(quotedName);
+        url = `${POKEMON_API}/cards?q=name:${encodedQuery}&orderBy=-set.releaseDate&pageSize=20`;
       }
 
       const headers = {
