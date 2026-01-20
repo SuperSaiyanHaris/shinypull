@@ -1,5 +1,6 @@
 import React from 'react';
-import { Sparkles, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
+import logo from '../imgs/shinypulllogo.png';
 
 const Header = () => {
   return (
@@ -10,9 +11,11 @@ const Header = () => {
           <div className="flex items-center gap-3">
             <div className="relative">
               <div className="absolute inset-0 bg-amber-400 blur-xl opacity-50 rounded-full animate-pulse-slow" />
-              <div className="relative w-12 h-12 bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/50">
-                <Sparkles className="w-6 h-6 text-slate-900" strokeWidth={2.5} />
-              </div>
+              <img
+                src={logo}
+                alt="ShinyPull Logo"
+                className="relative w-12 h-12 object-contain"
+              />
             </div>
             <div>
               <h1 className="text-2xl font-display text-slate-100 tracking-tight">
