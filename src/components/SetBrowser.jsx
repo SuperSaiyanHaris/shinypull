@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Grid3x3, List, SortDesc, Filter } from 'lucide-react';
+import { Search, Grid, List, SortDesc, Filter } from 'lucide-react';
 
 const SetBrowser = ({ onSetClick }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -116,7 +116,7 @@ const SetBrowser = ({ onSetClick }) => {
                   : 'bg-adaptive-card text-adaptive-secondary hover:bg-adaptive-hover border border-adaptive'
               }`}
             >
-              <Grid3x3 className="w-5 h-5 mx-auto" />
+              <Grid className="w-5 h-5 mx-auto" />
             </button>
             <button
               onClick={() => setViewMode('list')}
