@@ -1,7 +1,7 @@
 // Pokemon TCG API Integration
 // API Docs: https://pokemontcg.io/
 
-import { getEbayPriceAPI, estimateEbayPrice } from './ebayService.js';
+import { getEbayPriceAPI, estimateEbayPrice, getEbayPSA10Price, estimatePSA10Price } from './ebayService.js';
 
 const POKEMON_API = 'https://api.pokemontcg.io/v2';
 const API_KEY = import.meta.env.VITE_POKEMON_API_KEY;
@@ -251,7 +251,17 @@ async function transformCards(cards) {
       marketPrice * 1.04
     ] : []);
 
-    const cardmarketEstimate = marketPrice > 0 ? marketPrice * 0.92 : 0;
+    // Try to fetch PSA 10 graded prices from eBay
+    let psa10Data = null;
+    try {
+      psa10Data = await getEbayPSA10Price(card.name, card.set?.name || '', card.number || '');
+    } catch (error) {
+      console.warn('PSA 10 eBay API error for', card.name, error);
+    }
+
+    // Use real PSA 10 data if available, otherwise estimate
+    const psa10Avg = psa10Data?.avg || estimatePSA10Price(marketPrice);
+    const psa10Verified = !!psa10Data;
 
     return {
       id: card.id,
@@ -271,9 +281,9 @@ async function transformCards(cards) {
           recent: ebayRecent,
           verified: !!ebayData, // True if we got real data from eBay API
         },
-        cardmarket: {
-          avg: parseFloat(cardmarketEstimate.toFixed(2)),
-          trend: 'stable'
+        psa10: {
+          avg: parseFloat(psa10Avg.toFixed(2)),
+          verified: psa10Verified, // True if we got real PSA 10 data from eBay
         }
       },
       priceHistory

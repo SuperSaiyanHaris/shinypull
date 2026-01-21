@@ -212,9 +212,10 @@ const CardModal = ({ card, isOpen, onClose }) => {
                     estimated={!card.prices.ebay.verified}
                   />
                   <PriceCompareRow
-                    platform="Cardmarket (estimated)"
-                    price={card.prices.cardmarket.avg}
-                    estimated
+                    platform={card.prices.psa10.verified ? "PSA 10 (eBay)" : "PSA 10 (estimated)"}
+                    price={card.prices.psa10.avg}
+                    verified={card.prices.psa10.verified}
+                    estimated={!card.prices.psa10.verified}
                   />
                 </div>
                 <p className="text-xs text-adaptive-tertiary mt-6 text-center">

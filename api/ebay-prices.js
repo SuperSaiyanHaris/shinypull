@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { cardName, cardSet, cardNumber } = req.query;
+    const { cardName, cardSet, cardNumber, graded } = req.query;
 
     if (!cardName) {
       return res.status(400).json({ error: 'cardName is required' });
@@ -33,6 +33,11 @@ export default async function handler(req, res) {
     // Build search terms - keep it simple for better match rates
     // Don't include card number or set as they're too restrictive
     let searchTerms = `${cardName} pokemon card`;
+
+    // If searching for PSA 10 graded cards, add PSA 10 to search
+    if (graded === 'psa10') {
+      searchTerms = `${cardName} PSA 10 pokemon`;
+    }
 
     // Only add set name if the card name is very common (like "Pikachu")
     // to help narrow down results

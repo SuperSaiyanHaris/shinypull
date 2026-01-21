@@ -115,11 +115,82 @@ export async function getEbayPriceAPI(cardName, cardSet, cardNumber = '') {
   }
 }
 
+// Fetch PSA 10 graded card prices from eBay
+export async function getEbayPSA10Price(cardName, cardSet, cardNumber = '') {
+  const cacheKey = `psa10_${cardName}_${cardSet}_${cardNumber}`;
+  const cached = EBAY_CACHE.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    console.log(`✅ Using cached PSA 10 eBay data for: ${cardName} (${cached.data.count} sales)`);
+    return cached.data;
+  }
+
+  try {
+    await rateLimit();
+
+    // Build API endpoint URL
+    const isProduction = window.location.hostname !== 'localhost';
+    const apiBase = isProduction
+      ? window.location.origin
+      : 'http://localhost:3000';
+
+    const params = new URLSearchParams({
+      cardName,
+      graded: 'psa10',
+      ...(cardSet && { cardSet }),
+      ...(cardNumber && { cardNumber })
+    });
+
+    const url = `${apiBase}/api/ebay-prices?${params}`;
+
+    console.log(`🔍 Fetching PSA 10 eBay prices via backend:`, cardName);
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.found) {
+      console.log(`❌ No PSA 10 eBay results found for: ${data.searchTerms || cardName}`);
+      return null;
+    }
+
+    const result = {
+      avg: data.avg,
+      median: data.median,
+      recent: data.recent,
+      count: data.count,
+      lastUpdated: Date.now()
+    };
+
+    console.log(`✅ Found ${data.count} PSA 10 eBay sales for "${cardName}": $${data.avg} avg`);
+
+    // Cache the result
+    EBAY_CACHE.set(cacheKey, {
+      data: result,
+      timestamp: Date.now()
+    });
+
+    return result;
+
+  } catch (error) {
+    console.error('Error fetching PSA 10 eBay API data:', error);
+    return null;
+  }
+}
+
 // Helper to get better eBay price estimates based on TCGPlayer data
 export function estimateEbayPrice(tcgPlayerPrice) {
   if (!tcgPlayerPrice || tcgPlayerPrice === 0) return 0;
-  
+
   // eBay typically 5-10% higher due to fees and convenience
   const variance = 1.05 + (Math.random() * 0.05);
   return parseFloat((tcgPlayerPrice * variance).toFixed(2));
+}
+
+// Helper to estimate PSA 10 price based on raw card price
+export function estimatePSA10Price(tcgPlayerPrice) {
+  if (!tcgPlayerPrice || tcgPlayerPrice === 0) return 0;
+
+  // PSA 10 graded cards typically 3-5x raw card price
+  const multiplier = 3.5 + (Math.random() * 1.5);
+  return parseFloat((tcgPlayerPrice * multiplier).toFixed(2));
 }
