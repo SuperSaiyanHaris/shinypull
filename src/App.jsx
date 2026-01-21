@@ -1,21 +1,45 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import SearchBar from './components/SearchBar';
 import CardGrid from './components/CardGrid';
+import SetBrowser from './components/SetBrowser';
+import SetDetailPage from './components/SetDetailPage';
 import { useCardSearch } from './hooks/useCardSearch';
 import { preloadPopularSearches } from './services/cardService';
 
 function App() {
   const { query, setQuery, cards, loading } = useCardSearch();
+  const [currentView, setCurrentView] = useState('sets'); // 'sets', 'setDetail', 'search'
+  const [selectedSet, setSelectedSet] = useState(null);
 
   // Preload popular searches on app startup for better performance
   useEffect(() => {
     preloadPopularSearches();
   }, []);
 
+  // Switch to search view when user types
+  useEffect(() => {
+    if (query) {
+      setCurrentView('search');
+    } else {
+      setCurrentView('sets');
+    }
+  }, [query]);
+
   const handleClear = () => {
     setQuery('');
+    setCurrentView('sets');
+  };
+
+  const handleSetClick = (set) => {
+    setSelectedSet(set);
+    setCurrentView('setDetail');
+  };
+
+  const handleBackToSets = () => {
+    setSelectedSet(null);
+    setCurrentView('sets');
   };
 
   return (
@@ -29,28 +53,48 @@ function App() {
         <section className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-12 animate-slide-up" style={{ animationDelay: '300ms' }}>
-              <SearchBar 
+              <SearchBar
                 value={query}
                 onChange={setQuery}
                 onClear={handleClear}
               />
             </div>
 
-            {/* Results Section */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-display text-adaptive-primary">
-                  {query ? 'Search Results' : 'Popular Cards'}
-                </h3>
-                {!loading && cards.length > 0 && (
-                  <span className="text-sm text-adaptive-tertiary font-mono">
-                    {cards.length} {cards.length === 1 ? 'card' : 'cards'}
-                  </span>
-                )}
+            {/* Content Section */}
+            {currentView === 'sets' && (
+              <div className="mb-8">
+                <div className="mb-6">
+                  <h3 className="text-2xl font-display text-adaptive-primary">
+                    Browse Pokemon Sets
+                  </h3>
+                  <p className="text-sm text-adaptive-tertiary mt-2">
+                    Explore cards from your favorite Pokemon TCG sets
+                  </p>
+                </div>
+                <SetBrowser onSetClick={handleSetClick} />
               </div>
-              
-              <CardGrid cards={cards} loading={loading} />
-            </div>
+            )}
+
+            {currentView === 'setDetail' && selectedSet && (
+              <SetDetailPage set={selectedSet} onBack={handleBackToSets} />
+            )}
+
+            {currentView === 'search' && (
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-2xl font-display text-adaptive-primary">
+                    Search Results
+                  </h3>
+                  {!loading && cards.length > 0 && (
+                    <span className="text-sm text-adaptive-tertiary font-mono">
+                      {cards.length} {cards.length === 1 ? 'card' : 'cards'}
+                    </span>
+                  )}
+                </div>
+
+                <CardGrid cards={cards} loading={loading} />
+              </div>
+            )}
           </div>
         </section>
 
