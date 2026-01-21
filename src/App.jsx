@@ -8,18 +8,12 @@ import SetBrowser from './components/SetBrowser';
 import SetDetailPage from './components/SetDetailPage';
 import AdminSyncPanel from './components/AdminSyncPanel';
 import { useCardSearch } from './hooks/useCardSearch';
-import { preloadPopularSearches } from './services/cardService';
 
 function App() {
   const { query, setQuery, cards, loading } = useCardSearch();
   const [currentView, setCurrentView] = useState('sets'); // 'sets', 'setDetail', 'search', 'admin'
   const [selectedSet, setSelectedSet] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
-
-  // Preload popular searches on app startup for better performance
-  useEffect(() => {
-    preloadPopularSearches();
-  }, []);
 
   // Switch to search view when user types
   useEffect(() => {

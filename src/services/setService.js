@@ -63,7 +63,7 @@ export const getAllSets = async () => {
 };
 
 /**
- * Get all cards from a specific set
+ * Get all cards from a specific set (transformed to app format)
  */
 export const getSetCards = async (setId) => {
   try {
@@ -94,15 +94,66 @@ export const getSetCards = async (setId) => {
     }
 
     const data = await response.json();
-    const cards = data.data || [];
+    const rawCards = data.data || [];
+
+    // Transform cards to app format
+    const transformedCards = rawCards.map(card => {
+      const prices = card.tcgplayer?.prices || {};
+      const priceVariants = ['holofoil', 'reverseHolofoil', '1stEditionHolofoil', 'unlimitedHolofoil', 'normal'];
+      let priceData = null;
+
+      for (const variant of priceVariants) {
+        if (prices[variant] && prices[variant].market) {
+          priceData = prices[variant];
+          break;
+        }
+      }
+
+      if (!priceData) {
+        const firstVariant = Object.keys(prices)[0];
+        priceData = firstVariant ? prices[firstVariant] : {};
+      }
+
+      const marketPrice = priceData?.market || 0;
+      const lowPrice = priceData?.low || marketPrice * 0.8;
+      const highPrice = priceData?.high || marketPrice * 1.3;
+
+      return {
+        id: card.id,
+        name: card.name,
+        number: card.number || 'N/A',
+        rarity: card.rarity || 'Common',
+        image: card.images?.large || card.images?.small,
+        images: {
+          small: card.images?.small,
+          large: card.images?.large
+        },
+        prices: {
+          tcgplayer: {
+            market: marketPrice,
+            low: lowPrice,
+            high: highPrice
+          },
+          ebay: {
+            avg: 0,
+            verified: false
+          },
+          psa10: {
+            avg: 0,
+            verified: false
+          }
+        },
+        priceHistory: []
+      };
+    });
 
     cache.set(cacheKey, {
-      data: cards,
+      data: transformedCards,
       timestamp: Date.now()
     });
 
-    console.log(`✓ Loaded ${cards.length} cards from set ${setId}`);
-    return cards;
+    console.log(`✓ Loaded ${transformedCards.length} cards from set ${setId}`);
+    return transformedCards;
 
   } catch (error) {
     console.error('Error fetching set cards:', error);

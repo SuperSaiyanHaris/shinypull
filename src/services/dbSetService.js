@@ -1,7 +1,9 @@
 import { supabase } from '../lib/supabase';
+import { getAllSets as getApiSets, getSetCards as getApiCards } from './setService';
 
 /**
  * Get all Pokemon sets from the database
+ * Falls back to API if database is empty
  */
 export const getAllSets = async () => {
   try {
@@ -11,8 +13,17 @@ export const getAllSets = async () => {
       .order('release_date', { ascending: false });
 
     if (error) {
-      throw error;
+      console.warn('Database error, falling back to API:', error.message);
+      return await getApiSets();
     }
+
+    // If no data in database, fall back to API
+    if (!data || data.length === 0) {
+      console.log('No sets in database, fetching from API...');
+      return await getApiSets();
+    }
+
+    console.log(`Loaded ${data.length} sets from database`);
 
     // Transform to match app format
     return data.map(set => ({
@@ -26,12 +37,14 @@ export const getAllSets = async () => {
     }));
   } catch (error) {
     console.error('Error fetching sets from database:', error);
-    return [];
+    // Fall back to API on any error
+    return await getApiSets();
   }
 };
 
 /**
  * Get all cards for a specific set from the database
+ * Falls back to API if database has no cards for this set
  */
 export const getSetCards = async (setId) => {
   try {
@@ -54,12 +67,23 @@ export const getSetCards = async (setId) => {
       .order('number', { ascending: true });
 
     if (error) {
-      throw error;
+      console.warn('Database error fetching cards, falling back to API:', error.message);
+      return await getApiCards(setId);
     }
+
+    // If no cards in database for this set, fall back to API
+    if (!data || data.length === 0) {
+      console.log(`No cards in database for set ${setId}, fetching from API...`);
+      return await getApiCards(setId);
+    }
+
+    console.log(`Loaded ${data.length} cards from database for set ${setId}`);
 
     // Transform to match app format
     return data.map(card => {
-      const price = card.prices?.[0] || {};
+      // prices comes as an array from the relation - get first element or empty object
+      const priceData = Array.isArray(card.prices) ? card.prices[0] : card.prices;
+      const price = priceData || {};
 
       return {
         id: card.id,
@@ -73,17 +97,17 @@ export const getSetCards = async (setId) => {
         },
         prices: {
           tcgplayer: {
-            market: price.tcgplayer_market || 0,
-            low: price.tcgplayer_low || 0,
-            high: price.tcgplayer_high || 0
+            market: price.tcgplayer_market ?? 0,
+            low: price.tcgplayer_low ?? 0,
+            high: price.tcgplayer_high ?? 0
           },
           ebay: {
-            avg: price.ebay_avg || 0,
-            verified: price.ebay_verified || false
+            avg: price.ebay_avg ?? 0,
+            verified: price.ebay_verified ?? false
           },
           psa10: {
-            avg: price.psa10_avg || 0,
-            verified: price.psa10_verified || false
+            avg: price.psa10_avg ?? 0,
+            verified: price.psa10_verified ?? false
           }
         },
         priceHistory: []
@@ -91,7 +115,8 @@ export const getSetCards = async (setId) => {
     });
   } catch (error) {
     console.error('Error fetching cards from database:', error);
-    return [];
+    // Fall back to API on any error
+    return await getApiCards(setId);
   }
 };
 
@@ -100,6 +125,11 @@ export const getSetCards = async (setId) => {
  */
 export const searchCards = async (query) => {
   try {
+    // Return empty array for empty queries
+    if (!query || query.trim() === '') {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from('cards')
       .select(`
@@ -130,7 +160,9 @@ export const searchCards = async (query) => {
 
     // Transform to match app format
     return data.map(card => {
-      const price = card.prices?.[0] || {};
+      // prices comes as an array from the relation - get first element or empty object
+      const priceData = Array.isArray(card.prices) ? card.prices[0] : card.prices;
+      const price = priceData || {};
       const set = card.sets || {};
 
       return {
@@ -146,17 +178,17 @@ export const searchCards = async (query) => {
         set: set.name,
         prices: {
           tcgplayer: {
-            market: price.tcgplayer_market || 0,
-            low: price.tcgplayer_low || 0,
-            high: price.tcgplayer_high || 0
+            market: price.tcgplayer_market ?? 0,
+            low: price.tcgplayer_low ?? 0,
+            high: price.tcgplayer_high ?? 0
           },
           ebay: {
-            avg: price.ebay_avg || 0,
-            verified: price.ebay_verified || false
+            avg: price.ebay_avg ?? 0,
+            verified: price.ebay_verified ?? false
           },
           psa10: {
-            avg: price.psa10_avg || 0,
-            verified: price.psa10_verified || false
+            avg: price.psa10_avg ?? 0,
+            verified: price.psa10_verified ?? false
           }
         },
         priceHistory: []
