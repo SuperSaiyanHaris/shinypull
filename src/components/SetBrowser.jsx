@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Grid, List, SortDesc, Filter } from 'lucide-react';
-import { getAllSets } from '../services/setService';
+import { getAllSets } from '../services/dbSetService';
 
 const SetBrowser = ({ onSetClick }) => {
   const [searchQuery, setSearchQuery] = useState('');

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { searchCards } from '../services/cardService';
+import { searchCards } from '../services/dbSetService';
 
 export const useCardSearch = () => {
   const [query, setQuery] = useState('');

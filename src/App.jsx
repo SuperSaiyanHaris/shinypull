@@ -5,13 +5,15 @@ import SearchBar from './components/SearchBar';
 import CardGrid from './components/CardGrid';
 import SetBrowser from './components/SetBrowser';
 import SetDetailPage from './components/SetDetailPage';
+import AdminSyncPanel from './components/AdminSyncPanel';
 import { useCardSearch } from './hooks/useCardSearch';
 import { preloadPopularSearches } from './services/cardService';
 
 function App() {
   const { query, setQuery, cards, loading } = useCardSearch();
-  const [currentView, setCurrentView] = useState('sets'); // 'sets', 'setDetail', 'search'
+  const [currentView, setCurrentView] = useState('sets'); // 'sets', 'setDetail', 'search', 'admin'
   const [selectedSet, setSelectedSet] = useState(null);
+  const [showAdmin, setShowAdmin] = useState(false);
 
   // Preload popular searches on app startup for better performance
   useEffect(() => {
@@ -42,6 +44,18 @@ function App() {
     setCurrentView('sets');
   };
 
+  // Listen for Ctrl+Shift+A to toggle admin panel
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        setShowAdmin(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -59,6 +73,13 @@ function App() {
                 onClear={handleClear}
               />
             </div>
+
+            {/* Admin Panel */}
+            {showAdmin && (
+              <div className="mb-8">
+                <AdminSyncPanel />
+              </div>
+            )}
 
             {/* Content Section */}
             {currentView === 'sets' && (

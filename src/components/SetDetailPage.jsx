@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Search, SortDesc } from 'lucide-react';
 import CardModal from './CardModal';
 import { formatPrice } from '../services/cardService';
-import { getSetCards } from '../services/setService';
-import { getEbayPriceAPI, estimateEbayPrice, getEbayPSA10Price, estimatePSA10Price } from '../services/ebayService';
+import { getSetCards } from '../services/dbSetService';
 
 const SetDetailPage = ({ set, onBack }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,72 +15,8 @@ const SetDetailPage = ({ set, onBack }) => {
   useEffect(() => {
     const loadCards = async () => {
       setLoading(true);
-      const rawCards = await getSetCards(set.id);
-
-      // Transform cards with pricing
-      const transformedCards = await Promise.all(rawCards.map(async card => {
-        const prices = card.tcgplayer?.prices || {};
-        const priceVariants = ['holofoil', 'reverseHolofoil', '1stEditionHolofoil', 'unlimitedHolofoil', 'normal'];
-        let priceData = null;
-
-        for (const variant of priceVariants) {
-          if (prices[variant] && prices[variant].market) {
-            priceData = prices[variant];
-            break;
-          }
-        }
-
-        if (!priceData) {
-          const firstVariant = Object.keys(prices)[0];
-          priceData = firstVariant ? prices[firstVariant] : {};
-        }
-
-        const marketPrice = priceData?.market || 0;
-        const lowPrice = priceData?.low || marketPrice * 0.8;
-        const highPrice = priceData?.high || marketPrice * 1.3;
-
-        // Fetch eBay prices (parallel)
-        let ebayData = null;
-        let psa10Data = null;
-        try {
-          [ebayData, psa10Data] = await Promise.all([
-            getEbayPriceAPI(card.name, set.name, card.number).catch(() => null),
-            getEbayPSA10Price(card.name, set.name, card.number).catch(() => null)
-          ]);
-        } catch (error) {
-          console.warn('Error fetching prices for', card.name);
-        }
-
-        const ebayAvg = ebayData?.avg || estimateEbayPrice(marketPrice);
-        const psa10Avg = psa10Data?.avg || estimatePSA10Price(marketPrice);
-
-        return {
-          id: card.id,
-          name: card.name,
-          number: card.number || 'N/A',
-          rarity: card.rarity || 'Common',
-          image: card.images?.large || card.images?.small,
-          set: set.name,
-          prices: {
-            tcgplayer: {
-              market: marketPrice,
-              low: lowPrice,
-              high: highPrice,
-            },
-            ebay: {
-              avg: parseFloat(ebayAvg.toFixed(2)),
-              verified: !!ebayData,
-            },
-            psa10: {
-              avg: parseFloat(psa10Avg.toFixed(2)),
-              verified: !!psa10Data,
-            }
-          },
-          priceHistory: [],
-        };
-      }));
-
-      setCards(transformedCards);
+      const cardsFromDb = await getSetCards(set.id);
+      setCards(cardsFromDb);
       setLoading(false);
     };
 
