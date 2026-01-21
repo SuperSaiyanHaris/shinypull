@@ -7,11 +7,13 @@ import CardGrid from './components/CardGrid';
 import SetBrowser from './components/SetBrowser';
 import SetDetailPage from './components/SetDetailPage';
 import AdminSyncPanel from './components/AdminSyncPanel';
+import TermsOfUse from './components/TermsOfUse';
+import PrivacyPolicy from './components/PrivacyPolicy';
 import { useCardSearch } from './hooks/useCardSearch';
 
 function App() {
   const { query, setQuery, cards, loading } = useCardSearch();
-  const [currentView, setCurrentView] = useState('sets'); // 'sets', 'setDetail', 'search', 'admin'
+  const [currentView, setCurrentView] = useState('sets'); // 'sets', 'setDetail', 'search', 'terms', 'privacy'
   const [selectedSet, setSelectedSet] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
 
@@ -111,6 +113,14 @@ function App() {
                 <CardGrid cards={cards} loading={loading} />
               </div>
             )}
+
+            {currentView === 'terms' && (
+              <TermsOfUse onBack={() => setCurrentView('sets')} />
+            )}
+
+            {currentView === 'privacy' && (
+              <PrivacyPolicy onBack={() => setCurrentView('sets')} />
+            )}
           </div>
         </section>
 
@@ -129,18 +139,38 @@ function App() {
               </div>
 
               <div>
-                <h5 className="text-sm font-semibold text-adaptive-secondary mb-3">Resources</h5>
+                <h5 className="text-sm font-semibold text-adaptive-secondary mb-3">Legal</h5>
                 <ul className="space-y-2">
-                  <li><a href="#" className="text-sm text-adaptive-tertiary hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Pokemon TCG API</a></li>
-                  <li><a href="#" className="text-sm text-adaptive-tertiary hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Help Center</a></li>
-                  <li><a href="#" className="text-sm text-adaptive-tertiary hover:text-blue-600 dark:hover:text-blue-400 transition-colors">About</a></li>
+                  <li>
+                    <button
+                      onClick={() => setCurrentView('terms')}
+                      className="text-sm text-adaptive-tertiary hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    >
+                      Terms of Use
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => setCurrentView('privacy')}
+                      className="text-sm text-adaptive-tertiary hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    >
+                      Privacy Policy
+                    </button>
+                  </li>
                 </ul>
               </div>
             </div>
 
-            <div className="mt-12 pt-8 border-t border-adaptive">
+            {/* Pokemon Disclaimer */}
+            <div className="mt-8 pt-6 border-t border-adaptive">
+              <p className="text-xs text-adaptive-tertiary text-center max-w-3xl mx-auto">
+                ShinyPull is not affiliated with, sponsored or endorsed by, or in any way associated with Pokemon or The Pokemon Company International Inc. All Pokemon images, names, and related marks are trademarks of their respective owners.
+              </p>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-adaptive">
               <p className="text-center text-sm text-adaptive-tertiary">
-                © 2024 ShinyPull. Built with React + Vite.
+                © {new Date().getFullYear()} ShinyPull. Built with React + Vite.
               </p>
             </div>
           </div>
