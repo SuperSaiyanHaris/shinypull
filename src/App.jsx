@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import SearchBar from './components/SearchBar';
@@ -151,6 +152,7 @@ function App() {
           </div>
         </footer>
       </main>
+      <Analytics />
     </div>
   );
 }
