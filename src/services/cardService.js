@@ -51,8 +51,8 @@ export const searchCards = async (query) => {
           .trim()
           .toLowerCase();
 
-        // Use simple name: search - works reliably
-        const encodedQuery = encodeURIComponent(cleanQuery);
+        // Use wildcard search for better matching - supports partial names
+        const encodedQuery = encodeURIComponent(`*${cleanQuery}*`);
         url = `${POKEMON_API}/cards?q=name:${encodedQuery}&orderBy=-set.releaseDate&pageSize=100`;
       }
 
