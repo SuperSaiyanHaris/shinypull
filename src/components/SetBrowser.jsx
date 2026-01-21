@@ -1,44 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Grid, List, SortDesc, Filter } from 'lucide-react';
+import { getAllSets } from '../services/setService';
 
 const SetBrowser = ({ onSetClick }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('releaseDate'); // releaseDate, name, totalCards
   const [viewMode, setViewMode] = useState('grid'); // grid, list
   const [filterSeries, setFilterSeries] = useState('all');
+  const [sets, setSets] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data - will be replaced with real API data
-  const sets = [
-    {
-      id: 'sv08',
-      name: 'Surging Sparks',
-      series: 'Scarlet & Violet',
-      releaseDate: '2024-11-08',
-      totalCards: 191,
-      logo: 'https://images.pokemontcg.io/sv8/logo.png',
-      symbol: 'https://images.pokemontcg.io/sv8/symbol.png',
-    },
-    {
-      id: 'sv07',
-      name: 'Stellar Crown',
-      series: 'Scarlet & Violet',
-      releaseDate: '2024-09-13',
-      totalCards: 175,
-      logo: 'https://images.pokemontcg.io/sv7/logo.png',
-      symbol: 'https://images.pokemontcg.io/sv7/symbol.png',
-    },
-    {
-      id: 'sv06',
-      name: 'Twilight Masquerade',
-      series: 'Scarlet & Violet',
-      releaseDate: '2024-05-24',
-      totalCards: 167,
-      logo: 'https://images.pokemontcg.io/sv6/logo.png',
-      symbol: 'https://images.pokemontcg.io/sv6/symbol.png',
-    },
-  ];
+  useEffect(() => {
+    const loadSets = async () => {
+      setLoading(true);
+      const allSets = await getAllSets();
+      setSets(allSets);
+      setLoading(false);
+    };
+    loadSets();
+  }, []);
 
-  const seriesOptions = ['all', 'Scarlet & Violet', 'Sword & Shield', 'Sun & Moon', 'XY', 'Black & White'];
+  // Get unique series for filter
+  const seriesOptions = ['all', ...new Set(sets.map(s => s.series))].filter(Boolean);
 
   const filteredSets = sets
     .filter(set => {
@@ -139,6 +122,13 @@ const SetBrowser = ({ onSetClick }) => {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <>
       {/* Sets Display */}
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -210,6 +200,8 @@ const SetBrowser = ({ onSetClick }) => {
             </div>
           ))}
         </div>
+      )}
+        </>
       )}
     </div>
   );

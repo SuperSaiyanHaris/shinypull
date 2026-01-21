@@ -1,45 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Search, SortDesc } from 'lucide-react';
 import CardModal from './CardModal';
 import { formatPrice } from '../services/cardService';
+import { getSetCards } from '../services/setService';
+import { getEbayPriceAPI, estimateEbayPrice, getEbayPSA10Price, estimatePSA10Price } from '../services/ebayService';
 
 const SetDetailPage = ({ set, onBack }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('price'); // price, name, number
   const [selectedCard, setSelectedCard] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock card data - will be replaced with real API data
-  const cards = [
-    {
-      id: 'sv8-1',
-      name: 'Pikachu ex',
-      number: '1',
-      rarity: 'Double Rare',
-      image: 'https://images.pokemontcg.io/sv8/1_hires.png',
-      set: set.name,
-      prices: {
-        tcgplayer: { market: 45.99, low: 42.00, high: 52.00 },
-        ebay: { avg: 47.50, verified: true },
-        psa10: { avg: 189.99, verified: false },
-      },
-      priceHistory: [],
-    },
-    {
-      id: 'sv8-2',
-      name: 'Charizard ex',
-      number: '2',
-      rarity: 'Double Rare',
-      image: 'https://images.pokemontcg.io/sv8/2_hires.png',
-      set: set.name,
-      prices: {
-        tcgplayer: { market: 89.99, low: 85.00, high: 95.00 },
-        ebay: { avg: 91.50, verified: true },
-        psa10: { avg: 359.99, verified: false },
-      },
-      priceHistory: [],
-    },
-  ];
+  useEffect(() => {
+    const loadCards = async () => {
+      setLoading(true);
+      const rawCards = await getSetCards(set.id);
+
+      // Transform cards with pricing
+      const transformedCards = await Promise.all(rawCards.map(async card => {
+        const prices = card.tcgplayer?.prices || {};
+        const priceVariants = ['holofoil', 'reverseHolofoil', '1stEditionHolofoil', 'unlimitedHolofoil', 'normal'];
+        let priceData = null;
+
+        for (const variant of priceVariants) {
+          if (prices[variant] && prices[variant].market) {
+            priceData = prices[variant];
+            break;
+          }
+        }
+
+        if (!priceData) {
+          const firstVariant = Object.keys(prices)[0];
+          priceData = firstVariant ? prices[firstVariant] : {};
+        }
+
+        const marketPrice = priceData?.market || 0;
+        const lowPrice = priceData?.low || marketPrice * 0.8;
+        const highPrice = priceData?.high || marketPrice * 1.3;
+
+        // Fetch eBay prices (parallel)
+        let ebayData = null;
+        let psa10Data = null;
+        try {
+          [ebayData, psa10Data] = await Promise.all([
+            getEbayPriceAPI(card.name, set.name, card.number).catch(() => null),
+            getEbayPSA10Price(card.name, set.name, card.number).catch(() => null)
+          ]);
+        } catch (error) {
+          console.warn('Error fetching prices for', card.name);
+        }
+
+        const ebayAvg = ebayData?.avg || estimateEbayPrice(marketPrice);
+        const psa10Avg = psa10Data?.avg || estimatePSA10Price(marketPrice);
+
+        return {
+          id: card.id,
+          name: card.name,
+          number: card.number || 'N/A',
+          rarity: card.rarity || 'Common',
+          image: card.images?.large || card.images?.small,
+          set: set.name,
+          prices: {
+            tcgplayer: {
+              market: marketPrice,
+              low: lowPrice,
+              high: highPrice,
+            },
+            ebay: {
+              avg: parseFloat(ebayAvg.toFixed(2)),
+              verified: !!ebayData,
+            },
+            psa10: {
+              avg: parseFloat(psa10Avg.toFixed(2)),
+              verified: !!psa10Data,
+            }
+          },
+          priceHistory: [],
+        };
+      }));
+
+      setCards(transformedCards);
+      setLoading(false);
+    };
+
+    loadCards();
+  }, [set]);
 
   const filteredCards = cards
     .filter(card => card.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -125,11 +172,24 @@ const SetDetailPage = ({ set, onBack }) => {
 
         <div className="mt-4 pt-4 border-t border-adaptive">
           <p className="text-sm text-adaptive-tertiary">
-            Showing <span className="font-semibold text-adaptive-primary">{filteredCards.length}</span> of {cards.length} cards
+            {loading ? (
+              'Loading cards...'
+            ) : (
+              <>
+                Showing <span className="font-semibold text-adaptive-primary">{filteredCards.length}</span> of {cards.length} cards
+              </>
+            )}
           </p>
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <>
       {/* Cards Table */}
       <div className="glass-effect rounded-2xl overflow-hidden border border-adaptive">
         <div className="overflow-x-auto">
@@ -218,6 +278,8 @@ const SetDetailPage = ({ set, onBack }) => {
           </table>
         </div>
       </div>
+        </>
+      )}
 
       {/* Card Modal */}
       {selectedCard && (
