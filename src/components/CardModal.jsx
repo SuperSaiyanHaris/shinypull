@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
-import PriceChart from './PriceChart';
 
 // Reusable tooltip component for High price explanation
 const HighPriceTooltip = ({ className = "" }) => (
@@ -245,7 +244,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
             {/* Tabs Section */}
             <div className="modal-tabs border-b">
               <div className="flex gap-1 px-8 pt-6">
-                {['overview', 'chart', 'compare', 'details'].map((tab) => (
+                {['overview', 'compare', 'details'].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -296,16 +295,6 @@ const CardModal = ({ card, isOpen, onClose }) => {
                     <InfoCard label="Card ID" value={card.id} />
                   </div>
                 </div>
-              </div>
-            )}
-
-            {activeTab === 'chart' && (
-              <div>
-                <h3 className="text-xl font-display text-adaptive-primary mb-4">Price History</h3>
-                <PriceChart
-                  priceHistory={card.priceHistory}
-                  currentPrice={card.prices.tcgplayer.market}
-                />
               </div>
             )}
 
