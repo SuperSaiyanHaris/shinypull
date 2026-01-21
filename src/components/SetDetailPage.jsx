@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Search, SortDesc } from 'lucide-react';
+import { ArrowLeft, Search, SortDesc, Info } from 'lucide-react';
 import CardModal from './CardModal';
 import { formatPrice } from '../services/cardService';
 import { getSetCards } from '../services/dbSetService';
@@ -147,7 +147,14 @@ const SetDetailPage = ({ set, onBack }) => {
                   Low
                 </th>
                 <th className="px-6 py-4 text-right text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
-                  High
+                  <div className="flex items-center justify-end gap-1 group relative">
+                    High
+                    <Info className="w-3.5 h-3.5 text-adaptive-tertiary cursor-help" />
+                    <div className="absolute bottom-full right-0 mb-2 w-56 p-3 bg-slate-900 dark:bg-slate-800 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 font-normal normal-case tracking-normal">
+                      Highest listed price on TCGPlayer. May be inflated by individual sellers and not reflect actual market value.
+                      <div className="absolute top-full right-4 border-4 border-transparent border-t-slate-900 dark:border-t-slate-800"></div>
+                    </div>
+                  </div>
                 </th>
                 <th className="px-6 py-4 text-center text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
                   Actions
