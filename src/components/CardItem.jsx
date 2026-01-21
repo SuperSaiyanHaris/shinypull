@@ -196,7 +196,7 @@ const PriceCompareRow = ({ platform, price, highlight, verified, estimated }) =>
         </span>
       )}
       {estimated && (
-        <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700/50 text-slate-600 dark:text-slate-400 text-xs font-semibold rounded-full">
+        <span className="px-2 py-0.5 badge-estimated text-xs font-semibold rounded-full">
           ~Est
         </span>
       )}
