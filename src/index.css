@@ -96,6 +96,23 @@
     box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.4);
   }
 
+  /* Price Tooltip Styles */
+  .price-tooltip {
+    @apply bg-slate-800;
+  }
+
+  .light-mode .price-tooltip {
+    @apply bg-slate-700;
+  }
+
+  .price-tooltip-arrow {
+    border-top-color: #1e293b; /* slate-800 */
+  }
+
+  .light-mode .price-tooltip-arrow {
+    border-top-color: #334155; /* slate-700 */
+  }
+
   /* Modal Styles */
   .modal-backdrop {
     @apply bg-slate-950/80;

@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
-import { X, ExternalLink, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import PriceChart from './PriceChart';
+
+// Reusable tooltip component for High price explanation
+const HighPriceTooltip = ({ className = "" }) => (
+  <div className={`group relative inline-flex items-center ${className}`}>
+    <Info className="w-3.5 h-3.5 text-adaptive-tertiary cursor-help ml-1" />
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-3 price-tooltip text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] font-normal pointer-events-none">
+      Highest listed price on TCGPlayer. May be inflated by individual sellers and not reflect actual market value.
+      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent price-tooltip-arrow"></div>
+    </div>
+  </div>
+);
 
 const CardModal = ({ card, isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -109,7 +120,10 @@ const CardModal = ({ card, isOpen, onClose }) => {
                       </p>
                     </div>
                     <div className="p-3 modal-price-card rounded-lg border">
-                      <p className="text-xs text-adaptive-tertiary mb-1">High</p>
+                      <p className="text-xs text-adaptive-tertiary mb-1 flex items-center">
+                        High
+                        <HighPriceTooltip />
+                      </p>
                       <p className="text-lg font-semibold text-red-500">
                         {formatPrice(card.prices.tcgplayer.high)}
                       </p>
@@ -170,6 +184,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
                       label="Highest Price"
                       value={formatPrice(card.prices.tcgplayer.high)}
                       color="text-red-500"
+                      showHighTooltip
                     />
                   </div>
                 </div>
@@ -252,9 +267,12 @@ const CardModal = ({ card, isOpen, onClose }) => {
 };
 
 // Helper Components
-const StatCard = ({ label, value, trend, color = 'text-blue-500' }) => (
+const StatCard = ({ label, value, trend, color = 'text-blue-500', showHighTooltip = false }) => (
   <div className="p-5 modal-card rounded-xl border shadow-sm hover:shadow-md transition-shadow">
-    <p className="text-xs font-semibold text-adaptive-secondary mb-2 uppercase tracking-wide">{label}</p>
+    <p className="text-xs font-semibold text-adaptive-secondary mb-2 uppercase tracking-wide flex items-center">
+      {label}
+      {showHighTooltip && <HighPriceTooltip />}
+    </p>
     <p className={`text-2xl font-bold ${color}`}>{value}</p>
     {trend && (
       <p className="text-xs text-adaptive-tertiary mt-2 capitalize">Trend: {trend}</p>
