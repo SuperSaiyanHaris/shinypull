@@ -17,10 +17,6 @@ const Hero = () => {
             Pull the best prices.{' '}
             <span className="shiny-gradient">Shine brighter.</span>
           </h2>
-          <p className="text-xl text-adaptive-secondary mb-8 max-w-2xl mx-auto text-balance">
-            Track your <span className="text-amber-500 dark:text-amber-400 font-semibold">shiny</span> Pokemon card collection with real-time prices from Pokemon TCG API.
-            Search thousands of cards and never miss a sparkle.
-          </p>
         </div>
 
         {/* Feature Pills */}
