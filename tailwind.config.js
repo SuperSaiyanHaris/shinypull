@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['"DM Serif Display"', 'serif'],
-        body: ['"Work Sans"', 'sans-serif'],
+        display: ['"Poppins"', 'sans-serif'],
+        body: ['"Inter"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       colors: {

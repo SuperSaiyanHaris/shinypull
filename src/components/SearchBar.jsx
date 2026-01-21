@@ -14,12 +14,12 @@ const SearchBar = ({ value, onChange, onClear }) => {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Search for any Pokémon card..."
-          className="w-full pl-16 pr-14 py-5 bg-white/90 dark:bg-slate-900/50
-                     border-2 border-slate-300 dark:border-slate-800 rounded-2xl
+          className="w-full pl-16 pr-14 py-5 bg-white dark:bg-slate-800
+                     border-2 border-slate-300 dark:border-slate-700 rounded-2xl
                      text-lg text-slate-900 dark:text-slate-100
-                     placeholder-slate-400 dark:placeholder-slate-500
+                     placeholder-slate-500 dark:placeholder-slate-400
                      focus:outline-none focus:border-blue-500 dark:focus:border-blue-500
-                     focus:bg-white dark:focus:bg-slate-900/80
+                     focus:bg-white dark:focus:bg-slate-800
                      transition-all duration-300"
         />
 
