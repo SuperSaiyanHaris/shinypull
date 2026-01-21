@@ -7,7 +7,7 @@ import PriceChart from './PriceChart';
 const HighPriceTooltip = ({ className = "" }) => (
   <div className={`group relative inline-flex items-center ${className}`}>
     <Info className="w-3.5 h-3.5 text-adaptive-tertiary cursor-help ml-1" />
-    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-3 price-tooltip text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] font-normal pointer-events-none">
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-3 price-tooltip text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] font-normal normal-case tracking-normal pointer-events-none">
       Highest listed price on TCGPlayer. May be inflated by individual sellers and not reflect actual market value.
       <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent price-tooltip-arrow"></div>
     </div>

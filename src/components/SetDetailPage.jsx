@@ -74,7 +74,7 @@ const SetDetailPage = ({ set, onBack }) => {
       </div>
 
       {/* Controls */}
-      <div className="glass-effect rounded-2xl p-6 border border-adaptive">
+      <div className="glass-effect rounded-2xl p-6 border border-adaptive relative z-0">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
           <div className="md:col-span-8">
             <div className="relative">
@@ -129,7 +129,7 @@ const SetDetailPage = ({ set, onBack }) => {
       <div className="glass-effect rounded-2xl overflow-hidden border border-adaptive">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-adaptive-card border-b border-adaptive">
+            <thead className="bg-adaptive-card border-b border-adaptive relative z-10">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
                   Card
