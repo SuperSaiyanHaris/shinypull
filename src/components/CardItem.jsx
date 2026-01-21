@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, ExternalLink } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
-import PriceChart from './PriceChart';
 import CardModal from './CardModal';
 
 const CardItem = ({ card, index }) => {
@@ -65,16 +64,6 @@ const CardItem = ({ card, index }) => {
             Overview
           </button>
           <button
-            onClick={() => setSelectedView('chart')}
-            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              selectedView === 'chart'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-adaptive-card text-adaptive-secondary hover:bg-adaptive-hover border border-adaptive'
-            }`}
-          >
-            Chart
-          </button>
-          <button
             onClick={() => setSelectedView('compare')}
             className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedView === 'compare'
@@ -118,15 +107,6 @@ const CardItem = ({ card, index }) => {
                 </p>
               </div>
             </div>
-          </div>
-        )}
-
-        {selectedView === 'chart' && (
-          <div>
-            <PriceChart
-              priceHistory={card.priceHistory}
-              currentPrice={card.prices.tcgplayer.market}
-            />
           </div>
         )}
 
