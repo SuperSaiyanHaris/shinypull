@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Menu, Sun, Moon } from 'lucide-react';
 import logo from '../imgs/shinypulllogo.png';
 
-const Header = () => {
+const Header = ({ onLogoClick }) => {
   const [darkMode, setDarkMode] = useState(true);
 
   const toggleTheme = () => {
@@ -10,18 +10,28 @@ const Header = () => {
     document.documentElement.classList.toggle('light-mode');
   };
 
+  const handleLogoClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (onLogoClick) {
+      onLogoClick();
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 glass-effect border-b border-adaptive">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24">
-          {/* Logo - Made Bigger */}
-          <div className="flex items-center gap-4">
+          {/* Logo - Clickable */}
+          <button
+            onClick={handleLogoClick}
+            className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity"
+          >
             <img
               src={logo}
               alt="ShinyPull Logo"
               className="w-48 h-auto object-contain"
             />
-          </div>
+          </button>
 
           {/* Spacer for centered layout */}
           <div className="flex-1"></div>

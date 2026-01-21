@@ -9,6 +9,7 @@ import SetDetailPage from './components/SetDetailPage';
 import AdminSyncPanel from './components/AdminSyncPanel';
 import TermsOfUse from './components/TermsOfUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import ScrollToTop from './components/ScrollToTop';
 import { useCardSearch } from './hooks/useCardSearch';
 
 function App() {
@@ -41,6 +42,12 @@ function App() {
     setCurrentView('sets');
   };
 
+  const handleLogoClick = () => {
+    setQuery('');
+    setSelectedSet(null);
+    setCurrentView('sets');
+  };
+
   // Listen for Ctrl+Shift+A to toggle admin panel
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -55,7 +62,8 @@ function App() {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <Header onLogoClick={handleLogoClick} />
+      <ScrollToTop />
 
       <main>
         <Hero />
