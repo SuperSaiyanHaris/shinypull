@@ -170,19 +170,19 @@
   }
 
   .tab-active {
-    @apply bg-slate-800 text-adaptive-primary border-slate-700;
+    @apply bg-slate-800 text-slate-100 border-slate-700;
   }
 
   .light-mode .tab-active {
-    @apply bg-slate-100 text-adaptive-primary border-slate-200;
+    @apply bg-slate-100 text-slate-900 border-slate-200;
   }
 
   .tab-inactive {
-    @apply text-adaptive-secondary hover:text-adaptive-primary hover:bg-slate-800/50;
+    @apply text-slate-400 hover:text-slate-100 hover:bg-slate-800/50;
   }
 
   .light-mode .tab-inactive {
-    @apply text-adaptive-secondary hover:text-adaptive-primary hover:bg-slate-50;
+    @apply text-slate-600 hover:text-slate-900 hover:bg-slate-50;
   }
 }
 
