@@ -126,10 +126,10 @@ const SetDetailPage = ({ set, onBack }) => {
       ) : (
         <>
       {/* Cards Table */}
-      <div className="glass-effect rounded-2xl overflow-hidden border border-adaptive">
+      <div className="glass-effect rounded-2xl border border-adaptive">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-adaptive-card border-b border-adaptive relative z-10">
+            <thead className="bg-adaptive-card border-b border-adaptive relative overflow-visible">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
                   Card
@@ -146,13 +146,13 @@ const SetDetailPage = ({ set, onBack }) => {
                 <th className="px-6 py-4 text-right text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
                   Low
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-adaptive-secondary uppercase tracking-wider overflow-visible">
+                <th className="px-6 py-4 text-right text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
                   <div className="flex items-center justify-end gap-1 group relative">
                     High
                     <Info className="w-3.5 h-3.5 text-adaptive-tertiary cursor-help" />
-                    <div className="absolute bottom-full right-0 mb-2 w-56 p-3 price-tooltip text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] font-normal normal-case tracking-normal pointer-events-none">
+                    <div className="absolute top-full right-0 mt-2 w-56 p-3 price-tooltip text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] font-normal normal-case tracking-normal pointer-events-none">
                       Highest listed price on TCGPlayer. May be inflated by individual sellers and not reflect actual market value.
-                      <div className="absolute top-full right-4 border-4 border-transparent price-tooltip-arrow"></div>
+                      <div className="absolute bottom-full right-4 border-4 border-transparent price-tooltip-arrow-down"></div>
                     </div>
                   </div>
                 </th>

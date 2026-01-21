@@ -113,6 +113,14 @@
     border-top-color: #334155; /* slate-700 */
   }
 
+  .price-tooltip-arrow-down {
+    border-bottom-color: #1e293b; /* slate-800 */
+  }
+
+  .light-mode .price-tooltip-arrow-down {
+    border-bottom-color: #334155; /* slate-700 */
+  }
+
   /* Modal Styles */
   .modal-backdrop {
     @apply bg-slate-950/80;
