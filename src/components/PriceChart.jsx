@@ -76,9 +76,9 @@ const PriceChart = ({ priceHistory, currentPrice }) => {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 shadow-xl">
-          <p className="text-xs text-slate-400 mb-1">{payload[0].payload.displayDate}</p>
-          <p className="text-lg font-bold text-primary-400">
+        <div className="chart-tooltip border rounded-lg p-3 shadow-xl">
+          <p className="text-xs chart-tooltip-label mb-1">{payload[0].payload.displayDate}</p>
+          <p className="text-lg font-bold chart-tooltip-value">
             ${payload[0].value.toFixed(2)}
           </p>
         </div>
@@ -113,8 +113,8 @@ const PriceChart = ({ priceHistory, currentPrice }) => {
               onClick={() => setTimeRange(range)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 timeRange === range
-                  ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/30'
-                  : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-300'
+                  ? 'chart-button-active'
+                  : 'chart-button-inactive'
               }`}
             >
               {range}
@@ -191,20 +191,20 @@ const PriceChart = ({ priceHistory, currentPrice }) => {
 
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-slate-800/30 rounded-lg p-3">
-          <p className="text-xs text-slate-500 mb-1">Current</p>
-          <p className="text-sm font-semibold text-slate-200">
+        <div className="chart-stat-box rounded-lg p-3">
+          <p className="text-xs chart-stat-label mb-1">Current</p>
+          <p className="text-sm font-semibold chart-stat-value">
             ${currentPrice?.toFixed(2) || 'N/A'}
           </p>
         </div>
-        <div className="bg-slate-800/30 rounded-lg p-3">
-          <p className="text-xs text-slate-500 mb-1">High ({timeRange})</p>
+        <div className="chart-stat-box rounded-lg p-3">
+          <p className="text-xs chart-stat-label mb-1">High ({timeRange})</p>
           <p className="text-sm font-semibold text-green-400">
             ${maxPrice.toFixed(2)}
           </p>
         </div>
-        <div className="bg-slate-800/30 rounded-lg p-3">
-          <p className="text-xs text-slate-500 mb-1">Low ({timeRange})</p>
+        <div className="chart-stat-box rounded-lg p-3">
+          <p className="text-xs chart-stat-label mb-1">Low ({timeRange})</p>
           <p className="text-sm font-semibold text-red-400">
             ${minPrice.toFixed(2)}
           </p>
@@ -212,8 +212,8 @@ const PriceChart = ({ priceHistory, currentPrice }) => {
       </div>
 
       {/* Insights */}
-      <div className="p-3 bg-slate-800/20 rounded-lg border border-slate-800">
-        <p className="text-xs text-slate-400">
+      <div className="p-3 chart-insight-box rounded-lg border">
+        <p className="text-xs chart-insight-text">
           {change.isPositive ? (
             <>
               📈 Price has <span className="text-green-400 font-semibold">increased</span> by ${change.amount} ({change.percent}%) over the last {timeRange}

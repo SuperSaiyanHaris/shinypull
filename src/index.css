@@ -184,6 +184,83 @@
   .light-mode .tab-inactive {
     @apply text-slate-600 hover:text-slate-900 hover:bg-slate-50;
   }
+
+  /* Chart Styles */
+  .chart-button-active {
+    @apply bg-primary-600 text-white shadow-lg shadow-primary-600/30;
+  }
+
+  .chart-button-inactive {
+    @apply bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-300;
+  }
+
+  .light-mode .chart-button-inactive {
+    @apply bg-slate-200 text-slate-600 hover:bg-slate-300 hover:text-slate-900;
+  }
+
+  .chart-stat-box {
+    @apply bg-slate-800/30;
+  }
+
+  .light-mode .chart-stat-box {
+    @apply bg-white border border-slate-200;
+  }
+
+  .chart-stat-label {
+    @apply text-slate-500;
+  }
+
+  .light-mode .chart-stat-label {
+    @apply text-slate-600;
+  }
+
+  .chart-stat-value {
+    @apply text-slate-200;
+  }
+
+  .light-mode .chart-stat-value {
+    @apply text-slate-900;
+  }
+
+  .chart-insight-box {
+    @apply bg-slate-800/20 border-slate-800;
+  }
+
+  .light-mode .chart-insight-box {
+    @apply bg-white border-slate-200;
+  }
+
+  .chart-insight-text {
+    @apply text-slate-400;
+  }
+
+  .light-mode .chart-insight-text {
+    @apply text-slate-600;
+  }
+
+  .chart-tooltip {
+    @apply bg-slate-900 border-slate-700;
+  }
+
+  .light-mode .chart-tooltip {
+    @apply bg-white border-slate-300;
+  }
+
+  .chart-tooltip-label {
+    @apply text-slate-400;
+  }
+
+  .light-mode .chart-tooltip-label {
+    @apply text-slate-600;
+  }
+
+  .chart-tooltip-value {
+    @apply text-primary-400;
+  }
+
+  .light-mode .chart-tooltip-value {
+    @apply text-primary-600;
+  }
 }
 
 @layer utilities {
