@@ -40,17 +40,17 @@ const SetDetailPage = ({ set, onBack }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="glass-effect rounded-2xl p-8 border border-adaptive">
+      <div className="glass-effect rounded-2xl p-4 md:p-8 border border-adaptive">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-adaptive-secondary hover:text-adaptive-primary transition-colors mb-6"
+          className="flex items-center gap-2 text-adaptive-secondary hover:text-adaptive-primary transition-colors mb-4 md:mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="font-medium">Back to Sets</span>
         </button>
 
-        <div className="flex items-center gap-6">
-          <div className="w-48 h-28 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 rounded-xl flex items-center justify-center p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6">
+          <div className="w-32 h-20 md:w-48 md:h-28 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 rounded-xl flex items-center justify-center p-3 md:p-4 flex-shrink-0">
             <img
               src={set.logo}
               alt={set.name}
@@ -61,13 +61,13 @@ const SetDetailPage = ({ set, onBack }) => {
             />
           </div>
           <div className="flex-1">
-            <h1 className="text-4xl font-display text-adaptive-primary mb-2">{set.name}</h1>
-            <div className="flex items-center gap-4 text-sm text-adaptive-secondary">
+            <h1 className="text-2xl md:text-4xl font-display text-adaptive-primary mb-1 md:mb-2">{set.name}</h1>
+            <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-adaptive-secondary">
               <span>{set.series}</span>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <span>{set.totalCards} cards</span>
-              <span>•</span>
-              <span>Released {new Date(set.releaseDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+              <span className="hidden sm:inline">•</span>
+              <span className="w-full sm:w-auto">Released {new Date(set.releaseDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
             </div>
           </div>
         </div>
@@ -125,8 +125,52 @@ const SetDetailPage = ({ set, onBack }) => {
         </div>
       ) : (
         <>
-      {/* Cards Table */}
-      <div className="glass-effect rounded-2xl border border-adaptive">
+      {/* Mobile Card List - Hidden on desktop */}
+      <div className="md:hidden space-y-3">
+        {filteredCards.map((card, index) => (
+          <button
+            key={card.id}
+            onClick={() => handleViewDetails(card)}
+            className="w-full glass-effect rounded-xl border border-adaptive p-4 flex items-center gap-4 hover:bg-adaptive-hover transition-colors animate-slide-up text-left"
+            style={{ animationDelay: `${index * 20}ms` }}
+          >
+            {/* Card Image */}
+            <div className="flex-shrink-0 w-16 h-22 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 rounded-lg overflow-hidden">
+              <img
+                src={card.image}
+                alt={card.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/200x280?text=Card';
+                }}
+              />
+            </div>
+
+            {/* Card Info */}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-adaptive-primary truncate">{card.name}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs font-mono text-adaptive-tertiary">#{card.number}</span>
+                <span className="text-adaptive-tertiary">•</span>
+                <span className="text-xs text-adaptive-tertiary">{card.rarity}</span>
+              </div>
+              <p className="text-lg font-bold price-gradient mt-2">
+                {formatPrice(card.prices.tcgplayer.market)}
+              </p>
+            </div>
+
+            {/* Arrow indicator */}
+            <div className="flex-shrink-0 text-adaptive-tertiary">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Desktop Cards Table - Hidden on mobile */}
+      <div className="hidden md:block glass-effect rounded-2xl border border-adaptive">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-adaptive-card border-b border-adaptive relative overflow-visible">

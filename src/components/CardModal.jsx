@@ -50,121 +50,219 @@ const CardModal = ({ card, isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 modal-backdrop backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center md:p-4 modal-backdrop backdrop-blur-sm animate-fade-in"
       onClick={handleBackdropClick}
     >
-      <div className="relative w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl animate-slide-up modal-container border">
-        {/* Close Button */}
+      {/* Mobile: Full-screen drawer from bottom | Desktop: Centered modal */}
+      <div className="relative w-full md:max-w-5xl h-[95vh] md:h-auto md:max-h-[90vh] overflow-hidden rounded-t-2xl md:rounded-2xl shadow-2xl animate-slide-up modal-container border">
+        {/* Mobile Header Bar */}
+        <div className="md:hidden flex items-center justify-between p-4 border-b border-adaptive bg-adaptive-card sticky top-0 z-20">
+          <button
+            onClick={onClose}
+            className="flex items-center gap-2 text-adaptive-secondary"
+          >
+            <X className="w-5 h-5" />
+            <span className="font-medium">Close</span>
+          </button>
+          <span className="text-xs text-adaptive-tertiary font-mono">#{card.number}</span>
+        </div>
+
+        {/* Desktop Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 modal-button rounded-lg transition-colors group border"
+          className="hidden md:block absolute top-4 right-4 z-10 p-2 modal-button rounded-lg transition-colors group border"
           aria-label="Close modal"
         >
           <X className="w-5 h-5 text-adaptive-secondary group-hover:text-adaptive-primary" />
         </button>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-[90vh]">
-          {/* Header Section */}
-          <div className="relative p-8 modal-header border-b">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Left: Card Image */}
-              <div className="flex items-center justify-center">
-                <div className="relative aspect-[3/4] w-full max-w-md">
-                  <img
-                    src={card.image}
-                    alt={card.name}
-                    className="w-full h-full object-contain rounded-xl shadow-2xl"
-                  />
-                  {/* Rarity Badge */}
-                  <div className="absolute top-4 right-4">
-                    <span className="px-3 py-1.5 bg-yellow-400 text-slate-900 text-sm font-bold rounded-full shadow-lg">
-                      {card.rarity}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right: Card Info */}
-              <div className="flex flex-col justify-center space-y-4">
-                <h2 className="text-4xl font-display text-adaptive-primary mb-2">
-                  {card.name}
-                </h2>
-                <div className="flex items-center gap-3 text-adaptive-secondary">
-                  <span className="text-lg">{card.set}</span>
-                  <span className="text-slate-400">•</span>
-                  <span className="text-lg font-mono">{card.number}</span>
-                </div>
-
-                {/* Current Price Display */}
-                <div className="p-6 modal-price-box rounded-xl border">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-sm text-adaptive-secondary mb-1">Market Price</p>
-                      <p className="text-4xl font-bold price-gradient">
-                        {formatPrice(card.prices.tcgplayer.market)}
-                      </p>
-                      <p className="text-xs text-adaptive-tertiary mt-2">
-                        <span className="text-green-500">●</span> Live from Pokemon TCG API
-                      </p>
-                    </div>
-                    <TrendIcon className={`w-12 h-12 ${trendColor}`} />
-                  </div>
-
-                  {/* Price Range */}
-                  <div className="grid grid-cols-2 gap-3 mt-4">
-                    <div className="p-3 modal-price-card rounded-lg border">
-                      <p className="text-xs text-adaptive-tertiary mb-1">Low</p>
-                      <p className="text-lg font-semibold text-green-500">
-                        {formatPrice(card.prices.tcgplayer.low)}
-                      </p>
-                    </div>
-                    <div className="p-3 modal-price-card rounded-lg border">
-                      <p className="text-xs text-adaptive-tertiary mb-1 flex items-center">
-                        High
-                        <HighPriceTooltip />
-                      </p>
-                      <p className="text-lg font-semibold text-red-500">
-                        {formatPrice(card.prices.tcgplayer.high)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="flex gap-3">
-                  <button className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold rounded-xl transition-colors shadow-lg">
-                    Add to Collection
-                  </button>
-                  <button className="px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border">
-                    <ExternalLink className="w-5 h-5" />
-                  </button>
+        <div className="overflow-y-auto h-full md:max-h-[90vh]">
+          {/* Mobile Layout */}
+          <div className="md:hidden">
+            {/* Card Image - Smaller on mobile */}
+            <div className="p-4 flex justify-center bg-gradient-to-b from-slate-800/50 to-transparent">
+              <div className="relative w-40 aspect-[3/4]">
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  className="w-full h-full object-contain rounded-lg shadow-xl"
+                />
+                <div className="absolute top-2 right-2">
+                  <span className="px-2 py-1 bg-yellow-400 text-slate-900 text-xs font-bold rounded-full shadow">
+                    {card.rarity}
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Tabs Section */}
-          <div className="modal-tabs border-b">
-            <div className="flex gap-1 px-8 pt-6">
-              {['overview', 'chart', 'compare', 'details'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-6 py-3 rounded-t-lg font-medium capitalize transition-all ${
-                    activeTab === tab
-                      ? 'tab-active border-t border-x'
-                      : 'tab-inactive'
-                  }`}
-                >
-                  {tab}
+            {/* Card Info */}
+            <div className="p-4 space-y-4">
+              <div>
+                <h2 className="text-2xl font-display text-adaptive-primary">{card.name}</h2>
+                <p className="text-sm text-adaptive-secondary mt-1">{card.set}</p>
+              </div>
+
+              {/* Price Box */}
+              <div className="p-4 modal-price-box rounded-xl border">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-adaptive-secondary">Market Price</p>
+                    <p className="text-3xl font-bold price-gradient">
+                      {formatPrice(card.prices.tcgplayer.market)}
+                    </p>
+                  </div>
+                  <TrendIcon className={`w-8 h-8 ${trendColor}`} />
+                </div>
+
+                {/* Price Range Row */}
+                <div className="flex gap-3 mt-3 pt-3 border-t border-adaptive">
+                  <div className="flex-1">
+                    <p className="text-xs text-adaptive-tertiary">Low</p>
+                    <p className="text-base font-semibold text-green-500">
+                      {formatPrice(card.prices.tcgplayer.low)}
+                    </p>
+                  </div>
+                  <div className="flex-1 text-right">
+                    <p className="text-xs text-adaptive-tertiary">High</p>
+                    <p className="text-base font-semibold text-red-500">
+                      {formatPrice(card.prices.tcgplayer.high)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 modal-card rounded-lg border">
+                  <p className="text-xs text-adaptive-tertiary">Number</p>
+                  <p className="text-sm font-bold text-adaptive-primary font-mono">{card.number}</p>
+                </div>
+                <div className="p-3 modal-card rounded-lg border">
+                  <p className="text-xs text-adaptive-tertiary">Rarity</p>
+                  <p className="text-sm font-bold text-adaptive-primary">{card.rarity}</p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-lg">
+                  Add to Collection
                 </button>
-              ))}
+                <button className="px-4 py-3 modal-button rounded-xl border">
+                  <ExternalLink className="w-5 h-5 text-adaptive-secondary" />
+                </button>
+              </div>
+
+              {/* Source info */}
+              <p className="text-xs text-adaptive-tertiary text-center">
+                <span className="text-green-500">●</span> Live prices from Pokemon TCG API
+              </p>
             </div>
           </div>
 
-          {/* Tab Content */}
-          <div className="p-8 modal-content">
+          {/* Desktop Layout */}
+          <div className="hidden md:block">
+            {/* Header Section */}
+            <div className="relative p-8 modal-header border-b">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Left: Card Image */}
+                <div className="flex items-center justify-center">
+                  <div className="relative aspect-[3/4] w-full max-w-md">
+                    <img
+                      src={card.image}
+                      alt={card.name}
+                      className="w-full h-full object-contain rounded-xl shadow-2xl"
+                    />
+                    {/* Rarity Badge */}
+                    <div className="absolute top-4 right-4">
+                      <span className="px-3 py-1.5 bg-yellow-400 text-slate-900 text-sm font-bold rounded-full shadow-lg">
+                        {card.rarity}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Card Info */}
+                <div className="flex flex-col justify-center space-y-4">
+                  <h2 className="text-4xl font-display text-adaptive-primary mb-2">
+                    {card.name}
+                  </h2>
+                  <div className="flex items-center gap-3 text-adaptive-secondary">
+                    <span className="text-lg">{card.set}</span>
+                    <span className="text-slate-400">•</span>
+                    <span className="text-lg font-mono">{card.number}</span>
+                  </div>
+
+                  {/* Current Price Display */}
+                  <div className="p-6 modal-price-box rounded-xl border">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <p className="text-sm text-adaptive-secondary mb-1">Market Price</p>
+                        <p className="text-4xl font-bold price-gradient">
+                          {formatPrice(card.prices.tcgplayer.market)}
+                        </p>
+                        <p className="text-xs text-adaptive-tertiary mt-2">
+                          <span className="text-green-500">●</span> Live from Pokemon TCG API
+                        </p>
+                      </div>
+                      <TrendIcon className={`w-12 h-12 ${trendColor}`} />
+                    </div>
+
+                    {/* Price Range */}
+                    <div className="grid grid-cols-2 gap-3 mt-4">
+                      <div className="p-3 modal-price-card rounded-lg border">
+                        <p className="text-xs text-adaptive-tertiary mb-1">Low</p>
+                        <p className="text-lg font-semibold text-green-500">
+                          {formatPrice(card.prices.tcgplayer.low)}
+                        </p>
+                      </div>
+                      <div className="p-3 modal-price-card rounded-lg border">
+                        <p className="text-xs text-adaptive-tertiary mb-1 flex items-center">
+                          High
+                          <HighPriceTooltip />
+                        </p>
+                        <p className="text-lg font-semibold text-red-500">
+                          {formatPrice(card.prices.tcgplayer.high)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="flex gap-3">
+                    <button className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold rounded-xl transition-colors shadow-lg">
+                      Add to Collection
+                    </button>
+                    <button className="px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border">
+                      <ExternalLink className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabs Section */}
+            <div className="modal-tabs border-b">
+              <div className="flex gap-1 px-8 pt-6">
+                {['overview', 'chart', 'compare', 'details'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-6 py-3 rounded-t-lg font-medium capitalize transition-all ${
+                      activeTab === tab
+                        ? 'tab-active border-t border-x'
+                        : 'tab-inactive'
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="p-8 modal-content">
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 <div>
@@ -259,7 +357,9 @@ const CardModal = ({ card, isOpen, onClose }) => {
                 </div>
               </div>
             )}
+            </div>
           </div>
+          {/* End Desktop Layout */}
         </div>
       </div>
     </div>
