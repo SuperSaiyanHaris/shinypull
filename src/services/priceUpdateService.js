@@ -4,12 +4,12 @@ import { getEbayPriceAPI, getEbayPSA10Price, estimateEbayPrice, estimatePSA10Pri
 /**
  * Update eBay and PSA10 prices for a specific card
  */
-export const updateCardPrices = async (cardId, cardName, setName, cardNumber) => {
+export const updateCardPrices = async (cardId, cardName, setName, cardNumber, rarity = '') => {
   try {
     // Fetch eBay prices in parallel
     const [ebayData, psa10Data] = await Promise.all([
-      getEbayPriceAPI(cardName, setName, cardNumber).catch(() => null),
-      getEbayPSA10Price(cardName, setName, cardNumber).catch(() => null)
+      getEbayPriceAPI(cardName, setName, cardNumber, rarity).catch(() => null),
+      getEbayPSA10Price(cardName, setName, cardNumber, rarity).catch(() => null)
     ]);
 
     // Get current TCGPlayer market price for estimation fallback
@@ -62,7 +62,7 @@ export const updateSetPrices = async (setId, setName) => {
     // Get all cards in the set
     const { data: cards, error: cardsError } = await supabase
       .from('cards')
-      .select('id, name, number')
+      .select('id, name, number, rarity')
       .eq('set_id', setId);
 
     if (cardsError) {
@@ -76,7 +76,7 @@ export const updateSetPrices = async (setId, setName) => {
 
     // Update prices for each card with delay to avoid rate limiting
     for (const card of cards) {
-      const result = await updateCardPrices(card.id, card.name, setName, card.number);
+      const result = await updateCardPrices(card.id, card.name, setName, card.number, card.rarity);
 
       if (result.success) {
         successCount++;
@@ -197,6 +197,7 @@ export const updateStalePrices = async (hoursThreshold = 24) => {
           id,
           name,
           number,
+          rarity,
           sets (
             name
           )
@@ -217,7 +218,7 @@ export const updateStalePrices = async (hoursThreshold = 24) => {
       const card = price.cards;
       const setName = card.sets?.name || '';
 
-      const result = await updateCardPrices(card.id, card.name, setName, card.number);
+      const result = await updateCardPrices(card.id, card.name, setName, card.number, card.rarity);
 
       if (result.success) {
         successCount++;

@@ -24,7 +24,7 @@ async function rateLimit() {
 /**
  * Fetch eBay active listing prices for a raw card
  */
-export async function getEbayPriceAPI(cardName, cardSet = '', cardNumber = '') {
+export async function getEbayPriceAPI(cardName, cardSet = '', cardNumber = '', rarity = '') {
   const cacheKey = `ebay_${cardName}_${cardNumber}`;
   const cached = EBAY_CACHE.get(cacheKey);
 
@@ -41,7 +41,9 @@ export async function getEbayPriceAPI(cardName, cardSet = '', cardNumber = '') {
 
     const params = new URLSearchParams({
       cardName,
-      ...(cardNumber && { cardNumber })
+      ...(cardNumber && { cardNumber }),
+      ...(rarity && { rarity }),
+      ...(cardSet && { setName: cardSet })
     });
 
     const url = `${apiBase}/api/ebay-prices?${params}`;
@@ -81,7 +83,7 @@ export async function getEbayPriceAPI(cardName, cardSet = '', cardNumber = '') {
 /**
  * Fetch eBay active listing prices for PSA 10 graded cards
  */
-export async function getEbayPSA10Price(cardName, cardSet = '', cardNumber = '') {
+export async function getEbayPSA10Price(cardName, cardSet = '', cardNumber = '', rarity = '') {
   const cacheKey = `psa10_${cardName}_${cardNumber}`;
   const cached = EBAY_CACHE.get(cacheKey);
 
@@ -99,7 +101,9 @@ export async function getEbayPSA10Price(cardName, cardSet = '', cardNumber = '')
     const params = new URLSearchParams({
       cardName,
       graded: 'psa10',
-      ...(cardNumber && { cardNumber })
+      ...(cardNumber && { cardNumber }),
+      ...(rarity && { rarity }),
+      ...(cardSet && { setName: cardSet })
     });
 
     const url = `${apiBase}/api/ebay-prices?${params}`;

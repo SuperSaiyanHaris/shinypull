@@ -39,20 +39,43 @@ async function getAccessToken(clientId, clientSecret) {
 
 /**
  * Build eBay search terms for a Pokemon card
+ * Pattern: "Pokemon [CardName] [CardNumber] [Rarity] English [SetName] [PSA 10 if graded]"
  */
-function buildSearchTerms(cardName, cardNumber, graded) {
-  const parts = [cardName];
+function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
+  const parts = ['Pokemon', cardName];
 
-  if (graded === 'psa10') {
-    parts.push('PSA 10');
-  } else if (cardNumber) {
-    // Add card number for raw cards to narrow results
-    const num = cardNumber.split('/')[0];
-    parts.push(num);
+  // Add card number if available
+  if (cardNumber) {
+    parts.push(cardNumber);
   }
 
-  parts.push('pokemon card');
+  // Add rarity if available
+  if (rarity) {
+    parts.push(rarity);
+  }
+
+  // Add English for specificity
+  parts.push('English');
+
+  // Add set name if available
+  if (setName) {
+    parts.push(setName);
+  }
+
+  // Add PSA 10 for graded cards
+  if (graded === 'psa10') {
+    parts.push('PSA 10');
+  }
+
   return parts.join(' ');
+}
+
+/**
+ * Check if a listing title contains PSA 10 indicators
+ */
+function isPSA10Listing(title) {
+  const lowerTitle = title.toLowerCase();
+  return lowerTitle.includes('psa 10') || lowerTitle.includes('psa10');
 }
 
 export default async function handler(req, res) {
@@ -70,7 +93,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { cardName, cardNumber, graded } = req.query;
+    const { cardName, cardNumber, rarity, setName, graded } = req.query;
 
     if (!cardName) {
       return res.status(400).json({ error: 'cardName is required' });
@@ -88,7 +111,7 @@ export default async function handler(req, res) {
     const accessToken = await getAccessToken(clientId, clientSecret);
 
     // Build search terms
-    const searchTerms = buildSearchTerms(cardName, cardNumber, graded);
+    const searchTerms = buildSearchTerms(cardName, cardNumber, rarity, setName, graded);
     const encodedQuery = encodeURIComponent(searchTerms);
 
     // eBay Browse API endpoint
@@ -119,7 +142,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ found: false, searchTerms });
     }
 
-    // Extract prices from active listings
+    // Extract prices from active listings and filter based on search type
     const listings = items
       .map(item => ({
         price: parseFloat(item.price?.value || 0),
@@ -127,7 +150,19 @@ export default async function handler(req, res) {
         url: item.itemWebUrl || '',
         condition: item.condition || 'Unknown'
       }))
-      .filter(item => item.price > 0);
+      .filter(item => {
+        if (item.price <= 0) return false;
+        
+        const hasPSA = isPSA10Listing(item.title);
+        
+        // For PSA 10 searches, ONLY include listings with PSA 10 in title
+        if (graded === 'psa10') {
+          return hasPSA;
+        }
+        
+        // For raw card searches, EXCLUDE listings with PSA 10 in title
+        return !hasPSA;
+      });
 
     if (listings.length === 0) {
       console.log(`⚠️ eBay returned items but no valid prices`);

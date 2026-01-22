@@ -68,8 +68,8 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
       const fetchPrices = async () => {
         try {
           const [ebayData, psa10Data] = await Promise.all([
-            !hasEbayData ? getEbayPriceAPI(card.name, card.set || '', card.number || '') : Promise.resolve(null),
-            !hasPsa10Data ? getEbayPSA10Price(card.name, card.set || '', card.number || '') : Promise.resolve(null)
+            !hasEbayData ? getEbayPriceAPI(card.name, card.set || '', card.number || '', card.rarity || '') : Promise.resolve(null),
+            !hasPsa10Data ? getEbayPSA10Price(card.name, card.set || '', card.number || '', card.rarity || '') : Promise.resolve(null)
           ]);
 
           if (ebayData) {
