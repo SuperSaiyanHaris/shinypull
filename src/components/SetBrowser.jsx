@@ -15,6 +15,8 @@ const SetBrowser = ({ onSetClick }) => {
       try {
         setLoading(true);
         console.log('[SetBrowser] Loading sets...');
+        // Small delay to avoid connection pool contention on refresh
+        await new Promise(resolve => setTimeout(resolve, 100));
         const allSets = await getAllSets();
         console.log('[SetBrowser] Loaded', allSets?.length || 0, 'sets');
         setSets(allSets || []);
