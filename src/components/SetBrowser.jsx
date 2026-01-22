@@ -12,10 +12,16 @@ const SetBrowser = ({ onSetClick }) => {
 
   useEffect(() => {
     const loadSets = async () => {
-      setLoading(true);
-      const allSets = await getAllSets();
-      setSets(allSets);
-      setLoading(false);
+      try {
+        setLoading(true);
+        const allSets = await getAllSets();
+        setSets(allSets || []);
+      } catch (error) {
+        console.error('Error loading sets:', error);
+        setSets([]);
+      } finally {
+        setLoading(false);
+      }
     };
     loadSets();
   }, []);

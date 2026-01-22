@@ -7,10 +7,17 @@ import { getAllSets as getApiSets, getSetCards as getApiCards } from './setServi
  */
 export const getAllSets = async () => {
   try {
-    const { data, error } = await supabase
+    // Add timeout to prevent infinite loading
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Database timeout')), 10000)
+    );
+
+    const queryPromise = supabase
       .from('sets')
       .select('*')
       .order('release_date', { ascending: false });
+
+    const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
     if (error) {
       console.warn('Database error, falling back to API:', error.message);
