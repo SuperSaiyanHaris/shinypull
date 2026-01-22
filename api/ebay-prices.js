@@ -76,6 +76,7 @@ function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
 
   const searchString = parts.join(' ');
   console.log(`🔍 Built search string: "${searchString}"`);
+  console.log(`📋 Strategy: Name + Number + Set = Unique identifier (sellers may abbreviate set but eBay matches)`);
   return searchString;
 }
 
@@ -132,6 +133,7 @@ export default async function handler(req, res) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodedQuery}&category_ids=183454&limit=50&sort=price`;
 
     console.log(`🔍 Fetching eBay active listings for: ${searchTerms}`);
+    console.log(`🌐 Encoded query: ${encodedQuery}`);
 
     const response = await fetch(url, {
       headers: {
