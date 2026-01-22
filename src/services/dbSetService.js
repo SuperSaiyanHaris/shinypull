@@ -14,18 +14,30 @@ const SETS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 export const getAllSets = async () => {
   // Return cached sets if fresh
   if (setsCache.data && Date.now() - setsCache.timestamp < SETS_CACHE_TTL) {
+    console.log('[dbSetService] Returning cached sets');
     return setsCache.data;
   }
 
-  const { data, error } = await supabase
+  console.log('[dbSetService] Fetching sets from database...');
+  
+  // Diagnostic timeout
+  const timeoutPromise = new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('Sets query timeout after 10s')), 10000)
+  );
+  
+  const queryPromise = supabase
     .from('sets')
     .select('*')
     .order('release_date', { ascending: false });
+  
+  const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
   if (error) {
-    console.error('Error fetching sets:', error);
+    console.error('[dbSetService] Error fetching sets:', error);
     throw error;
   }
+  
+  console.log('[dbSetService] Query returned', data?.length || 0, 'sets');
 
   // Transform to match app format
   const transformed = data.map(set => ({

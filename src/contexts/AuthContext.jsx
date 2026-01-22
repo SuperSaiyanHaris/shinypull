@@ -38,11 +38,19 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async (userId) => {
     try {
       console.log('[Auth] Fetching profile for:', userId);
-      const { data, error } = await supabase
+      
+      // Diagnostic timeout to detect hangs
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Profile query timeout after 10s')), 10000)
+      );
+      
+      const queryPromise = supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
+      
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
       if (error) {
         // PGRST116 = no rows returned, which is fine (profile doesn't exist yet)
