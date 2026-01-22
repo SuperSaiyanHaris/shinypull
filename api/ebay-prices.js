@@ -76,7 +76,6 @@ function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
 
   const searchString = parts.join(' ');
   console.log(`🔍 Built search string: "${searchString}"`);
-  console.log(`📋 Strategy: Name + Number + Set = Unique identifier (sellers may abbreviate set but eBay matches)`);
   return searchString;
 }
 
