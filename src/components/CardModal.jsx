@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info, ChevronDown, ChevronUp, Award, Loader2 } from 'lucide-react';
+import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info, Award, Loader2 } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import { getEbayPriceAPI, getEbayPSA10Price, estimateEbayPrice, estimatePSA10Price } from '../services/ebayService';
 import AddToCollectionButton from './AddToCollectionButton';
-import PSA10Dropdown from './PSA10Dropdown';
 
 // Reusable tooltip component for High price explanation
 const HighPriceTooltip = ({ className = "" }) => (
@@ -50,9 +49,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   useEffect(() => {
     if (!isOpen || !card) return;
 
-    // Check if we already have verified eBay data with listings
-    const hasEbayData = card.prices?.ebay?.verified && card.prices?.ebay?.recentListings?.length > 0;
-    const hasPsa10Data = card.prices?.psa10?.verified && card.prices?.psa10?.recentListings?.length > 0;
+    // Check if we already have verified eBay data
+    const hasEbayData = card.prices?.ebay?.verified;
+    const hasPsa10Data = card.prices?.psa10?.verified;
 
     // If we already have good data, use it
     if (hasEbayData) {
@@ -69,15 +68,18 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
       const fetchPrices = async () => {
         try {
           const [ebayData, psa10Data] = await Promise.all([
-            !hasEbayData ? getEbayPriceAPI(card.name, card.set || '', card.number || '', card.rarity || '') : Promise.resolve(null),
-            !hasPsa10Data ? getEbayPSA10Price(card.name, card.set || '', card.number || '', card.rarity || '') : Promise.resolve(null)
+            !hasEbayData ? getEbayPriceAPI(card.name, card.set || '', card.number || '') : Promise.resolve(null),
+            !hasPsa10Data ? getEbayPSA10Price(card.name, card.set || '', card.number || '') : Promise.resolve(null)
           ]);
 
           if (ebayData) {
             setEbayPrices({
               avg: ebayData.avg,
+              low: ebayData.low,
+              high: ebayData.high,
+              count: ebayData.count,
               verified: true,
-              recentListings: ebayData.recentListings || [],
+              cheapestListing: ebayData.cheapestListing,
               searchTerms: ebayData.searchTerms || '',
               searchUrl: ebayData.searchUrl || ''
             });
@@ -87,7 +89,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
             setEbayPrices({
               avg: estimateEbayPrice(marketPrice),
               verified: false,
-              recentListings: [],
               searchTerms: '',
               searchUrl: ''
             });
@@ -96,8 +97,11 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
           if (psa10Data) {
             setPsa10Prices({
               avg: psa10Data.avg,
+              low: psa10Data.low,
+              high: psa10Data.high,
+              count: psa10Data.count,
               verified: true,
-              recentListings: psa10Data.recentListings || [],
+              cheapestListing: psa10Data.cheapestListing,
               searchTerms: psa10Data.searchTerms || '',
               searchUrl: psa10Data.searchUrl || ''
             });
@@ -107,7 +111,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
             setPsa10Prices({
               avg: estimatePSA10Price(marketPrice),
               verified: false,
-              recentListings: [],
               searchTerms: '',
               searchUrl: ''
             });
@@ -136,8 +139,8 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   if (!isOpen || !card) return null;
 
   // Use fetched prices or fall back to card's original prices
-  const displayEbayPrices = ebayPrices || card.prices?.ebay || { avg: 0, verified: false, recentListings: [], searchTerms: '', searchUrl: '' };
-  const displayPsa10Prices = psa10Prices || card.prices?.psa10 || { avg: 0, verified: false, recentListings: [], searchTerms: '', searchUrl: '' };
+  const displayEbayPrices = ebayPrices || card.prices?.ebay || { avg: 0, verified: false, searchTerms: '', searchUrl: '' };
+  const displayPsa10Prices = psa10Prices || card.prices?.psa10 || { avg: 0, verified: false, searchTerms: '', searchUrl: '' };
 
   const trend = getPriceTrend(card.priceHistory);
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
@@ -418,8 +421,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                     <>
                       <EbayPriceRow
                         ebayData={displayEbayPrices}
+                        label="eBay Raw Card"
                       />
-                      <PSA10Dropdown
+                      <PSA10PriceRow
                         psa10Data={displayPsa10Prices}
                       />
                     </>
@@ -434,7 +438,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   </div>
                 )}
                 <p className="text-xs text-adaptive-tertiary mt-4 text-center">
-                  Verified prices from Pokemon TCG API. eBay prices from recent sold listings.
+                  Verified prices from Pokemon TCG API. eBay prices from active listings.
                 </p>
               </div>
             )}
@@ -510,20 +514,20 @@ const PriceCompareRow = ({ platform, price, verified, estimated }) => (
   </div>
 );
 
-const EbayPriceRow = ({ ebayData }) => {
+const EbayPriceRow = ({ ebayData, label = "eBay" }) => {
   if (!ebayData) return null;
 
-  const { avg, verified, searchUrl } = ebayData;
+  const { avg, low, high, count, verified, searchUrl, cheapestListing } = ebayData;
 
   return (
     <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border group">
       <div className="flex items-center gap-3">
         <span className="text-adaptive-primary font-semibold">
-          {verified ? 'eBay (Sold)' : 'eBay (estimated)'}
+          {verified ? `${label} (Active)` : `${label} (estimated)`}
         </span>
         {verified ? (
           <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
-            ✓ Verified
+            ✓ {count || 0} listings
           </span>
         ) : (
           <span className="px-2 py-0.5 badge-estimated text-xs font-bold rounded-full">
@@ -532,9 +536,15 @@ const EbayPriceRow = ({ ebayData }) => {
         )}
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-          {formatPrice(avg)}
-        </span>
+        {verified && low !== undefined && high !== undefined ? (
+          <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+            {formatPrice(low)} - {formatPrice(high)}
+          </span>
+        ) : (
+          <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+            {formatPrice(avg)}
+          </span>
+        )}
         {verified && searchUrl && (
           <a
             href={searchUrl}
@@ -542,6 +552,56 @@ const EbayPriceRow = ({ ebayData }) => {
             rel="noopener noreferrer"
             className="p-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
             title="View on eBay"
+          >
+            <ExternalLink className="w-4 h-4 text-blue-500" />
+          </a>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const PSA10PriceRow = ({ psa10Data }) => {
+  if (!psa10Data) return null;
+
+  const { avg, low, high, count, verified, searchUrl } = psa10Data;
+
+  return (
+    <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border group">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <Award className="w-5 h-5 text-yellow-500" />
+          <span className="text-adaptive-primary font-semibold">
+            {verified ? 'PSA 10 (Active)' : 'PSA 10 (estimated)'}
+          </span>
+        </div>
+        {verified ? (
+          <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
+            ✓ {count || 0} listings
+          </span>
+        ) : (
+          <span className="px-2 py-0.5 badge-estimated text-xs font-bold rounded-full">
+            ~Estimated
+          </span>
+        )}
+      </div>
+      <div className="flex items-center gap-3">
+        {verified && low !== undefined && high !== undefined ? (
+          <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+            {formatPrice(low)} - {formatPrice(high)}
+          </span>
+        ) : (
+          <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+            {formatPrice(avg)}
+          </span>
+        )}
+        {verified && searchUrl && (
+          <a
+            href={searchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
+            title="View PSA 10 on eBay"
           >
             <ExternalLink className="w-4 h-4 text-blue-500" />
           </a>

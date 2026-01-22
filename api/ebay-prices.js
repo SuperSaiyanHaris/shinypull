@@ -1,99 +1,66 @@
 // Vercel Serverless Function - eBay Price Fetcher
-// This acts as a backend proxy to avoid CORS issues
+// Uses eBay Browse API for active listings (Finding API was decommissioned Feb 2025)
+
+// Cache for OAuth tokens (reuse while valid)
+let cachedToken = null;
+let tokenExpiry = 0;
 
 /**
- * Build eBay search terms for a Pokemon card
- * Keep it simple - card name + number is usually enough
- * eBay uses AND logic so fewer terms = more results
- * Example: "Mega Charizard X ex 125"
- * For PSA 10: "Mega Charizard X ex PSA 10"
+ * Get OAuth access token using client credentials grant
  */
-function buildEbaySearchTerms(cardName, cardSet, cardNumber, rarity, graded) {
-  const parts = [];
-
-  // Add card name (most important)
-  parts.push(cardName);
-
-  // For PSA 10, don't include number - sellers format it differently
-  // Just search for card name + PSA 10
-  if (graded === 'psa10') {
-    parts.push('PSA 10');
-  } else {
-    // For raw cards, add number to narrow results
-    if (cardNumber) {
-      const num = cardNumber.split('/')[0];
-      parts.push(num);
-    }
+async function getAccessToken(clientId, clientSecret) {
+  // Return cached token if still valid (with 5 min buffer)
+  if (cachedToken && Date.now() < tokenExpiry - 300000) {
+    return cachedToken;
   }
 
-  // Add "pokemon" to filter out non-Pokemon results
-  parts.push('pokemon');
+  const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
-  return parts.join(' ');
+  const response = await fetch('https://api.ebay.com/identity/v1/oauth2/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${credentials}`
+    },
+    body: 'grant_type=client_credentials&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope'
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`OAuth failed: ${response.status} - ${error}`);
+  }
+
+  const data = await response.json();
+  cachedToken = data.access_token;
+  tokenExpiry = Date.now() + (data.expires_in * 1000);
+
+  return cachedToken;
 }
 
 /**
- * Build a display title showing the eBay search format
- * This is what users see in the UI
+ * Build eBay search terms for a Pokemon card
  */
-function buildDisplayTitle(cardName, cardSet, cardNumber, rarity, graded) {
-  const parts = [];
+function buildSearchTerms(cardName, cardNumber, graded) {
+  const parts = [cardName];
 
-  // Year
-  const year = new Date().getFullYear();
-  parts.push(year);
-
-  parts.push('POKEMON');
-
-  // Set name abbreviated
-  if (cardSet) {
-    let setCode = cardSet
-      .replace(/Scarlet\s*&?\s*Violet/i, 'SV')
-      .replace(/Sword\s*&?\s*Shield/i, 'SWSH')
-      .replace(/Sun\s*&?\s*Moon/i, 'SM')
-      .replace(/—/g, '-')
-      .replace(/[^\w\s-]/g, '')
-      .toUpperCase()
-      .trim();
-    if (setCode.length > 25) {
-      setCode = setCode.split(/\s+/).slice(0, 3).join(' ');
-    }
-    parts.push(setCode);
-  }
-
-  // Rarity abbreviation
-  if (rarity) {
-    const r = rarity.toUpperCase();
-    if (r.includes('SPECIAL ILLUSTRATION')) parts.push('SIR');
-    else if (r.includes('ILLUSTRATION')) parts.push('IR');
-    else if (r.includes('ULTRA')) parts.push('UR');
-    else if (r.includes('SECRET')) parts.push('SR');
-    else if (r.includes('FULL ART')) parts.push('FA');
-  }
-
-  // Card number
-  if (cardNumber) {
-    parts.push(`#${cardNumber}`);
-  }
-
-  // Card name
-  parts.push(cardName.toUpperCase());
-
-  // PSA 10
   if (graded === 'psa10') {
     parts.push('PSA 10');
+  } else if (cardNumber) {
+    // Add card number for raw cards to narrow results
+    const num = cardNumber.split('/')[0];
+    parts.push(num);
   }
 
+  parts.push('pokemon card');
   return parts.join(' ');
 }
 
 export default async function handler(req, res) {
-  // Enable CORS for your frontend
+  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -103,117 +70,101 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { cardName, cardSet, cardNumber, rarity, graded } = req.query;
+    const { cardName, cardNumber, graded } = req.query;
 
     if (!cardName) {
       return res.status(400).json({ error: 'cardName is required' });
     }
 
-    // Get eBay credentials from environment variables
-    const APP_ID = process.env.EBAY_APP_ID;
+    // Get eBay credentials
+    const clientId = process.env.EBAY_APP_ID;
+    const clientSecret = process.env.EBAY_CERT_ID;
 
-    if (!APP_ID) {
-      return res.status(500).json({ error: 'eBay API not configured' });
+    if (!clientId || !clientSecret) {
+      return res.status(500).json({ error: 'eBay API credentials not configured' });
     }
 
-    // Build search terms - simpler format that matches actual eBay listings
-    const searchTerms = buildEbaySearchTerms(cardName, cardSet, cardNumber, rarity, graded);
+    // Get OAuth token
+    const accessToken = await getAccessToken(clientId, clientSecret);
 
-    // Build display title for UI (shows the formatted search style)
-    const displayTitle = buildDisplayTitle(cardName, cardSet, cardNumber, rarity, graded);
+    // Build search terms
+    const searchTerms = buildSearchTerms(cardName, cardNumber, graded);
+    const encodedQuery = encodeURIComponent(searchTerms);
 
-    const keywords = encodeURIComponent(searchTerms);
+    // eBay Browse API endpoint
+    // Category 183454 = Pokemon TCG
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodedQuery}&category_ids=183454&limit=50&sort=price`;
 
-    // eBay Production API endpoint
-    const baseUrl = 'https://svcs.ebay.com/services/search/FindingService/v1';
+    console.log(`🔍 Fetching eBay active listings for: ${searchTerms}`);
 
-    const url = `${baseUrl}` +
-      `?OPERATION-NAME=findCompletedItems` +
-      `&SERVICE-VERSION=1.0.0` +
-      `&SECURITY-APPNAME=${APP_ID}` +
-      `&RESPONSE-DATA-FORMAT=JSON` +
-      `&REST-PAYLOAD` +
-      `&keywords=${keywords}` +
-      `&categoryId=183454` + // Pokemon TCG category
-      `&itemFilter(0).name=SoldItemsOnly` +
-      `&itemFilter(0).value=true` +
-      `&itemFilter(1).name=MinPrice` +
-      `&itemFilter(1).value=0.50` +
-      `&sortOrder=EndTimeSoonest` +
-      `&paginationInput.entriesPerPage=100`;
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
+        'Content-Type': 'application/json'
+      }
+    });
 
-    console.log(`🔍 Fetching eBay prices for: ${searchTerms}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('eBay API error:', response.status, errorText);
+      return res.status(200).json({ found: false, searchTerms, error: `API error: ${response.status}` });
+    }
 
-    const response = await fetch(url);
     const data = await response.json();
+    const items = data.itemSummaries || [];
 
-    const searchResult = data.findCompletedItemsResponse?.[0]?.searchResult?.[0];
-    const resultCount = parseInt(searchResult?.['@count'] || '0');
-
-    if (!searchResult || resultCount === 0) {
-      console.log(`❌ No eBay results found for: ${searchTerms}`);
+    if (items.length === 0) {
+      console.log(`❌ No eBay listings found for: ${searchTerms}`);
       return res.status(200).json({ found: false, searchTerms });
     }
 
-    const items = searchResult.item || [];
-
-    // Extract price and listing details from each item
+    // Extract prices from active listings
     const listings = items
-      .map(item => {
-        const price = parseFloat(item.sellingStatus?.[0]?.currentPrice?.[0]?.__value__ || 0);
-        const title = item.title?.[0] || '';
-        const itemId = item.itemId?.[0] || '';
-        const viewItemURL = item.viewItemURL?.[0] || '';
-        const endTime = item.listingInfo?.[0]?.endTime?.[0] || '';
-
-        return {
-          price,
-          title,
-          itemId,
-          url: viewItemURL,
-          endTime: endTime ? new Date(endTime).toISOString() : null
-        };
-      })
+      .map(item => ({
+        price: parseFloat(item.price?.value || 0),
+        title: item.title || '',
+        url: item.itemWebUrl || '',
+        condition: item.condition || 'Unknown'
+      }))
       .filter(item => item.price > 0);
 
     if (listings.length === 0) {
-      console.log(`⚠️ eBay returned ${resultCount} items but no valid prices`);
+      console.log(`⚠️ eBay returned items but no valid prices`);
       return res.status(200).json({ found: false, searchTerms });
     }
 
     // Calculate statistics
-    const prices = listings.map(l => l.price);
-    prices.sort((a, b) => a - b);
+    const prices = listings.map(l => l.price).sort((a, b) => a - b);
     const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+    const low = prices[0];
+    const high = prices[prices.length - 1];
     const median = prices[Math.floor(prices.length / 2)];
 
-    // Get the 3 most recent sold listings with their URLs
-    const recentListings = listings
-      .sort((a, b) => new Date(b.endTime) - new Date(a.endTime))
-      .slice(0, 3)
-      .map(l => ({
-        price: l.price,
-        title: l.title,
-        url: l.url,
-        date: l.endTime
-      }));
+    // Get cheapest listing for "Buy Now" link
+    const cheapestListing = listings[0];
 
     // Build eBay search URL for users to view more
-    const ebaySearchUrl = `https://www.ebay.com/sch/i.html?_nkw=${keywords}&LH_Sold=1&LH_Complete=1&_sacat=183454`;
+    const ebaySearchUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454`;
 
     const result = {
       found: true,
       avg: parseFloat(avg.toFixed(2)),
+      low: parseFloat(low.toFixed(2)),
+      high: parseFloat(high.toFixed(2)),
       median: parseFloat(median.toFixed(2)),
-      recent: prices.slice(-5),
-      recentListings,
       count: listings.length,
-      searchTerms: displayTitle, // Show formatted title in UI
+      cheapestListing: {
+        price: cheapestListing.price,
+        title: cheapestListing.title,
+        url: cheapestListing.url
+      },
+      searchTerms,
       searchUrl: ebaySearchUrl,
       timestamp: Date.now()
     };
 
-    console.log(`✅ Found ${listings.length} eBay sales: $${avg.toFixed(2)} avg`);
+    console.log(`✅ Found ${listings.length} active eBay listings: $${low.toFixed(2)} - $${high.toFixed(2)}`);
 
     return res.status(200).json(result);
 

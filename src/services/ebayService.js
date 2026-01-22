@@ -1,204 +1,157 @@
-// eBay Price Scraper (Educational/Personal Use)
-// This fetches real sold listing data from eBay
+// eBay Price Service
+// Uses eBay Browse API for active listings (Finding API was decommissioned Feb 2025)
 
 const EBAY_CACHE = new Map();
 const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
 // Rate limiting
 let lastRequestTime = 0;
-const MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests
+const MIN_REQUEST_INTERVAL = 1000; // 1 second between requests
 
 async function rateLimit() {
   const now = Date.now();
   const timeSinceLastRequest = now - lastRequestTime;
-  
+
   if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
-    await new Promise(resolve => 
+    await new Promise(resolve =>
       setTimeout(resolve, MIN_REQUEST_INTERVAL - timeSinceLastRequest)
     );
   }
-  
+
   lastRequestTime = Date.now();
 }
 
-export async function getEbayPrice(cardName, cardSet) {
-  const cacheKey = `${cardName}_${cardSet}`;
-  
-  // Check cache first
+/**
+ * Fetch eBay active listing prices for a raw card
+ */
+export async function getEbayPriceAPI(cardName, cardSet = '', cardNumber = '') {
+  const cacheKey = `ebay_${cardName}_${cardNumber}`;
   const cached = EBAY_CACHE.get(cacheKey);
+
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    console.log(`✅ Using cached eBay data for: ${cardName}`);
     return cached.data;
   }
-  
+
   try {
     await rateLimit();
-    
-    // Use eBay's public RSS feed (doesn't require API key)
-    const searchQuery = encodeURIComponent(`${cardName} ${cardSet} pokemon card`);
-    const url = `https://www.ebay.com/sch/i.html?_nkw=${searchQuery}&LH_Sold=1&LH_Complete=1&_sop=13`;
-    
-    // In a real implementation, you'd:
-    // 1. Use a CORS proxy for browser-based scraping
-    // 2. Or implement this on a backend server
-    // 3. Or use eBay's Finding API (requires key but has free tier)
-    
-    // For now, we'll return estimated data
-    // To implement real scraping, you need a backend
-    console.log('eBay scraping would fetch from:', url);
-    
-    return null; // Indicates scraping not implemented yet
-    
+
+    const isProduction = window.location.hostname !== 'localhost';
+    const apiBase = isProduction ? window.location.origin : 'http://localhost:3000';
+
+    const params = new URLSearchParams({
+      cardName,
+      ...(cardNumber && { cardNumber })
+    });
+
+    const url = `${apiBase}/api/ebay-prices?${params}`;
+    console.log(`🔍 Fetching eBay active listings for: ${cardName}`);
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.found) {
+      console.log(`❌ No eBay listings found for: ${data.searchTerms || cardName}`);
+      return null;
+    }
+
+    const result = {
+      low: data.low,
+      high: data.high,
+      avg: data.avg,
+      median: data.median,
+      count: data.count,
+      cheapestListing: data.cheapestListing,
+      searchTerms: data.searchTerms,
+      searchUrl: data.searchUrl,
+      lastUpdated: Date.now()
+    };
+
+    console.log(`✅ Found ${data.count} eBay listings for "${cardName}": $${data.low} - $${data.high}`);
+
+    EBAY_CACHE.set(cacheKey, { data: result, timestamp: Date.now() });
+    return result;
+
   } catch (error) {
     console.error('Error fetching eBay data:', error);
     return null;
   }
 }
 
-// Use eBay Finding API via backend proxy (avoids CORS issues)
-export async function getEbayPriceAPI(cardName, cardSet, cardNumber = '', rarity = '') {
-  const cacheKey = `${cardName}_${cardSet}_${cardNumber}`;
+/**
+ * Fetch eBay active listing prices for PSA 10 graded cards
+ */
+export async function getEbayPSA10Price(cardName, cardSet = '', cardNumber = '') {
+  const cacheKey = `psa10_${cardName}_${cardNumber}`;
   const cached = EBAY_CACHE.get(cacheKey);
 
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    console.log(`✅ Using cached eBay data for: ${cardName} (${cached.data.count} sales)`);
+    console.log(`✅ Using cached PSA 10 eBay data for: ${cardName}`);
     return cached.data;
   }
 
   try {
     await rateLimit();
 
-    // Build API endpoint URL (use Vercel function in production, local in dev)
     const isProduction = window.location.hostname !== 'localhost';
-    const apiBase = isProduction
-      ? window.location.origin
-      : 'http://localhost:3000';
-
-    const params = new URLSearchParams({
-      cardName,
-      ...(cardSet && { cardSet }),
-      ...(cardNumber && { cardNumber }),
-      ...(rarity && { rarity })
-    });
-
-    const url = `${apiBase}/api/ebay-prices?${params}`;
-
-    console.log(`🔍 Fetching eBay prices via backend:`, cardName);
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (!data.found) {
-      console.log(`❌ No eBay results found for: ${data.searchTerms || cardName}`);
-      return null;
-    }
-
-    const result = {
-      avg: data.avg,
-      median: data.median,
-      recent: data.recent,
-      recentListings: data.recentListings || [],
-      count: data.count,
-      searchTerms: data.searchTerms,
-      searchUrl: data.searchUrl,
-      lastUpdated: Date.now()
-    };
-
-    console.log(`✅ Found ${data.count} eBay sales for "${cardName}": $${data.avg} avg`);
-
-    // Cache the result
-    EBAY_CACHE.set(cacheKey, {
-      data: result,
-      timestamp: Date.now()
-    });
-
-    return result;
-
-  } catch (error) {
-    console.error('Error fetching eBay API data:', error);
-    return null;
-  }
-}
-
-// Fetch PSA 10 graded card prices from eBay
-export async function getEbayPSA10Price(cardName, cardSet, cardNumber = '', rarity = '') {
-  const cacheKey = `psa10_${cardName}_${cardSet}_${cardNumber}`;
-  const cached = EBAY_CACHE.get(cacheKey);
-
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    console.log(`✅ Using cached PSA 10 eBay data for: ${cardName} (${cached.data.count} sales)`);
-    return cached.data;
-  }
-
-  try {
-    await rateLimit();
-
-    // Build API endpoint URL
-    const isProduction = window.location.hostname !== 'localhost';
-    const apiBase = isProduction
-      ? window.location.origin
-      : 'http://localhost:3000';
+    const apiBase = isProduction ? window.location.origin : 'http://localhost:3000';
 
     const params = new URLSearchParams({
       cardName,
       graded: 'psa10',
-      ...(cardSet && { cardSet }),
-      ...(cardNumber && { cardNumber }),
-      ...(rarity && { rarity })
+      ...(cardNumber && { cardNumber })
     });
 
     const url = `${apiBase}/api/ebay-prices?${params}`;
-
-    console.log(`🔍 Fetching PSA 10 eBay prices via backend:`, cardName);
+    console.log(`🔍 Fetching PSA 10 eBay listings for: ${cardName}`);
 
     const response = await fetch(url);
     const data = await response.json();
 
     if (!data.found) {
-      console.log(`❌ No PSA 10 eBay results found for: ${data.searchTerms || cardName}`);
+      console.log(`❌ No PSA 10 eBay listings found for: ${data.searchTerms || cardName}`);
       return null;
     }
 
     const result = {
+      low: data.low,
+      high: data.high,
       avg: data.avg,
       median: data.median,
-      recent: data.recent,
-      recentListings: data.recentListings || [],
       count: data.count,
+      cheapestListing: data.cheapestListing,
       searchTerms: data.searchTerms,
       searchUrl: data.searchUrl,
       lastUpdated: Date.now()
     };
 
-    console.log(`✅ Found ${data.count} PSA 10 eBay sales for "${cardName}": $${data.avg} avg`);
+    console.log(`✅ Found ${data.count} PSA 10 listings for "${cardName}": $${data.low} - $${data.high}`);
 
-    // Cache the result
-    EBAY_CACHE.set(cacheKey, {
-      data: result,
-      timestamp: Date.now()
-    });
-
+    EBAY_CACHE.set(cacheKey, { data: result, timestamp: Date.now() });
     return result;
 
   } catch (error) {
-    console.error('Error fetching PSA 10 eBay API data:', error);
+    console.error('Error fetching PSA 10 eBay data:', error);
     return null;
   }
 }
 
-// Helper to get better eBay price estimates based on TCGPlayer data
+/**
+ * Estimate eBay price based on TCGPlayer price (fallback)
+ */
 export function estimateEbayPrice(tcgPlayerPrice) {
   if (!tcgPlayerPrice || tcgPlayerPrice === 0) return 0;
-
-  // eBay typically 5-10% higher due to fees and convenience
-  const variance = 1.05 + (Math.random() * 0.05);
+  // eBay listings typically 5-15% higher due to fees
+  const variance = 1.05 + (Math.random() * 0.10);
   return parseFloat((tcgPlayerPrice * variance).toFixed(2));
 }
 
-// Helper to estimate PSA 10 price based on raw card price
+/**
+ * Estimate PSA 10 price based on raw card price (fallback)
+ */
 export function estimatePSA10Price(tcgPlayerPrice) {
   if (!tcgPlayerPrice || tcgPlayerPrice === 0) return 0;
-
-  // PSA 10 graded cards typically 3-5x raw card price
-  const multiplier = 3.5 + (Math.random() * 1.5);
+  // PSA 10 graded cards typically 2-4x raw card price
+  const multiplier = 2.5 + (Math.random() * 1.5);
   return parseFloat((tcgPlayerPrice * multiplier).toFixed(2));
 }
