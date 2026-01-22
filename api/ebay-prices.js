@@ -2,69 +2,88 @@
 // This acts as a backend proxy to avoid CORS issues
 
 /**
- * Build an eBay-style search title for a Pokemon card
- * Format: "YEAR POKEMON SET-CODE RARITY #NUMBER CARDNAME PSA 10"
- * Example: "2023 POKEMON MEW EN-151 SPECIAL ILLUSTRATION RARE #199 CHARIZARD EX PSA 10"
+ * Build eBay search terms for a Pokemon card
+ * Uses a simpler format that matches how sellers actually title their listings
+ * Example: "Mega Charizard X ex 125 Phantasmal Flames"
+ * For PSA 10: "Mega Charizard X ex 125 Phantasmal Flames PSA 10"
  */
-function buildEbaySearchTitle(cardName, cardSet, cardNumber, rarity, graded) {
+function buildEbaySearchTerms(cardName, cardSet, cardNumber, rarity, graded) {
   const parts = [];
 
-  // Extract year from set name or use current year
-  const yearMatch = cardSet?.match(/\b(20\d{2})\b/);
-  const year = yearMatch ? yearMatch[1] : new Date().getFullYear();
+  // Add card name (most important)
+  parts.push(cardName);
+
+  // Add card number without the total (e.g., "125" from "125/094")
+  if (cardNumber) {
+    const num = cardNumber.split('/')[0];
+    parts.push(num);
+  }
+
+  // Add set name (simplified - remove special characters)
+  if (cardSet) {
+    const cleanSet = cardSet
+      .replace(/—/g, ' ')
+      .replace(/[^\w\s]/g, '')
+      .trim();
+    parts.push(cleanSet);
+  }
+
+  // Add PSA 10 for graded searches
+  if (graded === 'psa10') {
+    parts.push('PSA 10');
+  }
+
+  return parts.join(' ');
+}
+
+/**
+ * Build a display title showing the eBay search format
+ * This is what users see in the UI
+ */
+function buildDisplayTitle(cardName, cardSet, cardNumber, rarity, graded) {
+  const parts = [];
+
+  // Year
+  const year = new Date().getFullYear();
   parts.push(year);
 
   parts.push('POKEMON');
 
-  // Add set code/name (cleaned up)
+  // Set name abbreviated
   if (cardSet) {
-    // Convert set name to abbreviated format
-    // e.g., "Scarlet & Violet—151" -> "SV-151", "Mew" -> "MEW"
     let setCode = cardSet
       .replace(/Scarlet\s*&?\s*Violet/i, 'SV')
       .replace(/Sword\s*&?\s*Shield/i, 'SWSH')
       .replace(/Sun\s*&?\s*Moon/i, 'SM')
-      .replace(/XY/i, 'XY')
-      .replace(/Black\s*&?\s*White/i, 'BW')
       .replace(/—/g, '-')
       .replace(/[^\w\s-]/g, '')
       .toUpperCase()
       .trim();
-
-    // Keep it concise
-    if (setCode.length > 20) {
+    if (setCode.length > 25) {
       setCode = setCode.split(/\s+/).slice(0, 3).join(' ');
     }
     parts.push(setCode);
   }
 
-  // Add rarity if available
+  // Rarity abbreviation
   if (rarity) {
-    const rarityUpper = rarity.toUpperCase();
-    // Only add distinctive rarities
-    if (rarityUpper.includes('ILLUSTRATION') ||
-        rarityUpper.includes('SPECIAL') ||
-        rarityUpper.includes('SECRET') ||
-        rarityUpper.includes('HOLO') ||
-        rarityUpper.includes('ULTRA') ||
-        rarityUpper.includes('FULL ART') ||
-        rarityUpper.includes('ALT ART') ||
-        rarityUpper.includes('RARE')) {
-      parts.push(rarityUpper);
-    }
+    const r = rarity.toUpperCase();
+    if (r.includes('SPECIAL ILLUSTRATION')) parts.push('SIR');
+    else if (r.includes('ILLUSTRATION')) parts.push('IR');
+    else if (r.includes('ULTRA')) parts.push('UR');
+    else if (r.includes('SECRET')) parts.push('SR');
+    else if (r.includes('FULL ART')) parts.push('FA');
   }
 
-  // Add card number
+  // Card number
   if (cardNumber) {
-    // Format as #NUMBER (e.g., "#199" or "#4/102")
-    const num = cardNumber.split('/')[0]; // Get just the number part
-    parts.push(`#${num}`);
+    parts.push(`#${cardNumber}`);
   }
 
-  // Add card name
+  // Card name
   parts.push(cardName.toUpperCase());
 
-  // Add PSA 10 for graded searches
+  // PSA 10
   if (graded === 'psa10') {
     parts.push('PSA 10');
   }
@@ -101,9 +120,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'eBay API not configured' });
     }
 
-    // Build eBay-style search title
-    // Format: "2023 POKEMON MEW EN-151 SPECIAL ILLUSTRATION RARE #199 CHARIZARD EX PSA 10"
-    const searchTerms = buildEbaySearchTitle(cardName, cardSet, cardNumber, rarity, graded);
+    // Build search terms - simpler format that matches actual eBay listings
+    const searchTerms = buildEbaySearchTerms(cardName, cardSet, cardNumber, rarity, graded);
+
+    // Build display title for UI (shows the formatted search style)
+    const displayTitle = buildDisplayTitle(cardName, cardSet, cardNumber, rarity, graded);
 
     const keywords = encodeURIComponent(searchTerms);
 
@@ -191,7 +212,7 @@ export default async function handler(req, res) {
       recent: prices.slice(-5),
       recentListings,
       count: listings.length,
-      searchTerms,
+      searchTerms: displayTitle, // Show formatted title in UI
       searchUrl: ebaySearchUrl,
       timestamp: Date.now()
     };
