@@ -268,7 +268,44 @@ const AdminSyncPanel = () => {
             <Zap className={`w-5 h-5 ${syncing ? 'animate-pulse' : ''}`} />
             Full Sync (Edge)
           </button>
-          <butto className="flex-1">
+          <button
+            onClick={handleEdgeFunctionSetsSync}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+          >
+            <Database className="w-5 h-5" />
+            Sync Sets (Edge)
+          </button>
+          <button
+            onClick={handleEdgeFunctionPricesSync}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+          >
+            <DollarSign className="w-5 h-5" />
+            Prices Only (Edge)
+          </button>
+        </div>
+        <p className="text-xs text-adaptive-tertiary italic">
+          💡 Edge Functions run on Supabase servers and are more reliable for large syncs
+        </p>
+      </div>
+
+      {/* Last Sync Result */}
+      {lastSyncResult && (
+        <div
+          className={`p-4 rounded-xl border ${
+            lastSyncResult.success
+              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+          }`}
+        >
+          <div className="flex items-start gap-3">
+            {lastSyncResult.success ? (
+              <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+            ) : (
+              <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            )}
+            <div className="flex-1">
               <p
                 className={`font-semibold ${
                   lastSyncResult.success
@@ -297,44 +334,7 @@ const AdminSyncPanel = () => {
                   {lastSyncResult.hint && (
                     <p className="mt-2 text-xs italic">💡 {lastSyncResult.hint}</p>
                   )}
-                </div
-
-      {/* Last Sync Result */}
-      {lastSyncResult && (
-        <div
-          className={`p-4 rounded-xl border ${
-            lastSyncResult.success
-              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-          }`}
-        >
-          <div className="flex items-start gap-3">
-            {lastSyncResult.success ? (
-              <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-            ) : (
-              <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-            )}
-            <div>
-              <p
-                className={`font-semibold ${
-                  lastSyncResult.success
-                    ? 'text-green-900 dark:text-green-100'
-                    : 'text-red-900 dark:text-red-100'
-                }`}
-              >
-                {lastSyncResult.success ? 'Sync Successful!' : 'Sync Failed'}
-              </p>
-              {lastSyncResult.success ? (
-                <p className="text-sm text-green-800 dark:text-green-200 mt-1">
-                  {lastSyncResult.sets && `${lastSyncResult.sets} sets synced`}
-                  {lastSyncResult.cards && `, ${lastSyncResult.cards} cards synced`}
-                  {lastSyncResult.count && `${lastSyncResult.count} items synced`}
-                  {lastSyncResult.totalSuccess && `${lastSyncResult.totalSuccess}/${lastSyncResult.totalCards} prices updated`}
-                </p>
-              ) : (
-                <p className="text-sm text-red-800 dark:text-red-200 mt-1">
-                  {lastSyncResult.error}
-                </p>
+                </div>
               )}
             </div>
           </div>
