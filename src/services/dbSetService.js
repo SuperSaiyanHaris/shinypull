@@ -19,9 +19,9 @@ export const getAllSets = async () => {
       return setsCache.data;
     }
 
-    // Add timeout to prevent infinite loading (15s to allow for cold start)
+    // Add timeout to prevent infinite loading (bumped to 30s to tolerate cold starts)
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Database timeout')), 15000)
+      setTimeout(() => reject(new Error('Database timeout')), 30000)
     );
 
     const queryPromise = supabase
@@ -30,6 +30,7 @@ export const getAllSets = async () => {
       .order('release_date', { ascending: false });
 
     let result;
+    const start = performance.now();
     try {
       result = await Promise.race([queryPromise, timeoutPromise]);
     } catch (timeoutError) {
@@ -53,7 +54,7 @@ export const getAllSets = async () => {
       return apiSets;
     }
 
-    console.log(`Loaded ${data.length} sets from database`);
+    console.log(`Loaded ${data.length} sets from database in ${(performance.now() - start).toFixed(0)}ms`);
 
     // Transform to match app format
     const transformed = data.map(set => ({
