@@ -6,6 +6,7 @@ import SearchBar from './components/SearchBar';
 import CardGrid from './components/CardGrid';
 import SetBrowser from './components/SetBrowser';
 import SetDetailPage from './components/SetDetailPage';
+import MyCollection from './components/MyCollection';
 import AdminSyncPanel from './components/AdminSyncPanel';
 import TermsOfUse from './components/TermsOfUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -14,7 +15,7 @@ import { useCardSearch } from './hooks/useCardSearch';
 
 function App() {
   const { query, setQuery, cards, loading } = useCardSearch();
-  const [currentView, setCurrentView] = useState('sets'); // 'sets', 'setDetail', 'search', 'terms', 'privacy'
+  const [currentView, setCurrentView] = useState('sets'); // 'sets', 'setDetail', 'search', 'collection', 'terms', 'privacy'
   const [selectedSet, setSelectedSet] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
 
@@ -48,6 +49,12 @@ function App() {
     setCurrentView('sets');
   };
 
+  const handleCollectionClick = () => {
+    setQuery('');
+    setSelectedSet(null);
+    setCurrentView('collection');
+  };
+
   // Listen for Ctrl+Shift+A to toggle admin panel
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -62,7 +69,7 @@ function App() {
 
   return (
     <div className="min-h-screen">
-      <Header onLogoClick={handleLogoClick} />
+      <Header onLogoClick={handleLogoClick} onCollectionClick={handleCollectionClick} />
       <ScrollToTop />
 
       <main>
@@ -124,6 +131,10 @@ function App() {
 
             {currentView === 'terms' && (
               <TermsOfUse onBack={() => setCurrentView('sets')} />
+            )}
+
+            {currentView === 'collection' && (
+              <MyCollection onBack={handleBackToSets} />
             )}
 
             {currentView === 'privacy' && (

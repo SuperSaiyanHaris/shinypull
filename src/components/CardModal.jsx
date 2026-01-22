@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
+import AddToCollectionButton from './AddToCollectionButton';
 
 // Reusable tooltip component for High price explanation
 const HighPriceTooltip = ({ className = "" }) => (
@@ -145,9 +146,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
-                <button className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-lg">
-                  Add to Collection
-                </button>
+                <AddToCollectionButton card={card} className="flex-1" />
                 <button className="px-4 py-3 modal-button rounded-xl border">
                   <ExternalLink className="w-5 h-5 text-adaptive-secondary" />
                 </button>
@@ -230,9 +229,7 @@ const CardModal = ({ card, isOpen, onClose }) => {
 
                   {/* Quick Actions */}
                   <div className="flex gap-3">
-                    <button className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold rounded-xl transition-colors shadow-lg">
-                      Add to Collection
-                    </button>
+                    <AddToCollectionButton card={card} className="flex-1" />
                     <button className="px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border">
                       <ExternalLink className="w-5 h-5" />
                     </button>

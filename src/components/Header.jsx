@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Sun, Moon, LogOut, User } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Package } from 'lucide-react';
 import logo from '../imgs/shinypulllogo.png';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';
 
-const Header = ({ onLogoClick }) => {
+const Header = ({ onLogoClick, onCollectionClick }) => {
   const [darkMode, setDarkMode] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -28,6 +28,13 @@ const Header = ({ onLogoClick }) => {
       setShowUserMenu(false);
     } catch (error) {
       console.error('Error signing out:', error);
+    }
+  };
+
+  const handleCollectionClick = () => {
+    setShowUserMenu(false);
+    if (onCollectionClick) {
+      onCollectionClick();
     }
   };
 
@@ -64,7 +71,18 @@ const Header = ({ onLogoClick }) => {
             <div className="flex-1"></div>
 
             {/* Right Side - Theme Toggle & Auth */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
+              {/* My Collection Button - Only shown when logged in */}
+              {user && (
+                <button
+                  onClick={handleCollectionClick}
+                  className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary border border-adaptive transition-colors"
+                >
+                  <Package className="w-5 h-5 text-blue-500" />
+                  <span className="hidden md:inline text-sm font-medium">My Collection</span>
+                </button>
+              )}
+
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
@@ -116,6 +134,14 @@ const Header = ({ onLogoClick }) => {
                             {user.email}
                           </p>
                         </div>
+                        {/* Mobile: Show My Collection in dropdown */}
+                        <button
+                          onClick={handleCollectionClick}
+                          className="md:hidden w-full flex items-center gap-2 px-4 py-2 text-sm text-adaptive-primary hover:bg-adaptive-hover transition-colors"
+                        >
+                          <Package className="w-4 h-4 text-blue-500" />
+                          My Collection
+                        </button>
                         <button
                           onClick={handleSignOut}
                           className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-adaptive-hover transition-colors"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Search, SortDesc, Info } from 'lucide-react';
 import CardModal from './CardModal';
+import AddToCollectionButton from './AddToCollectionButton';
 import { formatPrice } from '../services/cardService';
 import { getSetCards } from '../services/dbSetService';
 
@@ -128,14 +129,16 @@ const SetDetailPage = ({ set, onBack }) => {
       {/* Mobile Card List - Hidden on desktop */}
       <div className="md:hidden space-y-3">
         {filteredCards.map((card, index) => (
-          <button
+          <div
             key={card.id}
-            onClick={() => handleViewDetails(card)}
-            className="w-full glass-effect rounded-xl border border-adaptive p-4 flex items-center gap-4 hover:bg-adaptive-hover transition-colors animate-slide-up text-left"
+            className="glass-effect rounded-xl border border-adaptive p-4 flex items-center gap-4 animate-slide-up"
             style={{ animationDelay: `${index * 20}ms` }}
           >
             {/* Card Image */}
-            <div className="flex-shrink-0 w-16 h-22 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 rounded-lg overflow-hidden">
+            <button
+              onClick={() => handleViewDetails(card)}
+              className="flex-shrink-0 w-16 h-22 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 rounded-lg overflow-hidden"
+            >
               <img
                 src={card.image}
                 alt={card.name}
@@ -144,10 +147,13 @@ const SetDetailPage = ({ set, onBack }) => {
                   e.target.src = 'https://via.placeholder.com/200x280?text=Card';
                 }}
               />
-            </div>
+            </button>
 
             {/* Card Info */}
-            <div className="flex-1 min-w-0">
+            <button
+              onClick={() => handleViewDetails(card)}
+              className="flex-1 min-w-0 text-left"
+            >
               <p className="text-sm font-semibold text-adaptive-primary truncate">{card.name}</p>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-xs font-mono text-adaptive-tertiary">#{card.number}</span>
@@ -157,15 +163,11 @@ const SetDetailPage = ({ set, onBack }) => {
               <p className="text-lg font-bold price-gradient mt-2">
                 {formatPrice(card.prices.tcgplayer.market)}
               </p>
-            </div>
+            </button>
 
-            {/* Arrow indicator */}
-            <div className="flex-shrink-0 text-adaptive-tertiary">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </button>
+            {/* Add to Collection Button */}
+            <AddToCollectionButton card={card} variant="icon" />
+          </div>
         ))}
       </div>
 
@@ -250,13 +252,16 @@ const SetDetailPage = ({ set, onBack }) => {
                       {formatPrice(card.prices.tcgplayer.high)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-center">
-                    <button
-                      onClick={() => handleViewDetails(card)}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
-                    >
-                      View Details
-                    </button>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center justify-center gap-2">
+                      <AddToCollectionButton card={card} variant="compact" />
+                      <button
+                        onClick={() => handleViewDetails(card)}
+                        className="px-4 py-2 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-semibold rounded-lg transition-colors border border-adaptive"
+                      >
+                        Details
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

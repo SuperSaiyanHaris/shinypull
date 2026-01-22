@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, ExternalLink } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import CardModal from './CardModal';
+import AddToCollectionButton from './AddToCollectionButton';
 
 const CardItem = ({ card, index }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -138,17 +139,17 @@ const CardItem = ({ card, index }) => {
           </div>
         )}
 
-        {/* View Details Link */}
-        <button
-          onClick={() => {
-            console.log('Opening modal for card:', card.name);
-            setIsModalOpen(true);
-          }}
-          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-adaptive-card hover:bg-adaptive-hover text-blue-600 dark:text-blue-400 font-semibold rounded-xl transition-colors group border border-adaptive"
-        >
-          View Full Details
-          <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </button>
+        {/* Action Buttons */}
+        <div className="mt-4 flex gap-2">
+          <AddToCollectionButton card={card} className="flex-1" />
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-3 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-secondary rounded-xl transition-colors border border-adaptive"
+            title="View Details"
+          >
+            <ExternalLink className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
     </div>
