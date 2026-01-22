@@ -19,9 +19,11 @@ const SetBrowser = ({ onSetClick }) => {
         console.log('[SetBrowser] Loaded', allSets?.length || 0, 'sets');
         setSets(allSets || []);
       } catch (error) {
-        console.error('[SetBrowser] Error loading sets:', error);
+        console.error('[SetBrowser] CRITICAL ERROR loading sets:', error);
+        console.error('[SetBrowser] Error stack:', error.stack);
         setSets([]);
       } finally {
+        console.log('[SetBrowser] Setting loading to false');
         setLoading(false);
       }
     };
