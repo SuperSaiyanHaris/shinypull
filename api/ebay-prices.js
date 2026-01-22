@@ -39,7 +39,8 @@ async function getAccessToken(clientId, clientSecret) {
 
 /**
  * Build eBay search terms for a Pokemon card
- * Strategy: Use essential terms only to get broad results, then filter
+ * CRITICAL: Card numbers are NOT unique across sets - must include identifying info
+ * Example: Multiple sets have a #125, so we need Name + Number + Set
  */
 function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
   const parts = ['Pokemon'];
@@ -52,38 +53,28 @@ function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
     .replace(/\s+GX$/i, '')
     .trim();
   
-  // For PSA 10 searches, use minimal terms since sellers heavily abbreviate
-  // Card number + PSA 10 is sufficient since card numbers are unique
+  parts.push(cleanName);
+
+  // Add card number if available - helps narrow results
+  if (cardNumber) {
+    parts.push(cardNumber);
+  }
+
+  // ALWAYS include set name for specificity - even if sellers abbreviate,
+  // eBay's search will still match (e.g., searching "Phantasmal Flames" 
+  // will find listings with "PFL" or "Phantasmal Flames")
+  if (setName) {
+    parts.push(setName);
+  }
+
+  // Add PSA 10 for graded cards
   if (graded === 'psa10') {
-    if (cardNumber) {
-      // Just use card number and PSA 10 for maximum flexibility
-      // Example: "129 PSA 10" will match all Dawn #129 PSA 10 cards regardless of how sellers abbreviate
-      parts.push(cardNumber);
-    } else {
-      // Fallback if no card number
-      parts.push(cleanName);
-    }
     parts.push('PSA 10');
-  } else {
-    // For raw cards, include more details
-    parts.push(cleanName);
-    
-    // Add card number if available
-    if (cardNumber) {
-      parts.push(cardNumber);
-    }
-    
-    // Add set name if available (helps narrow down raw cards)
-    if (setName) {
-      parts.push(setName);
-    }
   }
 
   const searchString = parts.join(' ');
-  console.log(`🔍 Built search string: "${searchString}" (${graded === 'psa10' ? 'PSA 10 - minimal for flexibility' : 'Raw - detailed'})`);
-  if (graded !== 'psa10') {
-    console.log(`📋 Skipped - Rarity: "${rarity || 'none'}" (often abbreviated by sellers)`);
-  }
+  console.log(`🔍 Built search string: "${searchString}"`);
+  console.log(`📋 Strategy: Name + Number + Set = Unique identifier (sellers may abbreviate set but eBay matches)`);
   return searchString;
 }
 
