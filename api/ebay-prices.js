@@ -52,29 +52,38 @@ function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
     .replace(/\s+GX$/i, '')
     .trim();
   
-  parts.push(cleanName);
-
-  // Add card number if available - use full format (e.g., "125/094")
-  if (cardNumber) {
-    parts.push(cardNumber);
-  }
-
-  // Skip rarity - it's often abbreviated or missing in eBay listings
-  // Examples: "Special Illustration Rare" might be "SIR" or omitted entirely
-
-  // Add set name if available (essential for specificity)
-  if (setName) {
-    parts.push(setName);
-  }
-
-  // Add PSA 10 for graded cards
+  // For PSA 10 searches, use minimal terms since sellers heavily abbreviate
+  // Card number + PSA 10 is sufficient since card numbers are unique
   if (graded === 'psa10') {
+    if (cardNumber) {
+      // Just use card number and PSA 10 for maximum flexibility
+      // Example: "129 PSA 10" will match all Dawn #129 PSA 10 cards regardless of how sellers abbreviate
+      parts.push(cardNumber);
+    } else {
+      // Fallback if no card number
+      parts.push(cleanName);
+    }
     parts.push('PSA 10');
+  } else {
+    // For raw cards, include more details
+    parts.push(cleanName);
+    
+    // Add card number if available
+    if (cardNumber) {
+      parts.push(cardNumber);
+    }
+    
+    // Add set name if available (helps narrow down raw cards)
+    if (setName) {
+      parts.push(setName);
+    }
   }
 
   const searchString = parts.join(' ');
-  console.log(`🔍 Built search string: "${searchString}"`);
-  console.log(`📋 Skipped parameters - Rarity: "${rarity || 'none'}" (often abbreviated by sellers)`);
+  console.log(`🔍 Built search string: "${searchString}" (${graded === 'psa10' ? 'PSA 10 - minimal for flexibility' : 'Raw - detailed'})`);
+  if (graded !== 'psa10') {
+    console.log(`📋 Skipped - Rarity: "${rarity || 'none'}" (often abbreviated by sellers)`);
+  }
   return searchString;
 }
 

@@ -86,11 +86,14 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
           } else if (!hasEbayData) {
             // Use estimated price if API returned nothing
             const marketPrice = card.prices?.tcgplayer?.market || 0;
+            // Build fallback eBay search URL
+            const fallbackQuery = `Pokemon ${card.name} ${card.number || ''} ${card.set || ''}`.trim();
+            const encodedQuery = encodeURIComponent(fallbackQuery);
             setEbayPrices({
               avg: estimateEbayPrice(marketPrice),
               verified: false,
-              searchTerms: '',
-              searchUrl: ''
+              searchTerms: fallbackQuery,
+              searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454`
             });
           }
 
@@ -108,11 +111,14 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
           } else if (!hasPsa10Data) {
             // Use estimated price if API returned nothing
             const marketPrice = card.prices?.tcgplayer?.market || 0;
+            // Build fallback eBay search URL for PSA 10
+            const fallbackQuery = `Pokemon ${card.name} ${card.number || ''} PSA 10`.trim();
+            const encodedQuery = encodeURIComponent(fallbackQuery);
             setPsa10Prices({
               avg: estimatePSA10Price(marketPrice),
               verified: false,
-              searchTerms: '',
-              searchUrl: ''
+              searchTerms: fallbackQuery,
+              searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454`
             });
           }
         } catch (error) {
@@ -545,13 +551,13 @@ const EbayPriceRow = ({ ebayData, label = "eBay" }) => {
             {formatPrice(avg)}
           </span>
         )}
-        {verified && searchUrl && (
+        {searchUrl && (
           <a
             href={searchUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="p-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
-            title="View on eBay"
+            title={verified ? "View on eBay" : "Search on eBay (no results found)"}
           >
             <ExternalLink className="w-4 h-4 text-blue-500" />
           </a>
@@ -595,13 +601,13 @@ const PSA10PriceRow = ({ psa10Data }) => {
             {formatPrice(avg)}
           </span>
         )}
-        {verified && searchUrl && (
+        {searchUrl && (
           <a
             href={searchUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="p-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
-            title="View PSA 10 on eBay"
+            title={verified ? "View PSA 10 on eBay" : "Search PSA 10 on eBay (no results found)"}
           >
             <ExternalLink className="w-4 h-4 text-blue-500" />
           </a>
