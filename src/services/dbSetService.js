@@ -52,6 +52,10 @@ export const getSetCards = async (setId) => {
       .from('cards')
       .select(`
         *,
+        sets (
+          name,
+          series
+        ),
         prices (
           tcgplayer_market,
           tcgplayer_low,
@@ -84,6 +88,7 @@ export const getSetCards = async (setId) => {
       // prices comes as an array from the relation - get first element or empty object
       const priceData = Array.isArray(card.prices) ? card.prices[0] : card.prices;
       const price = priceData || {};
+      const setData = card.sets || {};
 
       return {
         id: card.id,
@@ -95,6 +100,8 @@ export const getSetCards = async (setId) => {
           small: card.image_small,
           large: card.image_large
         },
+        set: setData.name,
+        setId: card.set_id,
         prices: {
           tcgplayer: {
             market: price.tcgplayer_market ?? 0,
@@ -176,6 +183,7 @@ export const searchCards = async (query) => {
           large: card.image_large
         },
         set: set.name,
+        setId: card.set_id,
         prices: {
           tcgplayer: {
             market: price.tcgplayer_market ?? 0,
