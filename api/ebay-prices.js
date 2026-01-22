@@ -55,7 +55,9 @@ function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
   
   parts.push(cleanName);
 
-  // Add card number if available - helps narrow results
+  // Add card number if available
+  // Use full format (e.g., "125/094") as eBay will match both "125" and "125/094"
+  // Some sellers use just "125", others use "125/094", eBay search handles both
   if (cardNumber) {
     parts.push(cardNumber);
   }
