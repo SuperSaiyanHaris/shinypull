@@ -6,12 +6,15 @@ let collectionCache = {
   cardIds: new Set(),
   timestamp: 0
 };
-const CACHE_DURATION = 30000; // 30 seconds
+// Shared in-flight refresh promise to avoid stampeding the DB
+let collectionCachePromise = null;
+const CACHE_DURATION = 60000; // 60 seconds cache to reduce query bursts
 
 export const collectionService = {
   // Clear the cache (call after add/remove operations)
   clearCache() {
     collectionCache = { userId: null, cardIds: new Set(), timestamp: 0 };
+    collectionCachePromise = null;
   },
   // Get all cards in user's collection
   async getCollection(userId) {
@@ -36,28 +39,42 @@ export const collectionService = {
       return collectionCache.cardIds.has(cardId) ? { id: cardId, quantity: 1 } : null;
     }
 
-    // Cache miss - fetch all collected card IDs
+    // Cache miss - fetch all collected card IDs (deduplicated)
     await this.refreshCache(userId);
     return collectionCache.cardIds.has(cardId) ? { id: cardId, quantity: 1 } : null;
   },
 
   // Refresh the collection cache
   async refreshCache(userId) {
-    const { data, error } = await supabase
-      .from('user_collections')
-      .select('card_id')
-      .eq('user_id', userId);
-
-    if (error) {
-      console.error('Error fetching collection for cache:', error);
+    // Deduplicate concurrent refreshes
+    if (collectionCachePromise) {
+      await collectionCachePromise;
       return;
     }
 
-    collectionCache = {
-      userId,
-      cardIds: new Set(data.map(item => item.card_id)),
-      timestamp: Date.now()
-    };
+    collectionCachePromise = (async () => {
+      const { data, error } = await supabase
+        .from('user_collections')
+        .select('card_id')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error fetching collection for cache:', error);
+        return;
+      }
+
+      collectionCache = {
+        userId,
+        cardIds: new Set(data.map(item => item.card_id)),
+        timestamp: Date.now()
+      };
+    })();
+
+    try {
+      await collectionCachePromise;
+    } finally {
+      collectionCachePromise = null;
+    }
   },
 
   // Get all collected card IDs for a user (for batch checking)

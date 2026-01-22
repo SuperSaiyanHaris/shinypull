@@ -1,12 +1,24 @@
 import { supabase } from '../lib/supabase';
 import { getAllSets as getApiSets, getSetCards as getApiCards } from './setService';
 
+// In-memory cache to avoid refetching sets on every navigation
+const setsCache = {
+  data: null,
+  timestamp: 0
+};
+const SETS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 /**
  * Get all Pokemon sets from the database
  * Falls back to API if database is empty
  */
 export const getAllSets = async () => {
   try {
+    // Return cached sets if fresh
+    if (setsCache.data && Date.now() - setsCache.timestamp < SETS_CACHE_TTL) {
+      return setsCache.data;
+    }
+
     // Add timeout to prevent infinite loading (15s to allow for cold start)
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Database timeout')), 15000)
@@ -35,13 +47,16 @@ export const getAllSets = async () => {
     // If no data in database, fall back to API
     if (!data || data.length === 0) {
       console.log('No sets in database, fetching from API...');
-      return await getApiSets();
+      const apiSets = await getApiSets();
+      setsCache.data = apiSets;
+      setsCache.timestamp = Date.now();
+      return apiSets;
     }
 
     console.log(`Loaded ${data.length} sets from database`);
 
     // Transform to match app format
-    return data.map(set => ({
+    const transformed = data.map(set => ({
       id: set.id,
       name: set.name,
       series: set.series,
@@ -50,10 +65,18 @@ export const getAllSets = async () => {
       logo: set.logo,
       symbol: set.symbol
     }));
+
+    // Update cache
+    setsCache.data = transformed;
+    setsCache.timestamp = Date.now();
+    return transformed;
   } catch (error) {
     console.error('Error fetching sets from database:', error);
     // Fall back to API on any error
-    return await getApiSets();
+    const apiSets = await getApiSets();
+    setsCache.data = apiSets;
+    setsCache.timestamp = Date.now();
+    return apiSets;
   }
 };
 
