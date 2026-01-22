@@ -38,18 +38,30 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async (userId) => {
     try {
       console.log('[Auth] Fetching profile for:', userId);
+      console.log('[Auth] Supabase client exists:', !!supabase);
+      console.log('[Auth] Supabase from method:', typeof supabase?.from);
       
+      if (!supabase || typeof supabase.from !== 'function') {
+        console.error('[Auth] Supabase client is broken!');
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+
+      console.log('[Auth] Executing query...');
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
 
+      console.log('[Auth] Query returned. Error:', error?.message, 'Data:', !!data);
+
       if (error) {
         if (error.code !== 'PGRST116') {
           console.error('[Auth] Error fetching profile:', error);
         } else {
-          console.log('[Auth] No profile found (user can create one later)');
+          console.log('[Auth] No profile found');
         }
         setProfile(null);
       } else {
@@ -60,6 +72,7 @@ export const AuthProvider = ({ children }) => {
       console.error('[Auth] Exception fetching profile:', error);
       setProfile(null);
     } finally {
+      console.log('[Auth] Setting loading to false');
       setLoading(false);
     }
   };
