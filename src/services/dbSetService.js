@@ -20,24 +20,17 @@ export const getAllSets = async () => {
 
   console.log('[dbSetService] Fetching sets from database...');
   
-  // Diagnostic timeout
-  const timeoutPromise = new Promise((_, reject) => 
-    setTimeout(() => reject(new Error('Sets query timeout after 10s')), 10000)
-  );
-  
-  const queryPromise = supabase
+  const { data, error } = await supabase
     .from('sets')
     .select('*')
     .order('release_date', { ascending: false });
-  
-  const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
   if (error) {
-    console.error('[dbSetService] Error fetching sets:', error);
+    console.error('[dbSetService] DB error:', error.message);
     throw error;
   }
   
-  console.log('[dbSetService] Query returned', data?.length || 0, 'sets');
+  console.log('[dbSetService] DB returned', data?.length || 0, 'sets');
 
   // Transform to match app format
   const transformed = data.map(set => ({
