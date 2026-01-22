@@ -14,10 +14,12 @@ const SetBrowser = ({ onSetClick }) => {
     const loadSets = async () => {
       try {
         setLoading(true);
+        console.log('[SetBrowser] Loading sets...');
         const allSets = await getAllSets();
+        console.log('[SetBrowser] Loaded', allSets?.length || 0, 'sets');
         setSets(allSets || []);
       } catch (error) {
-        console.error('Error loading sets:', error);
+        console.error('[SetBrowser] Error loading sets:', error);
         setSets([]);
       } finally {
         setLoading(false);
