@@ -20,20 +20,19 @@ export const getAllSets = async () => {
 
   console.log('[dbSetService] Fetching sets from database...');
   
-  try {
-    const { data, error } = await supabase
-      .from('sets')
-      .select('*')
-      .order('release_date', { ascending: false });
+  const { data, error } = await supabase
+    .from('sets')
+    .select('*')
+    .order('release_date', { ascending: false });
 
-    console.log('[dbSetService] Query completed. Error:', error, 'Data length:', data?.length);
+  console.log('[dbSetService] Query completed. Error:', error, 'Data length:', data?.length);
 
-    if (error) {
-      console.error('[dbSetService] DB error:', error);
-      throw error;
-    }
-    
-    console.log('[dbSetService] DB returned', data?.length || 0, 'sets');
+  if (error) {
+    console.error('[dbSetService] DB error:', error);
+    throw error;
+  }
+  
+  console.log('[dbSetService] DB returned', data?.length || 0, 'sets');
 
   // Transform to match app format
   const transformed = data.map(set => ({
