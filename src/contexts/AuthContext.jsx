@@ -36,6 +36,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const fetchProfile = async (userId) => {
+    // TEMPORARY: Skip profile fetch due to Supabase client hang
+    // Profile data is not critical for app functionality
+    console.log('[Auth] Skipping profile fetch (workaround for client hang)');
+    console.log('[Auth] User ID:', userId);
+    setProfile(null);
+    setLoading(false);
+    return;
+
+    /* Disabled until Supabase client issue resolved
     try {
       console.log('[Auth] Fetching profile for:', userId);
       console.log('[Auth] Supabase client exists:', !!supabase);
@@ -75,6 +84,7 @@ export const AuthProvider = ({ children }) => {
       console.log('[Auth] Setting loading to false');
       setLoading(false);
     }
+    */
   };
 
   const signInWithGoogle = async () => {
