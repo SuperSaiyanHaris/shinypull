@@ -42,19 +42,29 @@ async function getAccessToken(clientId, clientSecret) {
  * Pattern: "Pokemon [CardName] [CardNumber] [Rarity] English [SetName] [PSA 10 if graded]"
  */
 function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
-  const parts = ['Pokemon', cardName];
+  const parts = ['Pokemon'];
+  
+  // Clean up card name (remove ex, EX, etc. as they can cause matching issues)
+  const cleanName = cardName
+    .replace(/\s+ex$/i, '')
+    .replace(/\s+EX$/i, '')
+    .replace(/\s+gx$/i, '')
+    .replace(/\s+GX$/i, '')
+    .trim();
+  
+  parts.push(cleanName);
 
-  // Add card number if available
+  // Add card number if available (this is critical for specificity)
   if (cardNumber) {
     parts.push(cardNumber);
   }
 
-  // Add rarity if available
-  if (rarity) {
+  // Add rarity if available and not too generic
+  if (rarity && !['Common', 'Uncommon'].includes(rarity)) {
     parts.push(rarity);
   }
 
-  // Add English for specificity
+  // Add English for language specificity
   parts.push('English');
 
   // Add set name if available
@@ -67,7 +77,9 @@ function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
     parts.push('PSA 10');
   }
 
-  return parts.join(' ');
+  const searchString = parts.join(' ');
+  console.log(`🔍 Built search string: "${searchString}"`);
+  return searchString;
 }
 
 /**
@@ -75,7 +87,9 @@ function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
  */
 function isPSA10Listing(title) {
   const lowerTitle = title.toLowerCase();
-  return lowerTitle.includes('psa 10') || lowerTitle.includes('psa10');
+  return lowerTitle.includes('psa 10') || 
+         lowerTitle.includes('psa10') || 
+         lowerTitle.includes('psa-10');
 }
 
 export default async function handler(req, res) {
@@ -137,35 +151,47 @@ export default async function handler(req, res) {
     const data = await response.json();
     const items = data.itemSummaries || [];
 
+    console.log(`📦 eBay returned ${items.length} total items`);
+
     if (items.length === 0) {
       console.log(`❌ No eBay listings found for: ${searchTerms}`);
       return res.status(200).json({ found: false, searchTerms });
     }
 
     // Extract prices from active listings and filter based on search type
-    const listings = items
-      .map(item => ({
-        price: parseFloat(item.price?.value || 0),
-        title: item.title || '',
-        url: item.itemWebUrl || '',
-        condition: item.condition || 'Unknown'
-      }))
-      .filter(item => {
-        if (item.price <= 0) return false;
-        
-        const hasPSA = isPSA10Listing(item.title);
-        
-        // For PSA 10 searches, ONLY include listings with PSA 10 in title
-        if (graded === 'psa10') {
-          return hasPSA;
+    const allListings = items.map(item => ({
+      price: parseFloat(item.price?.value || 0),
+      title: item.title || '',
+      url: item.itemWebUrl || '',
+      condition: item.condition || 'Unknown'
+    }));
+
+    const listings = allListings.filter(item => {
+      if (item.price <= 0) return false;
+      
+      const hasPSA = isPSA10Listing(item.title);
+      
+      // For PSA 10 searches, ONLY include listings with PSA 10 in title
+      if (graded === 'psa10') {
+        if (hasPSA) {
+          console.log(`✅ PSA 10 listing: "${item.title}" - $${item.price}`);
         }
-        
-        // For raw card searches, EXCLUDE listings with PSA 10 in title
-        return !hasPSA;
-      });
+        return hasPSA;
+      }
+      
+      // For raw card searches, EXCLUDE listings with PSA 10 in title
+      if (hasPSA) {
+        console.log(`⏭️  Skipping PSA listing in raw search: "${item.title}"`);
+        return false;
+      }
+      console.log(`✅ Raw card listing: "${item.title}" - $${item.price}`);
+      return true;
+    });
+
+    console.log(`🎯 After filtering: ${listings.length} valid listings (${graded === 'psa10' ? 'PSA 10' : 'raw'})`);
 
     if (listings.length === 0) {
-      console.log(`⚠️ eBay returned items but no valid prices`);
+      console.log(`⚠️ eBay returned items but no valid listings after filtering (${graded === 'psa10' ? 'no PSA 10 found' : 'all were PSA graded'})`);
       return res.status(200).json({ found: false, searchTerms });
     }
 
@@ -175,6 +201,14 @@ export default async function handler(req, res) {
     const low = prices[0];
     const high = prices[prices.length - 1];
     const median = prices[Math.floor(prices.length / 2)];
+
+    // Get top 5 listings (or 3 minimum if fewer available)
+    const topListings = listings.slice(0, 5).map(l => ({
+      price: l.price,
+      title: l.title,
+      url: l.url,
+      condition: l.condition
+    }));
 
     // Get cheapest listing for "Buy Now" link
     const cheapestListing = listings[0];
@@ -189,6 +223,7 @@ export default async function handler(req, res) {
       high: parseFloat(high.toFixed(2)),
       median: parseFloat(median.toFixed(2)),
       count: listings.length,
+      topListings,
       cheapestListing: {
         price: cheapestListing.price,
         title: cheapestListing.title,

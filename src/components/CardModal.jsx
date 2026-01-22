@@ -527,7 +527,7 @@ const EbayPriceRow = ({ ebayData, label = "eBay" }) => {
         </span>
         {verified ? (
           <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
-            ✓ {count || 0} listings
+            ✓ Found listings
           </span>
         ) : (
           <span className="px-2 py-0.5 badge-estimated text-xs font-bold rounded-full">
@@ -577,7 +577,7 @@ const PSA10PriceRow = ({ psa10Data }) => {
         </div>
         {verified ? (
           <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
-            ✓ {count || 0} listings
+            ✓ Found listings
           </span>
         ) : (
           <span className="px-2 py-0.5 badge-estimated text-xs font-bold rounded-full">
