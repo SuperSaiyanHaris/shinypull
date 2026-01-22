@@ -107,6 +107,8 @@ export default async function handler(req, res) {
   try {
     const { cardName, cardNumber, rarity, setName, graded } = req.query;
 
+    console.log(`📥 Received params:`, { cardName, cardNumber, rarity, setName, graded });
+
     if (!cardName) {
       return res.status(400).json({ error: 'cardName is required' });
     }
