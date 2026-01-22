@@ -39,7 +39,7 @@ async function getAccessToken(clientId, clientSecret) {
 
 /**
  * Build eBay search terms for a Pokemon card
- * Pattern: "Pokemon [CardName] [CardNumber] [Rarity] English [SetName] [PSA 10 if graded]"
+ * Strategy: Use essential terms only to get broad results, then filter
  */
 function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
   const parts = ['Pokemon'];
@@ -54,20 +54,15 @@ function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
   
   parts.push(cleanName);
 
-  // Add card number if available (this is critical for specificity)
+  // Add card number if available - use full format (e.g., "125/094")
   if (cardNumber) {
     parts.push(cardNumber);
   }
 
-  // Add rarity if available and not too generic
-  if (rarity && !['Common', 'Uncommon'].includes(rarity)) {
-    parts.push(rarity);
-  }
+  // Skip rarity - it's often abbreviated or missing in eBay listings
+  // Examples: "Special Illustration Rare" might be "SIR" or omitted entirely
 
-  // Add English for language specificity
-  parts.push('English');
-
-  // Add set name if available
+  // Add set name if available (essential for specificity)
   if (setName) {
     parts.push(setName);
   }
@@ -79,6 +74,7 @@ function buildSearchTerms(cardName, cardNumber, rarity, setName, graded) {
 
   const searchString = parts.join(' ');
   console.log(`🔍 Built search string: "${searchString}"`);
+  console.log(`📋 Skipped parameters - Rarity: "${rarity || 'none'}" (often abbreviated by sellers)`);
   return searchString;
 }
 
