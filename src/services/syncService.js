@@ -293,3 +293,53 @@ export const performFullSync = async () => {
     cards: cardsResult.totalCards
   };
 };
+
+/**
+ * Trigger Supabase Edge Function sync via Vercel endpoint
+ * @param {string} mode - Sync mode: 'full', 'sets', 'prices', 'single-set'
+ * @param {string} [setId] - Set ID for single-set mode
+ */
+export const triggerEdgeFunctionSync = async (mode = 'prices', setId = null) => {
+  try {
+    console.log(`🚀 Triggering Edge Function sync with mode: ${mode}${setId ? `, setId: ${setId}` : ''}`);
+    
+    const startTime = Date.now();
+    
+    // Build URL with query params
+    const url = new URL('/api/trigger-sync', window.location.origin);
+    url.searchParams.set('mode', mode);
+    if (setId) {
+      url.searchParams.set('setId', setId);
+    }
+
+    // Call the Vercel serverless function which triggers the Edge Function
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+    if (!response.ok) {
+      console.error('❌ Edge Function sync failed:', result);
+      throw new Error(result.error || `Edge Function returned ${response.status}`);
+    }
+
+    console.log(`✅ Edge Function sync completed in ${elapsed}s:`, result);
+    
+    return {
+      success: true,
+      ...result,
+      elapsed: `${elapsed}s`
+    };
+  } catch (error) {
+    console.error('💥 Error triggering Edge Function sync:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to trigger sync'
+    };
+  }
+};

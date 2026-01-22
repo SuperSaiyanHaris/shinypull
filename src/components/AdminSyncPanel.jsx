@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Database, CheckCircle, XCircle, Clock, DollarSign } from 'lucide-react';
-import { performFullSync, syncAllSets, syncAllCards, checkSyncStatus } from '../services/syncService';
+import { RefreshCw, Database, CheckCircle, XCircle, Clock, DollarSign, Zap } from 'lucide-react';
+import { performFullSync, syncAllSets, syncAllCards, checkSyncStatus, triggerEdgeFunctionSync } from '../services/syncService';
 import { updateAllPrices, updateStalePrices } from '../services/priceUpdateService';
 
 const AdminSyncPanel = () => {
@@ -86,6 +86,57 @@ const AdminSyncPanel = () => {
       setLastSyncResult(result);
       await loadSyncStatus();
     } catch (error) {
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleEdgeFunctionFullSync = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+
+    try {
+      console.log('🔥 Starting Edge Function full sync...');
+      const result = await triggerEdgeFunctionSync('full');
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      console.error('💥 Edge Function full sync failed:', error);
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleEdgeFunctionPricesSync = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+
+    try {
+      console.log('💰 Starting Edge Function prices sync...');
+      const result = await triggerEdgeFunctionSync('prices');
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      console.error('💥 Edge Function prices sync failed:', error);
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleEdgeFunctionSetsSync = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+
+    try {
+      console.log('📦 Starting Edge Function sets sync...');
+      const result = await triggerEdgeFunctionSync('sets');
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      console.error('💥 Edge Function sets sync failed:', error);
       setLastSyncResult({ success: false, error: error.message });
     } finally {
       setSyncing(false);
@@ -201,6 +252,52 @@ const AdminSyncPanel = () => {
           </button>
         </div>
       </div>
+
+      {/* Edge Function Sync Actions */}
+      <div className="space-y-3 mb-6">
+        <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wider flex items-center gap-2">
+          <Zap className="w-4 h-4 text-yellow-500" />
+          Supabase Edge Function Sync (Server-Side)
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <button
+            onClick={handleEdgeFunctionFullSync}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+          >
+            <Zap className={`w-5 h-5 ${syncing ? 'animate-pulse' : ''}`} />
+            Full Sync (Edge)
+          </button>
+          <butto className="flex-1">
+              <p
+                className={`font-semibold ${
+                  lastSyncResult.success
+                    ? 'text-green-900 dark:text-green-100'
+                    : 'text-red-900 dark:text-red-100'
+                }`}
+              >
+                {lastSyncResult.success ? 'Sync Successful!' : 'Sync Failed'}
+              </p>
+              {lastSyncResult.success ? (
+                <div className="text-sm text-green-800 dark:text-green-200 mt-1 space-y-1">
+                  {lastSyncResult.sets && <p>✓ {lastSyncResult.sets} sets synced</p>}
+                  {lastSyncResult.cards && <p>✓ {lastSyncResult.cards} cards synced</p>}
+                  {lastSyncResult.count && <p>✓ {lastSyncResult.count} items synced</p>}
+                  {lastSyncResult.totalSuccess && <p>✓ {lastSyncResult.totalSuccess}/{lastSyncResult.totalCards} prices updated</p>}
+                  {lastSyncResult.elapsed && <p>⏱️ Completed in {lastSyncResult.elapsed}</p>}
+                  {lastSyncResult.setsUpdated && <p>✓ {lastSyncResult.setsUpdated} sets updated</p>}
+                  {lastSyncResult.cardsUpdated && <p>✓ {lastSyncResult.cardsUpdated} cards updated</p>}
+                  {lastSyncResult.pricesUpdated && <p>✓ {lastSyncResult.pricesUpdated} prices updated</p>}
+                </div>
+              ) : (
+                <div className="text-sm text-red-800 dark:text-red-200 mt-1">
+                  <p className="font-mono text-xs bg-red-100 dark:bg-red-900/30 p-2 rounded mt-1">
+                    {lastSyncResult.error}
+                  </p>
+                  {lastSyncResult.hint && (
+                    <p className="mt-2 text-xs italic">💡 {lastSyncResult.hint}</p>
+                  )}
+                </div
 
       {/* Last Sync Result */}
       {lastSyncResult && (
