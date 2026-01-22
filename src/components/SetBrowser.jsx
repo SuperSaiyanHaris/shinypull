@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Grid, List, SortDesc, Filter } from 'lucide-react';
 import { getAllSets } from '../services/dbSetService';
+import { useAuth } from '../contexts/AuthContext';
 
 const SetBrowser = ({ onSetClick }) => {
+  const { loading: authLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('releaseDate'); // releaseDate, name, totalCards
   const [viewMode, setViewMode] = useState('grid'); // grid, list
@@ -11,12 +13,16 @@ const SetBrowser = ({ onSetClick }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Wait for auth to settle before loading sets
+    if (authLoading) {
+      console.log('[SetBrowser] Waiting for auth to settle...');
+      return;
+    }
+
     const loadSets = async () => {
       try {
         setLoading(true);
         console.log('[SetBrowser] Loading sets...');
-        // Small delay to avoid connection pool contention on refresh
-        await new Promise(resolve => setTimeout(resolve, 100));
         const allSets = await getAllSets();
         console.log('[SetBrowser] Loaded', allSets?.length || 0, 'sets');
         setSets(allSets || []);
@@ -30,7 +36,7 @@ const SetBrowser = ({ onSetClick }) => {
       }
     };
     loadSets();
-  }, []);
+  }, [authLoading]);
 
   // Get unique series for filter
   const seriesOptions = ['all', ...new Set(sets.map(s => s.series))].filter(Boolean);
