@@ -310,6 +310,24 @@ const MyCollection = ({ onBack }) => {
       ) : (
         /* Card Grid/List for Selected Set */
         <>
+          {/* Progress Bar - Above cards */}
+          <div className="glass-effect rounded-xl border border-adaptive p-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-adaptive-tertiary">
+                Collection Progress
+              </span>
+              <span className="font-bold text-adaptive-primary">
+                {collectedCount} / {setCards.length} cards ({progressPercent}%)
+              </span>
+            </div>
+            <div className="mt-2 h-2 bg-adaptive-card rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
+
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
               {filteredSetCards.map((card) => {
@@ -319,12 +337,10 @@ const MyCollection = ({ onBack }) => {
                 return (
                   <div
                     key={card.id}
-                    className={`relative group ${!isCollected ? 'opacity-30 grayscale' : ''}`}
+                    className={`relative group cursor-pointer ${!isCollected ? 'opacity-30 grayscale' : ''}`}
+                    onClick={() => handleViewDetails(card)}
                   >
-                    <button
-                      onClick={() => handleViewDetails(card)}
-                      className="w-full aspect-[3/4] rounded-lg overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900"
-                    >
+                    <div className="w-full aspect-[3/4] rounded-lg overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900">
                       <img
                         src={card.image}
                         alt={card.name}
@@ -333,54 +349,58 @@ const MyCollection = ({ onBack }) => {
                           e.target.src = 'https://via.placeholder.com/200x280?text=Card';
                         }}
                       />
-                    </button>
+                    </div>
 
                     {/* Collected Badge */}
                     {isCollected && (
-                      <div className="absolute top-1 right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow">
+                      <div className="absolute top-1 right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow pointer-events-none">
                         <Check className="w-3 h-3 text-white" />
                       </div>
                     )}
 
                     {/* Quantity Badge */}
                     {collectedItem && collectedItem.quantity > 1 && (
-                      <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-blue-600 text-white text-xs font-bold rounded">
+                      <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-blue-600 text-white text-xs font-bold rounded pointer-events-none">
                         x{collectedItem.quantity}
                       </div>
                     )}
 
-                    {/* Hover Controls for Collected Cards */}
+                    {/* Hover Controls for Collected Cards - Bottom bar instead of full overlay */}
                     {isCollected && (
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 rounded-lg">
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 py-1 rounded-b-lg">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleUpdateQuantity(card.id, collectedItem.quantity - 1);
                           }}
-                          className="p-1.5 bg-white/20 hover:bg-white/30 rounded text-white"
+                          className="p-1 bg-white/20 hover:bg-red-500/50 rounded text-white"
+                          title={collectedItem.quantity === 1 ? "Remove from collection" : "Decrease quantity"}
                         >
-                          <Minus className="w-4 h-4" />
+                          <Minus className="w-3 h-3" />
                         </button>
-                        <span className="text-white text-sm font-bold px-2">{collectedItem.quantity}</span>
+                        <span className="text-white text-xs font-bold px-1">{collectedItem.quantity}</span>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleUpdateQuantity(card.id, collectedItem.quantity + 1);
                           }}
-                          className="p-1.5 bg-white/20 hover:bg-white/30 rounded text-white"
+                          className="p-1 bg-white/20 hover:bg-white/30 rounded text-white"
                         >
-                          <Plus className="w-4 h-4" />
+                          <Plus className="w-3 h-3" />
                         </button>
                       </div>
                     )}
 
                     {/* Add Button for uncollected */}
                     {!isCollected && (
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center py-1 rounded-b-lg">
                         <AddToCollectionButton
                           card={card}
                           variant="icon"
-                          onSuccess={handleCardAdded}
+                          onSuccess={(e) => {
+                            if (e) e.stopPropagation();
+                            handleCardAdded();
+                          }}
                         />
                       </div>
                     )}
@@ -465,24 +485,6 @@ const MyCollection = ({ onBack }) => {
               })}
             </div>
           )}
-
-          {/* Summary Footer */}
-          <div className="glass-effect rounded-xl border border-adaptive p-4 mt-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-adaptive-tertiary">
-                Collection Progress
-              </span>
-              <span className="font-bold text-adaptive-primary">
-                {collectedCount} / {setCards.length} cards ({progressPercent}%)
-              </span>
-            </div>
-            <div className="mt-2 h-2 bg-adaptive-card rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-          </div>
         </>
       )}
 
