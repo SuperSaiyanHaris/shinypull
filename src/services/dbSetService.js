@@ -119,21 +119,6 @@ export const getSetCards = async (setId) => {
  * Search cards by name across all sets
  */
 export const searchCards = async (query) => {
-  try {
-    // Return empty array for empty queries
-    if (!query || query.trim() === '') {
-      return [];
-    }
-
-    const { data, error } = await supabase
-      .from('cards')
-      .select(`
-        *,
-        sets (
-          name,
-          series,
-          release_date,
-          logo
   // Return empty array for empty queries
   if (!query || query.trim() === '') {
     return [];
@@ -205,3 +190,4 @@ export const searchCards = async (query) => {
       priceHistory: []
     };
   });
+};
