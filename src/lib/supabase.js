@@ -4,22 +4,9 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials not found. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file');
+  console.error('❌ Missing Supabase credentials!');
+} else {
+  console.log('✅ Supabase client initialized');
 }
 
-console.log('[Supabase] Initializing client:', supabaseUrl);
-
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-  db: {
-    schema: 'public'
-  },
-  global: {
-    headers: {
-      'x-client-info': 'shinypull-web'
-    }
-  }
-});
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
