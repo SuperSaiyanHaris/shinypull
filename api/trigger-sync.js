@@ -14,11 +14,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+    // Try both naming conventions (Vercel uses non-VITE, frontend uses VITE_)
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl) {
-      return res.status(500).json({ error: 'SUPABASE_URL not configured' });
+      return res.status(500).json({
+        error: 'SUPABASE_URL not configured',
+        hint: 'Add SUPABASE_URL to your Vercel environment variables (Project Settings > Environment Variables)'
+      });
     }
 
     // Get sync mode from query params or body
