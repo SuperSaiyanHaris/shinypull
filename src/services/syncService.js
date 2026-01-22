@@ -113,7 +113,8 @@ export const syncSetCards = async (setId) => {
       number: card.number || 'N/A',
       rarity: card.rarity || 'Common',
       image_small: card.images?.small,
-      image_large: card.images?.large
+      image_large: card.images?.large,
+      tcgplayer_url: card.tcgplayer?.url || null
     }));
 
     // Upsert cards
