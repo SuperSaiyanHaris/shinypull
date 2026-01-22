@@ -7,6 +7,7 @@ const AddToCollectionButton = ({
   card,
   variant = 'default', // 'default', 'compact', 'icon'
   onAuthRequired,
+  onSuccess,
   className = ''
 }) => {
   const { user } = useAuth();
@@ -50,6 +51,7 @@ const AddToCollectionButton = ({
       setLoading(true);
       await collectionService.addToCollection(user.id, card);
       setIsInCollection(true);
+      onSuccess?.();
     } catch (error) {
       console.error('Error adding to collection:', error);
     } finally {
