@@ -1,6 +1,18 @@
 import { supabase } from '../lib/supabase';
 
+// Cache for collected card IDs to prevent repeated API calls
+let collectionCache = {
+  userId: null,
+  cardIds: new Set(),
+  timestamp: 0
+};
+const CACHE_DURATION = 30000; // 30 seconds
+
 export const collectionService = {
+  // Clear the cache (call after add/remove operations)
+  clearCache() {
+    collectionCache = { userId: null, cardIds: new Set(), timestamp: 0 };
+  },
   // Get all cards in user's collection
   async getCollection(userId) {
     const { data, error } = await supabase
@@ -13,17 +25,54 @@ export const collectionService = {
     return data;
   },
 
-  // Check if a card is in the collection
+  // Check if a card is in the collection (uses cache to prevent spam)
   async isInCollection(userId, cardId) {
+    // Check cache first
+    const now = Date.now();
+    if (
+      collectionCache.userId === userId &&
+      now - collectionCache.timestamp < CACHE_DURATION
+    ) {
+      return collectionCache.cardIds.has(cardId) ? { id: cardId, quantity: 1 } : null;
+    }
+
+    // Cache miss - fetch all collected card IDs
+    await this.refreshCache(userId);
+    return collectionCache.cardIds.has(cardId) ? { id: cardId, quantity: 1 } : null;
+  },
+
+  // Refresh the collection cache
+  async refreshCache(userId) {
     const { data, error } = await supabase
       .from('user_collections')
-      .select('id, quantity')
-      .eq('user_id', userId)
-      .eq('card_id', cardId)
-      .single();
+      .select('card_id')
+      .eq('user_id', userId);
 
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
+    if (error) {
+      console.error('Error fetching collection for cache:', error);
+      return;
+    }
+
+    collectionCache = {
+      userId,
+      cardIds: new Set(data.map(item => item.card_id)),
+      timestamp: Date.now()
+    };
+  },
+
+  // Get all collected card IDs for a user (for batch checking)
+  async getCollectedCardIds(userId) {
+    // Use cache if available
+    const now = Date.now();
+    if (
+      collectionCache.userId === userId &&
+      now - collectionCache.timestamp < CACHE_DURATION
+    ) {
+      return collectionCache.cardIds;
+    }
+
+    await this.refreshCache(userId);
+    return collectionCache.cardIds;
   },
 
   // Add a card to collection
@@ -47,6 +96,12 @@ export const collectionService = {
       .single();
 
     if (error) throw error;
+
+    // Update cache
+    if (collectionCache.userId === userId) {
+      collectionCache.cardIds.add(card.id);
+    }
+
     return data;
   },
 
@@ -77,6 +132,12 @@ export const collectionService = {
       .eq('card_id', cardId);
 
     if (error) throw error;
+
+    // Update cache
+    if (collectionCache.userId === userId) {
+      collectionCache.cardIds.delete(cardId);
+    }
+
     return true;
   },
 
