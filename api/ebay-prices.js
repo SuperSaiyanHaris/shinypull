@@ -3,9 +3,10 @@
 
 /**
  * Build eBay search terms for a Pokemon card
- * Uses a simpler format that matches how sellers actually title their listings
- * Example: "Mega Charizard X ex 125 Phantasmal Flames"
- * For PSA 10: "Mega Charizard X ex 125 Phantasmal Flames PSA 10"
+ * Keep it simple - card name + number is usually enough
+ * eBay uses AND logic so fewer terms = more results
+ * Example: "Mega Charizard X ex 125"
+ * For PSA 10: "Mega Charizard X ex PSA 10"
  */
 function buildEbaySearchTerms(cardName, cardSet, cardNumber, rarity, graded) {
   const parts = [];
@@ -13,25 +14,20 @@ function buildEbaySearchTerms(cardName, cardSet, cardNumber, rarity, graded) {
   // Add card name (most important)
   parts.push(cardName);
 
-  // Add card number without the total (e.g., "125" from "125/094")
-  if (cardNumber) {
-    const num = cardNumber.split('/')[0];
-    parts.push(num);
-  }
-
-  // Add set name (simplified - remove special characters)
-  if (cardSet) {
-    const cleanSet = cardSet
-      .replace(/—/g, ' ')
-      .replace(/[^\w\s]/g, '')
-      .trim();
-    parts.push(cleanSet);
-  }
-
-  // Add PSA 10 for graded searches
+  // For PSA 10, don't include number - sellers format it differently
+  // Just search for card name + PSA 10
   if (graded === 'psa10') {
     parts.push('PSA 10');
+  } else {
+    // For raw cards, add number to narrow results
+    if (cardNumber) {
+      const num = cardNumber.split('/')[0];
+      parts.push(num);
+    }
   }
+
+  // Add "pokemon" to filter out non-Pokemon results
+  parts.push('pokemon');
 
   return parts.join(' ');
 }
