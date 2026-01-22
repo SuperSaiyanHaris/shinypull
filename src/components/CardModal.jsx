@@ -14,7 +14,7 @@ const HighPriceTooltip = ({ className = "" }) => (
   </div>
 );
 
-const CardModal = ({ card, isOpen, onClose }) => {
+const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Close modal when clicking backdrop
@@ -146,7 +146,12 @@ const CardModal = ({ card, isOpen, onClose }) => {
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
-                <AddToCollectionButton card={card} className="flex-1" />
+                <AddToCollectionButton 
+                  card={card} 
+                  className="flex-1"
+                  onSuccess={onCardAdded}
+                  onRemove={onCardRemoved}
+                />
                 <button className="px-4 py-3 modal-button rounded-xl border">
                   <ExternalLink className="w-5 h-5 text-adaptive-secondary" />
                 </button>
@@ -229,7 +234,12 @@ const CardModal = ({ card, isOpen, onClose }) => {
 
                   {/* Quick Actions */}
                   <div className="flex gap-3">
-                    <AddToCollectionButton card={card} className="flex-1" />
+                    <AddToCollectionButton 
+                      card={card} 
+                      className="flex-1"
+                      onSuccess={onCardAdded}
+                      onRemove={onCardRemoved}
+                    />
                     <button className="px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border">
                       <ExternalLink className="w-5 h-5" />
                     </button>

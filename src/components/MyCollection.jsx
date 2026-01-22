@@ -123,6 +123,21 @@ const MyCollection = ({ onBack }) => {
   const handleCardAdded = () => {
     // Refresh collection when a card is added
     loadCollection();
+    // Also refresh set cards to update collection status
+    if (selectedSetId) {
+      loadSetCards(selectedSetId);
+    }
+  };
+
+  const handleCardRemoved = () => {
+    // Refresh collection when a card is removed
+    loadCollection();
+    // Also refresh collection cache
+    collectionService.clearCache();
+    // Refresh set cards to update collection status
+    if (selectedSetId) {
+      loadSetCards(selectedSetId);
+    }
   };
 
   const handleViewDetails = (card) => {
@@ -494,6 +509,8 @@ const MyCollection = ({ onBack }) => {
           card={selectedCard}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          onCardAdded={handleCardAdded}
+          onCardRemoved={handleCardRemoved}
         />
       )}
     </div>
