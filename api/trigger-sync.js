@@ -16,12 +16,19 @@ export default async function handler(req, res) {
   try {
     // Try both naming conventions (Vercel uses non-VITE, frontend uses VITE_)
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl) {
       return res.status(500).json({
         error: 'SUPABASE_URL not configured',
         hint: 'Add SUPABASE_URL to your Vercel environment variables (Project Settings > Environment Variables)'
+      });
+    }
+
+    if (!supabaseServiceKey) {
+      return res.status(500).json({
+        error: 'SUPABASE_SERVICE_ROLE_KEY not configured',
+        hint: 'Add SUPABASE_SERVICE_ROLE_KEY to your Vercel environment variables (Project Settings > Environment Variables)'
       });
     }
 
@@ -32,12 +39,12 @@ export default async function handler(req, res) {
     // Build the Edge Function URL
     const functionUrl = `${supabaseUrl}/functions/v1/sync-pokemon-data`;
 
-    // Call the Edge Function
+    // Call the Edge Function with service role key for authentication
     const response = await fetch(functionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Authorization': `Bearer ${supabaseServiceKey}`,
       },
       body: JSON.stringify({ mode, setId }),
     });
