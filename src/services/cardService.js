@@ -270,6 +270,7 @@ async function transformCards(cards) {
       number: card.number || 'N/A',
       rarity: card.rarity || 'Common',
       image: card.images?.large || card.images?.small || 'https://via.placeholder.com/400x560?text=No+Image',
+      tcgplayerUrl: card.tcgplayer?.url || null,
       prices: {
         tcgplayer: {
           market: marketPrice,

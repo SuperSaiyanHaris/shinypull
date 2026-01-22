@@ -90,6 +90,9 @@ export const getSetCards = async (setId) => {
     const price = priceData || {};
     const setData = card.sets || {};
 
+    // Build TCGPlayer search URL as fallback
+    const tcgplayerSearchUrl = `https://www.tcgplayer.com/search/pokemon/product?q=${encodeURIComponent(card.name + ' ' + card.number)}`;
+
     return {
       id: card.id,
       name: card.name,
@@ -102,6 +105,7 @@ export const getSetCards = async (setId) => {
       },
       set: setData.name,
       setId: card.set_id,
+      tcgplayerUrl: card.tcgplayer_url || tcgplayerSearchUrl,
       prices: {
         tcgplayer: {
           market: price.tcgplayer_market ?? 0,
@@ -173,6 +177,9 @@ export const searchCards = async (query) => {
     const price = priceData || {};
     const set = card.sets || {};
 
+    // Build TCGPlayer search URL as fallback
+    const tcgplayerSearchUrl = `https://www.tcgplayer.com/search/pokemon/product?q=${encodeURIComponent(card.name + ' ' + card.number)}`;
+
     return {
       id: card.id,
       name: card.name,
@@ -185,6 +192,7 @@ export const searchCards = async (query) => {
       },
       set: set.name,
       setId: card.set_id,
+      tcgplayerUrl: card.tcgplayer_url || tcgplayerSearchUrl,
       prices: {
         tcgplayer: {
           market: price.tcgplayer_market ?? 0,

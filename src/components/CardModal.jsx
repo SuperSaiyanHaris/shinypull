@@ -250,15 +250,23 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
-                <AddToCollectionButton 
-                  card={card} 
+                <AddToCollectionButton
+                  card={card}
                   className="flex-1"
                   onSuccess={onCardAdded}
                   onRemove={onCardRemoved}
                 />
-                <button className="px-4 py-3 modal-button rounded-xl border">
-                  <ExternalLink className="w-5 h-5 text-adaptive-secondary" />
-                </button>
+                {card.tcgplayerUrl && (
+                  <a
+                    href={card.tcgplayerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-3 modal-button rounded-xl border flex items-center justify-center"
+                    title="View on TCGPlayer"
+                  >
+                    <ExternalLink className="w-5 h-5 text-adaptive-secondary" />
+                  </a>
+                )}
               </div>
 
               {/* Source info */}
@@ -338,15 +346,23 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
 
                   {/* Quick Actions */}
                   <div className="flex gap-3">
-                    <AddToCollectionButton 
-                      card={card} 
+                    <AddToCollectionButton
+                      card={card}
                       className="flex-1"
                       onSuccess={onCardAdded}
                       onRemove={onCardRemoved}
                     />
-                    <button className="px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border">
-                      <ExternalLink className="w-5 h-5" />
-                    </button>
+                    {card.tcgplayerUrl && (
+                      <a
+                        href={card.tcgplayerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border flex items-center justify-center"
+                        title="View on TCGPlayer"
+                      >
+                        <ExternalLink className="w-5 h-5" />
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -417,6 +433,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                     platform="Pokemon TCG API"
                     price={card.prices.tcgplayer.market}
                     verified
+                    link={card.tcgplayerUrl}
                   />
                   {loadingEbay ? (
                     <div className="flex items-center justify-center p-4 modal-card rounded-lg border">
@@ -499,7 +516,7 @@ const InfoCard = ({ label, value }) => (
   </div>
 );
 
-const PriceCompareRow = ({ platform, price, verified, estimated }) => (
+const PriceCompareRow = ({ platform, price, verified, estimated, link }) => (
   <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border">
     <div className="flex items-center gap-3">
       <span className="text-adaptive-primary font-semibold">{platform}</span>
@@ -514,9 +531,22 @@ const PriceCompareRow = ({ platform, price, verified, estimated }) => (
         </span>
       )}
     </div>
-    <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-      {formatPrice(price)}
-    </span>
+    <div className="flex items-center gap-3">
+      <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+        {formatPrice(price)}
+      </span>
+      {link && (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
+          title="View on TCGPlayer"
+        >
+          <ExternalLink className="w-4 h-4 text-blue-500" />
+        </a>
+      )}
+    </div>
   </div>
 );
 
@@ -578,7 +608,7 @@ const PSA10PriceRow = ({ psa10Data }) => {
         <div className="flex items-center gap-2">
           <Award className="w-5 h-5 text-yellow-500" />
           <span className="text-adaptive-primary font-semibold">
-            {verified ? 'PSA 10 (Active)' : 'PSA 10 (estimated)'}
+            {verified ? 'eBay PSA 10 (Active)' : 'eBay PSA 10 (estimated)'}
           </span>
         </div>
         {verified ? (
