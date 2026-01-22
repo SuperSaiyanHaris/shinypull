@@ -14,7 +14,7 @@ const Hero = () => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-4xl mx-auto mb-12 animate-fade-in">
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-display text-adaptive-primary mb-6 leading-tight text-balance">
-            Pull the best <span className="shiny-gradient">Prices</span>
+            Pull the best <span className="shiny-gradient">prices.</span>
           </h2>
         </div>
 
