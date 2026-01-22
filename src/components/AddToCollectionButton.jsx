@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Check, Loader2, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useAuthModal } from '../contexts/AuthModalContext';
 import { collectionService } from '../services/collectionService';
 
 const AddToCollectionButton = ({
   card,
   variant = 'default', // 'default', 'compact', 'icon'
-  onAuthRequired,
   onSuccess,
   onRemove,
   className = ''
 }) => {
   const { user } = useAuth();
+  const { openAuthModal } = useAuthModal();
   const [isInCollection, setIsInCollection] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -41,9 +42,7 @@ const AddToCollectionButton = ({
     e.stopPropagation();
 
     if (!user) {
-      if (onAuthRequired) {
-        onAuthRequired();
-      }
+      openAuthModal();
       return;
     }
 

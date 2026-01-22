@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Sun, Moon, LogOut, User, Package } from 'lucide-react';
 import logo from '../imgs/shinypulllogo.png';
 import { useAuth } from '../contexts/AuthContext';
+import { useAuthModal } from '../contexts/AuthModalContext';
 import AuthModal from './AuthModal';
 
 const Header = ({ onLogoClick, onCollectionClick }) => {
   const [darkMode, setDarkMode] = useState(true);
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, profile, loading, signOut } = useAuth();
+  const { isAuthModalOpen, openAuthModal, closeAuthModal } = useAuthModal();
 
   const toggleTheme = () => {
     setDarkMode(!darkMode);
@@ -158,7 +159,7 @@ const Header = ({ onLogoClick, onCollectionClick }) => {
                 <>
                   {/* Mobile */}
                   <button
-                    onClick={() => setShowAuthModal(true)}
+                    onClick={() => openAuthModal()}
                     className="md:hidden p-2 text-adaptive-secondary hover:text-adaptive-primary transition-colors"
                   >
                     <User className="w-6 h-6" />
@@ -166,7 +167,7 @@ const Header = ({ onLogoClick, onCollectionClick }) => {
 
                   {/* Desktop */}
                   <button
-                    onClick={() => setShowAuthModal(true)}
+                    onClick={() => openAuthModal()}
                     className="hidden md:block px-5 py-2.5 bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 hover:from-yellow-300 hover:via-yellow-400 hover:to-amber-400 text-slate-900 font-bold rounded-xl transition-all shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50"
                   >
                     Sign In
@@ -180,8 +181,8 @@ const Header = ({ onLogoClick, onCollectionClick }) => {
 
       {/* Auth Modal */}
       <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
       />
     </>
   );
