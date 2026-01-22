@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
+import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info, ChevronDown, ChevronUp, Award } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import AddToCollectionButton from './AddToCollectionButton';
+import PSA10Dropdown from './PSA10Dropdown';
 
 // Reusable tooltip component for High price explanation
 const HighPriceTooltip = ({ className = "" }) => (
@@ -314,21 +315,23 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                     price={card.prices.tcgplayer.market}
                     verified
                   />
-                  <PriceCompareRow
-                    platform={card.prices.ebay.verified ? "eBay API" : "eBay (estimated)"}
-                    price={card.prices.ebay.avg}
-                    verified={card.prices.ebay.verified}
-                    estimated={!card.prices.ebay.verified}
+                  <EbayPriceRow
+                    ebayData={card.prices.ebay}
                   />
-                  <PriceCompareRow
-                    platform={card.prices.psa10.verified ? "PSA 10 (eBay)" : "PSA 10 (estimated)"}
-                    price={card.prices.psa10.avg}
-                    verified={card.prices.psa10.verified}
-                    estimated={!card.prices.psa10.verified}
+                  <PSA10Dropdown
+                    psa10Data={card.prices.psa10}
                   />
                 </div>
-                <p className="text-xs text-adaptive-tertiary mt-6 text-center">
-                  Verified prices from Pokemon TCG API. Other sources are estimates based on market data.
+                {card.prices.ebay.searchTerms && (
+                  <div className="mt-4 p-3 rounded-lg bg-slate-100 dark:bg-slate-800/50 border border-adaptive">
+                    <p className="text-xs text-adaptive-tertiary">
+                      <span className="font-semibold">eBay Search Title:</span>{' '}
+                      <span className="font-mono text-adaptive-secondary">{card.prices.ebay.searchTerms}</span>
+                    </p>
+                  </div>
+                )}
+                <p className="text-xs text-adaptive-tertiary mt-4 text-center">
+                  Verified prices from Pokemon TCG API. eBay prices from recent sold listings.
                 </p>
               </div>
             )}
@@ -403,6 +406,47 @@ const PriceCompareRow = ({ platform, price, verified, estimated }) => (
     </span>
   </div>
 );
+
+const EbayPriceRow = ({ ebayData }) => {
+  if (!ebayData) return null;
+
+  const { avg, verified, searchUrl } = ebayData;
+
+  return (
+    <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border group">
+      <div className="flex items-center gap-3">
+        <span className="text-adaptive-primary font-semibold">
+          {verified ? 'eBay (Sold)' : 'eBay (estimated)'}
+        </span>
+        {verified ? (
+          <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
+            ✓ Verified
+          </span>
+        ) : (
+          <span className="px-2 py-0.5 badge-estimated text-xs font-bold rounded-full">
+            ~Estimated
+          </span>
+        )}
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+          {formatPrice(avg)}
+        </span>
+        {verified && searchUrl && (
+          <a
+            href={searchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
+            title="View on eBay"
+          >
+            <ExternalLink className="w-4 h-4 text-blue-500" />
+          </a>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const DetailRow = ({ label, value }) => (
   <div className="flex justify-between items-center p-4 modal-card rounded-lg border">

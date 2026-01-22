@@ -1,6 +1,77 @@
 // Vercel Serverless Function - eBay Price Fetcher
 // This acts as a backend proxy to avoid CORS issues
 
+/**
+ * Build an eBay-style search title for a Pokemon card
+ * Format: "YEAR POKEMON SET-CODE RARITY #NUMBER CARDNAME PSA 10"
+ * Example: "2023 POKEMON MEW EN-151 SPECIAL ILLUSTRATION RARE #199 CHARIZARD EX PSA 10"
+ */
+function buildEbaySearchTitle(cardName, cardSet, cardNumber, rarity, graded) {
+  const parts = [];
+
+  // Extract year from set name or use current year
+  const yearMatch = cardSet?.match(/\b(20\d{2})\b/);
+  const year = yearMatch ? yearMatch[1] : new Date().getFullYear();
+  parts.push(year);
+
+  parts.push('POKEMON');
+
+  // Add set code/name (cleaned up)
+  if (cardSet) {
+    // Convert set name to abbreviated format
+    // e.g., "Scarlet & Violet—151" -> "SV-151", "Mew" -> "MEW"
+    let setCode = cardSet
+      .replace(/Scarlet\s*&?\s*Violet/i, 'SV')
+      .replace(/Sword\s*&?\s*Shield/i, 'SWSH')
+      .replace(/Sun\s*&?\s*Moon/i, 'SM')
+      .replace(/XY/i, 'XY')
+      .replace(/Black\s*&?\s*White/i, 'BW')
+      .replace(/—/g, '-')
+      .replace(/[^\w\s-]/g, '')
+      .toUpperCase()
+      .trim();
+
+    // Keep it concise
+    if (setCode.length > 20) {
+      setCode = setCode.split(/\s+/).slice(0, 3).join(' ');
+    }
+    parts.push(setCode);
+  }
+
+  // Add rarity if available
+  if (rarity) {
+    const rarityUpper = rarity.toUpperCase();
+    // Only add distinctive rarities
+    if (rarityUpper.includes('ILLUSTRATION') ||
+        rarityUpper.includes('SPECIAL') ||
+        rarityUpper.includes('SECRET') ||
+        rarityUpper.includes('HOLO') ||
+        rarityUpper.includes('ULTRA') ||
+        rarityUpper.includes('FULL ART') ||
+        rarityUpper.includes('ALT ART') ||
+        rarityUpper.includes('RARE')) {
+      parts.push(rarityUpper);
+    }
+  }
+
+  // Add card number
+  if (cardNumber) {
+    // Format as #NUMBER (e.g., "#199" or "#4/102")
+    const num = cardNumber.split('/')[0]; // Get just the number part
+    parts.push(`#${num}`);
+  }
+
+  // Add card name
+  parts.push(cardName.toUpperCase());
+
+  // Add PSA 10 for graded searches
+  if (graded === 'psa10') {
+    parts.push('PSA 10');
+  }
+
+  return parts.join(' ');
+}
+
 export default async function handler(req, res) {
   // Enable CORS for your frontend
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -17,7 +88,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { cardName, cardSet, cardNumber, graded } = req.query;
+    const { cardName, cardSet, cardNumber, rarity, graded } = req.query;
 
     if (!cardName) {
       return res.status(400).json({ error: 'cardName is required' });
@@ -30,21 +101,9 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'eBay API not configured' });
     }
 
-    // Build search terms - keep it simple for better match rates
-    // Don't include card number or set as they're too restrictive
-    let searchTerms = `${cardName} pokemon card`;
-
-    // If searching for PSA 10 graded cards, add PSA 10 to search
-    if (graded === 'psa10') {
-      searchTerms = `${cardName} PSA 10 pokemon`;
-    }
-
-    // Only add set name if the card name is very common (like "Pikachu")
-    // to help narrow down results
-    const commonNames = ['pikachu', 'charizard', 'mewtwo', 'mew', 'eevee'];
-    if (cardSet && commonNames.some(name => cardName.toLowerCase().includes(name))) {
-      searchTerms += ` ${cardSet}`;
-    }
+    // Build eBay-style search title
+    // Format: "2023 POKEMON MEW EN-151 SPECIAL ILLUSTRATION RARE #199 CHARIZARD EX PSA 10"
+    const searchTerms = buildEbaySearchTitle(cardName, cardSet, cardNumber, rarity, graded);
 
     const keywords = encodeURIComponent(searchTerms);
 
@@ -80,32 +139,64 @@ export default async function handler(req, res) {
     }
 
     const items = searchResult.item || [];
-    const prices = items
-      .map(item => parseFloat(item.sellingStatus?.[0]?.currentPrice?.[0]?.__value__ || 0))
-      .filter(price => price > 0);
 
-    if (prices.length === 0) {
+    // Extract price and listing details from each item
+    const listings = items
+      .map(item => {
+        const price = parseFloat(item.sellingStatus?.[0]?.currentPrice?.[0]?.__value__ || 0);
+        const title = item.title?.[0] || '';
+        const itemId = item.itemId?.[0] || '';
+        const viewItemURL = item.viewItemURL?.[0] || '';
+        const endTime = item.listingInfo?.[0]?.endTime?.[0] || '';
+
+        return {
+          price,
+          title,
+          itemId,
+          url: viewItemURL,
+          endTime: endTime ? new Date(endTime).toISOString() : null
+        };
+      })
+      .filter(item => item.price > 0);
+
+    if (listings.length === 0) {
       console.log(`⚠️ eBay returned ${resultCount} items but no valid prices`);
       return res.status(200).json({ found: false, searchTerms });
     }
 
     // Calculate statistics
+    const prices = listings.map(l => l.price);
     prices.sort((a, b) => a - b);
     const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
     const median = prices[Math.floor(prices.length / 2)];
-    const recent = prices.slice(-5);
+
+    // Get the 3 most recent sold listings with their URLs
+    const recentListings = listings
+      .sort((a, b) => new Date(b.endTime) - new Date(a.endTime))
+      .slice(0, 3)
+      .map(l => ({
+        price: l.price,
+        title: l.title,
+        url: l.url,
+        date: l.endTime
+      }));
+
+    // Build eBay search URL for users to view more
+    const ebaySearchUrl = `https://www.ebay.com/sch/i.html?_nkw=${keywords}&LH_Sold=1&LH_Complete=1&_sacat=183454`;
 
     const result = {
       found: true,
       avg: parseFloat(avg.toFixed(2)),
       median: parseFloat(median.toFixed(2)),
-      recent,
-      count: prices.length,
+      recent: prices.slice(-5),
+      recentListings,
+      count: listings.length,
       searchTerms,
+      searchUrl: ebaySearchUrl,
       timestamp: Date.now()
     };
 
-    console.log(`✅ Found ${prices.length} eBay sales: $${avg.toFixed(2)} avg`);
+    console.log(`✅ Found ${listings.length} eBay sales: $${avg.toFixed(2)} avg`);
 
     return res.status(200).json(result);
 

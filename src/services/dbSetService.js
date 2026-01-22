@@ -110,11 +110,17 @@ export const getSetCards = async (setId) => {
         },
         ebay: {
           avg: price.ebay_avg ?? 0,
-          verified: price.ebay_verified ?? false
+          verified: price.ebay_verified ?? false,
+          recentListings: [],
+          searchTerms: '',
+          searchUrl: ''
         },
         psa10: {
           avg: price.psa10_avg ?? 0,
-          verified: price.psa10_verified ?? false
+          verified: price.psa10_verified ?? false,
+          recentListings: [],
+          searchTerms: '',
+          searchUrl: ''
         }
       },
       priceHistory: []
@@ -187,11 +193,17 @@ export const searchCards = async (query) => {
         },
         ebay: {
           avg: price.ebay_avg ?? 0,
-          verified: price.ebay_verified ?? false
+          verified: price.ebay_verified ?? false,
+          recentListings: [],
+          searchTerms: '',
+          searchUrl: ''
         },
         psa10: {
           avg: price.psa10_avg ?? 0,
-          verified: price.psa10_verified ?? false
+          verified: price.psa10_verified ?? false,
+          recentListings: [],
+          searchTerms: '',
+          searchUrl: ''
         }
       },
       priceHistory: []

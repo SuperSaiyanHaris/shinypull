@@ -237,8 +237,8 @@ async function transformCards(cards) {
     // Try to fetch real eBay prices (async)
     let ebayData = null;
     try {
-      // Pass card number for more accurate eBay searches (e.g., "4/102")
-      ebayData = await getEbayPriceAPI(card.name, card.set?.name || '', card.number || '');
+      // Pass card number and rarity for more accurate eBay searches
+      ebayData = await getEbayPriceAPI(card.name, card.set?.name || '', card.number || '', card.rarity || '');
     } catch (error) {
       console.warn('eBay API error for', card.name, error);
     }
@@ -254,7 +254,7 @@ async function transformCards(cards) {
     // Try to fetch PSA 10 graded prices from eBay
     let psa10Data = null;
     try {
-      psa10Data = await getEbayPSA10Price(card.name, card.set?.name || '', card.number || '');
+      psa10Data = await getEbayPSA10Price(card.name, card.set?.name || '', card.number || '', card.rarity || '');
     } catch (error) {
       console.warn('PSA 10 eBay API error for', card.name, error);
     }
@@ -279,10 +279,16 @@ async function transformCards(cards) {
         ebay: {
           avg: parseFloat(ebayAvg.toFixed(2)),
           recent: ebayRecent,
+          recentListings: ebayData?.recentListings || [],
+          searchTerms: ebayData?.searchTerms || '',
+          searchUrl: ebayData?.searchUrl || '',
           verified: !!ebayData, // True if we got real data from eBay API
         },
         psa10: {
           avg: parseFloat(psa10Avg.toFixed(2)),
+          recentListings: psa10Data?.recentListings || [],
+          searchTerms: psa10Data?.searchTerms || '',
+          searchUrl: psa10Data?.searchUrl || '',
           verified: psa10Verified, // True if we got real PSA 10 data from eBay
         }
       },

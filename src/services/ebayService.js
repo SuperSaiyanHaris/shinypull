@@ -55,7 +55,7 @@ export async function getEbayPrice(cardName, cardSet) {
 }
 
 // Use eBay Finding API via backend proxy (avoids CORS issues)
-export async function getEbayPriceAPI(cardName, cardSet, cardNumber = '') {
+export async function getEbayPriceAPI(cardName, cardSet, cardNumber = '', rarity = '') {
   const cacheKey = `${cardName}_${cardSet}_${cardNumber}`;
   const cached = EBAY_CACHE.get(cacheKey);
 
@@ -76,7 +76,8 @@ export async function getEbayPriceAPI(cardName, cardSet, cardNumber = '') {
     const params = new URLSearchParams({
       cardName,
       ...(cardSet && { cardSet }),
-      ...(cardNumber && { cardNumber })
+      ...(cardNumber && { cardNumber }),
+      ...(rarity && { rarity })
     });
 
     const url = `${apiBase}/api/ebay-prices?${params}`;
@@ -95,7 +96,10 @@ export async function getEbayPriceAPI(cardName, cardSet, cardNumber = '') {
       avg: data.avg,
       median: data.median,
       recent: data.recent,
+      recentListings: data.recentListings || [],
       count: data.count,
+      searchTerms: data.searchTerms,
+      searchUrl: data.searchUrl,
       lastUpdated: Date.now()
     };
 
@@ -116,7 +120,7 @@ export async function getEbayPriceAPI(cardName, cardSet, cardNumber = '') {
 }
 
 // Fetch PSA 10 graded card prices from eBay
-export async function getEbayPSA10Price(cardName, cardSet, cardNumber = '') {
+export async function getEbayPSA10Price(cardName, cardSet, cardNumber = '', rarity = '') {
   const cacheKey = `psa10_${cardName}_${cardSet}_${cardNumber}`;
   const cached = EBAY_CACHE.get(cacheKey);
 
@@ -138,7 +142,8 @@ export async function getEbayPSA10Price(cardName, cardSet, cardNumber = '') {
       cardName,
       graded: 'psa10',
       ...(cardSet && { cardSet }),
-      ...(cardNumber && { cardNumber })
+      ...(cardNumber && { cardNumber }),
+      ...(rarity && { rarity })
     });
 
     const url = `${apiBase}/api/ebay-prices?${params}`;
@@ -157,7 +162,10 @@ export async function getEbayPSA10Price(cardName, cardSet, cardNumber = '') {
       avg: data.avg,
       median: data.median,
       recent: data.recent,
+      recentListings: data.recentListings || [],
       count: data.count,
+      searchTerms: data.searchTerms,
+      searchUrl: data.searchUrl,
       lastUpdated: Date.now()
     };
 
