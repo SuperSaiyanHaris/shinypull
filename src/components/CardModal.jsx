@@ -341,6 +341,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               <p className="text-xs text-adaptive-tertiary text-center">
                 <span className="text-green-500">●</span> Live prices from Pokemon TCG API
               </p>
+              <p className="text-xs text-adaptive-tertiary text-center">
+                Links may be affiliate links. We may earn a commission from purchases.
+              </p>
             </div>
           </div>
 
@@ -530,6 +533,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                 )}
                 <p className="text-xs text-adaptive-tertiary mt-4 text-center">
                   Verified prices from Pokemon TCG API. eBay prices from active listings.
+                </p>
+                <p className="text-xs text-adaptive-tertiary mt-1 text-center">
+                  Links may be affiliate links. We may earn a commission from purchases.
                 </p>
               </div>
             )}
