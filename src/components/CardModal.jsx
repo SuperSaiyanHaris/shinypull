@@ -269,6 +269,74 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                 )}
               </div>
 
+              {/* eBay Price Comparisons */}
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide">eBay Prices</h3>
+                {loadingEbay ? (
+                  <div className="flex items-center justify-center p-3 modal-card rounded-lg border">
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-500 mr-2" />
+                    <span className="text-sm text-adaptive-secondary">Fetching eBay prices...</span>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {/* eBay Raw Card */}
+                    <div className="p-3 modal-card rounded-lg border">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-adaptive-tertiary">
+                            {displayEbayPrices.verified ? 'eBay Raw (Active)' : 'eBay Raw (est.)'}
+                          </p>
+                          <p className="text-lg font-bold text-blue-500">
+                            {displayEbayPrices.verified && displayEbayPrices.low !== undefined
+                              ? `${formatPrice(displayEbayPrices.low)} - ${formatPrice(displayEbayPrices.high)}`
+                              : formatPrice(displayEbayPrices.avg)}
+                          </p>
+                        </div>
+                        {displayEbayPrices.searchUrl && (
+                          <a
+                            href={displayEbayPrices.searchUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors flex items-center gap-1.5"
+                          >
+                            <span className="text-xs font-medium text-blue-500">eBay</span>
+                            <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* eBay PSA 10 */}
+                    <div className="p-3 modal-card rounded-lg border">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-adaptive-tertiary flex items-center gap-1">
+                            <Award className="w-3 h-3 text-yellow-500" />
+                            {displayPsa10Prices.verified ? 'PSA 10 (Active)' : 'PSA 10 (est.)'}
+                          </p>
+                          <p className="text-lg font-bold text-blue-500">
+                            {displayPsa10Prices.verified && displayPsa10Prices.low !== undefined
+                              ? `${formatPrice(displayPsa10Prices.low)} - ${formatPrice(displayPsa10Prices.high)}`
+                              : formatPrice(displayPsa10Prices.avg)}
+                          </p>
+                        </div>
+                        {displayPsa10Prices.searchUrl && (
+                          <a
+                            href={displayPsa10Prices.searchUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors flex items-center gap-1.5"
+                          >
+                            <span className="text-xs font-medium text-blue-500">eBay</span>
+                            <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Source info */}
               <p className="text-xs text-adaptive-tertiary text-center">
                 <span className="text-green-500">●</span> Live prices from Pokemon TCG API
