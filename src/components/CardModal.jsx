@@ -158,9 +158,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
       onClick={handleBackdropClick}
     >
       {/* Mobile: Full-screen drawer from bottom | Desktop: Centered modal */}
-      <div className="relative w-full md:max-w-5xl h-[95vh] md:h-auto md:max-h-[90vh] overflow-hidden rounded-t-2xl md:rounded-2xl shadow-2xl animate-slide-up modal-container border">
+      <div className="relative w-full md:max-w-5xl h-[95vh] md:h-auto md:max-h-[90vh] overflow-hidden rounded-t-2xl md:rounded-2xl shadow-2xl animate-slide-up modal-container border flex flex-col">
         {/* Mobile Header Bar */}
-        <div className="md:hidden flex items-center justify-between p-4 border-b border-adaptive bg-adaptive-card sticky top-0 z-20">
+        <div className="md:hidden flex-shrink-0 flex items-center justify-between p-4 border-b border-adaptive bg-adaptive-card z-20">
           <button
             onClick={onClose}
             className="flex items-center gap-2 text-adaptive-secondary"
@@ -181,7 +181,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
         </button>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto h-full md:max-h-[90vh]">
+        <div className="overflow-y-auto flex-1 md:max-h-[90vh]">
           {/* Mobile Layout */}
           <div className="md:hidden">
             {/* Card Image - Smaller on mobile */}
