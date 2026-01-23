@@ -439,64 +439,30 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               </div>
             </div>
 
-            {/* Tabs Section */}
-            <div className="modal-tabs border-b">
-              <div className="flex gap-1 px-8 pt-6">
-                {['overview', 'compare', 'details'].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-6 py-3 rounded-t-lg font-medium capitalize transition-all ${
-                      activeTab === tab
-                        ? 'tab-active border-t border-x'
-                        : 'tab-inactive'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Tab Content */}
-            <div className="p-8 modal-content">
-            {activeTab === 'overview' && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-display text-adaptive-primary mb-4">Price Summary</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <StatCard
-                      label="Current Market"
-                      value={formatPrice(card.prices.tcgplayer.market)}
-                      trend={trend}
-                    />
-                    <StatCard
-                      label="Lowest Price"
-                      value={formatPrice(card.prices.tcgplayer.low)}
-                      color="text-green-500"
-                    />
-                    <StatCard
-                      label="Highest Price"
-                      value={formatPrice(card.prices.tcgplayer.high)}
-                      color="text-red-500"
-                      showHighTooltip
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-xl font-display text-adaptive-primary mb-4">Quick Stats</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <InfoCard label="Set" value={card.set} />
-                    <InfoCard label="Number" value={card.number} />
-                    <InfoCard label="Rarity" value={card.rarity} />
-                    <InfoCard label="Card ID" value={card.id} />
-                  </div>
+            {/* Content */}
+            <div className="p-8 modal-content space-y-6">
+              <div>
+                <h3 className="text-xl font-display text-adaptive-primary mb-4">Price Summary</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <StatCard
+                    label="Current Market"
+                    value={formatPrice(card.prices.tcgplayer.market)}
+                    trend={trend}
+                  />
+                  <StatCard
+                    label="Lowest Price"
+                    value={formatPrice(card.prices.tcgplayer.low)}
+                    color="text-green-500"
+                  />
+                  <StatCard
+                    label="Highest Price"
+                    value={formatPrice(card.prices.tcgplayer.high)}
+                    color="text-red-500"
+                    showHighTooltip
+                  />
                 </div>
               </div>
-            )}
 
-            {activeTab === 'compare' && (
               <div>
                 <h3 className="text-xl font-display text-adaptive-primary mb-4">Price Comparison</h3>
                 <div className="space-y-3">
@@ -523,43 +489,10 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                     </>
                   )}
                 </div>
-                {displayEbayPrices.searchTerms && (
-                  <div className="mt-4 p-3 rounded-lg bg-slate-100 dark:bg-slate-800/50 border border-adaptive">
-                    <p className="text-xs text-adaptive-tertiary">
-                      <span className="font-semibold">eBay Search Title:</span>{' '}
-                      <span className="font-mono text-adaptive-secondary">{displayEbayPrices.searchTerms}</span>
-                    </p>
-                  </div>
-                )}
                 <p className="text-xs text-adaptive-tertiary mt-4 text-center">
-                  Verified prices from Pokemon TCG API. eBay prices from active listings.
-                </p>
-                <p className="text-xs text-adaptive-tertiary mt-1 text-center">
                   Links may be affiliate links. We may earn a commission from purchases.
                 </p>
               </div>
-            )}
-
-            {activeTab === 'details' && (
-              <div>
-                <h3 className="text-xl font-display text-adaptive-primary mb-4">Card Details</h3>
-                <div className="space-y-4">
-                  <DetailRow label="Name" value={card.name} />
-                  <DetailRow label="Set" value={card.set} />
-                  <DetailRow label="Card Number" value={card.number} />
-                  <DetailRow label="Rarity" value={card.rarity} />
-                  <DetailRow label="Card ID" value={card.id} />
-                  <DetailRow
-                    label="Market Price"
-                    value={formatPrice(card.prices.tcgplayer.market)}
-                  />
-                  <DetailRow
-                    label="Price Range"
-                    value={`${formatPrice(card.prices.tcgplayer.low)} - ${formatPrice(card.prices.tcgplayer.high)}`}
-                  />
-                </div>
-              </div>
-            )}
             </div>
           </div>
           {/* End Desktop Layout */}
