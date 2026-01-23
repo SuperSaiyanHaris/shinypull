@@ -215,7 +215,7 @@ export default async function handler(req, res) {
     const cheapestListing = listings[0];
 
     // Build eBay search URL for users to view more
-    const ebaySearchUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454`;
+    const ebaySearchUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454&mkcid=1&mkrid=711-53200-19255-0&campid=5339138366&toolid=10001`;
 
     const result = {
       found: true,

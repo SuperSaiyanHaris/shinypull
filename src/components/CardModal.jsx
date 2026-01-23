@@ -93,7 +93,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               avg: estimateEbayPrice(marketPrice),
               verified: false,
               searchTerms: fallbackQuery,
-              searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454`
+              searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454&mkcid=1&mkrid=711-53200-19255-0&campid=5339138366&toolid=10001`
             });
           }
 
@@ -118,7 +118,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               avg: estimatePSA10Price(marketPrice),
               verified: false,
               searchTerms: fallbackQuery,
-              searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454`
+              searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454&mkcid=1&mkrid=711-53200-19255-0&campid=5339138366&toolid=10001`
             });
           }
         } catch (error) {
