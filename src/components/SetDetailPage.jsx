@@ -211,8 +211,9 @@ const SetDetailPage = ({ set, onBack }) => {
               {filteredCards.map((card, index) => (
                 <tr
                   key={card.id}
-                  className="hover:bg-adaptive-hover transition-colors animate-slide-up"
+                  className="hover:bg-adaptive-hover transition-colors animate-slide-up cursor-pointer"
                   style={{ animationDelay: `${index * 30}ms` }}
+                  onClick={() => handleViewDetails(card)}
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
@@ -253,7 +254,7 @@ const SetDetailPage = ({ set, onBack }) => {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
                       <AddToCollectionButton card={card} variant="compact" />
                       <button
                         onClick={() => handleViewDetails(card)}
