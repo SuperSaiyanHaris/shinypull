@@ -20,7 +20,10 @@ const CardItem = ({ card, index }) => {
       style={{ animationDelay: `${index * 75}ms` }}
     >
       {/* Card Image */}
-      <div className="relative aspect-[3/4] bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 overflow-hidden">
+      <div
+        className="relative aspect-[3/4] bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 overflow-hidden cursor-pointer"
+        onClick={() => setIsModalOpen(true)}
+      >
         {!imageLoaded && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -45,12 +48,14 @@ const CardItem = ({ card, index }) => {
 
       {/* Card Info */}
       <div className="p-6">
-        <h3 className="text-xl font-display text-adaptive-primary mb-1 line-clamp-1">
-          {card.name}
-        </h3>
-        <p className="text-sm text-adaptive-secondary mb-4 font-medium">
-          {card.set} • {card.number}
-        </p>
+        <div className="cursor-pointer" onClick={() => setIsModalOpen(true)}>
+          <h3 className="text-xl font-display text-adaptive-primary mb-1 line-clamp-1">
+            {card.name}
+          </h3>
+          <p className="text-sm text-adaptive-secondary mb-4 font-medium">
+            {card.set} • {card.number}
+          </p>
+        </div>
 
         {/* Price Tabs */}
         <div className="flex gap-2 mb-4">
