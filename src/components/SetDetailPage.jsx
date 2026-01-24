@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Search, SortDesc, Info } from 'lucide-react';
 import CardModal from './CardModal';
 import AddToCollectionButton from './AddToCollectionButton';
+import PriceAlertButton from './PriceAlertButton';
 import { formatPrice } from '../services/cardService';
 import { getSetCards } from '../services/dbSetService';
 
@@ -189,19 +190,6 @@ const SetDetailPage = ({ set, onBack }) => {
                 <th className="px-6 py-4 text-right text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
                   Market Price
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
-                  Low
-                </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
-                  <div className="flex items-center justify-end gap-1 group relative">
-                    High
-                    <Info className="w-3.5 h-3.5 text-adaptive-tertiary cursor-help" />
-                    <div className="absolute top-full right-0 mt-2 w-56 p-3 price-tooltip text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] font-normal normal-case tracking-normal pointer-events-none">
-                      Highest listed price on TCGPlayer. May be inflated by individual sellers and not reflect actual market value.
-                      <div className="absolute bottom-full right-4 border-4 border-transparent price-tooltip-arrow-down"></div>
-                    </div>
-                  </div>
-                </th>
                 <th className="px-6 py-4 text-center text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
                   Actions
                 </th>
@@ -243,19 +231,10 @@ const SetDetailPage = ({ set, onBack }) => {
                       {formatPrice(card.prices.tcgplayer.market)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="text-sm text-green-500 font-medium">
-                      {formatPrice(card.prices.tcgplayer.low)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="text-sm text-red-500 font-medium">
-                      {formatPrice(card.prices.tcgplayer.high)}
-                    </span>
-                  </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
                       <AddToCollectionButton card={card} variant="compact" />
+                      <PriceAlertButton card={card} variant="compact" />
                       <button
                         onClick={() => handleViewDetails(card)}
                         className="px-4 py-2 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-semibold rounded-lg transition-colors border border-adaptive"
