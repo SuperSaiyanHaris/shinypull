@@ -249,24 +249,13 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-2">
+              <div className="pt-2">
                 <AddToCollectionButton
                   card={card}
-                  className="flex-1"
+                  className="w-full"
                   onSuccess={onCardAdded}
                   onRemove={onCardRemoved}
                 />
-                {card.tcgplayerUrl && (
-                  <a
-                    href={card.tcgplayerUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-3 modal-button rounded-xl border flex items-center justify-center"
-                    title="View on TCGPlayer"
-                  >
-                    <ExternalLink className="w-5 h-5 text-adaptive-secondary" />
-                  </a>
-                )}
               </div>
 
               {/* eBay Price Comparisons */}
@@ -336,6 +325,30 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   </div>
                 )}
               </div>
+
+              {/* TCGPlayer Link */}
+              {card.tcgplayerUrl && (
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide">View on TCGPlayer</h3>
+                  <div className="p-3 modal-card rounded-lg border">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-adaptive-tertiary">TCGPlayer Marketplace</p>
+                        <p className="text-sm font-medium text-adaptive-primary">View listings & buy</p>
+                      </div>
+                      <a
+                        href={card.tcgplayerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-2 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-colors flex items-center gap-1.5"
+                      >
+                        <span className="text-xs font-medium text-green-500">TCGPlayer</span>
+                        <ExternalLink className="w-3.5 h-3.5 text-green-500" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Source info */}
               <p className="text-xs text-adaptive-tertiary text-center">
