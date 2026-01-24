@@ -1,13 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-const PrivacyPolicy = ({ onBack }) => {
+const PrivacyPolicy = () => {
+  const navigate = useNavigate();
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="glass-effect rounded-2xl p-8 border border-adaptive">
         <button
-          onClick={onBack}
+          onClick={() => navigate('/')}
           className="flex items-center gap-2 text-adaptive-secondary hover:text-adaptive-primary transition-colors mb-6"
         >
           <ArrowLeft className="w-5 h-5" />

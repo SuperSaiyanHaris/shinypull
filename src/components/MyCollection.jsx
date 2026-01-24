@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, Plus, Minus, Package, Sparkles, Layers, Grid, List, ChevronRight, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { collectionService } from '../services/collectionService';
@@ -7,7 +8,8 @@ import { formatPrice } from '../services/cardService';
 import CardModal from './CardModal';
 import AddToCollectionButton from './AddToCollectionButton';
 
-const MyCollection = ({ onBack }) => {
+const MyCollection = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [collection, setCollection] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -162,7 +164,7 @@ const MyCollection = ({ onBack }) => {
       {/* Header */}
       <div className="glass-effect rounded-2xl p-4 md:p-8 border border-adaptive">
         <button
-          onClick={selectedSetId ? handleBackToSetList : onBack}
+          onClick={selectedSetId ? handleBackToSetList : () => navigate('/')}
           className="flex items-center gap-2 text-adaptive-secondary hover:text-adaptive-primary transition-colors mb-4 md:mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -267,7 +269,7 @@ const MyCollection = ({ onBack }) => {
           <h3 className="text-xl font-display text-adaptive-primary mb-2">Your collection is empty</h3>
           <p className="text-adaptive-secondary mb-6">Start adding cards to track your collection!</p>
           <button
-            onClick={onBack}
+            onClick={() => navigate('/')}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors"
           >
             Browse Sets

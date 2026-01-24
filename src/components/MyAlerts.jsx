@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bell, Trash2, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { alertService } from '../services/alertService';
 import { formatPrice } from '../services/cardService';
 
-const MyAlerts = ({ onBack }) => {
+const MyAlerts = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +58,7 @@ const MyAlerts = ({ onBack }) => {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <button
-              onClick={onBack}
+              onClick={() => navigate('/')}
               className="p-2 hover:bg-adaptive-hover rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-adaptive-secondary" />

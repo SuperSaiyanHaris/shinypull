@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, SortDesc, Info } from 'lucide-react';
 import CardModal from './CardModal';
 import AddToCollectionButton from './AddToCollectionButton';
@@ -6,7 +7,8 @@ import PriceAlertButton from './PriceAlertButton';
 import { formatPrice } from '../services/cardService';
 import { getSetCards } from '../services/dbSetService';
 
-const SetDetailPage = ({ set, onBack }) => {
+const SetDetailPage = ({ set }) => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('price'); // price, name, number
   const [selectedCard, setSelectedCard] = useState(null);
@@ -44,7 +46,7 @@ const SetDetailPage = ({ set, onBack }) => {
       {/* Header */}
       <div className="glass-effect rounded-2xl p-4 md:p-8 border border-adaptive">
         <button
-          onClick={onBack}
+          onClick={() => navigate('/')}
           className="flex items-center gap-2 text-adaptive-secondary hover:text-adaptive-primary transition-colors mb-4 md:mb-6"
         >
           <ArrowLeft className="w-5 h-5" />

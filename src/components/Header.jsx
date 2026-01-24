@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Sun, Moon, LogOut, User, Package, Bell } from 'lucide-react';
 import logo from '../imgs/shinypulllogo.png';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import AuthModal from './AuthModal';
 
-const Header = ({ onLogoClick, onCollectionClick, onAlertsClick }) => {
+const Header = () => {
   const [darkMode, setDarkMode] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, profile, loading, signOut } = useAuth();
   const { isAuthModalOpen, openAuthModal, closeAuthModal } = useAuthModal();
+  const navigate = useNavigate();
 
   const toggleTheme = () => {
     setDarkMode(!darkMode);
@@ -18,15 +20,14 @@ const Header = ({ onLogoClick, onCollectionClick, onAlertsClick }) => {
 
   const handleLogoClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (onLogoClick) {
-      onLogoClick();
-    }
+    navigate('/');
   };
 
   const handleSignOut = async () => {
     try {
       await signOut();
       setShowUserMenu(false);
+      navigate('/');
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -34,16 +35,12 @@ const Header = ({ onLogoClick, onCollectionClick, onAlertsClick }) => {
 
   const handleCollectionClick = () => {
     setShowUserMenu(false);
-    if (onCollectionClick) {
-      onCollectionClick();
-    }
+    navigate('/collection');
   };
 
   const handleAlertsClick = () => {
     setShowUserMenu(false);
-    if (onAlertsClick) {
-      onAlertsClick();
-    }
+    navigate('/alerts');
   };
 
   const getUserDisplayName = () => {

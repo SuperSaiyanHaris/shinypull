@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -14,52 +15,33 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import ScrollToTop from './components/ScrollToTop';
 import { useCardSearch } from './hooks/useCardSearch';
 
-function App() {
+function AppContent() {
   const { query, setQuery, cards, loading } = useCardSearch();
-  const [currentView, setCurrentView] = useState('sets'); // 'sets', 'setDetail', 'search', 'collection', 'alerts', 'terms', 'privacy'
   const [selectedSet, setSelectedSet] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Switch to search view when user types
   useEffect(() => {
-    if (query) {
-      setCurrentView('search');
-    } else {
-      setCurrentView('sets');
+    if (query && location.pathname === '/') {
+      navigate('/search');
     }
-  }, [query]);
+  }, [query, location.pathname, navigate]);
 
   const handleClear = () => {
     setQuery('');
-    setCurrentView('sets');
+    navigate('/');
   };
 
   const handleSetClick = (set) => {
     setSelectedSet(set);
-    setCurrentView('setDetail');
+    navigate(`/sets/${set.id}`);
   };
 
   const handleBackToSets = () => {
     setSelectedSet(null);
-    setCurrentView('sets');
-  };
-
-  const handleLogoClick = () => {
-    setQuery('');
-    setSelectedSet(null);
-    setCurrentView('sets');
-  };
-
-  const handleCollectionClick = () => {
-    setQuery('');
-    setSelectedSet(null);
-    setCurrentView('collection');
-  };
-
-  const handleAlertsClick = () => {
-    setQuery('');
-    setSelectedSet(null);
-    setCurrentView('alerts');
+    navigate('/');
   };
 
   // Listen for Ctrl+Shift+A to toggle admin panel
@@ -76,7 +58,7 @@ function App() {
 
   return (
     <div className="min-h-screen">
-      <Header onLogoClick={handleLogoClick} onCollectionClick={handleCollectionClick} onAlertsClick={handleAlertsClick} />
+      <Header />
       <ScrollToTop />
 
       <main>
@@ -100,114 +82,145 @@ function App() {
               </div>
             )}
 
-            {/* Content Section */}
-            {currentView === 'sets' && (
-              <div className="mb-8">
-                <div className="mb-6">
-                  <h3 className="text-2xl font-display text-adaptive-primary">
-                    Browse Pokemon Sets
-                  </h3>
-                  <p className="text-sm text-adaptive-tertiary mt-2">
-                    Explore cards from your favorite Pokemon TCG sets
-                  </p>
+            {/* Routes */}
+            <Routes>
+              {/* Home / Sets Browser */}
+              <Route path="/" element={
+                <div className="mb-8">
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-display text-adaptive-primary">
+                      Browse Pokemon Sets
+                    </h3>
+                    <p className="text-sm text-adaptive-tertiary mt-2">
+                      Explore cards from your favorite Pokemon TCG sets
+                    </p>
+                  </div>
+                  <SetBrowser onSetClick={handleSetClick} />
                 </div>
-                <SetBrowser onSetClick={handleSetClick} />
-              </div>
-            )}
+              } />
 
-            {currentView === 'setDetail' && selectedSet && (
-              <SetDetailPage set={selectedSet} onBack={handleBackToSets} />
-            )}
+              {/* Set Detail Page */}
+              <Route path="/sets/:setId" element={
+                selectedSet ? (
+                  <SetDetailPage set={selectedSet} onBack={handleBackToSets} />
+                ) : (
+                  <div className="text-center py-20">
+                    <p className="text-adaptive-tertiary">Loading set...</p>
+                  </div>
+                )
+              } />
 
-            {currentView === 'search' && (
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-display text-adaptive-primary">
-                    Search Results
-                  </h3>
-                  {!loading && cards.length > 0 && (
-                    <span className="text-sm text-adaptive-tertiary font-mono">
-                      {cards.length} {cards.length === 1 ? 'card' : 'cards'}
-                    </span>
-                  )}
+              {/* Search Results */}
+              <Route path="/search" element={
+                <div className="mb-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-2xl font-display text-adaptive-primary">
+                      Search Results
+                    </h3>
+                    {!loading && cards.length > 0 && (
+                      <span className="text-sm text-adaptive-tertiary font-mono">
+                        {cards.length} {cards.length === 1 ? 'card' : 'cards'}
+                      </span>
+                    )}
+                  </div>
+                  <CardGrid cards={cards} loading={loading} />
                 </div>
+              } />
 
-                <CardGrid cards={cards} loading={loading} />
-              </div>
-            )}
+              {/* My Collection */}
+              <Route path="/collection" element={
+                <MyCollection onBack={handleBackToSets} />
+              } />
 
-            {currentView === 'terms' && (
-              <TermsOfUse onBack={() => setCurrentView('sets')} />
-            )}
+              {/* My Alerts */}
+              <Route path="/alerts" element={
+                <MyAlerts onBack={handleBackToSets} />
+              } />
 
-            {currentView === 'collection' && (
-              <MyCollection onBack={handleBackToSets} />
-            )}
+              {/* Terms of Use */}
+              <Route path="/terms" element={
+                <TermsOfUse onBack={handleBackToSets} />
+              } />
 
-            {currentView === 'alerts' && (
-              <MyAlerts onBack={handleBackToSets} />
-            )}
-
-            {currentView === 'privacy' && (
-              <PrivacyPolicy onBack={() => setCurrentView('sets')} />
-            )}
+              {/* Privacy Policy */}
+              <Route path="/privacy" element={
+                <PrivacyPolicy onBack={handleBackToSets} />
+              } />
+            </Routes>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-adaptive mt-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="col-span-1 md:col-span-2">
-                <h4 className="text-lg font-display text-adaptive-primary mb-3">
-                  ShinyPull
-                </h4>
-                <p className="text-sm text-adaptive-tertiary max-w-md">
-                  Track your shiny Pokemon card collection with real-time prices.
-                  Monitor values, discover trends, and never miss a sparkle.
-                </p>
-              </div>
-
-              <div>
-                <h5 className="text-sm font-semibold text-adaptive-secondary mb-3">Legal</h5>
-                <ul className="space-y-2">
-                  <li>
-                    <button
-                      onClick={() => setCurrentView('terms')}
-                      className="text-sm text-adaptive-tertiary hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                    >
-                      Terms of Use
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => setCurrentView('privacy')}
-                      className="text-sm text-adaptive-tertiary hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                    >
-                      Privacy Policy
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Pokemon Disclaimer */}
-            <div className="mt-8 pt-6 border-t border-adaptive">
-              <p className="text-xs text-adaptive-tertiary text-center max-w-3xl mx-auto">
-                ShinyPull is not affiliated with, sponsored or endorsed by, or in any way associated with Pokemon or The Pokemon Company International Inc. All Pokemon images, names, and related marks are trademarks of their respective owners.
-              </p>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-adaptive">
-              <p className="text-center text-sm text-adaptive-tertiary">
-                © {new Date().getFullYear()} ShinyPull. Built with React + Vite.
-              </p>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </main>
       <Analytics />
     </div>
+  );
+}
+
+// Footer Component
+function Footer() {
+  const navigate = useNavigate();
+  
+  return (
+    <footer className="border-t border-adaptive mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="col-span-1 md:col-span-2">
+            <h4 className="text-lg font-display text-adaptive-primary mb-3">
+              ShinyPull
+            </h4>
+            <p className="text-sm text-adaptive-tertiary max-w-md">
+              Track your shiny Pokemon card collection with real-time prices.
+              Monitor values, discover trends, and never miss a sparkle.
+            </p>
+          </div>
+
+          <div>
+            <h5 className="text-sm font-semibold text-adaptive-secondary mb-3">Legal</h5>
+            <ul className="space-y-2">
+              <li>
+                <button
+                  onClick={() => navigate('/terms')}
+                  className="text-sm text-adaptive-tertiary hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  Terms of Use
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigate('/privacy')}
+                  className="text-sm text-adaptive-tertiary hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  Privacy Policy
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Pokemon Disclaimer */}
+        <div className="mt-8 pt-6 border-t border-adaptive">
+          <p className="text-xs text-adaptive-tertiary text-center max-w-3xl mx-auto">
+            ShinyPull is not affiliated with, sponsored or endorsed by, or in any way associated with Pokemon or The Pokemon Company International Inc. All Pokemon images, names, and related marks are trademarks of their respective owners.
+          </p>
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-adaptive">
+          <p className="text-center text-sm text-adaptive-tertiary">
+            © {new Date().getFullYear()} ShinyPull. Built with React + Vite.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 
