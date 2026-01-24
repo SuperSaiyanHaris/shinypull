@@ -253,14 +253,12 @@ const MyAlerts = () => {
 
       {/* Edit Modal */}
       {editingAlert && (
-        <div className="hidden">
-          <PriceAlertButton
-            card={editingAlert.card}
-            existingAlert={editingAlert.alert}
-            onComplete={handleEditComplete}
-            autoOpen
-          />
-        </div>
+        <PriceAlertButton
+          card={editingAlert.card}
+          existingAlert={editingAlert.alert}
+          onComplete={handleEditComplete}
+          autoOpen
+        />
       )}
     </div>
   );
