@@ -131,7 +131,7 @@ const MyCollection = () => {
     };
   };
 
-  const setStats = getSetStatistics();
+  const selectedSetStats = getSetStatistics();
 
   // Filter cards based on search
   const filteredSetCards = setCards.filter(card =>
@@ -364,7 +364,7 @@ const MyCollection = () => {
         /* Card Grid/List for Selected Set */
         <>
           {/* Set Statistics Header */}
-          {setStats && (
+          {selectedSetStats && (
             <div className="glass-effect rounded-2xl p-6 border border-adaptive">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Complete Set Stats */}
@@ -389,12 +389,12 @@ const MyCollection = () => {
                           className="stroke-blue-500"
                           strokeWidth="8"
                           fill="none"
-                          strokeDasharray={`${(setStats.completionPercent / 100) * 251.2} 251.2`}
+                          strokeDasharray={`${(selectedSetStats.completionPercent / 100) * 251.2} 251.2`}
                           strokeLinecap="round"
                         />
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-lg font-bold text-blue-500">{setStats.completionPercent}%</span>
+                        <span className="text-lg font-bold text-blue-500">{selectedSetStats.completionPercent}%</span>
                       </div>
                     </div>
                     
@@ -402,7 +402,7 @@ const MyCollection = () => {
                     <div className="space-y-2">
                       <div>
                         <p className="text-2xl font-bold text-adaptive-primary">
-                          {setStats.collectedCount} of {setStats.totalCards}
+                          {selectedSetStats.collectedCount} of {selectedSetStats.totalCards}
                         </p>
                       </div>
                       <div>
@@ -416,7 +416,7 @@ const MyCollection = () => {
                       <div>
                         <p className="text-sm text-adaptive-tertiary">Market Value</p>
                         <p className="text-lg font-bold price-gradient">
-                          {formatPrice(setStats.collectedMarketValue)}
+                          {formatPrice(selectedSetStats.collectedMarketValue)}
                         </p>
                       </div>
                     </div>
@@ -427,7 +427,7 @@ const MyCollection = () => {
                 <div className="lg:col-span-2">
                   <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide mb-4">Most Expensive</h3>
                   <div className="grid grid-cols-3 gap-3">
-                    {setStats.mostExpensiveCards.map((card, index) => (
+                    {selectedSetStats.mostExpensiveCards.map((card, index) => (
                       <button
                         key={card.id}
                         onClick={() => handleViewDetails(card)}
