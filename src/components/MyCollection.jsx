@@ -483,7 +483,7 @@ const MyCollection = () => {
                 return (
                   <div
                     key={card.id}
-                    className={`relative group cursor-pointer ${!isCollected ? 'opacity-45' : ''}`}
+                    className={`relative group cursor-pointer ${!isCollected ? 'opacity-80' : ''}`}
                     onClick={() => handleViewDetails(card)}
                   >
                     <div className="w-full aspect-[3/4] rounded-lg overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900">
@@ -578,7 +578,7 @@ const MyCollection = () => {
                   <div
                     key={card.id}
                     className={`glass-effect rounded-lg border border-adaptive p-3 flex items-center gap-3 ${
-                      !isCollected ? 'opacity-45' : ''
+                      !isCollected ? 'opacity-80' : ''
                     }`}
                   >
                     {/* Card Thumbnail */}
