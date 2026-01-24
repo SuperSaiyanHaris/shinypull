@@ -546,11 +546,14 @@ const MyCollection = () => {
                         {/* Add button on hover - bright and visible */}
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center bg-black/90 rounded-lg">
                           <div className="text-center">
-                            <div className="w-12 h-12 mx-auto bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center mb-2 transition-colors cursor-pointer"
+                            <div className="w-12 h-12 mx-auto bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center mb-2 transition-colors cursor-pointer relative"
                               onClick={(e) => {
                                 e.stopPropagation();
                               }}
                             >
+                              <svg className="w-6 h-6 text-black absolute pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
+                              </svg>
                               <AddToCollectionButton
                                 card={card}
                                 variant="icon"
