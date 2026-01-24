@@ -289,16 +289,36 @@ async function syncSetCards(supabase: any, headers: Record<string, string>, setI
 async function syncPricesOnly(supabase: any, headers: Record<string, string>, limit: number = 20) {
   console.log(`Syncing prices only (limit: ${limit} sets)...`);
 
-  // Get sets to update - limit to prevent timeout
-  const { data: allSets, error: setsError } = await supabase
+  // Strategy: Mix of recent sets (high priority) and oldest updated sets (rotation)
+  // Get 70% recent sets + 30% least recently synced sets
+  const recentLimit = Math.ceil(limit * 0.7);
+  const rotationLimit = limit - recentLimit;
+
+  // Get most recent sets (prioritized for active trading)
+  const { data: recentSets } = await supabase
     .from("sets")
-    .select("id")
+    .select("id, last_price_sync")
     .order("release_date", { ascending: false })
-    .limit(limit);
+    .limit(recentLimit);
 
-  if (setsError) throw setsError;
+  // Get sets that haven't been updated in longest time (rotation)
+  const { data: oldSets } = await supabase
+    .from("sets")
+    .select("id, last_price_sync")
+    .order("last_price_sync", { ascending: true, nullsFirst: true })
+    .limit(rotationLimit);
 
-  const setsToSync = allSets || [];
+  // Combine and deduplicate
+  const setsToSync = [...(recentSets || []), ...(oldSets || [])]
+    .filter((set, index, self) => 
+      index === self.findIndex((s) => s.id === set.id)
+    );
+
+  return await processPriceSync(supabase, headers, setsToSync);
+}
+
+// Separate function to process the actual price sync
+async function processPriceSync(supabase: any, headers: Record<string, string>, setsToSync: any[]) {
 
   let totalCards = 0;
   let successCount = 0;
@@ -352,6 +372,12 @@ async function syncPricesOnly(supabase: any, headers: Record<string, string>, li
           await supabase
             .from("prices")
             .upsert(priceUpdates, { onConflict: "card_id" });
+
+          // Update last_price_sync timestamp for this set
+          await supabase
+            .from("sets")
+            .update({ last_price_sync: new Date().toISOString() })
+            .eq("id", set.id);
 
           return { success: true, count: cards.length };
         } catch {
