@@ -256,11 +256,11 @@ const PriceAlertButton = ({ card, className = '' }) => {
                 <button
                   type="submit"
                   disabled={loading || !targetPrice}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-adaptive-hover disabled:to-adaptive-hover disabled:text-adaptive-tertiary text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none"
+                  className="w-full px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-adaptive-hover disabled:to-adaptive-hover disabled:text-adaptive-tertiary text-slate-900 font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none"
                 >
                   {loading ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin" />
                       Creating Alert...
                     </>
                   ) : (
