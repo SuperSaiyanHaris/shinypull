@@ -460,28 +460,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
             {/* Content */}
             <div className="p-8 modal-content space-y-6">
               <div>
-                <h3 className="text-xl font-display text-adaptive-primary mb-4">Price Summary</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <StatCard
-                    label="Current Market"
-                    value={formatPrice(card.prices.tcgplayer.market)}
-                    trend={trend}
-                  />
-                  <StatCard
-                    label="Lowest Price"
-                    value={formatPrice(card.prices.tcgplayer.low)}
-                    color="text-green-500"
-                  />
-                  <StatCard
-                    label="Highest Price"
-                    value={formatPrice(card.prices.tcgplayer.high)}
-                    color="text-red-500"
-                    showHighTooltip
-                  />
-                </div>
-              </div>
-
-              <div>
                 <h3 className="text-xl font-display text-adaptive-primary mb-4">Price Comparison</h3>
                 <div className="space-y-3">
                   <PriceCompareRow
