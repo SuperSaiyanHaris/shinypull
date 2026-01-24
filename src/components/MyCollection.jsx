@@ -8,7 +8,7 @@ import { formatPrice } from '../services/cardService';
 import CardModal from './CardModal';
 import AddToCollectionButton from './AddToCollectionButton';
 
-const MyCollection = () => {
+const MyCollection = ({ selectedSetId: propSetId }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [collection, setCollection] = useState([]);
@@ -16,7 +16,7 @@ const MyCollection = () => {
   const [stats, setStats] = useState({ totalCards: 0, uniqueCards: 0, totalSets: 0 });
 
   // Set-based view state
-  const [selectedSetId, setSelectedSetId] = useState(null);
+  const [selectedSetId, setSelectedSetId] = useState(propSetId || null);
   const [setCards, setSetCards] = useState([]);
   const [loadingSetCards, setLoadingSetCards] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
@@ -31,6 +31,13 @@ const MyCollection = () => {
       loadCollection();
     }
   }, [user]);
+
+  // Sync with prop changes (URL changes)
+  useEffect(() => {
+    if (propSetId !== undefined) {
+      setSelectedSetId(propSetId);
+    }
+  }, [propSetId]);
 
   const loadCollection = async () => {
     try {
@@ -197,6 +204,7 @@ const MyCollection = () => {
     setSelectedSetId(null);
     setSetCards([]);
     setSearchQuery('');
+    navigate('/collection');
   };
 
   const selectedSetData = collectionBySet[selectedSetId];
@@ -326,7 +334,7 @@ const MyCollection = () => {
           {setList.map((setData) => (
             <button
               key={setData.setId}
-              onClick={() => setSelectedSetId(setData.setId)}
+              onClick={() => navigate(`/collection/sets/${setData.setId}`)}
               className="glass-effect rounded-xl border border-adaptive p-4 text-left hover:bg-adaptive-hover transition-colors group"
             >
               <div className="flex items-center justify-between">

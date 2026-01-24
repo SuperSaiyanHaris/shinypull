@@ -16,6 +16,11 @@ import ScrollToTop from './components/ScrollToTop';
 import { useCardSearch } from './hooks/useCardSearch';
 import { getAllSets } from './services/dbSetService';
 
+function CollectionWrapper() {
+  const { setId } = useParams();
+  return <MyCollection selectedSetId={setId} />;
+}
+
 function SetDetailWrapper({ selectedSet, onSetLoaded }) {
   const { setId } = useParams();
   const [set, setSet] = useState(selectedSet);
@@ -181,6 +186,11 @@ function AppContent() {
               {/* My Collection */}
               <Route path="/collection" element={
                 <MyCollection onBack={handleBackToSets} />
+              } />
+              
+              {/* Collection Set View */}
+              <Route path="/collection/sets/:setId" element={
+                <CollectionWrapper />
               } />
 
               {/* My Alerts */}
