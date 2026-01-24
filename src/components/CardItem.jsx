@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, Minus, ExternalLink } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import CardModal from './CardModal';
 import AddToCollectionButton from './AddToCollectionButton';
+import PriceAlertButton from './PriceAlertButton';
 
 const CardItem = ({ card, index }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -97,22 +98,6 @@ const CardItem = ({ card, index }) => {
               </div>
               <TrendIcon className={`w-6 h-6 ${trendColor}`} />
             </div>
-
-            {/* Price Range */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-3 bg-adaptive-card rounded-lg border border-adaptive">
-                <p className="text-xs text-adaptive-tertiary mb-1 font-medium">Low</p>
-                <p className="text-sm font-bold text-green-500">
-                  {formatPrice(card.prices.tcgplayer.low)}
-                </p>
-              </div>
-              <div className="p-3 bg-adaptive-card rounded-lg border border-adaptive">
-                <p className="text-xs text-adaptive-tertiary mb-1 font-medium">High</p>
-                <p className="text-sm font-bold text-red-500">
-                  {formatPrice(card.prices.tcgplayer.high)}
-                </p>
-              </div>
-            </div>
           </div>
         )}
 
@@ -147,6 +132,7 @@ const CardItem = ({ card, index }) => {
         {/* Action Buttons */}
         <div className="mt-4 flex gap-2">
           <AddToCollectionButton card={card} className="flex-1" />
+          <PriceAlertButton card={card} className="flex-1" />
           <button
             onClick={() => setIsModalOpen(true)}
             className="px-4 py-3 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-secondary rounded-xl transition-colors border border-adaptive"
