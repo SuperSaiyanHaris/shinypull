@@ -186,7 +186,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
           {/* Mobile Layout */}
           <div className="md:hidden">
             {/* Card Image - Smaller on mobile */}
-            <div className="p-4 flex justify-center bg-gradient-to-b from-slate-800/50 to-transparent">
+            <div className="p-4 flex justify-center bg-adaptive-card">
               <div className="relative w-40 aspect-[3/4]">
                 <img
                   src={card.image}
