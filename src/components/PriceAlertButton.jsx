@@ -131,7 +131,7 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
       {/* Alert Modal */}
       {showModal && ReactDOM.createPortal(
         <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[10000] flex items-center justify-center p-4 animate-fade-in"
           onClick={() => setShowModal(false)}
         >
           <div
