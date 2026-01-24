@@ -144,7 +144,7 @@ const Header = ({ onLogoClick, onCollectionClick, onAlertsClick }) => {
                         className="fixed inset-0 z-40"
                         onClick={() => setShowUserMenu(false)}
                       />
-                      <div className="absolute right-0 top-full mt-2 w-48 bg-adaptive-card rounded-xl border border-adaptive shadow-xl z-50 py-2">
+                      <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-adaptive shadow-xl z-50 py-2 backdrop-blur-xl" style={{ backgroundColor: 'rgba(15, 23, 42, 0.95)' }}>
                         <div className="px-4 py-2 border-b border-adaptive">
                           <p className="text-sm font-medium text-adaptive-primary truncate">
                             {getUserDisplayName()}
@@ -153,10 +153,9 @@ const Header = ({ onLogoClick, onCollectionClick, onAlertsClick }) => {
                             {user.email}
                           </p>
                         </div>
-                        {/* Mobile: Show My Collection in dropdown */}
                         <button
                           onClick={handleCollectionClick}
-                          className="md:hidden w-full flex items-center gap-2 px-4 py-2 text-sm text-adaptive-primary hover:bg-adaptive-hover transition-colors"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-adaptive-primary hover:bg-adaptive-hover transition-colors"
                         >
                           <Package className="w-4 h-4 text-blue-500" />
                           My Collection
