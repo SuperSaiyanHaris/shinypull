@@ -107,7 +107,7 @@ const MyCollection = () => {
     const completionPercent = ((collectedCount / totalCards) * 100).toFixed(1);
     
     // Calculate total market value of collected cards
-    const collectedMarketValue = setCards
+    const ownedMarketValue = setCards
       .filter(card => collectedCards.has(card.id))
       .reduce((sum, card) => {
         const quantity = collectedCards.get(card.id)?.quantity || 1;
@@ -115,18 +115,27 @@ const MyCollection = () => {
         return sum + (price * quantity);
       }, 0);
     
-    // Find most expensive collected cards
+    // Calculate total market value of entire set
+    const totalSetMarketValue = setCards.reduce((sum, card) => {
+      return sum + (card.prices?.tcgplayer?.market || 0);
+    }, 0);
+    
+    // Find 3 most expensive cards in the ENTIRE set (regardless of collection status)
     const mostExpensiveCards = setCards
-      .filter(card => collectedCards.has(card.id))
       .sort((a, b) => (b.prices?.tcgplayer?.market || 0) - (a.prices?.tcgplayer?.market || 0))
       .slice(0, 3);
+    
+    // Get release date from first card's set data
+    const releaseDate = setCards[0]?.set?.releaseDate || null;
     
     return {
       collectedCount,
       totalCards,
       completionPercent,
-      collectedMarketValue,
+      ownedMarketValue,
+      totalSetMarketValue,
       mostExpensiveCards,
+      releaseDate,
       setName: setData?.setName || 'Unknown Set'
     };
   };
@@ -370,55 +379,31 @@ const MyCollection = () => {
                 {/* Complete Set Stats */}
                 <div className="space-y-4">
                   <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide">Complete Set</h3>
-                  <div className="flex items-center gap-6">
-                    {/* Progress Circle */}
-                    <div className="relative w-24 h-24">
-                      <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="40"
-                          className="stroke-adaptive-card"
-                          strokeWidth="8"
-                          fill="none"
-                        />
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="40"
-                          className="stroke-blue-500"
-                          strokeWidth="8"
-                          fill="none"
-                          strokeDasharray={`${(selectedSetStats.completionPercent / 100) * 251.2} 251.2`}
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-lg font-bold text-blue-500">{selectedSetStats.completionPercent}%</span>
-                      </div>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-2xl font-bold text-adaptive-primary">
+                        {selectedSetStats.collectedCount} of {selectedSetStats.totalCards}
+                      </p>
                     </div>
-                    
-                    {/* Stats */}
-                    <div className="space-y-2">
-                      <div>
-                        <p className="text-2xl font-bold text-adaptive-primary">
-                          {selectedSetStats.collectedCount} of {selectedSetStats.totalCards}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-adaptive-tertiary">Release Date</p>
-                        <p className="text-sm font-medium text-adaptive-secondary">
-                          {setCards[0]?.set?.releaseDate 
-                            ? new Date(setCards[0].set.releaseDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                            : 'Unknown'}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-adaptive-tertiary">Market Value</p>
-                        <p className="text-lg font-bold price-gradient">
-                          {formatPrice(selectedSetStats.collectedMarketValue)}
-                        </p>
-                      </div>
+                    <div>
+                      <p className="text-sm text-adaptive-tertiary">Release Date</p>
+                      <p className="text-sm font-medium text-adaptive-secondary">
+                        {selectedSetStats.releaseDate 
+                          ? new Date(selectedSetStats.releaseDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                          : 'Unknown'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-adaptive-tertiary">Owned Market Value</p>
+                      <p className="text-lg font-bold price-gradient">
+                        {formatPrice(selectedSetStats.ownedMarketValue)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-adaptive-tertiary">Total Set Value</p>
+                      <p className="text-base font-semibold text-adaptive-primary">
+                        {formatPrice(selectedSetStats.totalSetMarketValue)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -427,34 +412,44 @@ const MyCollection = () => {
                 <div className="lg:col-span-2">
                   <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide mb-4">Most Expensive</h3>
                   <div className="grid grid-cols-3 gap-3">
-                    {selectedSetStats.mostExpensiveCards.map((card, index) => (
-                      <button
-                        key={card.id}
-                        onClick={() => handleViewDetails(card)}
-                        className="glass-effect rounded-xl p-3 border border-adaptive hover:bg-adaptive-hover transition-all text-left"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-12 h-16 rounded overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 flex-shrink-0">
-                            <img
-                              src={card.image}
-                              alt={card.name}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.target.src = 'https://via.placeholder.com/100x140?text=?';
-                              }}
-                            />
+                    {selectedSetStats.mostExpensiveCards.map((card, index) => {
+                      const isCollected = collectedCards.has(card.id);
+                      return (
+                        <button
+                          key={card.id}
+                          onClick={() => handleViewDetails(card)}
+                          className={`glass-effect rounded-xl p-3 border border-adaptive hover:bg-adaptive-hover transition-all text-left ${
+                            !isCollected ? 'opacity-50' : ''
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="relative w-12 h-16 rounded overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 flex-shrink-0">
+                              <img
+                                src={card.image}
+                                alt={card.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.src = 'https://via.placeholder.com/100x140?text=?';
+                                }}
+                              />
+                              {isCollected && (
+                                <div className="absolute top-0.5 right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                                  <Check className="w-2.5 h-2.5 text-white" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-adaptive-primary truncate">
+                                {card.name}
+                              </p>
+                              <p className="text-lg font-bold price-gradient mt-1">
+                                {formatPrice(card.prices?.tcgplayer?.market || 0)}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-adaptive-primary truncate">
-                              {card.name}
-                            </p>
-                            <p className="text-lg font-bold price-gradient mt-1">
-                              {formatPrice(card.prices?.tcgplayer?.market || 0)}
-                            </p>
-                          </div>
-                        </div>
-                      </button>
-                    ))}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
