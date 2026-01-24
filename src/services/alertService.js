@@ -6,6 +6,8 @@ export const alertService = {
    */
   async createAlert(userId, cardData, targetPrice, alertType, checkFrequency = 4, startDate = null) {
     try {
+      const currentPrice = cardData.prices?.tcgplayer?.market || 0;
+      
       const { data, error } = await supabase
         .from('price_alerts')
         .insert({
@@ -15,6 +17,7 @@ export const alertService = {
           card_image: cardData.image,
           card_set: cardData.set,
           target_price: targetPrice,
+          current_price: currentPrice,
           alert_type: alertType,
           check_frequency: checkFrequency,
           start_date: startDate || new Date().toISOString(),

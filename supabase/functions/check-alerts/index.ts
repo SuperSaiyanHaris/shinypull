@@ -86,10 +86,13 @@ serve(async (req) => {
         // Fetch current price from Pokemon TCG API
         const priceData = await fetchCardPrice(alert.card_id)
         
-        // Update last_checked_at regardless of whether price was found
+        // Update last_checked_at and current_price regardless of whether price was found
         await supabaseAdmin
           .from('price_alerts')
-          .update({ last_checked_at: now.toISOString() })
+          .update({ 
+            last_checked_at: now.toISOString(),
+            current_price: priceData?.market || alert.current_price
+          })
           .eq('id', alert.id)
         
         if (!priceData) {
