@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { Bell, BellOff, Check, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { alertService } from '../services/alertService';
+import { cardService } from '../services/cardService';
 
 const PriceAlertButton = ({ card, className = '', existingAlert = null, onComplete = null, autoOpen = false }) => {
   const { user } = useAuth();
@@ -16,8 +18,9 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
   const [checkFrequency, setCheckFrequency] = useState(existingAlert?.check_frequency || 4);
   const [startDate, setStartDate] = useState(existingAlert?.start_date || '');
   const [editingAlertId, setEditingAlertId] = useState(existingAlert?.id || null);
+  const [currentPrice, setCurrentPrice] = useState(card.prices?.tcgplayer?.market || 0);
+  const [loadingPrice, setLoadingPrice] = useState(false);
 
-  const currentPrice = card.prices?.tcgplayer?.market || 0;
   const isEditMode = !!existingAlert;
 
   useEffect(() => {
@@ -34,8 +37,23 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
       setCheckFrequency(existingAlert.check_frequency);
       setStartDate(existingAlert.start_date || '');
       setEditingAlertId(existingAlert.id);
+      // Fetch fresh price for the card
+      fetchCurrentPrice(card.id);
     }
   }, [autoOpen, existingAlert]);
+
+  const fetchCurrentPrice = async (cardId) => {
+    setLoadingPrice(true);
+    try {
+      const result = await cardService.getCardById(cardId);
+      if (result.success && result.data?.prices?.tcgplayer?.market) {
+        setCurrentPrice(result.data.prices.tcgplayer.market);
+      }
+    } catch (error) {
+      console.error('Failed to fetch current price:', error);
+    }
+    setLoadingPrice(false);
+  };
 
   const checkExistingAlerts = async () => {
     const result = await alertService.getCardAlerts(user.id, card.id);
@@ -128,7 +146,7 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
       </button>
 
       {/* Alert Modal */}
-      {showModal && (
+      {showModal && ReactDOM.createPortal(
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
           onClick={() => setShowModal(false)}
@@ -162,9 +180,16 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
               {/* Current Price */}
               <div className="mb-6 p-4 modal-price-box rounded-xl border">
                 <p className="text-xs text-adaptive-secondary uppercase tracking-wide mb-1">Current Price</p>
-                <p className="text-3xl font-bold price-gradient">
-                  ${currentPrice.toFixed(2)}
-                </p>
+                {loadingPrice ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
+                    <span className="text-adaptive-tertiary">Loading...</span>
+                  </div>
+                ) : (
+                  <p className="text-3xl font-bold price-gradient">
+                    ${currentPrice.toFixed(2)}
+                  </p>
+                )}
               </div>
 
               {/* Existing Alerts */}
@@ -306,7 +331,8 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
               </form>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
