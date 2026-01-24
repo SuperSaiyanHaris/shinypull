@@ -93,6 +93,11 @@ function AppContent() {
     setSelectedSet(set);
   };
 
+  const handleBackToSets = () => {
+    setSelectedSet(null);
+    navigate('/');
+  };
+
   // Listen for Ctrl+Shift+A to toggle admin panel
   useEffect(() => {
     const handleKeyDown = (e) => {
