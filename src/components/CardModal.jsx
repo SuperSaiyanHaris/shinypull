@@ -182,11 +182,11 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
         </button>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto flex-1 md:max-h-[90vh]">
+        <div className="overflow-y-auto flex-1 md:max-h-[90vh] bg-adaptive-card">
           {/* Mobile Layout */}
-          <div className="md:hidden">
+          <div className="md:hidden bg-adaptive-card">
             {/* Card Image - Smaller on mobile */}
-            <div className="p-4 flex justify-center bg-adaptive-card">
+            <div className="p-4 flex justify-center">
               <div className="relative w-40 aspect-[3/4]">
                 <img
                   src={card.image}
@@ -354,9 +354,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               </div>
 
               {/* Source info */}
-              <p className="text-xs text-adaptive-tertiary text-center">
-                <span className="text-green-500">●</span> Live prices from Pokemon TCG API
-              </p>
               <p className="text-xs text-adaptive-tertiary text-center">
                 Links may be affiliate links. We may earn a commission from purchases.
               </p>
