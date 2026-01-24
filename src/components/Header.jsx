@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Sun, Moon, LogOut, User, Package, Bell } from 'lucide-react';
 import logo from '../imgs/shinypulllogo.png';
@@ -7,14 +7,29 @@ import { useAuthModal } from '../contexts/AuthModalContext';
 import AuthModal from './AuthModal';
 
 const Header = () => {
-  const [darkMode, setDarkMode] = useState(true);
+  // Initialize from localStorage or default to dark mode
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved ? saved === 'dark' : true;
+  });
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, profile, loading, signOut } = useAuth();
   const { isAuthModalOpen, openAuthModal, closeAuthModal } = useAuthModal();
   const navigate = useNavigate();
 
+  // Apply theme on mount
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.remove('light-mode');
+    } else {
+      document.documentElement.classList.add('light-mode');
+    }
+  }, []);
+
   const toggleTheme = () => {
-    setDarkMode(!darkMode);
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem('theme', newMode ? 'dark' : 'light');
     document.documentElement.classList.toggle('light-mode');
   };
 
