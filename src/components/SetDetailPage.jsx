@@ -234,10 +234,10 @@ const SetDetailPage = ({ set, onBack }) => {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
                       <AddToCollectionButton card={card} variant="compact" />
-                      <PriceAlertButton card={card} variant="compact" />
+                      <PriceAlertButton card={card} className="!px-3 !py-1.5 !text-sm !rounded-lg" />
                       <button
                         onClick={() => handleViewDetails(card)}
-                        className="px-4 py-2 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-semibold rounded-lg transition-colors border border-adaptive"
+                        className="px-3 py-1.5 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-medium rounded-lg transition-colors border border-adaptive"
                       >
                         Details
                       </button>
