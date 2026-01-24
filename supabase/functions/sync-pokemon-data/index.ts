@@ -16,6 +16,7 @@ const corsHeaders = {
 interface SyncOptions {
   mode: "full" | "prices" | "sets" | "single-set";
   setId?: string;
+  limit?: number; // Max number of sets to process (prevents timeout)
 }
 
 serve(async (req) => {
@@ -79,7 +80,7 @@ serve(async (req) => {
         break;
       case "prices":
       default:
-        result = await syncPricesOnly(supabase, headers);
+        result = await syncPricesOnly(supabase, headers, options.limit);
         break;
     }
 
@@ -285,14 +286,15 @@ async function syncSetCards(supabase: any, headers: Record<string, string>, setI
 }
 
 // Prices-only sync - faster, updates only price data
-async function syncPricesOnly(supabase: any, headers: Record<string, string>) {
-  console.log("Syncing prices only...");
+async function syncPricesOnly(supabase: any, headers: Record<string, string>, limit: number = 20) {
+  console.log(`Syncing prices only (limit: ${limit} sets)...`);
 
-  // Get ALL sets to update prices for every card in database
+  // Get sets to update - limit to prevent timeout
   const { data: allSets, error: setsError } = await supabase
     .from("sets")
     .select("id")
-    .order("release_date", { ascending: false });
+    .order("release_date", { ascending: false })
+    .limit(limit);
 
   if (setsError) throw setsError;
 
