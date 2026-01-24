@@ -483,7 +483,7 @@ const MyCollection = () => {
                 return (
                   <div
                     key={card.id}
-                    className={`relative group cursor-pointer ${!isCollected ? 'opacity-30 grayscale' : ''}`}
+                    className={`relative group cursor-pointer ${!isCollected ? 'opacity-60' : ''}`}
                     onClick={() => handleViewDetails(card)}
                   >
                     <div className="w-full aspect-[3/4] rounded-lg overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900">
@@ -537,18 +537,24 @@ const MyCollection = () => {
                       </div>
                     )}
 
-                    {/* Add Button for uncollected */}
+                    {/* Add Button for uncollected - always show subtle hint */}
                     {!isCollected && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center py-1 rounded-b-lg">
-                        <AddToCollectionButton
-                          card={card}
-                          variant="icon"
-                          onSuccess={(e) => {
-                            if (e) e.stopPropagation();
-                            handleCardAdded();
-                          }}
-                        />
-                      </div>
+                      <>
+                        {/* Persistent overlay hint */}
+                        <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none" />
+                        
+                        {/* Add button on hover */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center py-2 rounded-b-lg">
+                          <AddToCollectionButton
+                            card={card}
+                            variant="icon"
+                            onSuccess={(e) => {
+                              if (e) e.stopPropagation();
+                              handleCardAdded();
+                            }}
+                          />
+                        </div>
+                      </>
                     )}
                   </div>
                 );
@@ -565,7 +571,7 @@ const MyCollection = () => {
                   <div
                     key={card.id}
                     className={`glass-effect rounded-lg border border-adaptive p-3 flex items-center gap-3 ${
-                      !isCollected ? 'opacity-40' : ''
+                      !isCollected ? 'opacity-60' : ''
                     }`}
                   >
                     {/* Card Thumbnail */}
