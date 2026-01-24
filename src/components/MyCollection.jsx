@@ -483,7 +483,7 @@ const MyCollection = () => {
                 return (
                   <div
                     key={card.id}
-                    className={`relative group cursor-pointer ${!isCollected ? 'opacity-80' : ''}`}
+                    className={`relative group cursor-pointer ${!isCollected ? 'opacity-45' : ''}`}
                     onClick={() => handleViewDetails(card)}
                   >
                     <div className="w-full aspect-[3/4] rounded-lg overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900">
@@ -543,23 +543,25 @@ const MyCollection = () => {
                         {/* Persistent overlay hint */}
                         <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none" />
                         
-                        {/* Add button on hover */}
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/95 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center py-2 rounded-b-lg">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }}
-                            className="w-full"
-                          >
-                            <AddToCollectionButton
-                              card={card}
-                              variant="icon"
-                              onSuccess={(e) => {
-                                if (e) e.stopPropagation();
-                                handleCardAdded();
+                        {/* Add button on hover - bright and visible */}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center bg-black/90 rounded-lg">
+                          <div className="text-center">
+                            <div className="w-12 h-12 mx-auto bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center mb-2 transition-colors cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
                               }}
-                            />
-                          </button>
+                            >
+                              <AddToCollectionButton
+                                card={card}
+                                variant="icon"
+                                onSuccess={(e) => {
+                                  if (e) e.stopPropagation();
+                                  handleCardAdded();
+                                }}
+                              />
+                            </div>
+                            <p className="text-white text-xs font-semibold">Add to Collection</p>
+                          </div>
                         </div>
                       </>
                     )}
@@ -578,7 +580,7 @@ const MyCollection = () => {
                   <div
                     key={card.id}
                     className={`glass-effect rounded-lg border border-adaptive p-3 flex items-center gap-3 ${
-                      !isCollected ? 'opacity-80' : ''
+                      !isCollected ? 'opacity-45' : ''
                     }`}
                   >
                     {/* Card Thumbnail */}
