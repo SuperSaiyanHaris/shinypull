@@ -97,6 +97,42 @@ const MyCollection = () => {
 
   const collectedCards = getCollectedCardIds();
 
+  // Calculate set statistics
+  const getSetStatistics = () => {
+    if (!selectedSetId || !setCards.length) return null;
+    
+    const setData = collectionBySet[selectedSetId];
+    const collectedCount = collectedCards.size;
+    const totalCards = setCards.length;
+    const completionPercent = ((collectedCount / totalCards) * 100).toFixed(1);
+    
+    // Calculate total market value of collected cards
+    const collectedMarketValue = setCards
+      .filter(card => collectedCards.has(card.id))
+      .reduce((sum, card) => {
+        const quantity = collectedCards.get(card.id)?.quantity || 1;
+        const price = card.prices?.tcgplayer?.market || 0;
+        return sum + (price * quantity);
+      }, 0);
+    
+    // Find most expensive collected cards
+    const mostExpensiveCards = setCards
+      .filter(card => collectedCards.has(card.id))
+      .sort((a, b) => (b.prices?.tcgplayer?.market || 0) - (a.prices?.tcgplayer?.market || 0))
+      .slice(0, 3);
+    
+    return {
+      collectedCount,
+      totalCards,
+      completionPercent,
+      collectedMarketValue,
+      mostExpensiveCards,
+      setName: setData?.setName || 'Unknown Set'
+    };
+  };
+
+  const setStats = getSetStatistics();
+
   // Filter cards based on search
   const filteredSetCards = setCards.filter(card =>
     card.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -327,7 +363,105 @@ const MyCollection = () => {
       ) : (
         /* Card Grid/List for Selected Set */
         <>
-          {/* Progress Bar - Above cards */}
+          {/* Set Statistics Header */}
+          {setStats && (
+            <div className="glass-effect rounded-2xl p-6 border border-adaptive">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Complete Set Stats */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide">Complete Set</h3>
+                  <div className="flex items-center gap-6">
+                    {/* Progress Circle */}
+                    <div className="relative w-24 h-24">
+                      <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          className="stroke-adaptive-card"
+                          strokeWidth="8"
+                          fill="none"
+                        />
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          className="stroke-blue-500"
+                          strokeWidth="8"
+                          fill="none"
+                          strokeDasharray={`${(setStats.completionPercent / 100) * 251.2} 251.2`}
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-lg font-bold text-blue-500">{setStats.completionPercent}%</span>
+                      </div>
+                    </div>
+                    
+                    {/* Stats */}
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-2xl font-bold text-adaptive-primary">
+                          {setStats.collectedCount} of {setStats.totalCards}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-adaptive-tertiary">Release Date</p>
+                        <p className="text-sm font-medium text-adaptive-secondary">
+                          {setCards[0]?.set?.releaseDate 
+                            ? new Date(setCards[0].set.releaseDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                            : 'Unknown'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-adaptive-tertiary">Market Value</p>
+                        <p className="text-lg font-bold price-gradient">
+                          {formatPrice(setStats.collectedMarketValue)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Most Expensive Cards */}
+                <div className="lg:col-span-2">
+                  <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide mb-4">Most Expensive</h3>
+                  <div className="grid grid-cols-3 gap-3">
+                    {setStats.mostExpensiveCards.map((card, index) => (
+                      <button
+                        key={card.id}
+                        onClick={() => handleViewDetails(card)}
+                        className="glass-effect rounded-xl p-3 border border-adaptive hover:bg-adaptive-hover transition-all text-left"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-12 h-16 rounded overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 flex-shrink-0">
+                            <img
+                              src={card.image}
+                              alt={card.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.src = 'https://via.placeholder.com/100x140?text=?';
+                              }}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-adaptive-primary truncate">
+                              {card.name}
+                            </p>
+                            <p className="text-lg font-bold price-gradient mt-1">
+                              {formatPrice(card.prices?.tcgplayer?.market || 0)}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Progress Bar - Below stats */}
           <div className="glass-effect rounded-xl border border-adaptive p-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-adaptive-tertiary">
