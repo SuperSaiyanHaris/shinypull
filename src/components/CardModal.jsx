@@ -258,97 +258,98 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                 />
               </div>
 
-              {/* eBay Price Comparisons */}
+              {/* Price Comparison */}
               <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide">eBay Prices</h3>
-                {loadingEbay ? (
-                  <div className="flex items-center justify-center p-3 modal-card rounded-lg border">
-                    <Loader2 className="w-4 h-4 animate-spin text-blue-500 mr-2" />
-                    <span className="text-sm text-adaptive-secondary">Fetching eBay prices...</span>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {/* eBay Raw Card */}
-                    <div className="p-3 modal-card rounded-lg border">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs text-adaptive-tertiary">
-                            {displayEbayPrices.verified ? 'eBay Raw (Active)' : 'eBay Raw (est.)'}
-                          </p>
-                          <p className="text-lg font-bold text-blue-500">
-                            {displayEbayPrices.verified && displayEbayPrices.low !== undefined
-                              ? `${formatPrice(displayEbayPrices.low)} - ${formatPrice(displayEbayPrices.high)}`
-                              : formatPrice(displayEbayPrices.avg)}
-                          </p>
-                        </div>
-                        {displayEbayPrices.searchUrl && (
-                          <a
-                            href={displayEbayPrices.searchUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors flex items-center gap-1.5"
-                          >
-                            <span className="text-xs font-medium text-blue-500">eBay</span>
-                            <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* eBay PSA 10 */}
-                    <div className="p-3 modal-card rounded-lg border">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs text-adaptive-tertiary flex items-center gap-1">
-                            <Award className="w-3 h-3 text-yellow-500" />
-                            {displayPsa10Prices.verified ? 'PSA 10 (Active)' : 'PSA 10 (est.)'}
-                          </p>
-                          <p className="text-lg font-bold text-blue-500">
-                            {displayPsa10Prices.verified && displayPsa10Prices.low !== undefined
-                              ? `${formatPrice(displayPsa10Prices.low)} - ${formatPrice(displayPsa10Prices.high)}`
-                              : formatPrice(displayPsa10Prices.avg)}
-                          </p>
-                        </div>
-                        {displayPsa10Prices.searchUrl && (
-                          <a
-                            href={displayPsa10Prices.searchUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors flex items-center gap-1.5"
-                          >
-                            <span className="text-xs font-medium text-blue-500">eBay</span>
-                            <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* TCGPlayer Link */}
-              {card.tcgplayerUrl && (
+                <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide">Price Comparison</h3>
                 <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide">View on TCGPlayer</h3>
-                  <div className="p-3 modal-card rounded-lg border">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-adaptive-tertiary">TCGPlayer Marketplace</p>
-                        <p className="text-sm font-medium text-adaptive-primary">View listings & buy</p>
+                  {/* TCGPlayer */}
+                  {card.tcgplayerUrl && (
+                    <div className="p-3 modal-card rounded-lg border">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-adaptive-tertiary">TCG</p>
+                          <p className="text-lg font-bold text-blue-500">
+                            {formatPrice(card.prices.tcgplayer.market)}
+                          </p>
+                        </div>
+                        <a
+                          href={card.tcgplayerUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-2 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-colors flex items-center gap-1.5"
+                        >
+                          <span className="text-xs font-medium text-green-500">View</span>
+                          <ExternalLink className="w-3.5 h-3.5 text-green-500" />
+                        </a>
                       </div>
-                      <a
-                        href={card.tcgplayerUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-2 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-colors flex items-center gap-1.5"
-                      >
-                        <span className="text-xs font-medium text-green-500">TCGPlayer</span>
-                        <ExternalLink className="w-3.5 h-3.5 text-green-500" />
-                      </a>
                     </div>
-                  </div>
+                  )}
+
+                  {loadingEbay ? (
+                    <div className="flex items-center justify-center p-3 modal-card rounded-lg border">
+                      <Loader2 className="w-4 h-4 animate-spin text-blue-500 mr-2" />
+                      <span className="text-sm text-adaptive-secondary">Fetching eBay prices...</span>
+                    </div>
+                  ) : (
+                    <>
+                      {/* eBay Raw Card */}
+                      <div className="p-3 modal-card rounded-lg border">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs text-adaptive-tertiary">
+                              {displayEbayPrices.verified ? 'eBay Raw Card' : 'eBay Raw Card (est.)'}
+                            </p>
+                            <p className="text-lg font-bold text-blue-500">
+                              {displayEbayPrices.verified && displayEbayPrices.low !== undefined
+                                ? `${formatPrice(displayEbayPrices.low)} - ${formatPrice(displayEbayPrices.high)}`
+                                : formatPrice(displayEbayPrices.avg)}
+                            </p>
+                          </div>
+                          {displayEbayPrices.searchUrl && (
+                            <a
+                              href={displayEbayPrices.searchUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors flex items-center gap-1.5"
+                            >
+                              <span className="text-xs font-medium text-blue-500">View</span>
+                              <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* eBay PSA 10 */}
+                      <div className="p-3 modal-card rounded-lg border">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs text-adaptive-tertiary flex items-center gap-1">
+                              <Award className="w-3 h-3 text-yellow-500" />
+                              {displayPsa10Prices.verified ? 'eBay PSA 10' : 'eBay PSA 10 (est.)'}
+                            </p>
+                            <p className="text-lg font-bold text-blue-500">
+                              {displayPsa10Prices.verified && displayPsa10Prices.low !== undefined
+                                ? `${formatPrice(displayPsa10Prices.low)} - ${formatPrice(displayPsa10Prices.high)}`
+                                : formatPrice(displayPsa10Prices.avg)}
+                            </p>
+                          </div>
+                          {displayPsa10Prices.searchUrl && (
+                            <a
+                              href={displayPsa10Prices.searchUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors flex items-center gap-1.5"
+                            >
+                              <span className="text-xs font-medium text-blue-500">View</span>
+                              <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
-              )}
+              </div>
 
               {/* Source info */}
               <p className="text-xs text-adaptive-tertiary text-center">
@@ -480,7 +481,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                 <h3 className="text-xl font-display text-adaptive-primary mb-4">Price Comparison</h3>
                 <div className="space-y-3">
                   <PriceCompareRow
-                    platform="Pokemon TCG API"
+                    platform="TCG"
                     price={card.prices.tcgplayer.market}
                     verified
                     link={card.tcgplayerUrl}
@@ -579,7 +580,7 @@ const EbayPriceRow = ({ ebayData, label = "eBay" }) => {
     <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border group">
       <div className="flex items-center gap-3">
         <span className="text-adaptive-primary font-semibold">
-          {verified ? `${label} (Active)` : `${label} (estimated)`}
+          {verified ? label : `${label} (estimated)`}
         </span>
         {verified ? (
           <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
@@ -628,7 +629,7 @@ const PSA10PriceRow = ({ psa10Data }) => {
         <div className="flex items-center gap-2">
           <Award className="w-5 h-5 text-yellow-500" />
           <span className="text-adaptive-primary font-semibold">
-            {verified ? 'eBay PSA 10 (Active)' : 'eBay PSA 10 (estimated)'}
+            {verified ? 'eBay PSA 10' : 'eBay PSA 10 (estimated)'}
           </span>
         </div>
         {verified ? (
