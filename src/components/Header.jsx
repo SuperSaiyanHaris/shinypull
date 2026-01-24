@@ -91,6 +91,17 @@ const Header = ({ onLogoClick, onCollectionClick, onAlertsClick }) => {
                 </button>
               )}
 
+              {/* My Alerts Button - Only shown when logged in */}
+              {user && (
+                <button
+                  onClick={handleAlertsClick}
+                  className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 border border-amber-600 transition-all shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50"
+                >
+                  <Bell className="w-5 h-5" />
+                  <span className="hidden md:inline text-sm font-bold">My Alerts</span>
+                </button>
+              )}
+
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
@@ -133,7 +144,7 @@ const Header = ({ onLogoClick, onCollectionClick, onAlertsClick }) => {
                         className="fixed inset-0 z-40"
                         onClick={() => setShowUserMenu(false)}
                       />
-                      <div className="absolute right-0 top-full mt-2 w-48 glass-effect rounded-xl border border-adaptive shadow-xl z-50 py-2">
+                      <div className="absolute right-0 top-full mt-2 w-48 bg-adaptive-card rounded-xl border border-adaptive shadow-xl z-50 py-2">
                         <div className="px-4 py-2 border-b border-adaptive">
                           <p className="text-sm font-medium text-adaptive-primary truncate">
                             {getUserDisplayName()}
@@ -152,9 +163,9 @@ const Header = ({ onLogoClick, onCollectionClick, onAlertsClick }) => {
                         </button>
                         <button
                           onClick={handleAlertsClick}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-adaptive-primary hover:bg-adaptive-hover transition-colors"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-amber-500 hover:bg-amber-500/10 transition-colors font-medium"
                         >
-                          <Bell className="w-4 h-4 text-amber-500" />
+                          <Bell className="w-4 h-4" />
                           My Alerts
                         </button>
                         <button
