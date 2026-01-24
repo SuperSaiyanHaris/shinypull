@@ -12,57 +12,75 @@ Run the SQL schema in your Supabase SQL Editor:
 # Run the query to create the table and policies
 ```
 
-### 2. Environment Variables
+### 2. Deploy Edge Function
 
-Add these to your Vercel environment variables:
+Deploy the check-alerts function to Supabase:
 
 ```bash
-# Supabase Service Role Key (for server-side operations)
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
-
-# Cron Secret (generate a random string for security)
-CRON_SECRET=your_random_secret_here
-
-# Optional: Pokemon TCG API Key (for better rate limits)
-POKEMON_TCG_API_KEY=your_pokemon_tcg_api_key
+# From the project root
+supabase functions deploy check-alerts
 ```
 
-To find your Supabase Service Role Key:
+### 3. Set Edge Function Secrets
+
+Add environment variables for the Edge Function:
+
+```bash
+# Set Pokemon TCG API Key (optional, for better rate limits)
+supabase secrets set POKEMON_TCG_API_KEY=your_pokemon_tcg_api_key
+
+# Note: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are automatically available
+```
+
+### 4. Configure Supabase Cron Job
+
+Set up a daily cron job in Supabase:
+
 1. Go to Supabase Dashboard
-2. Project Settings > API
-3. Copy the `service_role` key (not the `anon` key)
+2. Database > Extensions > Enable `pg_cron`
+3. Go to SQL Editor and run:
 
-### 3. Vercel Cron Job
+```sql
+-- Create a cron job to run check-alerts daily at midnight UTC
+SELECT cron.schedule(
+  'check-price-alerts-daily',
+  '0 0 * * *', -- Run at midnight UTC every day
+  $$
+  SELECT
+    net.http_post(
+      url := 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/check-alerts',
+      headers := jsonb_build_object(
+        'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key'),
+        'Content-Type', 'application/json'
+      ),
+      body := '{}'::jsonb
+    ) AS request_id;
+  $$
+);
 
-The cron job is configured in `vercel.json` to run daily at midnight UTC:
+-- View all scheduled jobs
+SELECT * FROM cron.job;
 
-```json
-"crons": [
-  {
-    "path": "/api/check-alerts",
-    "schedule": "0 0 * * *"
-  }
-]
+-- To remove the job later (if needed):
+-- SELECT cron.unschedule('check-price-alerts-daily');
 ```
 
-**Important:** Cron jobs are only available on Vercel Pro plans. If you're on the Hobby plan, you can:
-- Manually trigger: `curl -X GET https://your-domain.com/api/check-alerts -H "Authorization: Bearer YOUR_CRON_SECRET"`
-- Use a third-party cron service like cron-job.org
-- Upgrade to Vercel Pro
+**Note:** Replace `YOUR_PROJECT_REF` with your actual Supabase project reference (found in Project Settings > API > Project URL)
 
-### 4. Email Notifications (TODO)
+### 5. Email Notifications (TODO)
 
-Currently, the check-alerts endpoint logs when alerts are triggered but doesn't send emails yet. To complete email functionality:
+Currently, the check-alerts function logs when alerts are triggered but doesn't send emails yet. To complete email functionality:
 
-**Option 1: Supabase Edge Functions with Resend**
-1. Set up a Supabase Edge Function
-2. Use Resend for email delivery
-3. Create a custom email template (see template below)
+**Option 1: Resend (Recommended)**
+1. Sign up for Resend and get API key
+2. Set the secret: `supabase secrets set RESEND_API_KEY=your_key`
+3. Uncomment the Resend code in `supabase/functions/check-alerts/index.ts`
+4. Verify sender domain in Resend dashboard
 
 **Option 2: SendGrid/Mailgun**
-1. Add API key to environment variables
-2. Update `sendAlertEmail()` in `api/check-alerts.js`
-3. Use the email template provided
+1. Get API key from your email service
+2. Set the secret in Supabase
+3. Update the `sendAlertEmail()` function with your service's API
 
 ### Email Template
 
@@ -118,8 +136,9 @@ Subject: 🔔 Price Alert: {{card_name}}
 1. **Frontend:** PriceAlertButton component handles UI and alert creation
 2. **Service Layer:** alertService.js manages CRUD operations with Supabase
 3. **Database:** price_alerts table stores all user alerts with RLS policies
-4. **Cron Job:** check-alerts.js runs daily to check prices and trigger notifications
-5. **Email:** (TODO) Send notification when alert is triggered
+4. **Supabase Cron:** pg_cron triggers the Edge Function daily at midnight
+5. **Edge Function:** check-alerts function checks prices and sends notifications
+6. **Email:** (TODO) Send notification via Resend/SendGrid when alert is triggered
 
 ### Alert Management
 
@@ -163,21 +182,36 @@ price_alerts (
    - Select "My Alerts"
    - Verify your alert appears
 
-3. **Test cron job locally:**
+3. **Test Edge Function locally:**
    ```bash
-   # In api/check-alerts.js, temporarily set authorization check to always pass
-   # Then run:
-   curl -X GET http://localhost:5173/api/check-alerts -H "Authorization: Bearer test"
+   # Start Supabase locally
+   supabase start
+   
+   # Serve the function locally
+   supabase functions serve check-alerts
+   
+   # In another terminal, invoke it
+   curl -i --location --request POST 'http://localhost:54321/functions/v1/check-alerts' \
+     --header 'Authorization: Bearer YOUR_ANON_KEY' \
+     --header 'Content-Type: application/json'
    ```
 
 ### Production Testing
 
-1. Deploy to Vercel
-2. Add environment variables
-3. Manually trigger cron:
+1. Deploy the Edge Function:
    ```bash
-   curl -X GET https://shinypull.com/api/check-alerts -H "Authorization: Bearer YOUR_CRON_SECRET"
+   supabase functions deploy check-alerts
    ```
+
+2. Manually invoke the function:
+   ```bash
+   curl -i --location --request POST 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/check-alerts' \
+     --header 'Authorization: Bearer YOUR_SERVICE_ROLE_KEY' \
+     --header 'Content-Type: application/json'
+   ```
+
+3. Check function logs in Supabase Dashboard:
+   - Go to Edge Functions > check-alerts > Logs
 
 ## Future Enhancements
 
