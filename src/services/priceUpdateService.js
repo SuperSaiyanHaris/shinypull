@@ -1,6 +1,78 @@
 import { supabase } from '../lib/supabase';
 import { getEbayPriceAPI, getEbayPSA10Price, estimateEbayPrice, estimatePSA10Price } from './ebayService';
 
+const POKEMON_TCG_API = 'https://api.pokemontcg.io/v2';
+
+/**
+ * Fetch latest TCG market price from Pokemon API and update database
+ * Called when card modal opens to ensure real-time prices
+ */
+export const fetchAndUpdateTCGPrice = async (cardId) => {
+  try {
+    // Fetch card data from Pokemon TCG API
+    const response = await fetch(`${POKEMON_TCG_API}/cards/${cardId}`);
+    
+    if (!response.ok) {
+      console.warn(`Failed to fetch price for card ${cardId}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const card = data.data;
+
+    // Extract price data (same logic as Edge Function)
+    const prices = card.tcgplayer?.prices || {};
+    const priceVariants = ['holofoil', 'reverseHolofoil', '1stEditionHolofoil', 'unlimitedHolofoil', 'normal'];
+    let priceData = null;
+
+    for (const variant of priceVariants) {
+      if (prices[variant]?.market) {
+        priceData = prices[variant];
+        break;
+      }
+    }
+
+    if (!priceData) {
+      const firstVariant = Object.keys(prices)[0];
+      priceData = firstVariant ? prices[firstVariant] : {};
+    }
+
+    const marketPrice = priceData?.market || 0;
+    const lowPrice = priceData?.low || marketPrice * 0.8;
+    const highPrice = priceData?.high || marketPrice * 1.3;
+
+    // Update database with fresh prices
+    const { error } = await supabase
+      .from('prices')
+      .upsert({
+        card_id: cardId,
+        tcgplayer_market: marketPrice,
+        tcgplayer_low: lowPrice,
+        tcgplayer_high: highPrice,
+        last_updated: new Date().toISOString()
+      }, { onConflict: 'card_id' });
+
+    if (error) {
+      console.error('Error updating price in database:', error);
+      return null;
+    }
+
+    console.log(`✅ Updated TCG price for ${cardId}: $${marketPrice}`);
+
+    // Return fresh price data
+    return {
+      market: marketPrice,
+      low: lowPrice,
+      high: highPrice,
+      lastUpdated: new Date().toISOString()
+    };
+
+  } catch (error) {
+    console.error('Error fetching/updating TCG price:', error);
+    return null;
+  }
+};
+
 /**
  * Update eBay and PSA10 prices for a specific card
  */

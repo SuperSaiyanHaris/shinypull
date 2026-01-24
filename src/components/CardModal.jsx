@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info, Award, Loader2 } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import { getEbayPriceAPI, getEbayPSA10Price, estimateEbayPrice, estimatePSA10Price } from '../services/ebayService';
+import { fetchAndUpdateTCGPrice } from '../services/priceUpdateService';
 import AddToCollectionButton from './AddToCollectionButton';
 import PriceAlertButton from './PriceAlertButton';
 
@@ -21,6 +22,8 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   const [ebayPrices, setEbayPrices] = useState(null);
   const [psa10Prices, setPsa10Prices] = useState(null);
   const [loadingEbay, setLoadingEbay] = useState(false);
+  const [tcgPrices, setTcgPrices] = useState(null);
+  const [loadingTcg, setLoadingTcg] = useState(false);
 
   // Close modal when clicking backdrop
   const handleBackdropClick = (e) => {
@@ -49,6 +52,16 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   // Fetch eBay prices on-demand when modal opens
   useEffect(() => {
     if (!isOpen || !card) return;
+
+    // Fetch fresh TCG market price and update database
+    setLoadingTcg(true);
+    fetchAndUpdateTCGPrice(card.id)
+      .then(freshPrice => {
+        if (freshPrice) {
+          setTcgPrices(freshPrice);
+        }
+      })
+      .finally(() => setLoadingTcg(false));
 
     // Check if we already have verified eBay data
     const hasEbayData = card.prices?.ebay?.verified;
@@ -138,7 +151,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
     if (!isOpen) {
       setEbayPrices(null);
       setPsa10Prices(null);
+      setTcgPrices(null);
       setLoadingEbay(false);
+      setLoadingTcg(false);
     }
   }, [isOpen]);
 
@@ -148,6 +163,13 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   // Use fetched prices or fall back to card's original prices
   const displayEbayPrices = ebayPrices || card.prices?.ebay || { avg: 0, verified: false, searchTerms: '', searchUrl: '' };
   const displayPsa10Prices = psa10Prices || card.prices?.psa10 || { avg: 0, verified: false, searchTerms: '', searchUrl: '' };
+  
+  // Use fresh TCG prices if available, otherwise fall back to card data
+  const displayTcgPrices = tcgPrices || {
+    market: card.prices?.tcgplayer?.market || 0,
+    low: card.prices?.tcgplayer?.low || 0,
+    high: card.prices?.tcgplayer?.high || 0
+  };
 
   const trend = getPriceTrend(card.priceHistory);
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
@@ -212,9 +234,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               <div className="p-4 modal-price-box rounded-xl border">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-adaptive-secondary">Market Price</p>
+                    <p className="text-xs text-adaptive-secondary">Market Price {loadingTcg && <span className="text-xs">(updating...)</span>}</p>
                     <p className="text-3xl font-bold price-gradient">
-                      {formatPrice(card.prices.tcgplayer.market)}
+                      {formatPrice(displayTcgPrices.market)}
                     </p>
                   </div>
                   <TrendIcon className={`w-8 h-8 ${trendColor}`} />
@@ -225,13 +247,13 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   <div className="flex-1">
                     <p className="text-xs text-adaptive-tertiary">Low</p>
                     <p className="text-base font-semibold text-green-500">
-                      {formatPrice(card.prices.tcgplayer.low)}
+                      {formatPrice(displayTcgPrices.low)}
                     </p>
                   </div>
                   <div className="flex-1 text-right">
                     <p className="text-xs text-adaptive-tertiary">High</p>
                     <p className="text-base font-semibold text-red-500">
-                      {formatPrice(card.prices.tcgplayer.high)}
+                      {formatPrice(displayTcgPrices.high)}
                     </p>
                   </div>
                 </div>
@@ -269,9 +291,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                     <div className="p-3 modal-card rounded-lg border">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs text-adaptive-tertiary">TCG</p>
+                          <p className="text-xs text-adaptive-tertiary">TCG {loadingTcg && <span className="text-[10px]">(updating...)</span>}</p>
                           <p className="text-lg font-bold text-blue-500">
-                            {formatPrice(card.prices.tcgplayer.market)}
+                            {formatPrice(displayTcgPrices.market)}
                           </p>
                         </div>
                         <a
@@ -397,9 +419,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   <div className="p-6 modal-price-box rounded-xl border">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <p className="text-sm text-adaptive-secondary mb-1">Market Price</p>
+                        <p className="text-sm text-adaptive-secondary mb-1">Market Price {loadingTcg && <span className="text-xs">(updating...)</span>}</p>
                         <p className="text-4xl font-bold price-gradient">
-                          {formatPrice(card.prices.tcgplayer.market)}
+                          {formatPrice(displayTcgPrices.market)}
                         </p>
                         <p className="text-xs text-adaptive-tertiary mt-2">
                           <span className="text-green-500">●</span> Live from Pokemon TCG API
@@ -413,7 +435,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                       <div className="p-3 modal-price-card rounded-lg border">
                         <p className="text-xs text-adaptive-tertiary mb-1">Low</p>
                         <p className="text-lg font-semibold text-green-500">
-                          {formatPrice(card.prices.tcgplayer.low)}
+                          {formatPrice(displayTcgPrices.low)}
                         </p>
                       </div>
                       <div className="p-3 modal-price-card rounded-lg border">
@@ -422,7 +444,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                           <HighPriceTooltip />
                         </p>
                         <p className="text-lg font-semibold text-red-500">
-                          {formatPrice(card.prices.tcgplayer.high)}
+                          {formatPrice(displayTcgPrices.high)}
                         </p>
                       </div>
                     </div>
