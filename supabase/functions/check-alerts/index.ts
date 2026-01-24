@@ -104,6 +104,12 @@ serve(async (req) => {
         const currentPrice = priceData.market
         const targetPrice = parseFloat(alert.target_price)
 
+        // Update current_price in database
+        await supabaseAdmin
+          .from('price_alerts')
+          .update({ current_price: currentPrice })
+          .eq('id', alert.id)
+
         // Check if threshold is met
         const isTriggered = 
           (alert.alert_type === 'below' && currentPrice <= targetPrice) ||
