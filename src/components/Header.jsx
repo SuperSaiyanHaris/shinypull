@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Sun, Moon, LogOut, User, Package } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Package, Bell } from 'lucide-react';
 import logo from '../imgs/shinypulllogo.png';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import AuthModal from './AuthModal';
 
-const Header = ({ onLogoClick, onCollectionClick }) => {
+const Header = ({ onLogoClick, onCollectionClick, onAlertsClick }) => {
   const [darkMode, setDarkMode] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, profile, loading, signOut } = useAuth();
@@ -36,6 +36,13 @@ const Header = ({ onLogoClick, onCollectionClick }) => {
     setShowUserMenu(false);
     if (onCollectionClick) {
       onCollectionClick();
+    }
+  };
+
+  const handleAlertsClick = () => {
+    setShowUserMenu(false);
+    if (onAlertsClick) {
+      onAlertsClick();
     }
   };
 
@@ -142,6 +149,13 @@ const Header = ({ onLogoClick, onCollectionClick }) => {
                         >
                           <Package className="w-4 h-4 text-blue-500" />
                           My Collection
+                        </button>
+                        <button
+                          onClick={handleAlertsClick}
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-adaptive-primary hover:bg-adaptive-hover transition-colors"
+                        >
+                          <Bell className="w-4 h-4 text-amber-500" />
+                          My Alerts
                         </button>
                         <button
                           onClick={handleSignOut}

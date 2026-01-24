@@ -3,6 +3,7 @@ import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info, Award, Loader2 
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import { getEbayPriceAPI, getEbayPSA10Price, estimateEbayPrice, estimatePSA10Price } from '../services/ebayService';
 import AddToCollectionButton from './AddToCollectionButton';
+import PriceAlertButton from './PriceAlertButton';
 
 // Reusable tooltip component for High price explanation
 const HighPriceTooltip = ({ className = "" }) => (
@@ -249,13 +250,14 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               </div>
 
               {/* Actions */}
-              <div className="pt-2">
+              <div className="pt-2 space-y-2">
                 <AddToCollectionButton
                   card={card}
                   className="w-full"
                   onSuccess={onCardAdded}
                   onRemove={onCardRemoved}
                 />
+                <PriceAlertButton card={card} className="w-full" />
               </div>
 
               {/* Price Comparison */}
@@ -430,25 +432,27 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   </div>
 
                   {/* Quick Actions */}
-                  <div className="flex gap-3">
+                  <div className="grid grid-cols-2 gap-3">
                     <AddToCollectionButton
                       card={card}
-                      className="flex-1"
+                      className="w-full"
                       onSuccess={onCardAdded}
                       onRemove={onCardRemoved}
                     />
-                    {card.tcgplayerUrl && (
-                      <a
-                        href={card.tcgplayerUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border flex items-center justify-center"
-                        title="View on TCGPlayer"
-                      >
-                        <ExternalLink className="w-5 h-5" />
-                      </a>
-                    )}
+                    <PriceAlertButton card={card} className="w-full" />
                   </div>
+                  {card.tcgplayerUrl && (
+                    <a
+                      href={card.tcgplayerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border flex items-center justify-center gap-2"
+                      title="View on TCGPlayer"
+                    >
+                      <ExternalLink className="w-5 h-5" />
+                      <span className="text-sm font-medium">View on TCGPlayer</span>
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
