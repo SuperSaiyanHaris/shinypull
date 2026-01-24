@@ -17,6 +17,7 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
   const [checkFrequency, setCheckFrequency] = useState(existingAlert?.check_frequency || 4);
   const [startDate, setStartDate] = useState(existingAlert?.start_date || '');
   const [editingAlertId, setEditingAlertId] = useState(existingAlert?.id || null);
+  const [priceError, setPriceError] = useState('');
 
   const currentPrice = existingAlert?.current_price || card.prices?.tcgplayer?.market || 0;
   const isEditMode = !!existingAlert;
@@ -60,7 +61,13 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
 
   const handleCreateAlert = async (e) => {
     e.preventDefault();
-    if (!targetPrice || parseFloat(targetPrice) <= 0) return;
+    
+    const price = parseFloat(targetPrice);
+    if (!targetPrice || isNaN(price) || price <= 0) {
+      setPriceError('Please enter a valid price greater than $0.00');
+      return;
+    }
+    setPriceError('');
 
     setLoading(true);
     
@@ -243,15 +250,28 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
                       step="0.01"
                       min="0.01"
                       value={targetPrice}
-                      onChange={(e) => setTargetPrice(e.target.value)}
+                      onChange={(e) => {
+                        setTargetPrice(e.target.value);
+                        setPriceError('');
+                      }}
                       placeholder="0.00"
-                      className="w-full pl-10 pr-4 py-3 modal-card border border-adaptive rounded-xl text-adaptive-primary placeholder-adaptive-tertiary font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all"
+                      className={`w-full pl-10 pr-4 py-3 modal-card border rounded-xl text-adaptive-primary placeholder-adaptive-tertiary font-semibold focus:outline-none focus:ring-2 transition-all ${
+                        priceError 
+                          ? 'border-red-500 focus:ring-red-500/50 focus:border-red-500' 
+                          : 'border-adaptive focus:ring-amber-500/50 focus:border-amber-500/50'
+                      }`}
                       required
                     />
                   </div>
-                  <p className="text-xs text-adaptive-tertiary mt-2">
-                    You'll be notified when the price goes {alertType} this amount
-                  </p>
+                  {priceError ? (
+                    <p className="text-xs text-red-500 mt-2 font-semibold">
+                      {priceError}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-adaptive-tertiary mt-2">
+                      You'll be notified when the price goes {alertType} this amount
+                    </p>
+                  )}
                 </div>
 
                 <div>
