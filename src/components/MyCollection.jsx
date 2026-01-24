@@ -75,12 +75,12 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
     a.setName.localeCompare(b.setName)
   );
 
-  // Load all cards for selected set
+  // Load all cards for selected set (wait for user to be available)
   useEffect(() => {
-    if (selectedSetId) {
+    if (selectedSetId && user) {
       loadSetCards(selectedSetId);
     }
-  }, [selectedSetId]);
+  }, [selectedSetId, user]);
 
   const loadSetCards = async (setId) => {
     try {
@@ -212,6 +212,30 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
   const totalCount = setCards.length || 1;
   const progressPercent = Math.round((collectedCount / totalCount) * 100);
 
+  // Get set name from setCards if not in collection yet
+  const displaySetName = selectedSetData?.setName || (setCards.length > 0 ? setCards[0].set.name : 'Loading...');
+
+  // Show loading state when on a set view but data isn't ready
+  if (selectedSetId && (loading || loadingSetCards) && setCards.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="glass-effect rounded-2xl p-4 md:p-8 border border-adaptive">
+          <button
+            onClick={handleBackToSetList}
+            className="flex items-center gap-2 text-adaptive-secondary hover:text-adaptive-primary transition-colors mb-4 md:mb-6"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to Sets</span>
+          </button>
+          <div className="text-center py-20">
+            <div className="inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-adaptive-tertiary">Loading collection...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -229,7 +253,7 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-4xl font-display text-adaptive-primary mb-2">
-              {selectedSetId ? selectedSetData?.setName : 'My Collection'}
+              {selectedSetId ? displaySetName : 'My Collection'}
             </h1>
             <p className="text-sm text-adaptive-secondary">
               {selectedSetId
