@@ -110,7 +110,7 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
     <>
       <button
         onClick={handleClick}
-        className={`flex items-center gap-2 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl border border-amber-600 transition-colors font-semibold ${className}`}
+        className={`flex items-center gap-2 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-black rounded-xl border border-amber-600 transition-colors font-semibold ${className}`}
         title={hasAlert ? 'Manage price alerts' : 'Set price alert'}
       >
         {hasAlert ? (
@@ -131,7 +131,7 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
       {/* Alert Modal */}
       {showModal && ReactDOM.createPortal(
         <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fade-in"
           onClick={() => setShowModal(false)}
         >
           <div
