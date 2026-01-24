@@ -95,10 +95,10 @@ const Header = ({ onLogoClick, onCollectionClick, onAlertsClick }) => {
               {user && (
                 <button
                   onClick={handleAlertsClick}
-                  className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 border border-amber-600 transition-all shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50"
+                  className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary border border-adaptive transition-colors"
                 >
-                  <Bell className="w-5 h-5" />
-                  <span className="hidden md:inline text-sm font-bold">My Alerts</span>
+                  <Bell className="w-5 h-5 text-amber-500" />
+                  <span className="hidden md:inline text-sm font-medium">My Alerts</span>
                 </button>
               )}
 

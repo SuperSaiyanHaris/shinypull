@@ -81,20 +81,20 @@ const PriceAlertButton = ({ card, className = '' }) => {
     <>
       <button
         onClick={handleClick}
-        className={`flex items-center gap-2 px-4 py-3 modal-button rounded-xl border transition-colors ${className}`}
+        className={`flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl border border-amber-600 transition-all font-bold shadow-lg hover:shadow-amber-500/30 ${className}`}
         title={hasAlert ? 'Manage price alerts' : 'Set price alert'}
       >
         {hasAlert ? (
           <>
-            <BellOff className="w-5 h-5 text-amber-500" />
-            <span className="text-sm font-medium text-adaptive-secondary">
+            <BellOff className="w-5 h-5" />
+            <span className="text-sm font-bold">
               {existingAlerts.length} Alert{existingAlerts.length !== 1 ? 's' : ''}
             </span>
           </>
         ) : (
           <>
-            <Bell className="w-5 h-5 text-adaptive-secondary" />
-            <span className="text-sm font-medium text-adaptive-secondary">Set Alert</span>
+            <Bell className="w-5 h-5" />
+            <span className="text-sm font-bold">Set Alert</span>
           </>
         )}
       </button>
@@ -256,11 +256,11 @@ const PriceAlertButton = ({ card, className = '' }) => {
                 <button
                   type="submit"
                   disabled={loading || !targetPrice}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-adaptive-hover disabled:to-adaptive-hover disabled:text-adaptive-tertiary text-slate-900 font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none"
+                  className="w-full px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-adaptive-hover disabled:to-adaptive-hover disabled:text-adaptive-tertiary text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none"
                 >
                   {loading ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Creating Alert...
                     </>
                   ) : (
