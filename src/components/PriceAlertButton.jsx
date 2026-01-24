@@ -292,11 +292,11 @@ const PriceAlertButton = ({ card, className = '', existingAlert = null, onComple
                 <button
                   type="submit"
                   disabled={loading || !targetPrice}
-                  className="w-full px-6 py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-adaptive-hover disabled:text-adaptive-tertiary text-slate-900 font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full px-6 py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-adaptive-hover disabled:text-adaptive-tertiary text-black font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {loading ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                       {editingAlertId ? 'Updating Alert...' : 'Creating Alert...'}
                     </>
                   ) : (
