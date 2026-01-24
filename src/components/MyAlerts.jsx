@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Bell, Trash2, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, Bell, Trash2, ToggleLeft, ToggleRight, Loader2, Edit } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { alertService } from '../services/alertService';
 import { formatPrice } from '../services/cardService';
+import PriceAlertButton from './PriceAlertButton';
 
 const MyAlerts = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const MyAlerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'active', 'inactive'
+  const [editingAlert, setEditingAlert] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -41,6 +43,28 @@ const MyAlerts = () => {
     if (result.success) {
       await loadAlerts();
     }
+  };
+
+  const handleEditAlert = (alert) => {
+    setEditingAlert({
+      alert,
+      card: {
+        id: alert.card_id,
+        name: alert.card_name,
+        set: { name: alert.card_set },
+        images: { small: alert.card_image },
+        prices: {
+          tcgplayer: {
+            market: parseFloat(alert.current_price || 0)
+          }
+        }
+      }
+    });
+  };
+
+  const handleEditComplete = async () => {
+    setEditingAlert(null);
+    await loadAlerts();
   };
 
   const filteredAlerts = alerts.filter(alert => {
@@ -202,6 +226,13 @@ const MyAlerts = () => {
                     )}
                   </button>
                   <button
+                    onClick={() => handleEditAlert(alert)}
+                    className="px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg transition-colors border border-amber-500/30"
+                    title="Edit alert"
+                  >
+                    <Edit className="w-4 h-4 text-amber-500" />
+                  </button>
+                  <button
                     onClick={() => handleDeleteAlert(alert.id)}
                     className="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors border border-red-500/30"
                     title="Delete alert"
@@ -219,6 +250,18 @@ const MyAlerts = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {editingAlert && (
+        <div className="hidden">
+          <PriceAlertButton
+            card={editingAlert.card}
+            existingAlert={editingAlert.alert}
+            onComplete={handleEditComplete}
+            autoOpen
+          />
+        </div>
+      )}
     </div>
   );
 };

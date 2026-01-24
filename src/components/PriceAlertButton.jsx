@@ -4,25 +4,38 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { alertService } from '../services/alertService';
 
-const PriceAlertButton = ({ card, className = '' }) => {
+const PriceAlertButton = ({ card, className = '', existingAlert = null, onComplete = null, autoOpen = false }) => {
   const { user } = useAuth();
   const { openAuthModal } = useAuthModal();
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(autoOpen);
   const [hasAlert, setHasAlert] = useState(false);
   const [existingAlerts, setExistingAlerts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [targetPrice, setTargetPrice] = useState('');
-  const [alertType, setAlertType] = useState('below');
-  const [checkFrequency, setCheckFrequency] = useState(4);
-  const [startDate, setStartDate] = useState('');
+  const [targetPrice, setTargetPrice] = useState(existingAlert?.target_price || '');
+  const [alertType, setAlertType] = useState(existingAlert?.alert_type || 'below');
+  const [checkFrequency, setCheckFrequency] = useState(existingAlert?.check_frequency || 4);
+  const [startDate, setStartDate] = useState(existingAlert?.start_date || '');
+  const [editingAlertId, setEditingAlertId] = useState(existingAlert?.id || null);
 
   const currentPrice = card.prices?.tcgplayer?.market || 0;
+  const isEditMode = !!existingAlert;
 
   useEffect(() => {
     if (user && card?.id) {
       checkExistingAlerts();
     }
   }, [user, card?.id]);
+
+  useEffect(() => {
+    if (autoOpen && existingAlert) {
+      setShowModal(true);
+      setTargetPrice(existingAlert.target_price);
+      setAlertType(existingAlert.alert_type);
+      setCheckFrequency(existingAlert.check_frequency);
+      setStartDate(existingAlert.start_date || '');
+      setEditingAlertId(existingAlert.id);
+    }
+  }, [autoOpen, existingAlert]);
 
   const checkExistingAlerts = async () => {
     const result = await alertService.getCardAlerts(user.id, card.id);
@@ -49,21 +62,36 @@ const PriceAlertButton = ({ card, className = '' }) => {
     if (!targetPrice || parseFloat(targetPrice) <= 0) return;
 
     setLoading(true);
-    const result = await alertService.createAlert(
-      user.id,
-      card,
-      parseFloat(targetPrice),
-      alertType,
-      checkFrequency,
-      startDate || null
-    );
+    
+    let result;
+    if (editingAlertId) {
+      // Update existing alert
+      result = await alertService.updateAlert(editingAlertId, {
+        target_price: parseFloat(targetPrice),
+        alert_type: alertType,
+        check_frequency: checkFrequency,
+        start_date: startDate || null
+      });
+    } else {
+      // Create new alert
+      result = await alertService.createAlert(
+        user.id,
+        card,
+        parseFloat(targetPrice),
+        alertType,
+        checkFrequency,
+        startDate || null
+      );
+    }
 
     if (result.success) {
       await checkExistingAlerts();
       setShowModal(false);
       setTargetPrice('');
+      setEditingAlertId(null);
+      if (onComplete) onComplete();
     } else {
-      alert('Failed to create alert: ' + result.error);
+      alert(`Failed to ${editingAlertId ? 'update' : 'create'} alert: ` + result.error);
     }
     setLoading(false);
   };
@@ -112,11 +140,16 @@ const PriceAlertButton = ({ card, className = '' }) => {
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-adaptive modal-header">
               <div>
-                <h3 className="text-2xl font-display text-adaptive-primary">Price Alerts</h3>
+                <h3 className="text-2xl font-display text-adaptive-primary">
+                  {editingAlertId ? 'Update Alert' : 'Price Alerts'}
+                </h3>
                 <p className="text-sm text-adaptive-secondary mt-1">{card.name}</p>
               </div>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  if (onComplete) onComplete();
+                }}
                 className="p-2 modal-button rounded-lg transition-colors border"
                 aria-label="Close modal"
               >
@@ -135,7 +168,7 @@ const PriceAlertButton = ({ card, className = '' }) => {
               </div>
 
               {/* Existing Alerts */}
-              {existingAlerts.length > 0 && (
+              {!editingAlertId && existingAlerts.length > 0 && (
                 <div className="mb-6 space-y-2">
                   <p className="text-xs font-semibold text-adaptive-secondary uppercase tracking-wide">Active Alerts</p>
                   {existingAlerts.map((alert) => (
@@ -261,12 +294,12 @@ const PriceAlertButton = ({ card, className = '' }) => {
                   {loading ? (
                     <>
                       <div className="w-5 h-5 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin" />
-                      Creating Alert...
+                      {editingAlertId ? 'Updating Alert...' : 'Creating Alert...'}
                     </>
                   ) : (
                     <>
                       <Bell className="w-5 h-5" />
-                      Create Alert
+                      {editingAlertId ? 'Update Alert' : 'Create Alert'}
                     </>
                   )}
                 </button>
