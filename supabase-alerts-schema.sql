@@ -10,7 +10,10 @@ create table if not exists price_alerts (
   card_set text,
   target_price decimal(10, 2) not null,
   alert_type text check (alert_type in ('below', 'above')) not null,
+  check_frequency integer default 4 check (check_frequency in (1, 4, 8, 12)),
+  start_date timestamp with time zone default now(),
   is_active boolean default true,
+  last_checked_at timestamp with time zone,
   last_triggered_at timestamp with time zone,
   created_at timestamp with time zone default now(),
   updated_at timestamp with time zone default now()

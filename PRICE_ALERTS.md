@@ -34,17 +34,17 @@ supabase secrets set POKEMON_TCG_API_KEY=your_pokemon_tcg_api_key
 
 ### 4. Configure Supabase Cron Job
 
-Set up a daily cron job in Supabase:
+Set up an hourly cron job in Supabase:
 
 1. Go to Supabase Dashboard
 2. Database > Extensions > Enable `pg_cron`
 3. Go to SQL Editor and run:
 
 ```sql
--- Create a cron job to run check-alerts daily at midnight UTC
+-- Create a cron job to run check-alerts every hour
 SELECT cron.schedule(
-  'check-price-alerts-daily',
-  '0 0 * * *', -- Run at midnight UTC every day
+  'check-price-alerts-hourly',
+  '0 * * * *', -- Run at the start of every hour
   $$
   SELECT
     net.http_post(
@@ -62,10 +62,12 @@ SELECT cron.schedule(
 SELECT * FROM cron.job;
 
 -- To remove the job later (if needed):
--- SELECT cron.unschedule('check-price-alerts-daily');
+-- SELECT cron.unschedule('check-price-alerts-hourly');
 ```
 
-**Note:** Replace `YOUR_PROJECT_REF` with your actual Supabase project reference (found in Project Settings > API > Project URL)
+**Note:** 
+- Replace `YOUR_PROJECT_REF` with your actual Supabase project reference (found in Project Settings > API > Project URL)
+- The cron runs hourly, but each alert is checked based on the user's chosen frequency (1, 4, 8, or 12 hours)
 
 ### 5. Email Notifications (TODO)
 
@@ -159,8 +161,11 @@ price_alerts (
   card_set: TEXT
   target_price: DECIMAL
   alert_type: TEXT ('below' | 'above')
+  check_frequency: INTEGER (1, 4, 8, or 12 hours)
+  start_date: TIMESTAMP (when to start checking)
   is_active: BOOLEAN
-  last_triggered_at: TIMESTAMP
+  last_checked_at: TIMESTAMP (last time price was checked)
+  last_triggered_at: TIMESTAMP (last time alert was triggered)
   created_at: TIMESTAMP
   updated_at: TIMESTAMP
 )

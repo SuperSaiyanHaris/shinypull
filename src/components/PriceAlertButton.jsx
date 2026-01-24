@@ -13,6 +13,8 @@ const PriceAlertButton = ({ card, className = '' }) => {
   const [loading, setLoading] = useState(false);
   const [targetPrice, setTargetPrice] = useState('');
   const [alertType, setAlertType] = useState('below');
+  const [checkFrequency, setCheckFrequency] = useState(4);
+  const [startDate, setStartDate] = useState('');
 
   const currentPrice = card.prices?.tcgplayer?.market || 0;
 
@@ -38,6 +40,8 @@ const PriceAlertButton = ({ card, className = '' }) => {
     setShowModal(true);
     setTargetPrice('');
     setAlertType('below');
+    setCheckFrequency(4);
+    setStartDate('');
   };
 
   const handleCreateAlert = async (e) => {
@@ -49,7 +53,9 @@ const PriceAlertButton = ({ card, className = '' }) => {
       user.id,
       card,
       parseFloat(targetPrice),
-      alertType
+      alertType,
+      checkFrequency,
+      startDate || null
     );
 
     if (result.success) {
@@ -200,6 +206,41 @@ const PriceAlertButton = ({ card, className = '' }) => {
                 </div>
                 <p className="text-xs text-adaptive-tertiary mt-1">
                   You'll be notified when the price goes {alertType} this amount
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-adaptive-secondary mb-2">
+                  Check Frequency
+                </label>
+                <select
+                  value={checkFrequency}
+                  onChange={(e) => setCheckFrequency(parseInt(e.target.value))}
+                  className="w-full px-4 py-3 bg-adaptive-hover border border-adaptive rounded-lg text-adaptive-primary focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                >
+                  <option value={1}>Every hour</option>
+                  <option value={4}>Every 4 hours</option>
+                  <option value={8}>Every 8 hours</option>
+                  <option value={12}>Every 12 hours</option>
+                </select>
+                <p className="text-xs text-adaptive-tertiary mt-1">
+                  How often to check for price changes
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-adaptive-secondary mb-2">
+                  Start Date (Optional)
+                </label>
+                <input
+                  type="datetime-local"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  min={new Date().toISOString().slice(0, 16)}
+                  className="w-full px-4 py-3 bg-adaptive-hover border border-adaptive rounded-lg text-adaptive-primary focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                />
+                <p className="text-xs text-adaptive-tertiary mt-1">
+                  When to start checking (defaults to now)
                 </p>
               </div>
 

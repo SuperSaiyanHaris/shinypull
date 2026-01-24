@@ -62,8 +62,35 @@ serve(async (req) => {
     // Check each alert
     for (const alert of alerts) {
       try {
+        // Check if alert start date has been reached
+        const startDate = new Date(alert.start_date)
+        const now = new Date()
+        
+        if (now < startDate) {
+          console.log(`Skipping alert ${alert.id}: Start date ${startDate} not reached yet`)
+          continue
+        }
+
+        // Check if enough time has passed since last check based on frequency
+        if (alert.last_checked_at) {
+          const lastCheck = new Date(alert.last_checked_at)
+          const hoursSinceLastCheck = (now.getTime() - lastCheck.getTime()) / (1000 * 60 * 60)
+          const checkFrequency = alert.check_frequency || 4
+          
+          if (hoursSinceLastCheck < checkFrequency) {
+            console.log(`Skipping alert ${alert.id}: Only ${hoursSinceLastCheck.toFixed(1)}h since last check (needs ${checkFrequency}h)`)
+            continue
+          }
+        }
+
         // Fetch current price from Pokemon TCG API
         const priceData = await fetchCardPrice(alert.card_id)
+        
+        // Update last_checked_at regardless of whether price was found
+        await supabaseAdmin
+          .from('price_alerts')
+          .update({ last_checked_at: now.toISOString() })
+          .eq('id', alert.id)
         
         if (!priceData) {
           console.log(`Could not fetch price for card ${alert.card_id}`)

@@ -162,9 +162,17 @@ const MyAlerts = ({ onBack }) => {
                       {alert.alert_type === 'below' ? '↓' : '↑'} {formatPrice(parseFloat(alert.target_price))}
                     </span>
                   </div>
-                  <p className="text-xs text-adaptive-secondary">
+                  <p className="text-xs text-adaptive-secondary mb-2">
                     Alert when price goes {alert.alert_type}
                   </p>
+                  <div className="flex items-center justify-between text-xs text-adaptive-tertiary pt-2 border-t border-adaptive">
+                    <span>Checks every {alert.check_frequency}h</span>
+                    {alert.start_date && new Date(alert.start_date) > new Date() && (
+                      <span className="text-amber-500">
+                        Starts {new Date(alert.start_date).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
                   {alert.last_triggered_at && (
                     <p className="text-xs text-amber-500 mt-2">
                       Last triggered: {new Date(alert.last_triggered_at).toLocaleDateString()}

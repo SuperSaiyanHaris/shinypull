@@ -4,7 +4,7 @@ export const alertService = {
   /**
    * Create a new price alert
    */
-  async createAlert(userId, cardData, targetPrice, alertType) {
+  async createAlert(userId, cardData, targetPrice, alertType, checkFrequency = 4, startDate = null) {
     try {
       const { data, error } = await supabase
         .from('price_alerts')
@@ -16,6 +16,8 @@ export const alertService = {
           card_set: cardData.set,
           target_price: targetPrice,
           alert_type: alertType,
+          check_frequency: checkFrequency,
+          start_date: startDate || new Date().toISOString(),
           is_active: true
         })
         .select()
