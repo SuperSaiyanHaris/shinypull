@@ -81,20 +81,20 @@ const PriceAlertButton = ({ card, className = '' }) => {
     <>
       <button
         onClick={handleClick}
-        className={`flex items-center gap-2 px-4 py-3 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary rounded-xl border border-adaptive transition-colors font-medium ${className}`}
+        className={`flex items-center gap-2 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl border border-amber-600 transition-colors font-semibold ${className}`}
         title={hasAlert ? 'Manage price alerts' : 'Set price alert'}
       >
         {hasAlert ? (
           <>
-            <Bell className="w-5 h-5 text-amber-500" />
-            <span className="text-sm font-medium">
+            <Bell className="w-5 h-5" />
+            <span className="text-sm font-semibold">
               {existingAlerts.length} Alert{existingAlerts.length !== 1 ? 's' : ''}
             </span>
           </>
         ) : (
           <>
-            <Bell className="w-5 h-5 text-amber-500" />
-            <span className="text-sm font-medium">Set Alert</span>
+            <Bell className="w-5 h-5" />
+            <span className="text-sm font-semibold">Set Alert</span>
           </>
         )}
       </button>
