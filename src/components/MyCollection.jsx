@@ -419,7 +419,7 @@ const MyCollection = () => {
                           key={card.id}
                           onClick={() => handleViewDetails(card)}
                           className={`glass-effect rounded-xl p-3 border border-adaptive hover:bg-adaptive-hover transition-all text-left ${
-                            !isCollected ? 'opacity-50' : ''
+                            !isCollected ? 'opacity-70' : ''
                           }`}
                         >
                           <div className="flex items-start gap-3">
