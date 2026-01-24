@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Bell, Trash2, ToggleLeft, ToggleRight, Loader2, Edit } from 'lucide-react';
+import { ArrowLeft, Bell, Trash2, ToggleLeft, ToggleRight, Loader2, Edit, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { alertService } from '../services/alertService';
 import { formatPrice } from '../services/cardService';
@@ -13,6 +13,7 @@ const MyAlerts = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'active', 'inactive'
   const [editingAlert, setEditingAlert] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // { id, cardName }
 
   useEffect(() => {
     if (user) {
@@ -37,12 +38,11 @@ const MyAlerts = () => {
   };
 
   const handleDeleteAlert = async (alertId) => {
-    if (!confirm('Are you sure you want to delete this alert?')) return;
-    
     const result = await alertService.deleteAlert(alertId);
     if (result.success) {
       await loadAlerts();
     }
+    setDeleteConfirm(null);
   };
 
   const handleEditAlert = (alert) => {
@@ -233,7 +233,7 @@ const MyAlerts = () => {
                     <Edit className="w-4 h-4 text-amber-500" />
                   </button>
                   <button
-                    onClick={() => handleDeleteAlert(alert.id)}
+                    onClick={() => setDeleteConfirm({ id: alert.id, cardName: alert.card_name })}
                     className="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors border border-red-500/30"
                     title="Delete alert"
                   >
@@ -259,6 +259,53 @@ const MyAlerts = () => {
           onComplete={handleEditComplete}
           autoOpen
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="relative w-full max-w-md modal-container border rounded-2xl overflow-hidden shadow-2xl animate-slide-up">
+            <div className="p-6 modal-content">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10">
+                <AlertTriangle className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="text-xl font-display text-adaptive-primary text-center mb-2">
+                Delete Alert?
+              </h3>
+              <p className="text-adaptive-secondary text-center mb-2">
+                Are you sure you want to delete the alert for
+              </p>
+              <p className="text-adaptive-primary font-semibold text-center mb-6">
+                {deleteConfirm.cardName}?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="flex-1 px-4 py-3 modal-card border border-adaptive rounded-xl font-semibold text-adaptive-primary hover:bg-adaptive-hover transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDeleteAlert(deleteConfirm.id)}
+                  disabled={loading}
+                  className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 rounded-xl font-semibold text-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
