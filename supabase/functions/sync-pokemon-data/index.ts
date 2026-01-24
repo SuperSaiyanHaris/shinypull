@@ -286,33 +286,27 @@ async function syncSetCards(supabase: any, headers: Record<string, string>, setI
 }
 
 // Prices-only sync - faster, updates only price data
-async function syncPricesOnly(supabase: any, headers: Record<string, string>, limit: number = 20) {
+async function syncPricesOnly(supabase: any, headers: Record<string, string>, limit: number = 3) {
   console.log(`Syncing prices only (limit: ${limit} sets)...`);
 
-  // Strategy: Mix of recent sets (high priority) and oldest updated sets (rotation)
-  // Get 70% recent sets + 30% least recently synced sets
-  const recentLimit = Math.ceil(limit * 0.7);
-  const rotationLimit = limit - recentLimit;
-
-  // Get most recent sets (prioritized for active trading)
-  const { data: recentSets } = await supabase
+  // Simple rotation: Get the sets that haven't been synced in the longest time
+  // This ensures ALL sets get updated in order, rotating through the entire database
+  const { data: setsToSync } = await supabase
     .from("sets")
-    .select("id, last_price_sync")
-    .order("release_date", { ascending: false })
-    .limit(recentLimit);
-
-  // Get sets that haven't been updated in longest time (rotation)
-  const { data: oldSets } = await supabase
-    .from("sets")
-    .select("id, last_price_sync")
+    .select("id, name, last_price_sync")
     .order("last_price_sync", { ascending: true, nullsFirst: true })
-    .limit(rotationLimit);
+    .limit(limit);
 
-  // Combine and deduplicate
-  const setsToSync = [...(recentSets || []), ...(oldSets || [])]
-    .filter((set, index, self) => 
-      index === self.findIndex((s) => s.id === set.id)
-    );
+  if (!setsToSync || setsToSync.length === 0) {
+    return {
+      success: true,
+      cardsUpdated: 0,
+      setsProcessed: 0,
+      message: "No sets to sync"
+    };
+  }
+
+  console.log(`Processing sets: ${setsToSync.map(s => s.name || s.id).join(", ")}`);
 
   return await processPriceSync(supabase, headers, setsToSync);
 }
