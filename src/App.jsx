@@ -14,7 +14,7 @@ import TermsOfUse from './components/TermsOfUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import ScrollToTop from './components/ScrollToTop';
 import { useCardSearch } from './hooks/useCardSearch';
-import { getAllSets } from './services/setService';
+import { getAllSets } from './services/dbSetService';
 
 function SetDetailWrapper({ selectedSet, onSetLoaded }) {
   const { setId } = useParams();
