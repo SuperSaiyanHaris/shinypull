@@ -288,28 +288,15 @@ async function syncSetCards(supabase: any, headers: Record<string, string>, setI
 async function syncPricesOnly(supabase: any, headers: Record<string, string>) {
   console.log("Syncing prices only...");
 
-  // Get sets that were synced in the last 30 days (active sets)
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-  const { data: recentSets, error: setsError } = await supabase
+  // Get ALL sets to update prices for every card in database
+  const { data: allSets, error: setsError } = await supabase
     .from("sets")
     .select("id")
-    .gte("release_date", thirtyDaysAgo.toISOString().split("T")[0])
     .order("release_date", { ascending: false });
 
   if (setsError) throw setsError;
 
-  // If no recent sets, get the 10 most recent sets
-  let setsToSync = recentSets || [];
-  if (setsToSync.length === 0) {
-    const { data: fallbackSets } = await supabase
-      .from("sets")
-      .select("id")
-      .order("release_date", { ascending: false })
-      .limit(10);
-    setsToSync = fallbackSets || [];
-  }
+  const setsToSync = allSets || [];
 
   let totalCards = 0;
   let successCount = 0;
