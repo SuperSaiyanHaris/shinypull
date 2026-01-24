@@ -54,6 +54,23 @@ const SetBrowser = ({ onSetClick }) => {
       return 0;
     });
 
+  // Group sets by series
+  const groupedSets = filteredSets.reduce((groups, set) => {
+    const series = set.series || 'Other';
+    if (!groups[series]) {
+      groups[series] = [];
+    }
+    groups[series].push(set);
+    return groups;
+  }, {});
+
+  // Sort series by most recent release date in that series
+  const sortedSeries = Object.keys(groupedSets).sort((a, b) => {
+    const latestA = Math.max(...groupedSets[a].map(s => new Date(s.releaseDate)));
+    const latestB = Math.max(...groupedSets[b].map(s => new Date(s.releaseDate)));
+    return latestB - latestA;
+  });
+
   return (
     <div className="space-y-6">
       {/* Controls Bar */}
@@ -149,37 +166,45 @@ const SetBrowser = ({ onSetClick }) => {
         <>
       {/* Sets Display */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSets.map((set, index) => (
-            <div
-              key={set.id}
-              onClick={() => onSetClick(set)}
-              className="glass-effect rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform duration-300 cursor-pointer animate-slide-up border border-adaptive"
-              style={{ animationDelay: `${index * 75}ms` }}
-            >
-              <div className="relative aspect-[16/9] bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center p-8">
-                <img
-                  src={set.logo}
-                  alt={set.name}
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/400x225?text=' + encodeURIComponent(set.name);
-                  }}
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-display text-adaptive-primary mb-2">
-                  {set.name}
-                </h3>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-adaptive-secondary">{set.series}</span>
-                  <span className="text-adaptive-tertiary">{set.totalCards} cards</span>
-                </div>
-                <div className="mt-3 pt-3 border-t border-adaptive">
-                  <span className="text-xs text-adaptive-tertiary">
-                    Released: {new Date(set.releaseDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                  </span>
-                </div>
+        <div className="space-y-8">
+          {sortedSeries.map((series) => (
+            <div key={series}>
+              {/* Series Header */}
+              <h2 className="text-xl font-display text-adaptive-primary mb-4">
+                {series}
+              </h2>
+              
+              {/* Sets Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {groupedSets[series].map((set) => (
+                  <div
+                    key={set.id}
+                    onClick={() => onSetClick(set)}
+                    className="glass-effect rounded-xl overflow-hidden hover:scale-[1.02] transition-transform duration-300 cursor-pointer border border-adaptive"
+                  >
+                    <div className="relative aspect-square bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center p-4">
+                      <img
+                        src={set.logo}
+                        alt={set.name}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          e.target.src = 'https://via.placeholder.com/200x200?text=' + encodeURIComponent(set.name);
+                        }}
+                      />
+                    </div>
+                    <div className="p-3">
+                      <h3 className="text-sm font-semibold text-adaptive-primary truncate mb-1">
+                        {set.name}
+                      </h3>
+                      <p className="text-xs text-adaptive-tertiary">
+                        {new Date(set.releaseDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                      <p className="text-xs text-adaptive-secondary mt-1">
+                        {set.totalCards} Cards
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
