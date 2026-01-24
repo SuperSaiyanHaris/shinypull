@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -14,6 +14,56 @@ import TermsOfUse from './components/TermsOfUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import ScrollToTop from './components/ScrollToTop';
 import { useCardSearch } from './hooks/useCardSearch';
+import { getAllSets } from './services/setService';
+
+function SetDetailWrapper({ selectedSet, onSetLoaded }) {
+  const { setId } = useParams();
+  const [set, setSet] = useState(selectedSet);
+  const [loading, setLoading] = useState(!selectedSet);
+
+  useEffect(() => {
+    if (!selectedSet && setId) {
+      // Fetch set data if not available (e.g., on page refresh)
+      const fetchSet = async () => {
+        setLoading(true);
+        try {
+          const allSets = await getAllSets();
+          const foundSet = allSets.find(s => s.id === setId);
+          if (foundSet) {
+            setSet(foundSet);
+            if (onSetLoaded) onSetLoaded(foundSet);
+          }
+        } catch (error) {
+          console.error('Error fetching set:', error);
+        }
+        setLoading(false);
+      };
+      fetchSet();
+    } else if (selectedSet) {
+      setSet(selectedSet);
+      setLoading(false);
+    }
+  }, [setId, selectedSet, onSetLoaded]);
+
+  if (loading) {
+    return (
+      <div className="text-center py-20">
+        <div className="inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-adaptive-tertiary">Loading set...</p>
+      </div>
+    );
+  }
+
+  if (!set) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-adaptive-tertiary">Set not found</p>
+      </div>
+    );
+  }
+
+  return <SetDetailPage set={set} />;
+}
 
 function AppContent() {
   const { query, setQuery, cards, loading } = useCardSearch();
@@ -39,9 +89,8 @@ function AppContent() {
     navigate(`/sets/${set.id}`);
   };
 
-  const handleBackToSets = () => {
-    setSelectedSet(null);
-    navigate('/');
+  const handleSetLoaded = (set) => {
+    setSelectedSet(set);
   };
 
   // Listen for Ctrl+Shift+A to toggle admin panel
@@ -101,13 +150,10 @@ function AppContent() {
 
               {/* Set Detail Page */}
               <Route path="/sets/:setId" element={
-                selectedSet ? (
-                  <SetDetailPage set={selectedSet} onBack={handleBackToSets} />
-                ) : (
-                  <div className="text-center py-20">
-                    <p className="text-adaptive-tertiary">Loading set...</p>
-                  </div>
-                )
+                <SetDetailWrapper 
+                  selectedSet={selectedSet} 
+                  onSetLoaded={handleSetLoaded}
+                />
               } />
 
               {/* Search Results */}
