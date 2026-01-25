@@ -173,9 +173,6 @@ const SetDetailPage = ({ set }) => {
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Main Content Area */}
-          <div className={`${showFilters ? 'lg:col-span-9' : 'lg:col-span-12'}`}>
         <>
       {/* Mobile Card List - Hidden on desktop */}
       <div className="md:hidden space-y-3">
@@ -332,20 +329,26 @@ const SetDetailPage = ({ set }) => {
         </div>
       </div>
         </>
-          </div>
+      )}
 
-          {/* Filters Sidebar - Right side on desktop */}
-          {showFilters && (
-            <div className="lg:col-span-3">
-              <div className="lg:sticky lg:top-6">
-                <CardFilters 
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                />
-              </div>
-            </div>
-          )}
-        </div>
+      {/* Filters Slide-out Panel - Overlay from right */}
+      {showFilters && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 animate-fade-in"
+            onClick={() => setShowFilters(false)}
+          />
+          
+          {/* Slide-out Panel */}
+          <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-adaptive z-50 shadow-2xl animate-slide-in-right overflow-y-auto">
+            <CardFilters 
+              filters={filters}
+              onFiltersChange={setFilters}
+              onClose={() => setShowFilters(false)}
+            />
+          </div>
+        </>
       )}
       {selectedCard && (
         <CardModal

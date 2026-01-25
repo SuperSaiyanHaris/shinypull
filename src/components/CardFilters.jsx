@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, X, ChevronDown, ChevronUp } from 'lucide-react';
 
-const CardFilters = ({ filters, onFiltersChange, showOwnershipFilter = false }) => {
+const CardFilters = ({ filters, onFiltersChange, showOwnershipFilter = false, onClose }) => {
   const [expandedSections, setExpandedSections] = React.useState({
     sort: true,
     ownership: true,
@@ -88,22 +88,32 @@ const CardFilters = ({ filters, onFiltersChange, showOwnershipFilter = false }) 
   );
 
   return (
-    <div className="glass-effect rounded-2xl border border-adaptive overflow-hidden">
-      {/* Header */}
-      <div className="p-4 border-b border-adaptive bg-adaptive-card">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-display text-adaptive-primary">Filters</h3>
-          {activeFilterCount() > 0 && (
-            <button
-              onClick={clearFilters}
-              className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
-            >
-              <X className="w-3 h-3" />
-              Clear ({activeFilterCount()})
-            </button>
-          )}
+    <div className="h-full flex flex-col bg-adaptive">
+      {/* Header with Close Button */}
+      <div className="p-6 border-b border-adaptive bg-adaptive-card sticky top-0 z-10">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-2xl font-display text-adaptive-primary">Filters</h3>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-adaptive-hover rounded-lg transition-colors"
+            aria-label="Close filters"
+          >
+            <X className="w-6 h-6 text-adaptive-secondary" />
+          </button>
         </div>
+        {activeFilterCount() > 0 && (
+          <button
+            onClick={clearFilters}
+            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+          >
+            <X className="w-4 h-4" />
+            Clear all filters ({activeFilterCount()})
+          </button>
+        )}
       </div>
+
+      {/* Scrollable Filter Content */}
+      <div className="flex-1 overflow-y-auto">
 
       {/* Sort By */}
       <FilterSection title="Sort By" section="sort">
@@ -236,6 +246,7 @@ const CardFilters = ({ filters, onFiltersChange, showOwnershipFilter = false }) 
             'Ultra Rare',
             'Promo'
           ].map(rarity => (
+      </div>
             <FilterButton
               key={rarity}
               active={filters.rarities?.includes(rarity)}
