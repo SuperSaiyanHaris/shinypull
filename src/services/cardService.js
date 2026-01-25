@@ -210,26 +210,18 @@ async function transformCards(cards) {
     // Get the best available price data
     const prices = card.tcgplayer?.prices || {};
 
-    // Try to find the best price variant (holofoil, reverse holofoil, normal, etc.)
-    const priceVariants = ['holofoil', 'reverseHolofoil', '1stEditionHolofoil', 'unlimitedHolofoil', 'normal'];
-    let priceData = null;
+    // Extract normal and holofoil prices separately
+    const normalPrice = prices.normal?.market || 0;
+    const holofoilPrice = prices.holofoil?.market || prices.reverseHolofoil?.market || prices['1stEditionHolofoil']?.market || 0;
 
-    for (const variant of priceVariants) {
-      if (prices[variant] && prices[variant].market) {
-        priceData = prices[variant];
-        break;
-      }
-    }
-
-    // Fallback to first available price
-    if (!priceData) {
-      const firstVariant = Object.keys(prices)[0];
-      priceData = firstVariant ? prices[firstVariant] : {};
-    }
-
-    const marketPrice = priceData?.market || 0;
-    const lowPrice = priceData?.low || marketPrice * 0.8;
-    const highPrice = priceData?.high || marketPrice * 1.3;
+    // Use holofoil as primary if available, otherwise normal
+    const marketPrice = holofoilPrice || normalPrice;
+    const lowPrice = holofoilPrice 
+      ? (prices.holofoil?.low || prices.reverseHolofoil?.low || marketPrice * 0.8)
+      : (prices.normal?.low || marketPrice * 0.8);
+    const highPrice = holofoilPrice
+      ? (prices.holofoil?.high || prices.reverseHolofoil?.high || marketPrice * 1.3)
+      : (prices.normal?.high || marketPrice * 1.3);
 
     // Generate mock price history based on current price
     const priceHistory = generateMockHistory(marketPrice);
@@ -276,6 +268,8 @@ async function transformCards(cards) {
           market: marketPrice,
           low: lowPrice,
           high: highPrice,
+          normal: normalPrice,
+          holofoil: holofoilPrice,
         },
         ebay: {
           avg: parseFloat(ebayAvg.toFixed(2)),

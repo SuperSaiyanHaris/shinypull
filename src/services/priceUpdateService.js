@@ -24,33 +24,24 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
     const data = await response.json();
     const card = data.data;
 
-    // Extract price data (same logic as Edge Function)
+    // Extract both normal and holofoil prices
     const prices = card.tcgplayer?.prices || {};
-    const priceVariants = ['holofoil', 'reverseHolofoil', '1stEditionHolofoil', 'unlimitedHolofoil', 'normal'];
-    let priceData = null;
-    let variantUsed = null;
-
-    for (const variant of priceVariants) {
-      if (prices[variant]?.market) {
-        priceData = prices[variant];
-        variantUsed = variant;
-        break;
-      }
-    }
-
-    if (!priceData) {
-      const firstVariant = Object.keys(prices)[0];
-      priceData = firstVariant ? prices[firstVariant] : {};
-      variantUsed = firstVariant;
-    }
-
-    const marketPrice = priceData?.market || 0;
-    const lowPrice = priceData?.low || marketPrice * 0.8;
-    const highPrice = priceData?.high || marketPrice * 1.3;
+    const normalPrice = prices.normal?.market || 0;
+    const holofoilPrice = prices.holofoil?.market || prices.reverseHolofoil?.market || prices['1stEditionHolofoil']?.market || 0;
+    
+    // Use holofoil as primary if available
+    const marketPrice = holofoilPrice || normalPrice;
+    const lowPrice = holofoilPrice 
+      ? (prices.holofoil?.low || prices.reverseHolofoil?.low || marketPrice * 0.8)
+      : (prices.normal?.low || marketPrice * 0.8);
+    const highPrice = holofoilPrice
+      ? (prices.holofoil?.high || prices.reverseHolofoil?.high || marketPrice * 1.3)
+      : (prices.normal?.high || marketPrice * 1.3);
     const updatedAt = card.tcgplayer?.updatedAt || new Date().toISOString();
 
     console.log(`📊 TCG API Data for ${cardId}:`, {
-      variant: variantUsed,
+      normal: normalPrice,
+      holofoil: holofoilPrice,
       market: marketPrice,
       low: lowPrice,
       high: highPrice,
@@ -66,6 +57,8 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
         tcgplayer_market: marketPrice,
         tcgplayer_low: lowPrice,
         tcgplayer_high: highPrice,
+        tcgplayer_normal: normalPrice,
+        tcgplayer_holofoil: holofoilPrice,
         last_updated: new Date().toISOString()
       }, { onConflict: 'card_id' });
 
@@ -74,14 +67,15 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
       return null;
     }
 
-    console.log(`✅ Updated TCG price for ${cardId}: $${marketPrice} (${variantUsed})`);
+    console.log(`✅ Updated TCG price for ${cardId}: Normal: $${normalPrice}, Holofoil: $${holofoilPrice}`);
 
     // Return fresh price data
     return {
       market: marketPrice,
       low: lowPrice,
       high: highPrice,
-      variant: variantUsed,
+      normal: normalPrice,
+      holofoil: holofoilPrice,
       apiUpdatedAt: updatedAt,
       lastUpdated: new Date().toISOString()
     };

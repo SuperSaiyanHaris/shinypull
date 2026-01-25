@@ -232,15 +232,26 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
 
               {/* Price Box */}
               <div className="p-4 modal-price-box rounded-xl border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-adaptive-secondary">Market Price {loadingTcg && <span className="text-xs">(updating...)</span>}</p>
-                    <p className="text-3xl font-bold price-gradient">
-                      {formatPrice(displayTcgPrices.market)}
-                    </p>
-                  </div>
-                  <TrendIcon className={`w-8 h-8 ${trendColor}`} />
+                {/* Variant Prices Grid */}
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  {displayTcgPrices.normal > 0 && (
+                    <div className="text-center bg-adaptive-hover rounded-lg p-3">
+                      <p className="text-xs text-adaptive-secondary font-medium mb-1">Normal</p>
+                      <p className="text-xl font-bold text-adaptive-primary">
+                        {formatPrice(displayTcgPrices.normal)}
+                      </p>
+                    </div>
+                  )}
+                  {displayTcgPrices.holofoil > 0 && (
+                    <div className="text-center bg-adaptive-hover rounded-lg p-3">
+                      <p className="text-xs text-adaptive-secondary font-medium mb-1">Holofoil</p>
+                      <p className="text-xl font-bold price-gradient">
+                        {formatPrice(displayTcgPrices.holofoil)}
+                      </p>
+                    </div>
+                  )}
                 </div>
+                {loadingTcg && <p className="text-xs text-adaptive-tertiary text-center mb-2">(updating...)</p>}
 
                 {/* Price Range Row */}
                 <div className="flex gap-3 mt-3 pt-3 border-t border-adaptive">
@@ -417,16 +428,27 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
 
                   {/* Current Price Display */}
                   <div className="p-6 modal-price-box rounded-xl border">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <p className="text-sm text-adaptive-secondary mb-1">Market Price {loadingTcg && <span className="text-xs">(updating...)</span>}</p>
-                        <p className="text-4xl font-bold price-gradient">
-                          {formatPrice(displayTcgPrices.market)}
-                        </p>
-                        <p className="text-xs text-adaptive-tertiary mt-1.5">Prices updated regularly</p>
-                      </div>
-                      <TrendIcon className={`w-12 h-12 ${trendColor}`} />
+                    {/* Variant Prices Grid */}
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      {displayTcgPrices.normal > 0 && (
+                        <div className="text-center bg-adaptive-hover rounded-lg p-4">
+                          <p className="text-sm text-adaptive-secondary font-medium mb-2">Normal</p>
+                          <p className="text-3xl font-bold text-adaptive-primary">
+                            {formatPrice(displayTcgPrices.normal)}
+                          </p>
+                        </div>
+                      )}
+                      {displayTcgPrices.holofoil > 0 && (
+                        <div className="text-center bg-adaptive-hover rounded-lg p-4">
+                          <p className="text-sm text-adaptive-secondary font-medium mb-2">Holofoil</p>
+                          <p className="text-3xl font-bold price-gradient">
+                            {formatPrice(displayTcgPrices.holofoil)}
+                          </p>
+                        </div>
+                      )}
                     </div>
+                    <p className="text-xs text-adaptive-tertiary text-center mb-3">Prices updated regularly</p>
+                    {loadingTcg && <p className="text-xs text-adaptive-tertiary text-center mb-3">(updating...)</p>}
 
                     {/* Price Range */}
                     <div className="grid grid-cols-2 gap-3 mt-4">
