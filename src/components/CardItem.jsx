@@ -45,7 +45,7 @@ const CardItem = ({ card, index }) => {
       </div>
 
       {/* Card Info */}
-      <div className="p-6">
+      <div className="p-6 relative">
         <div className="cursor-pointer" onClick={() => setIsModalOpen(true)}>
           <h3 className="text-xl font-display text-adaptive-primary mb-1 line-clamp-1">
             {card.name}
@@ -87,7 +87,7 @@ const CardItem = ({ card, index }) => {
 
         {/* Price Display */}
         {selectedView === 'overview' && (
-          <div className="space-y-3 relative">
+          <div className="space-y-3">
             {/* Market Price */}
             <div className="flex items-center justify-between p-4 bg-adaptive-card rounded-xl border border-adaptive">
               <div>
@@ -101,23 +101,11 @@ const CardItem = ({ card, index }) => {
               </div>
               <TrendIcon className={`w-6 h-6 ${trendColor}`} />
             </div>
-            
-            {/* Auth Gate Overlay */}
-            {!user && (
-              <div className="absolute inset-0 flex items-center justify-center bg-adaptive-card/80 backdrop-blur-[2px] rounded-xl">
-                <button
-                  onClick={() => openAuthModal()}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
-                >
-                  Sign in to view pricing
-                </button>
-              </div>
-            )}
           </div>
         )}
 
         {selectedView === 'compare' && (
-          <div className="space-y-2 relative">
+          <div className="space-y-2">
             <div className={!user ? 'blur-sm select-none' : ''}>
               <PriceCompareRow
                 platform="Pokemon TCG"
@@ -143,23 +131,11 @@ const CardItem = ({ card, index }) => {
                   : "Verified prices from Pokemon TCG API. Others estimated."}
               </p>
             </div>
-            
-            {/* Auth Gate Overlay */}
-            {!user && (
-              <div className="absolute inset-0 flex items-center justify-center bg-adaptive-card/80 backdrop-blur-[2px] rounded-xl">
-                <button
-                  onClick={() => openAuthModal()}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
-                >
-                  Sign in to view pricing
-                </button>
-              </div>
-            )}
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="mt-4 flex gap-2">
+        <div className={`mt-4 flex gap-2 ${!user ? 'blur-sm select-none pointer-events-none' : ''}`}>
           <AddToCollectionButton card={card} className="flex-1" />
           <PriceAlertButton card={card} className="flex-1" />
           <button
@@ -170,6 +146,19 @@ const CardItem = ({ card, index }) => {
             <ExternalLink className="w-5 h-5" />
           </button>
         </div>
+        
+        {/* Auth Gate Overlay - covers entire pricing section */}
+        {!user && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/95 backdrop-blur-sm rounded-2xl">
+            <p className="text-sm text-adaptive-secondary mb-3">Sign in to view pricing</p>
+            <button
+              onClick={() => openAuthModal()}
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+            >
+              Sign In
+            </button>
+          </div>
+        )}
       </div>
 
     </div>

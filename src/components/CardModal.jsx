@@ -284,15 +284,15 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                 
                 {/* Auth Gate Overlay for Price Box */}
                 {!user && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/90 backdrop-blur-[2px] rounded-xl">
-                    <p className="text-sm text-adaptive-secondary mb-3 text-center px-4">
-                      Create a free account to view live pricing
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/95 backdrop-blur-sm rounded-xl">
+                    <p className="text-xs text-adaptive-tertiary mb-2 text-center px-4">
+                      Sign in to view pricing
                     </p>
                     <button
                       onClick={() => openAuthModal()}
-                      className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+                      className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-lg transition-colors"
                     >
-                      Sign Up Free
+                      Sign In
                     </button>
                   </div>
                 )}
@@ -311,7 +311,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               </div>
 
               {/* Actions */}
-              <div className="pt-2 space-y-2">
+              <div className={`pt-2 space-y-2 ${!user ? 'blur-sm pointer-events-none' : ''}`}>
                 <AddToCollectionButton
                   card={card}
                   className="w-full"
@@ -415,13 +415,13 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                 
                 {/* Auth Gate Overlay for Price Comparison */}
                 {!user && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/90 backdrop-blur-[2px] rounded-xl mt-8">
-                    <p className="text-sm text-adaptive-secondary mb-3 text-center px-4">
-                      Sign in to compare prices across platforms
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/95 backdrop-blur-sm rounded-xl mt-8">
+                    <p className="text-xs text-adaptive-tertiary mb-2 text-center px-4">
+                      Sign in to compare prices
                     </p>
                     <button
                       onClick={() => openAuthModal()}
-                      className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+                      className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-lg transition-colors"
                     >
                       Sign In
                     </button>
@@ -514,22 +514,22 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                     
                     {/* Auth Gate Overlay for Desktop Price Box */}
                     {!user && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/90 backdrop-blur-[2px] rounded-xl">
-                        <p className="text-base text-adaptive-secondary mb-4 text-center px-4">
-                          Create a free account to view live pricing
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/95 backdrop-blur-sm rounded-xl">
+                        <p className="text-sm text-adaptive-tertiary mb-3 text-center px-4">
+                          Sign in to view pricing
                         </p>
                         <button
                           onClick={() => openAuthModal()}
-                          className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+                          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
                         >
-                          Sign Up Free
+                          Sign In
                         </button>
                       </div>
                     )}
                   </div>
 
                   {/* Quick Actions */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className={`grid grid-cols-2 gap-3 ${!user ? 'blur-sm pointer-events-none' : ''}`}>
                     <AddToCollectionButton
                       card={card}
                       className="w-full"
@@ -543,7 +543,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                       href={card.tcgplayerUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border flex items-center justify-center gap-2"
+                      className={`w-full px-4 py-3 modal-button text-adaptive-secondary rounded-xl transition-colors border flex items-center justify-center gap-2 ${!user ? 'blur-sm pointer-events-none' : ''}`}
                       title="View on TCGPlayer"
                     >
                       <ExternalLink className="w-5 h-5" />
@@ -588,13 +588,13 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                 
                 {/* Auth Gate Overlay for Desktop Price Comparison */}
                 {!user && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/90 backdrop-blur-[2px] rounded-xl mt-12">
-                    <p className="text-base text-adaptive-secondary mb-4 text-center px-4">
-                      Sign in to compare prices across platforms
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/95 backdrop-blur-sm rounded-xl mt-12">
+                    <p className="text-sm text-adaptive-tertiary mb-3 text-center px-4">
+                      Sign in to compare prices
                     </p>
                     <button
                       onClick={() => openAuthModal()}
-                      className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+                      className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
                     >
                       Sign In
                     </button>

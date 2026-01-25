@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, SortDesc, Info } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useAuthModal } from '../contexts/AuthModalContext';
 import CardModal from './CardModal';
 import AddToCollectionButton from './AddToCollectionButton';
 import PriceAlertButton from './PriceAlertButton';
@@ -15,6 +17,8 @@ const SetDetailPage = ({ set }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { openAuthModal } = useAuthModal();
 
   useEffect(() => {
     const loadCards = async () => {
@@ -165,13 +169,15 @@ const SetDetailPage = ({ set }) => {
                 <span className="text-adaptive-tertiary">•</span>
                 <span className="text-xs text-adaptive-tertiary">{card.rarity}</span>
               </div>
-              <p className="text-lg font-bold price-gradient mt-2">
-                {formatPrice(card.prices.tcgplayer.market)}
+              <p className={`text-lg font-bold price-gradient mt-2 ${!user ? 'blur-sm' : ''}`}>
+                {user ? formatPrice(card.prices.tcgplayer.market) : '$---.--'}
               </p>
             </button>
 
             {/* Add to Collection Button */}
-            <AddToCollectionButton card={card} variant="icon" />
+            <div className={!user ? 'blur-sm pointer-events-none' : ''}>
+              <AddToCollectionButton card={card} variant="icon" />
+            </div>
           </div>
         ))}
       </div>
@@ -231,20 +237,31 @@ const SetDetailPage = ({ set }) => {
                     <span className="text-sm text-adaptive-secondary">{card.rarity}</span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <span className="text-sm font-bold price-gradient">
-                      {formatPrice(card.prices.tcgplayer.market)}
+                    <span className={`text-sm font-bold price-gradient ${!user ? 'blur-sm' : ''}`}>
+                      {user ? formatPrice(card.prices.tcgplayer.market) : '$---.--'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
-                      <AddToCollectionButton card={card} variant="compact" />
-                      <PriceAlertButton card={card} className="!px-3 !py-1.5 !text-sm !rounded-lg" />
-                      <button
-                        onClick={() => handleViewDetails(card)}
-                        className="px-3 py-1.5 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-medium rounded-lg transition-colors border border-adaptive"
-                      >
-                        Details
-                      </button>
+                      {user ? (
+                        <>
+                          <AddToCollectionButton card={card} variant="compact" />
+                          <PriceAlertButton card={card} className="!px-3 !py-1.5 !text-sm !rounded-lg" />
+                          <button
+                            onClick={() => handleViewDetails(card)}
+                            className="px-3 py-1.5 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-medium rounded-lg transition-colors border border-adaptive"
+                          >
+                            Details
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openAuthModal(); }}
+                          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                        >
+                          Sign In
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
