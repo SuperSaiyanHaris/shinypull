@@ -43,8 +43,8 @@ export const syncAllCardMetadata = async (onProgress) => {
     let totalSetsProcessed = 0;
     let batchNumber = 0;
 
-    // Call Edge Function processing 1 set at a time (avoids Gateway Timeout)
-    const BATCH_SIZE = 1;
+    // Call Edge Function processing 2 sets at a time (back to what was working)
+    const BATCH_SIZE = 2;
     
     while (totalSetsProcessed < setsToSync.length) {
       batchNumber++;
@@ -68,8 +68,8 @@ export const syncAllCardMetadata = async (onProgress) => {
           throw new Error('Not authenticated');
         }
 
-        // Call Edge Function for one batch (1 set at a time to avoid timeout)
-        const response = await fetch('/api/trigger-sync?mode=card-metadata&limit=1', {
+        // Call Edge Function for one batch (2 sets - back to what was working)
+        const response = await fetch('/api/trigger-sync?mode=card-metadata&limit=2', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${session.access_token}`,

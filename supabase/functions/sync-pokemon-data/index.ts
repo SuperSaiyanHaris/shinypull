@@ -437,7 +437,7 @@ async function processPriceSync(supabase: any, headers: Record<string, string>, 
 
 // Card metadata sync - updates static fields (types, supertype, etc.) in batches
 // This is for one-time updates of card metadata that doesn't change
-async function syncCardMetadataBatch(supabase: any, headers: Record<string, string>, limit: number = 1) {
+async function syncCardMetadataBatch(supabase: any, headers: Record<string, string>, limit: number = 2) {
   console.log(`Syncing card metadata (limit: ${limit} sets)...`);
 
   // Get sets that haven't had metadata synced yet (or oldest sync)
@@ -478,42 +478,52 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
 
       if (!response.ok) {
         console.error(`Failed to fetch cards for ${set.id}: ${response.statusText}`);
+        // DON'T mark as synced - let it retry next time
         continue;
       }
 
       const data = await response.json();
       const cards = data.data;
 
-      console.log(`Updating metadata for ${cards.length} cards in set ${set.id}...`);
-
-      // Update cards with metadata fields (types, supertype, images, etc.)
-      // Do this in smaller batches to avoid overwhelming the database
-      const CARD_BATCH_SIZE = 50;
-      for (let i = 0; i < cards.length; i += CARD_BATCH_SIZE) {
-        const cardBatch = cards.slice(i, i + CARD_BATCH_SIZE);
-        
-        const updates = cardBatch.map((card: any) => ({
-          id: card.id,
-          types: card.types || null,
-          supertype: card.supertype || null,
-          // Can add more static fields here in the future
-        }));
-
-        const { error: updateError } = await supabase
-          .from("cards")
-          .upsert(updates, { 
-            onConflict: "id",
-            ignoreDuplicates: false 
-          });
-
-        if (updateError) {
-          console.error(`Error updating card metadata batch:`, updateError);
-        } else {
-          totalCardsUpdated += cardBatch.length;
-        }
+      if (!cards || cards.length === 0) {
+        console.log(`No cards found for set ${set.id}`);
+        // Empty set is considered synced
+        await supabase
+          .from("sets")
+          .update({ last_metadata_sync: new Date().toISOString() })
+          .eq("id", set.id);
+        successCount++;
+        continue;
       }
 
-      // Mark this set as metadata-synced
+      console.log(`Updating metadata for ${cards.length} cards in set ${set.id}...`);
+
+      // Batch update - process in chunks of 100 cards
+      const BATCH_SIZE = 100;
+      for (let i = 0; i < cards.length; i += BATCH_SIZE) {
+        const cardBatch = cards.slice(i, i + BATCH_SIZE);
+        const cardIds = cardBatch.map((c: any) => c.id);
+        
+        // Update all cards in batch with their respective data
+        for (const card of cardBatch) {
+          const { error: updateError } = await supabase
+            .from("cards")
+            .update({
+              types: card.types || null,
+              supertype: card.supertype || null,
+            })
+            .eq("id", card.id);
+
+          if (updateError) {
+            console.error(`Error updating card ${card.id}:`, updateError);
+            throw updateError; // Throw to prevent marking set as synced
+          }
+        }
+        
+        totalCardsUpdated += cardBatch.length;
+      }
+
+      // ONLY mark as synced if everything succeeded
       await supabase
         .from("sets")
         .update({ last_metadata_sync: new Date().toISOString() })
@@ -524,10 +534,9 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
 
     } catch (error) {
       console.error(`Error processing set ${set.id}:`, error);
+      // DON'T mark as synced - it will retry next time
+      throw error; // Throw to stop processing and report failure
     }
-
-    // Small delay between sets
-    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
   // Update sync metadata
