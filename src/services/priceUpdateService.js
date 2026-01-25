@@ -49,8 +49,8 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
     // Cache expired or no cached data - fetch fresh prices
     console.log(`🔄 Fetching fresh TCG prices for ${cardId} (cache expired or missing)`);
     
-    // Fetch card data from Pokemon TCG API
-    const response = await fetch(`${POKEMON_TCG_API}/cards/${cardId}`);
+    // Fetch card data from Pokemon TCG API via our serverless function to avoid CORS
+    const response = await fetch(`/api/tcg-prices?cardId=${cardId}`);
     
     if (!response.ok) {
       console.warn(`Failed to fetch price for card ${cardId}`);
@@ -58,22 +58,14 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
     }
 
     const data = await response.json();
-    const card = data.data;
-
-    // Extract both normal and holofoil prices
-    const prices = card.tcgplayer?.prices || {};
-    const normalPrice = prices.normal?.market || 0;
-    const holofoilPrice = prices.holofoil?.market || prices.reverseHolofoil?.market || prices['1stEditionHolofoil']?.market || 0;
     
-    // Use holofoil as primary if available
-    const marketPrice = holofoilPrice || normalPrice;
-    const lowPrice = holofoilPrice 
-      ? (prices.holofoil?.low || prices.reverseHolofoil?.low || marketPrice * 0.8)
-      : (prices.normal?.low || marketPrice * 0.8);
-    const highPrice = holofoilPrice
-      ? (prices.holofoil?.high || prices.reverseHolofoil?.high || marketPrice * 1.3)
-      : (prices.normal?.high || marketPrice * 1.3);
-    const updatedAt = card.tcgplayer?.updatedAt || new Date().toISOString();
+    if (!data.success || !data.prices) {
+      console.warn(`No price data returned for card ${cardId}`);
+      return null;
+    }
+
+    // Extract prices from API response
+    const { market: marketPrice, low: lowPrice, high: highPrice, normal: normalPrice, holofoil: holofoilPrice, updatedAt } = data.prices;
 
     console.log(`📊 TCG API Data for ${cardId}:`, {
       normal: normalPrice,
@@ -82,7 +74,7 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
       low: lowPrice,
       high: highPrice,
       apiUpdatedAt: updatedAt,
-      note: 'Pokemon TCG API may have cached/delayed prices from TCGPlayer'
+      note: 'Fetched via serverless function to avoid CORS'
     });
 
     // Update database with fresh prices
