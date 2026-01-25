@@ -255,16 +255,22 @@ const SetDetailPage = ({ set }) => {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className={`flex items-center justify-center gap-2 ${!user ? 'blur-sm pointer-events-none' : ''}`} onClick={(e) => e.stopPropagation()}>
-                      <AddToCollectionButton card={card} variant="compact" />
-                      <PriceAlertButton card={card} className="!px-3 !py-1.5 !text-sm !rounded-lg" />
-                      <button
-                        onClick={() => handleViewDetails(card)}
-                        className="px-3 py-1.5 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-medium rounded-lg transition-colors border border-adaptive"
-                      >
-                        Details
-                      </button>
-                    </div>
+                    {user ? (
+                      <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        <AddToCollectionButton card={card} variant="compact" />
+                        <PriceAlertButton card={card} className="!px-3 !py-1.5 !text-sm !rounded-lg" />
+                        <button
+                          onClick={() => handleViewDetails(card)}
+                          className="px-3 py-1.5 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-medium rounded-lg transition-colors border border-adaptive"
+                        >
+                          Details
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        {/* Empty placeholder for non-authenticated users */}
+                      </div>
+                    )}
                   </td>
                   
                   {/* Auth Gate Overlay for entire row */}
