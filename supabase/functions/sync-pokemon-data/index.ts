@@ -340,9 +340,15 @@ async function processPriceSync(supabase: any, headers: Record<string, string>, 
             tcgplayer_url: card.tcgplayer?.url || null,
           }));
 
-          await supabase
+          const { error: cardUpdateError } = await supabase
             .from("cards")
             .upsert(cardUpdates, { onConflict: "id", ignoreDuplicates: false });
+          
+          if (cardUpdateError) {
+            console.error(`Error updating tcgplayer_url for set ${set.id}:`, cardUpdateError);
+          } else {
+            console.log(`Updated tcgplayer_url for ${cardUpdates.length} cards in set ${set.id}`);
+          }
 
           // Update prices
           const priceUpdates = cards.map((card: any) => {
