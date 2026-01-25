@@ -89,9 +89,6 @@ const CardItem = ({ card, index }) => {
                 <p className={`text-2xl font-bold price-gradient ${!user ? 'blur-sm select-none' : ''}`}>
                   {formatPrice(card.prices.tcgplayer.market)}
                 </p>
-                <p className="text-xs text-adaptive-tertiary mt-1 font-medium">
-                  <span className="text-green-500">●</span> Live from Pokemon TCG API
-                </p>
               </div>
               <TrendIcon className={`w-6 h-6 ${trendColor}`} />
             </div>
@@ -119,11 +116,6 @@ const CardItem = ({ card, index }) => {
                 verified={card.prices.psa10?.verified}
                 estimated={!card.prices.psa10?.verified}
               />
-              <p className="text-xs text-adaptive-tertiary mt-3 text-center font-medium">
-                {card.prices.ebay?.verified || card.prices.psa10?.verified
-                  ? "✓ Live prices from Pokemon TCG & eBay APIs"
-                  : "Verified prices from Pokemon TCG API. Others estimated."}
-              </p>
             </div>
           </div>
         )}
