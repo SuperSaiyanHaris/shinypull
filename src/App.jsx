@@ -15,6 +15,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import ScrollToTop from './components/ScrollToTop';
 import { useCardSearch } from './hooks/useCardSearch';
 import { getAllSets } from './services/dbSetService';
+import { useAuth } from './contexts/AuthContext';
 
 function CollectionWrapper() {
   const { setId } = useParams();
@@ -76,6 +77,11 @@ function AppContent() {
   const [showAdmin, setShowAdmin] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+
+  // Admin email - replace with your actual admin email
+  const ADMIN_EMAIL = 'harris@sharifsandhu.com';
+  const isAdmin = user?.email === ADMIN_EMAIL;
 
   // Switch to search view when user types
   useEffect(() => {
@@ -103,15 +109,22 @@ function AppContent() {
     navigate('/');
   };
 
-  // Listen for Ctrl+Shift+A to toggle admin panel
+  // Listen for Ctrl+Shift+A to toggle admin panel (admin users only)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'A') {
         e.preventDefault();
-        setShowAdmin(prev => !prev);
+        // Only allow admin users to open the panel
+        if (isAdmin) {
+          setShowAdmin(prev => !prev);
+        } else {
+          console.warn('Admin panel access denied: not authorized');
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAdmin]);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
