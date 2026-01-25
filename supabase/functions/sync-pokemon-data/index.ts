@@ -478,7 +478,7 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
 
   const set = setsToSync[0];
   const startFrom = set.metadata_sync_progress || 0;
-  const CHUNK_SIZE = 50; // Process 50 cards at a time to avoid timeout
+  const CHUNK_SIZE = 10; // Process 10 cards at a time - Pokemon API is slow
 
   console.log(`Processing metadata for ${set.name}: cards ${startFrom + 1} to ${startFrom + CHUNK_SIZE}`);
 
@@ -519,10 +519,11 @@ async function processMetadataSync(supabase: any, headers: Record<string, string
 
     console.log(`Fetching metadata for ${dbCards.length} cards from Pokemon API...`);
 
-    // STEP 2: Fetch these cards from Pokemon API using a query (faster than individual calls)
-    const cardIds = dbCards.map(c => c.id).join(" OR id:");
+    // STEP 2: Fetch these cards from Pokemon API using a query
+    // Build proper OR query: (id:card1 OR id:card2 OR id:card3)
+    const cardIds = dbCards.map(c => `id:${c.id}`).join(" OR ");
     const response = await fetch(
-      `${POKEMON_API}/cards?q=id:${cardIds}`,
+      `${POKEMON_API}/cards?q=(${cardIds})`,
       { headers }
     );
 
