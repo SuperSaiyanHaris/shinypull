@@ -342,13 +342,20 @@ const AdminSyncPanel = () => {
               </p>
               {lastSyncResult.success ? (
                 <div className="text-sm text-green-800 dark:text-green-200 mt-1 space-y-1">
+                  {lastSyncResult.message && (
+                    <p className={`${lastSyncResult.message.includes('all metadata up to date') || lastSyncResult.message.includes('No sets to sync') ? 'text-lg font-bold text-green-600 dark:text-green-400' : ''}`}>
+                      {lastSyncResult.message.includes('all metadata up to date') || lastSyncResult.message.includes('No sets to sync') ? '🎉 ' : ''}
+                      {lastSyncResult.message}
+                    </p>
+                  )}
                   {lastSyncResult.sets && <p>✓ {lastSyncResult.sets} sets synced</p>}
                   {lastSyncResult.cards && <p>✓ {lastSyncResult.cards} cards synced</p>}
                   {lastSyncResult.count && <p>✓ {lastSyncResult.count} items synced</p>}
+                  {lastSyncResult.cardsUpdated !== undefined && lastSyncResult.cardsUpdated > 0 && <p>✓ {lastSyncResult.cardsUpdated} cards updated</p>}
+                  {lastSyncResult.setsProcessed !== undefined && lastSyncResult.totalSets && <p>✓ Processed {lastSyncResult.setsProcessed}/{lastSyncResult.totalSets} sets</p>}
                   {lastSyncResult.totalSuccess && <p>✓ {lastSyncResult.totalSuccess}/{lastSyncResult.totalCards} prices updated</p>}
                   {lastSyncResult.elapsed && <p>⏱️ Completed in {lastSyncResult.elapsed}</p>}
                   {lastSyncResult.setsUpdated && <p>✓ {lastSyncResult.setsUpdated} sets updated</p>}
-                  {lastSyncResult.cardsUpdated && <p>✓ {lastSyncResult.cardsUpdated} cards updated</p>}
                   {lastSyncResult.pricesUpdated && <p>✓ {lastSyncResult.pricesUpdated} prices updated</p>}
                 </div>
               ) : (
