@@ -137,6 +137,21 @@ const SetDetailPage = ({ set }) => {
         <>
       {/* Mobile Card List - Hidden on desktop */}
       <div className="md:hidden space-y-3">
+        {/* Auth Banner for non-authenticated users */}
+        {!user && (
+          <div className="glass-effect rounded-xl border border-adaptive p-4 bg-blue-600/10 border-blue-600/30">
+            <p className="text-sm text-adaptive-primary mb-3">
+              <span className="font-semibold">Sign in</span> to view pricing and add cards to your collection
+            </p>
+            <button
+              onClick={() => openAuthModal()}
+              className="w-full px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
+            >
+              Sign In
+            </button>
+          </div>
+        )}
+        
         {filteredCards.map((card, index) => (
           <div
             key={card.id}
@@ -175,28 +190,30 @@ const SetDetailPage = ({ set }) => {
             </button>
 
             {/* Add to Collection Button */}
-            <div className={!user ? 'blur-sm pointer-events-none' : ''}>
+            <div className={!user ? 'blur-sm pointer-events-none select-none' : ''}>
               <AddToCollectionButton card={card} variant="icon" />
             </div>
-            
-            {/* Auth Gate Overlay */}
-            {!user && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/95 backdrop-blur-sm rounded-xl">
-                <p className="text-xs text-adaptive-tertiary mb-2">Sign in to view pricing and actions</p>
-                <button
-                  onClick={(e) => { e.stopPropagation(); openAuthModal(); }}
-                  className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-lg transition-colors"
-                >
-                  Sign In
-                </button>
-              </div>
-            )}
           </div>
         ))}
       </div>
 
       {/* Desktop Cards Table - Hidden on mobile */}
       <div className="hidden md:block glass-effect rounded-2xl border border-adaptive">
+        {/* Auth Banner for non-authenticated users */}
+        {!user && (
+          <div className="p-4 bg-blue-600/10 border-b border-blue-600/30 flex items-center justify-between">
+            <p className="text-sm text-adaptive-primary">
+              <span className="font-semibold">Sign in</span> to view pricing, add cards to your collection, and set price alerts
+            </p>
+            <button
+              onClick={() => openAuthModal()}
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
+            >
+              Sign In
+            </button>
+          </div>
+        )}
+        
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-adaptive-card border-b border-adaptive relative overflow-visible">
@@ -250,45 +267,22 @@ const SetDetailPage = ({ set }) => {
                     <span className="text-sm text-adaptive-secondary">{card.rarity}</span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <span className={`text-sm font-bold price-gradient ${!user ? 'blur-sm' : ''}`}>
+                    <span className={`text-sm font-bold price-gradient ${!user ? 'blur-sm select-none' : ''}`}>
                       {user ? formatPrice(card.prices.tcgplayer.market) : '$---.--'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    {user ? (
-                      <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
-                        <AddToCollectionButton card={card} variant="compact" />
-                        <PriceAlertButton card={card} className="!px-3 !py-1.5 !text-sm !rounded-lg" />
-                        <button
-                          onClick={() => handleViewDetails(card)}
-                          className="px-3 py-1.5 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-medium rounded-lg transition-colors border border-adaptive"
-                        >
-                          Details
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center">
-                        {/* Empty placeholder for non-authenticated users */}
-                      </div>
-                    )}
+                    <div className={`flex items-center justify-center gap-2 ${!user ? 'blur-sm pointer-events-none select-none' : ''}`} onClick={(e) => e.stopPropagation()}>
+                      <AddToCollectionButton card={card} variant="compact" />
+                      <PriceAlertButton card={card} className="!px-3 !py-1.5 !text-sm !rounded-lg" />
+                      <button
+                        onClick={() => handleViewDetails(card)}
+                        className="px-3 py-1.5 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-medium rounded-lg transition-colors border border-adaptive"
+                      >
+                        Details
+                      </button>
+                    </div>
                   </td>
-                  
-                  {/* Auth Gate Overlay for entire row */}
-                  {!user && (
-                    <td colSpan="5" className="absolute inset-0 pointer-events-none">
-                      <div className="flex items-center justify-center h-full pointer-events-auto">
-                        <div className="px-4 py-2 bg-adaptive-card/95 backdrop-blur-sm rounded-lg border border-adaptive shadow-lg flex items-center gap-3">
-                          <p className="text-xs text-adaptive-tertiary">Sign in to view pricing and actions</p>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); openAuthModal(); }}
-                            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
-                          >
-                            Sign In
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                  )}
                 </tr>
               ))}
             </tbody>
