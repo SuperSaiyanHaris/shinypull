@@ -69,7 +69,9 @@ export const syncAllCardMetadata = async (onProgress) => {
         }
 
         // Call Edge Function for one batch (2 sets - back to what was working)
-        const response = await fetch('/api/trigger-sync?mode=card-metadata&limit=2', {
+        // Add timestamp to bust any caching
+        const timestamp = Date.now();
+        const response = await fetch(`/api/trigger-sync?mode=card-metadata&limit=2&t=${timestamp}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${session.access_token}`,
