@@ -341,7 +341,7 @@ const SetDetailPage = ({ set }) => {
           />
           
           {/* Slide-out Panel */}
-          <div className="fixed top-0 right-0 bottom-0 w-full sm:max-w-md bg-adaptive z-[101] shadow-2xl animate-slide-in-right overflow-y-auto">
+          <div className="fixed top-0 right-0 bottom-0 w-full sm:max-w-md bg-slate-950 sm:bg-adaptive z-[101] shadow-2xl animate-slide-in-right overflow-y-auto">
             <CardFilters 
               filters={filters}
               onFiltersChange={setFilters}

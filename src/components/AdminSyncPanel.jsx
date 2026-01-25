@@ -149,7 +149,7 @@ const AdminSyncPanel = () => {
 
     try {
       console.log('🎴 Starting Edge Function card metadata sync...');
-      const result = await triggerEdgeFunctionSync('card-metadata', 5); // 5 sets per batch
+      const result = await triggerEdgeFunctionSync('card-metadata', 4); // 4 sets per batch
       setLastSyncResult(result);
       await loadSyncStatus();
     } catch (error) {
@@ -299,7 +299,7 @@ const AdminSyncPanel = () => {
             className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
             <Database className="w-5 h-5" />
-            Card Metadata (5 sets)
+            Card Metadata (4 sets)
           </button>
           <button
             onClick={handleEdgeFunctionPricesSync}

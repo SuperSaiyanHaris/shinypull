@@ -434,7 +434,7 @@ async function processPriceSync(supabase: any, headers: Record<string, string>, 
 
 // Card metadata sync - updates static fields (types, supertype, etc.) in batches
 // This is for one-time updates of card metadata that doesn't change
-async function syncCardMetadataBatch(supabase: any, headers: Record<string, string>, limit: number = 5) {
+async function syncCardMetadataBatch(supabase: any, headers: Record<string, string>, limit: number = 4) {
   console.log(`Syncing card metadata (limit: ${limit} sets)...`);
 
   // Get sets that haven't had metadata synced yet (or oldest sync)
