@@ -3,6 +3,9 @@ import { getEbayPriceAPI, getEbayPSA10Price, estimateEbayPrice, estimatePSA10Pri
 
 const POKEMON_TCG_API = 'https://api.pokemontcg.io/v2';
 
+// Price cache duration: 6 hours (prices don't update that frequently)
+const PRICE_CACHE_DURATION_MS = 6 * 60 * 60 * 1000;
+
 /**
  * Fetch latest TCG market price from Pokemon API and update database
  * Called when card modal opens to ensure real-time prices
@@ -10,9 +13,42 @@ const POKEMON_TCG_API = 'https://api.pokemontcg.io/v2';
  * NOTE: Pokemon TCG API prices are NOT real-time - they cache TCGPlayer data
  * and update periodically (every few hours). For truly real-time prices, 
  * we'd need direct TCGPlayer API access (requires paid partnership).
+ * 
+ * CACHING: Only fetches fresh data if last update was more than 6 hours ago
  */
 export const fetchAndUpdateTCGPrice = async (cardId) => {
   try {
+    // Check if we have recent cached prices in the database
+    const { data: existingPrice, error: fetchError } = await supabase
+      .from('prices')
+      .select('tcgplayer_market, tcgplayer_low, tcgplayer_high, tcgplayer_normal, tcgplayer_holofoil, last_updated')
+      .eq('card_id', cardId)
+      .single();
+
+    if (!fetchError && existingPrice?.last_updated) {
+      const lastUpdated = new Date(existingPrice.last_updated);
+      const now = new Date();
+      const timeSinceUpdate = now - lastUpdated;
+
+      // If prices were updated within the cache duration, return cached data
+      if (timeSinceUpdate < PRICE_CACHE_DURATION_MS) {
+        const hoursAgo = Math.floor(timeSinceUpdate / (60 * 60 * 1000));
+        console.log(`✅ Using cached TCG prices for ${cardId} (updated ${hoursAgo}h ago)`);
+        return {
+          market: existingPrice.tcgplayer_market,
+          low: existingPrice.tcgplayer_low,
+          high: existingPrice.tcgplayer_high,
+          normal: existingPrice.tcgplayer_normal,
+          holofoil: existingPrice.tcgplayer_holofoil,
+          lastUpdated: existingPrice.last_updated,
+          cached: true
+        };
+      }
+    }
+
+    // Cache expired or no cached data - fetch fresh prices
+    console.log(`🔄 Fetching fresh TCG prices for ${cardId} (cache expired or missing)`);
+    
     // Fetch card data from Pokemon TCG API
     const response = await fetch(`${POKEMON_TCG_API}/cards/${cardId}`);
     
@@ -77,7 +113,8 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
       normal: normalPrice,
       holofoil: holofoilPrice,
       apiUpdatedAt: updatedAt,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
+      cached: false
     };
 
   } catch (error) {
