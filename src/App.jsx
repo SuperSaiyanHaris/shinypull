@@ -79,9 +79,9 @@ function AppContent() {
   const location = useLocation();
   const { user } = useAuth();
 
-  // Admin email - replace with your actual admin email
-  const ADMIN_EMAIL = 'harris@sharifsandhu.com';
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  // Admin emails
+  const ADMIN_EMAILS = ['haris.lilic@gmail.com', 'shinypull@proton.me'];
+  const isAdmin = user?.email && ADMIN_EMAILS.includes(user.email);
 
   // Switch to search view when user types
   useEffect(() => {
