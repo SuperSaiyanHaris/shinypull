@@ -81,12 +81,18 @@ export default async function handler(req, res) {
 
     console.log(`✅ Authenticated sync request from: ${user.email}`);
 
-    // Get sync mode from query params or body
+    // Get sync mode and parameters from query params or body
     const mode = req.query.mode || req.body?.mode || 'prices';
     const setId = req.query.setId || req.body?.setId;
+    const limit = req.query.limit || req.body?.limit;
 
     // Build the Edge Function URL
     const functionUrl = `${supabaseUrl}/functions/v1/sync-pokemon-data`;
+
+    // Prepare request body
+    const requestBody = { mode };
+    if (setId) requestBody.setId = setId;
+    if (limit) requestBody.limit = parseInt(limit, 10);
 
     // Call the Edge Function with service role key for authentication
     const response = await fetch(functionUrl, {
@@ -95,7 +101,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${supabaseServiceKey}`,
       },
-      body: JSON.stringify({ mode, setId }),
+      body: JSON.stringify(requestBody),
     });
 
     const result = await response.json();

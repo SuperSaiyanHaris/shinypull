@@ -143,6 +143,23 @@ const AdminSyncPanel = () => {
     }
   };
 
+  const handleEdgeFunctionCardMetadataSync = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+
+    try {
+      console.log('🎴 Starting Edge Function card metadata sync...');
+      const result = await triggerEdgeFunctionSync('card-metadata', 5); // 5 sets per batch
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      console.error('💥 Edge Function card metadata sync failed:', error);
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'success':
@@ -259,7 +276,7 @@ const AdminSyncPanel = () => {
           <Zap className="w-4 h-4 text-yellow-500" />
           Supabase Edge Function Sync (Server-Side)
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <button
             onClick={handleEdgeFunctionFullSync}
             disabled={syncing}
@@ -277,6 +294,14 @@ const AdminSyncPanel = () => {
             Sync Sets (Edge)
           </button>
           <button
+            onClick={handleEdgeFunctionCardMetadataSync}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+          >
+            <Database className="w-5 h-5" />
+            Card Metadata (5 sets)
+          </button>
+          <button
             onClick={handleEdgeFunctionPricesSync}
             disabled={syncing}
             className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
@@ -286,7 +311,7 @@ const AdminSyncPanel = () => {
           </button>
         </div>
         <p className="text-xs text-adaptive-tertiary italic">
-          💡 Edge Functions run on Supabase servers and are more reliable for large syncs
+          💡 <strong>Card Metadata</strong> syncs types/supertype fields (run multiple times until all sets done). <strong>Prices Only</strong> updates pricing data (auto-rotates through sets).
         </p>
       </div>
 

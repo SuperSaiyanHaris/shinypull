@@ -14,7 +14,7 @@ const corsHeaders = {
 };
 
 interface SyncOptions {
-  mode: "full" | "prices" | "sets" | "single-set";
+  mode: "full" | "prices" | "sets" | "single-set" | "card-metadata";
   setId?: string;
   limit?: number; // Max number of sets to process (prevents timeout)
 }
@@ -77,6 +77,9 @@ serve(async (req) => {
           throw new Error("setId is required for single-set mode");
         }
         result = await syncSetCards(supabase, headers, options.setId);
+        break;
+      case "card-metadata":
+        result = await syncCardMetadataBatch(supabase, headers, options.limit);
         break;
       case "prices":
       default:
@@ -426,5 +429,123 @@ async function processPriceSync(supabase: any, headers: Record<string, string>, 
     success: true,
     cardsUpdated: totalCards,
     setsProcessed: successCount,
+  };
+}
+
+// Card metadata sync - updates static fields (types, supertype, etc.) in batches
+// This is for one-time updates of card metadata that doesn't change
+async function syncCardMetadataBatch(supabase: any, headers: Record<string, string>, limit: number = 5) {
+  console.log(`Syncing card metadata (limit: ${limit} sets)...`);
+
+  // Get sets that haven't had metadata synced yet (or oldest sync)
+  const { data: setsToSync, error: setsError } = await supabase
+    .from("sets")
+    .select("id, name, last_metadata_sync")
+    .order("last_metadata_sync", { ascending: true, nullsFirst: true })
+    .limit(limit);
+
+  if (setsError) {
+    console.error("Error fetching sets:", setsError);
+    throw setsError;
+  }
+
+  if (!setsToSync || setsToSync.length === 0) {
+    return {
+      success: true,
+      cardsUpdated: 0,
+      setsProcessed: 0,
+      message: "No sets to sync - all metadata up to date!"
+    };
+  }
+
+  console.log(`Processing metadata for sets: ${setsToSync.map((s: any) => s.name || s.id).join(", ")}`);
+
+  let totalCardsUpdated = 0;
+  let successCount = 0;
+
+  // Process each set
+  for (const set of setsToSync) {
+    try {
+      console.log(`Fetching cards for set ${set.id}...`);
+      
+      const response = await fetch(
+        `${POKEMON_API}/cards?q=set.id:${set.id}&orderBy=number&pageSize=250`,
+        { headers }
+      );
+
+      if (!response.ok) {
+        console.error(`Failed to fetch cards for ${set.id}: ${response.statusText}`);
+        continue;
+      }
+
+      const data = await response.json();
+      const cards = data.data;
+
+      console.log(`Updating metadata for ${cards.length} cards in set ${set.id}...`);
+
+      // Update cards with metadata fields (types, supertype, images, etc.)
+      // Do this in smaller batches to avoid overwhelming the database
+      const CARD_BATCH_SIZE = 50;
+      for (let i = 0; i < cards.length; i += CARD_BATCH_SIZE) {
+        const cardBatch = cards.slice(i, i + CARD_BATCH_SIZE);
+        
+        const updates = cardBatch.map((card: any) => ({
+          id: card.id,
+          types: card.types || null,
+          supertype: card.supertype || null,
+          // Can add more static fields here in the future
+        }));
+
+        const { error: updateError } = await supabase
+          .from("cards")
+          .upsert(updates, { 
+            onConflict: "id",
+            ignoreDuplicates: false 
+          });
+
+        if (updateError) {
+          console.error(`Error updating card metadata batch:`, updateError);
+        } else {
+          totalCardsUpdated += cardBatch.length;
+        }
+      }
+
+      // Mark this set as metadata-synced
+      await supabase
+        .from("sets")
+        .update({ last_metadata_sync: new Date().toISOString() })
+        .eq("id", set.id);
+
+      successCount++;
+      console.log(`✓ Completed metadata sync for ${set.name} (${cards.length} cards)`);
+
+    } catch (error) {
+      console.error(`Error processing set ${set.id}:`, error);
+    }
+
+    // Small delay between sets
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  // Update sync metadata
+  await supabase
+    .from("sync_metadata")
+    .upsert({
+      entity_type: "card_metadata",
+      status: "success",
+      message: `Updated metadata for ${totalCardsUpdated} cards from ${successCount}/${setsToSync.length} sets`,
+      last_sync: new Date().toISOString(),
+    }, { onConflict: "entity_type" });
+
+  console.log(`Card metadata sync complete: ${totalCardsUpdated} cards from ${successCount} sets`);
+  
+  return {
+    success: true,
+    cardsUpdated: totalCardsUpdated,
+    setsProcessed: successCount,
+    totalSets: setsToSync.length,
+    message: successCount === setsToSync.length 
+      ? `All ${successCount} sets synced successfully!` 
+      : `${successCount}/${setsToSync.length} sets synced successfully`
   };
 }

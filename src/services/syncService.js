@@ -299,9 +299,9 @@ export const performFullSync = async () => {
  * @param {string} mode - Sync mode: 'full', 'sets', 'prices', 'single-set'
  * @param {string} [setId] - Set ID for single-set mode
  */
-export const triggerEdgeFunctionSync = async (mode = 'prices', setId = null) => {
+export const triggerEdgeFunctionSync = async (mode = 'prices', limit = null, setId = null) => {
   try {
-    console.log(`🚀 Triggering Edge Function sync with mode: ${mode}${setId ? `, setId: ${setId}` : ''}`);
+    console.log(`🚀 Triggering Edge Function sync with mode: ${mode}${limit ? `, limit: ${limit}` : ''}${setId ? `, setId: ${setId}` : ''}`);
     
     // Get the user's session token for authentication
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -315,6 +315,9 @@ export const triggerEdgeFunctionSync = async (mode = 'prices', setId = null) => 
     // Build URL with query params
     const url = new URL('/api/trigger-sync', window.location.origin);
     url.searchParams.set('mode', mode);
+    if (limit) {
+      url.searchParams.set('limit', limit.toString());
+    }
     if (setId) {
       url.searchParams.set('setId', setId);
     }
