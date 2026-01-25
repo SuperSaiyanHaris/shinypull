@@ -232,8 +232,8 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
 
               {/* Price Box */}
               <div className="p-4 modal-price-box rounded-xl border">
-                {/* Variant Prices Grid */}
-                <div className="grid grid-cols-2 gap-3 mb-3">
+                {/* Variant Prices Grid - adjust columns based on available variants */}
+                <div className={`grid gap-3 mb-3 ${(displayTcgPrices.normal > 0 && displayTcgPrices.holofoil > 0) ? 'grid-cols-2' : 'grid-cols-1'}`}>
                   {displayTcgPrices.normal > 0 && (
                     <div className="text-center bg-adaptive-hover rounded-lg p-3">
                       <p className="text-xs text-adaptive-secondary font-medium mb-1">Normal</p>
@@ -428,8 +428,8 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
 
                   {/* Current Price Display */}
                   <div className="p-6 modal-price-box rounded-xl border">
-                    {/* Variant Prices Grid */}
-                    <div className="grid grid-cols-2 gap-4 mb-4">
+                    {/* Variant Prices Grid - adjust columns based on available variants */}
+                    <div className={`grid gap-4 mb-4 ${(displayTcgPrices.normal > 0 && displayTcgPrices.holofoil > 0) ? 'grid-cols-2' : 'grid-cols-1'}`}>
                       {displayTcgPrices.normal > 0 && (
                         <div className="text-center bg-adaptive-hover rounded-lg p-4">
                           <p className="text-sm text-adaptive-secondary font-medium mb-2">Normal</p>
