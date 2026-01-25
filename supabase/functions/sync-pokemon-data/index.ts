@@ -456,10 +456,22 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
     try {
       console.log(`Fetching cards for set ${set.id}...`);
       
+      // Add 25-second timeout to Pokemon API call
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        console.error(`Timeout fetching ${set.id} - Pokemon API too slow`);
+      }, 25000);
+      
       const response = await fetch(
         `${POKEMON_API}/cards?q=set.id:${set.id}&orderBy=number&pageSize=250`,
-        { headers }
+        { 
+          headers,
+          signal: controller.signal
+        }
       );
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         console.error(`Failed to fetch cards for ${set.id}: ${response.statusText}`);
@@ -524,7 +536,12 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
     } catch (error) {
       console.error(`Error processing set ${set.id}:`, error);
       // DON'T mark as synced - it will retry next time
-      throw error; // Throw to stop processing and report failure
+      // But don't throw - continue to next set
+      if (error.name === 'AbortError') {
+        console.error(`Skipping ${set.id} - Pokemon API timeout, will retry later`);
+        continue; // Skip this set, try next one
+      }
+      throw error; // Throw for other errors to stop processing
     }
   }
 
