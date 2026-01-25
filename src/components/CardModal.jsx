@@ -423,9 +423,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                         <p className="text-4xl font-bold price-gradient">
                           {formatPrice(displayTcgPrices.market)}
                         </p>
-                        <p className="text-xs text-adaptive-tertiary mt-2">
-                          <span className="text-green-500">●</span> Live from Pokemon TCG API
-                        </p>
                       </div>
                       <TrendIcon className={`w-12 h-12 ${trendColor}`} />
                     </div>
