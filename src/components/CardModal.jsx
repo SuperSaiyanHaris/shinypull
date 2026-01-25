@@ -3,6 +3,7 @@ import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info, Award, Loader2 
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import { getEbayPriceAPI, getEbayPSA10Price, estimateEbayPrice, estimatePSA10Price } from '../services/ebayService';
 import { fetchAndUpdateTCGPrice } from '../services/priceUpdateService';
+import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import AddToCollectionButton from './AddToCollectionButton';
@@ -38,13 +39,36 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
     console.log('🔧 Admin forcing price refresh...');
     setLoadingTcg(true);
     try {
-      const freshPrice = await fetchAndUpdateTCGPrice(card.id, true); // Force refresh
-      if (freshPrice) {
-        setTcgPrices(freshPrice);
+      // Get user's session token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.error('No session found');
+        return;
+      }
+
+      // Call admin API endpoint with authentication
+      const response = await fetch('/api/admin-refresh-price', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ cardId: card.id })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to refresh prices');
+      }
+
+      if (result.success && result.prices) {
+        setTcgPrices(result.prices);
         console.log('✅ Prices refreshed successfully');
       }
     } catch (error) {
       console.error('❌ Error forcing refresh:', error);
+      alert('Failed to refresh prices: ' + error.message);
     } finally {
       setLoadingTcg(false);
     }
