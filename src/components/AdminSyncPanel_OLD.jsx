@@ -22,7 +22,6 @@ const AdminSyncPanel = () => {
   const handleFullSync = async () => {
     setSyncing(true);
     setLastSyncResult(null);
-    setSyncProgress(null);
 
     try {
       const result = await performFullSync();
@@ -38,7 +37,6 @@ const AdminSyncPanel = () => {
   const handleSyncSets = async () => {
     setSyncing(true);
     setLastSyncResult(null);
-    setSyncProgress(null);
 
     try {
       const result = await syncAllSets();
@@ -54,7 +52,6 @@ const AdminSyncPanel = () => {
   const handleSyncCards = async () => {
     setSyncing(true);
     setLastSyncResult(null);
-    setSyncProgress(null);
 
     try {
       const result = await syncAllCards();
@@ -67,37 +64,115 @@ const AdminSyncPanel = () => {
     }
   };
 
-  const handleSyncMetadata = async () => {
-    setSyncing(true);
-    setLastSyncResult(null);
-    setSyncProgress(null);
-
-    try {
-      console.log('🎴 Starting complete metadata sync (no timeout!)...');
-      const result = await syncAllCardMetadata((progress) => {
-        setSyncProgress(progress);
-      });
-      setLastSyncResult(result);
-      await loadSyncStatus();
-    } catch (error) {
-      console.error('💥 Metadata sync failed:', error);
-      setLastSyncResult({ success: false, error: error.message });
-    } finally {
-      setSyncing(false);
-      setSyncProgress(null);
-    }
-  };
-
   const handleUpdatePrices = async () => {
     setSyncing(true);
     setLastSyncResult(null);
-    setSyncProgress(null);
+
+    try {
+      const result = await updateAllPrices();
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleUpdateStalePrices = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
 
     try {
       const result = await updateStalePrices(24); // Update prices older than 24 hours
       setLastSyncResult(result);
       await loadSyncStatus();
     } catch (error) {
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleEdgeFunctionFullSync = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+
+    try {
+      console.log('🔥 Starting Edge Function full sync...');
+      const result = await triggerEdgeFunctionSync('full');
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      console.error('💥 Edge Function full sync failed:', error);
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleEdgeFunctionPricesSync = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+
+    try {
+      console.log('💰 Starting Edge Function prices sync...');
+      const result = await triggerEdgeFunctionSync('prices');
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      console.error('💥 Edge Function prices sync failed:', error);
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleEdgeFunctionSetsSync = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+
+    try {
+      console.log('📦 Starting Edge Function sets sync...');
+      const result = await triggerEdgeFunctionSync('sets');
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      console.error('💥 Edge Function sets sync failed:', error);
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleEdgeFunctionCardMetadataSync = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+
+    try {
+      console.log('🎴 Starting Edge Function card metadata sync...');
+      const result = await triggerEdgeFunctionSync('card-metadata', 4); // 4 sets per batch
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      console.error('💥 Edge Function card metadata sync failed:', error);
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleEdgeFunctionCardMetadataAll = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+
+    try {
+      console.log('🎴 Starting complete card metadata sync (all batches)...');
+      const result = await triggerEdgeFunctionSync('card-metadata-all'); // Syncs ALL sets
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      console.error('💥 Edge Function complete metadata sync failed:', error);
       setLastSyncResult({ success: false, error: error.message });
     } finally {
       setSyncing(false);
@@ -156,17 +231,16 @@ const AdminSyncPanel = () => {
         ))}
       </div>
 
-      {/* Primary Sync Actions - Direct API calls (NO TIMEOUT!) */}
+      {/* Sync Actions */}
       <div className="space-y-3 mb-6">
-        <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wider flex items-center gap-2">
-          <Zap className="w-4 h-4 text-green-500" />
-          Direct Sync (No Timeout)
+        <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wider">
+          Data Sync Actions
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <button
             onClick={handleFullSync}
             disabled={syncing}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-colors"
           >
             <RefreshCw className={`w-5 h-5 ${syncing ? 'animate-spin' : ''}`} />
             Full Sync
@@ -174,13 +248,72 @@ const AdminSyncPanel = () => {
           <button
             onClick={handleSyncSets}
             disabled={syncing}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-colors"
           >
             <Database className="w-5 h-5" />
             Sync Sets
           </button>
           <button
-            onClick={handleSyncMetadata}
+            onClick={handleSyncCards}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-colors"
+          >
+            <Database className="w-5 h-5" />
+            Sync Cards
+          </button>
+        </div>
+      </div>
+
+      {/* Price Update Actions */}
+      <div className="space-y-3 mb-6">
+        <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wider">
+          Price Update Actions
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <button
+            onClick={handleUpdatePrices}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-colors"
+          >
+            <DollarSign className="w-5 h-5" />
+            Update All Prices
+          </button>
+          <button
+            onClick={handleUpdateStalePrices}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-colors"
+          >
+            <DollarSign className="w-5 h-5" />
+            Update Stale Prices
+          </button>
+        </div>
+      </div>
+
+      {/* Edge Function Sync Actions */}
+      <div className="space-y-3 mb-6">
+        <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wider flex items-center gap-2">
+          <Zap className="w-4 h-4 text-yellow-500" />
+          Supabase Edge Function Sync (Server-Side)
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <button
+            onClick={handleEdgeFunctionFullSync}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+          >
+            <Zap className={`w-5 h-5 ${syncing ? 'animate-pulse' : ''}`} />
+            Full Sync (Edge)
+          </button>
+          <button
+            onClick={handleEdgeFunctionSetsSync}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+          >
+            <Database className="w-5 h-5" />
+            Sync Sets (Edge)
+          </button>
+          <button
+            onClick={handleEdgeFunctionCardMetadataAll}
             disabled={syncing}
             className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
@@ -188,41 +321,18 @@ const AdminSyncPanel = () => {
             Sync Metadata
           </button>
           <button
-            onClick={handleUpdatePrices}
+            onClick={handleEdgeFunctionPricesSync}
             disabled={syncing}
             className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
             <DollarSign className="w-5 h-5" />
-            Update Prices
+            Prices Only (Edge)
           </button>
         </div>
         <p className="text-xs text-adaptive-tertiary italic">
-          ✨ <strong>Direct API calls</strong> run in your browser with NO timeout limits! Click once and let it finish.
+          💡 <strong>Sync Metadata</strong> automatically syncs all remaining sets (click once and done!). <strong>Prices Only</strong> rotates through sets updating pricing data.
         </p>
       </div>
-
-      {/* Progress Indicator */}
-      {syncProgress && (
-        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-          <div className="flex items-center gap-3 mb-2">
-            <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
-            <div className="flex-1">
-              <p className="font-semibold text-blue-900 dark:text-blue-100">
-                Syncing {syncProgress.setName}...
-              </p>
-              <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                Set {syncProgress.current} of {syncProgress.total} • {syncProgress.cardsUpdated} cards updated
-              </p>
-            </div>
-          </div>
-          <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2">
-            <div
-              className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(syncProgress.current / syncProgress.total) * 100}%` }}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Last Sync Result */}
       {lastSyncResult && (
@@ -252,7 +362,8 @@ const AdminSyncPanel = () => {
               {lastSyncResult.success ? (
                 <div className="text-sm text-green-800 dark:text-green-200 mt-1 space-y-1">
                   {lastSyncResult.message && (
-                    <p className="text-lg font-bold">
+                    <p className={`${lastSyncResult.message.includes('all metadata up to date') || lastSyncResult.message.includes('No sets to sync') ? 'text-lg font-bold text-green-600 dark:text-green-400' : ''}`}>
+                      {lastSyncResult.message.includes('all metadata up to date') || lastSyncResult.message.includes('No sets to sync') ? '🎉 ' : ''}
                       {lastSyncResult.message}
                     </p>
                   )}
@@ -262,12 +373,18 @@ const AdminSyncPanel = () => {
                   {lastSyncResult.cardsUpdated !== undefined && lastSyncResult.cardsUpdated > 0 && <p>✓ {lastSyncResult.cardsUpdated} cards updated</p>}
                   {lastSyncResult.setsProcessed !== undefined && lastSyncResult.totalSets && <p>✓ Processed {lastSyncResult.setsProcessed}/{lastSyncResult.totalSets} sets</p>}
                   {lastSyncResult.totalSuccess && <p>✓ {lastSyncResult.totalSuccess}/{lastSyncResult.totalCards} prices updated</p>}
+                  {lastSyncResult.elapsed && <p>⏱️ Completed in {lastSyncResult.elapsed}</p>}
+                  {lastSyncResult.setsUpdated && <p>✓ {lastSyncResult.setsUpdated} sets updated</p>}
+                  {lastSyncResult.pricesUpdated && <p>✓ {lastSyncResult.pricesUpdated} prices updated</p>}
                 </div>
               ) : (
                 <div className="text-sm text-red-800 dark:text-red-200 mt-1">
                   <p className="font-mono text-xs bg-red-100 dark:bg-red-900/30 p-2 rounded mt-1">
                     {lastSyncResult.error}
                   </p>
+                  {lastSyncResult.hint && (
+                    <p className="mt-2 text-xs italic">💡 {lastSyncResult.hint}</p>
+                  )}
                 </div>
               )}
             </div>
@@ -277,15 +394,11 @@ const AdminSyncPanel = () => {
 
       {/* Instructions */}
       <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-        <p className="text-sm text-blue-900 dark:text-blue-100 mb-2">
-          <strong>✨ Optimized Sync:</strong> All syncs now run directly in your browser with NO timeout limits!
+        <p className="text-sm text-blue-900 dark:text-blue-100">
+          <strong>Note:</strong> Full sync will take several minutes as it fetches all sets
+          and cards from the Pokemon TCG API. Run this when setting up for the first time or
+          when new sets are released.
         </p>
-        <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1 ml-4 list-disc">
-          <li><strong>Full Sync:</strong> Complete database initialization (sets + all cards)</li>
-          <li><strong>Sync Sets:</strong> Updates list of Pokemon TCG sets</li>
-          <li><strong>Sync Metadata:</strong> Updates card types/supertype for ALL sets (click once, done!)</li>
-          <li><strong>Update Prices:</strong> Refreshes pricing data for cards with stale prices</li>
-        </ul>
       </div>
     </div>
   );
