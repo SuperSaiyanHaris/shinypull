@@ -141,8 +141,15 @@ export const searchCards = async (query) => {
     return [];
   }
 
-  // Search by both name and card number
-  const { data, error } = await supabase
+  const trimmedQuery = query.trim();
+  
+  // Check if query contains both text and numbers (e.g., "Charizard 125")
+  // Split by spaces and check if we have both text and number parts
+  const parts = trimmedQuery.split(/\s+/);
+  const numberPart = parts.find(part => /^\d+$/.test(part));
+  const textParts = parts.filter(part => !/^\d+$/.test(part));
+  
+  let dbQuery = supabase
     .from('cards')
     .select(`
       *,
@@ -161,8 +168,21 @@ export const searchCards = async (query) => {
         psa10_avg,
         psa10_verified
       )
-    `)
-    .or(`name.ilike.%${query}%,number.ilike.%${query}%`)
+    `);
+  
+  // If we have both text and number, search for cards matching both conditions
+  if (numberPart && textParts.length > 0) {
+    const nameQuery = textParts.join(' ');
+    console.log(`Searching for name containing "${nameQuery}" AND number containing "${numberPart}"`);
+    dbQuery = dbQuery
+      .ilike('name', `%${nameQuery}%`)
+      .ilike('number', `%${numberPart}%`);
+  } else {
+    // Otherwise, search either name OR number
+    dbQuery = dbQuery.or(`name.ilike.%${trimmedQuery}%,number.ilike.%${trimmedQuery}%`);
+  }
+  
+  const { data, error } = await dbQuery
     .order('name', { ascending: true })
     .limit(100);
 

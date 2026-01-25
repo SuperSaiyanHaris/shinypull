@@ -144,10 +144,12 @@ function AppContent() {
         {/* Hero - Only show on home page */}
         {location.pathname === '/' && <Hero />}
 
-        {/* Search Section - Hide on collection and alerts pages */}
+        {/* Search Section - Hide on collection, alerts, and set detail pages */}
         <section className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {!location.pathname.startsWith('/collection') && !location.pathname.startsWith('/alerts') && (
+            {!location.pathname.startsWith('/collection') && 
+             !location.pathname.startsWith('/alerts') && 
+             !location.pathname.startsWith('/sets/') && (
               <div className="mb-12 animate-slide-up" style={{ animationDelay: '300ms' }}>
                 <SearchBar
                   value={query}
