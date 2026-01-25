@@ -7,9 +7,25 @@ import crypto from 'crypto';
 // IMPORTANT: Set this verification token in your eBay Developer Portal
 // AND as an environment variable in Vercel
 // eBay requires 32-80 characters for the verification token
-const VERIFICATION_TOKEN = process.env.EBAY_VERIFICATION_TOKEN || 'shinypull_ebay_verification_token_2024_prod_secure';
+const VERIFICATION_TOKEN = process.env.EBAY_VERIFICATION_TOKEN;
+
+if (!VERIFICATION_TOKEN) {
+  console.error('❌ EBAY_VERIFICATION_TOKEN not configured in environment variables');
+}
 
 export default async function handler(req, res) {
+  // CORS - only allow eBay's servers (they don't send Origin header, so this is for security logging)
+  const origin = req.headers.origin;
+  if (origin) {
+    // Log unexpected origins for monitoring
+    console.warn('Unexpected Origin header from eBay endpoint:', origin);
+  }
+
+  // Verify token is configured before processing any requests
+  if (!VERIFICATION_TOKEN) {
+    return res.status(500).json({ error: 'Server configuration error' });
+  }
+
   // Handle GET request for challenge code validation (eBay's initial verification)
   if (req.method === 'GET') {
     const challengeCode = req.query.challenge_code;

@@ -2,8 +2,22 @@
 // Proxies requests to Pokemon TCG API to avoid CORS issues
 
 export default async function handler(req, res) {
-  // Enable CORS for your domain
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Restrict CORS to your domains only
+  const allowedOrigins = [
+    'https://shinypull.com',
+    'https://www.shinypull.com',
+    'https://shinypull.vercel.app',
+    // Allow localhost for development
+    ...(process.env.NODE_ENV === 'development' || req.headers.host?.includes('localhost') ? 
+      ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:4173'] : [])
+  ];
+
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 

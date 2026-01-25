@@ -4,8 +4,22 @@
 import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Restrict CORS to your domains only
+  const allowedOrigins = [
+    'https://shinypull.com',
+    'https://www.shinypull.com',
+    'https://shinypull.vercel.app',
+    // Allow localhost for development
+    ...(process.env.NODE_ENV === 'development' || req.headers.host?.includes('localhost') ? 
+      ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:4173'] : [])
+  ];
+
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
@@ -14,14 +28,26 @@ export default async function handler(req, res) {
   }
 
   try {
+    // AUTHENTICATION CHECK - Verify user is authenticated and is admin
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        hint: 'Authentication token required. Please sign in.'
+      });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
     // Try both naming conventions (Vercel uses non-VITE, frontend uses VITE_)
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!supabaseUrl) {
+    if (!supabaseUrl || !supabaseAnonKey) {
       return res.status(500).json({
-        error: 'SUPABASE_URL not configured',
-        hint: 'Add SUPABASE_URL to your Vercel environment variables (Project Settings > Environment Variables)'
+        error: 'SUPABASE_URL or SUPABASE_ANON_KEY not configured',
+        hint: 'Add SUPABASE_URL and SUPABASE_ANON_KEY to your Vercel environment variables'
       });
     }
 
@@ -31,6 +57,29 @@ export default async function handler(req, res) {
         hint: 'Add SUPABASE_SERVICE_ROLE_KEY to your Vercel environment variables (Project Settings > Environment Variables)'
       });
     }
+
+    // Verify the user's authentication token
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+
+    if (authError || !user) {
+      return res.status(401).json({
+        error: 'Invalid or expired token',
+        hint: 'Please sign in again'
+      });
+    }
+
+    // TODO: Add admin role check here when you implement user roles
+    // For now, any authenticated user can trigger sync (you can add email whitelist)
+    const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim()).filter(e => e);
+    if (adminEmails.length > 0 && !adminEmails.includes(user.email)) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        hint: 'Admin access required. Contact support if you need access.'
+      });
+    }
+
+    console.log(`✅ Authenticated sync request from: ${user.email}`);
 
     // Get sync mode from query params or body
     const mode = req.query.mode || req.body?.mode || 'prices';
