@@ -59,12 +59,21 @@ export default async function handler(req, res) {
     
     // Use holofoil as primary if available
     const marketPrice = holofoilPrice || normalPrice;
-    const lowPrice = holofoilPrice 
-      ? (prices.holofoil?.low || prices.reverseHolofoil?.low || marketPrice * 0.8)
-      : (prices.normal?.low || marketPrice * 0.8);
-    const highPrice = holofoilPrice
-      ? (prices.holofoil?.high || prices.reverseHolofoil?.high || marketPrice * 1.3)
-      : (prices.normal?.high || marketPrice * 1.3);
+    
+    // Get raw low/high from same variant as market price
+    let rawLow = holofoilPrice 
+      ? (prices.holofoil?.low || prices.reverseHolofoil?.low || 0)
+      : (prices.normal?.low || 0);
+    let rawHigh = holofoilPrice
+      ? (prices.holofoil?.high || prices.reverseHolofoil?.high || 0)
+      : (prices.normal?.high || 0);
+    
+    // Ensure logical consistency: low <= market <= high
+    // If low is missing or > market, use market * 0.8
+    const lowPrice = (rawLow > 0 && rawLow <= marketPrice) ? rawLow : marketPrice * 0.8;
+    // If high is missing or < market, use market * 1.3
+    const highPrice = (rawHigh > 0 && rawHigh >= marketPrice) ? rawHigh : marketPrice * 1.3;
+    
     const updatedAt = card.tcgplayer?.updatedAt || new Date().toISOString();
 
     // Return formatted price data
