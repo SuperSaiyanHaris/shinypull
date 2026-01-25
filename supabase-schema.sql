@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS prices (
   tcgplayer_market DECIMAL(10, 2),
   tcgplayer_low DECIMAL(10, 2),
   tcgplayer_high DECIMAL(10, 2),
+  tcgplayer_normal DECIMAL(10, 2), -- Normal variant price
+  tcgplayer_holofoil DECIMAL(10, 2), -- Holofoil/reverse holofoil variant price
   ebay_avg DECIMAL(10, 2),
   ebay_verified BOOLEAN DEFAULT FALSE,
   psa10_avg DECIMAL(10, 2),
