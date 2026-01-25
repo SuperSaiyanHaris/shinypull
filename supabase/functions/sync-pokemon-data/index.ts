@@ -298,11 +298,10 @@ async function syncSetCards(supabase: any, headers: Record<string, string>, setI
 async function syncPricesOnly(supabase: any, headers: Record<string, string>, limit: number = 1) {
   console.log(`Syncing prices (limit: ${limit} sets)...`);
 
-  // Get 1 set that needs price sync (oldest or with incomplete card sync)
+  // Get 1 set that needs price sync (oldest sync)
   const { data: setsToSync } = await supabase
     .from("sets")
     .select("id, name, total_cards, price_sync_progress, last_price_sync")
-    .or("price_sync_progress.is.null,price_sync_progress.lt.total_cards")
     .order("last_price_sync", { ascending: true, nullsFirst: true })
     .limit(limit);
 
@@ -437,26 +436,44 @@ async function processPriceSync(supabase: any, headers: Record<string, string>, 
 async function syncCardMetadataBatch(supabase: any, headers: Record<string, string>, limit: number = 1) {
   console.log(`Syncing card metadata...`);
 
-  // Get 1 set that needs metadata sync (incomplete or never synced)
+  // Get 1 set that needs metadata sync (never synced or partially synced)
   const { data: setsToSync, error: setsError } = await supabase
     .from("sets")
     .select("id, name, total_cards, metadata_sync_progress, last_metadata_sync")
-    .or("metadata_sync_progress.is.null,metadata_sync_progress.lt.total_cards")
-    .order("last_metadata_sync", { ascending: true, nullsFirst: true })
+    .is("last_metadata_sync", null)
+    .order("id")
     .limit(limit);
+  
+  // If all sets have been synced at least once, get ones with partial progress
+  if (!setsToSync || setsToSync.length === 0) {
+    const { data: partialSets, error: partialError } = await supabase
+      .from("sets")
+      .select("id, name, total_cards, metadata_sync_progress, last_metadata_sync")
+      .not("metadata_sync_progress", "is", null)
+      .gt("metadata_sync_progress", 0)
+      .order("last_metadata_sync", { ascending: true })
+      .limit(limit);
+    
+    if (partialError) {
+      console.error("Error fetching partial sets:", partialError);
+      throw partialError;
+    }
+    
+    if (!partialSets || partialSets.length === 0) {
+      return {
+        success: true,
+        cardsUpdated: 0,
+        setsProcessed: 0,
+        message: "No sets to sync - all metadata up to date!"
+      };
+    }
+    
+    setsToSync = partialSets;
+  }
 
   if (setsError) {
     console.error("Error fetching sets:", setsError);
     throw setsError;
-  }
-
-  if (!setsToSync || setsToSync.length === 0) {
-    return {
-      success: true,
-      cardsUpdated: 0,
-      setsProcessed: 0,
-      message: "No sets to sync - all metadata up to date!"
-    };
   }
 
   const set = setsToSync[0];
@@ -565,7 +582,7 @@ async function syncAllCardMetadata(supabase: any, headers: Record<string, string
     const { data: remainingSets, error: checkError } = await supabase
       .from("sets")
       .select("id")
-      .or("metadata_sync_progress.is.null,metadata_sync_progress.lt.total_cards")
+      .is("last_metadata_sync", null)
       .limit(1);
     
     if (checkError) throw checkError;

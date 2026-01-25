@@ -8,12 +8,12 @@ export const syncAllCardMetadata = async (onProgress) => {
   try {
     console.log('🎴 Starting complete metadata sync via Edge Function...');
 
-    // Get all sets that need syncing (incomplete or never synced)
+    // Get all sets that need syncing (never synced)
     const { data: sets, error: setsError } = await supabase
       .from('sets')
       .select('id, name, total_cards, metadata_sync_progress, last_metadata_sync')
-      .or('metadata_sync_progress.is.null,metadata_sync_progress.lt.total_cards')
-      .order('last_metadata_sync', { ascending: true, nullsFirst: true });
+      .is('last_metadata_sync', null)
+      .order('id');
 
     if (setsError) throw setsError;
 
@@ -41,8 +41,8 @@ export const syncAllCardMetadata = async (onProgress) => {
       const { data: currentSets } = await supabase
         .from('sets')
         .select('id, name, total_cards, metadata_sync_progress')
-        .or('metadata_sync_progress.is.null,metadata_sync_progress.lt.total_cards')
-        .order('last_metadata_sync', { ascending: true, nullsFirst: true })
+        .is('last_metadata_sync', null)
+        .order('id')
         .limit(1);
 
       if (!currentSets || currentSets.length === 0) {
