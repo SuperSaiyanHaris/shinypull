@@ -342,23 +342,7 @@ async function processPriceSync(supabase: any, headers: Record<string, string>, 
           const data = await response.json();
           const cards = data.data;
 
-          // Update tcgplayer_url in cards table using individual updates
-          let updateCount = 0;
-          for (const card of cards) {
-            const { error: cardUpdateError } = await supabase
-              .from("cards")
-              .update({ tcgplayer_url: card.tcgplayer?.url || null })
-              .eq("id", card.id);
-            
-            if (cardUpdateError) {
-              console.error(`Error updating tcgplayer_url for card ${card.id}:`, cardUpdateError);
-            } else {
-              updateCount++;
-            }
-          }
-          console.log(`Updated tcgplayer_url for ${updateCount}/${cards.length} cards in set ${set.id}`);
-
-          // Update prices
+          // Process price updates in batch
           const priceUpdates = cards.map((card: any) => {
             const prices = card.tcgplayer?.prices || {};
             const priceVariants = ["holofoil", "reverseHolofoil", "1stEditionHolofoil", "unlimitedHolofoil", "normal"];
@@ -387,6 +371,7 @@ async function processPriceSync(supabase: any, headers: Record<string, string>, 
             };
           });
 
+          // Batch upsert prices
           await supabase
             .from("prices")
             .upsert(priceUpdates, { onConflict: "card_id" });
