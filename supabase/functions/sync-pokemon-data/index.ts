@@ -558,7 +558,7 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
 async function syncAllCardMetadata(supabase: any, headers: Record<string, string>) {
   console.log("Starting complete card metadata sync (all sets)...");
   
-  const BATCH_SIZE = 4;
+  const BATCH_SIZE = 2;
   let totalCardsUpdated = 0;
   let totalSetsProcessed = 0;
   let batchNumber = 0;

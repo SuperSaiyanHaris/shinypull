@@ -293,7 +293,7 @@ const AdminSyncPanel = () => {
           <Zap className="w-4 h-4 text-yellow-500" />
           Supabase Edge Function Sync (Server-Side)
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <button
             onClick={handleEdgeFunctionFullSync}
             disabled={syncing}
@@ -311,20 +311,12 @@ const AdminSyncPanel = () => {
             Sync Sets (Edge)
           </button>
           <button
-            onClick={handleEdgeFunctionCardMetadataSync}
-            disabled={syncing}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
-          >
-            <Database className="w-5 h-5" />
-            Metadata (4 sets)
-          </button>
-          <button
             onClick={handleEdgeFunctionCardMetadataAll}
             disabled={syncing}
             className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
             <Zap className="w-5 h-5" />
-            Metadata ALL
+            Sync Metadata
           </button>
           <button
             onClick={handleEdgeFunctionPricesSync}
@@ -336,7 +328,7 @@ const AdminSyncPanel = () => {
           </button>
         </div>
         <p className="text-xs text-adaptive-tertiary italic">
-          💡 <strong>Metadata (4 sets)</strong> syncs one batch. <strong>Metadata ALL</strong> syncs all remaining sets automatically (click once and done!). <strong>Prices Only</strong> updates pricing data.
+          💡 <strong>Sync Metadata</strong> automatically syncs all remaining sets (click once and done!). <strong>Prices Only</strong> rotates through sets updating pricing data.
         </p>
       </div>
 
