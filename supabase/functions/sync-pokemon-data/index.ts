@@ -294,14 +294,15 @@ async function syncSetCards(supabase: any, headers: Record<string, string>, setI
 }
 
 // Prices-only sync - faster, updates only price data
-async function syncPricesOnly(supabase: any, headers: Record<string, string>, limit: number = 3) {
-  console.log(`Syncing prices only (limit: ${limit} sets)...`);
+// NEW: Processes 1 set at a time, chunking cards within that set
+async function syncPricesOnly(supabase: any, headers: Record<string, string>, limit: number = 1) {
+  console.log(`Syncing prices (limit: ${limit} sets)...`);
 
-  // Simple rotation: Get the sets that haven't been synced in the longest time
-  // This ensures ALL sets get updated in order, rotating through the entire database
+  // Get 1 set that needs price sync (oldest or with incomplete card sync)
   const { data: setsToSync } = await supabase
     .from("sets")
-    .select("id, name, last_price_sync")
+    .select("id, name, total_cards, price_sync_progress, last_price_sync")
+    .or("price_sync_progress.is.null,price_sync_progress.lt.total_cards")
     .order("last_price_sync", { ascending: true, nullsFirst: true })
     .limit(limit);
 
@@ -310,125 +311,137 @@ async function syncPricesOnly(supabase: any, headers: Record<string, string>, li
       success: true,
       cardsUpdated: 0,
       setsProcessed: 0,
-      message: "No sets to sync"
+      message: "No sets to sync - all prices up to date!"
     };
   }
 
-  console.log(`Processing sets: ${setsToSync.map(s => s.name || s.id).join(", ")}`);
+  const set = setsToSync[0];
+  const startFrom = set.price_sync_progress || 0;
+  const CHUNK_SIZE = 50; // Process 50 cards at a time
+  
+  console.log(`Processing prices for ${set.name}: cards ${startFrom + 1} to ${startFrom + CHUNK_SIZE}`);
 
-  return await processPriceSync(supabase, headers, setsToSync);
+  return await processPriceSync(supabase, headers, set, startFrom, CHUNK_SIZE);
 }
 
-// Separate function to process the actual price sync
-async function processPriceSync(supabase: any, headers: Record<string, string>, setsToSync: any[]) {
-
-  let totalCards = 0;
-  let successCount = 0;
-
-  // Process sets in parallel batches
-  const BATCH_SIZE = 5;
-  for (let i = 0; i < setsToSync.length; i += BATCH_SIZE) {
-    const batch = setsToSync.slice(i, i + BATCH_SIZE);
-    const results = await Promise.all(
-      batch.map(async (set: { id: string }) => {
-        try {
-          const response = await fetch(
-            `${POKEMON_API}/cards?q=set.id:${set.id}&select=id,tcgplayer&pageSize=250`,
-            { headers }
-          );
-
-          if (!response.ok) return { success: false };
-
-          const data = await response.json();
-          const cards = data.data;
-
-          // Process price updates in batch
-          const priceUpdates = cards.map((card: any) => {
-            const prices = card.tcgplayer?.prices || {};
-            const priceVariants = ["holofoil", "reverseHolofoil", "1stEditionHolofoil", "unlimitedHolofoil", "normal"];
-            let priceData: any = null;
-
-            for (const variant of priceVariants) {
-              if (prices[variant]?.market) {
-                priceData = prices[variant];
-                break;
-              }
-            }
-
-            if (!priceData) {
-              const firstVariant = Object.keys(prices)[0];
-              priceData = firstVariant ? prices[firstVariant] : {};
-            }
-
-            const marketPrice = priceData?.market || 0;
-
-            return {
-              card_id: card.id,
-              tcgplayer_market: marketPrice,
-              tcgplayer_low: priceData?.low || marketPrice * 0.8,
-              tcgplayer_high: priceData?.high || marketPrice * 1.3,
-              last_updated: new Date().toISOString(),
-            };
-          });
-
-          // Batch upsert prices
-          await supabase
-            .from("prices")
-            .upsert(priceUpdates, { onConflict: "card_id" });
-
-          // Update last_price_sync timestamp for this set
-          await supabase
-            .from("sets")
-            .update({ last_price_sync: new Date().toISOString() })
-            .eq("id", set.id);
-
-          return { success: true, count: cards.length };
-        } catch {
-          return { success: false, count: 0 };
-        }
-      })
+// NEW: Process price sync for a CHUNK of cards within a single set
+async function processPriceSync(supabase: any, headers: Record<string, string>, set: any, startFrom: number, chunkSize: number) {
+  try {
+    console.log(`Fetching cards from Pokemon API for set ${set.id}...`);
+    
+    // Fetch ALL cards for the set (with pagination info)
+    const response = await fetch(
+      `${POKEMON_API}/cards?q=set.id:${set.id}&select=id,number,tcgplayer&orderBy=number&page=${Math.floor(startFrom / 250) + 1}&pageSize=250`,
+      { headers }
     );
 
-    for (const result of results) {
-      if (result.success) {
-        totalCards += result.count || 0;
-        successCount++;
+    if (!response.ok) {
+      console.error(`Failed to fetch cards for ${set.id}: ${response.statusText}`);
+      return { success: false, cardsUpdated: 0, setsProcessed: 0 };
+    }
+
+    const data = await response.json();
+    const allCards = data.data;
+
+    // Get the specific chunk we want to process
+    const localStartIndex = startFrom % 250;
+    const cardsToProcess = allCards.slice(localStartIndex, localStartIndex + chunkSize);
+
+    if (cardsToProcess.length === 0) {
+      console.log(`No more cards to process for ${set.id} - marking as complete`);
+      // Reset progress and update timestamp
+      await supabase
+        .from("sets")
+        .update({ 
+          price_sync_progress: 0,
+          last_price_sync: new Date().toISOString() 
+        })
+        .eq("id", set.id);
+
+      return { success: true, cardsUpdated: 0, setsProcessed: 1 };
+    }
+
+    console.log(`Processing ${cardsToProcess.length} cards...`);
+
+    // Process price updates
+    const priceUpdates = cardsToProcess.map((card: any) => {
+      const prices = card.tcgplayer?.prices || {};
+      const priceVariants = ["holofoil", "reverseHolofoil", "1stEditionHolofoil", "unlimitedHolofoil", "normal"];
+      let priceData: any = null;
+
+      for (const variant of priceVariants) {
+        if (prices[variant]?.market) {
+          priceData = prices[variant];
+          break;
+        }
       }
+
+      if (!priceData) {
+        const firstVariant = Object.keys(prices)[0];
+        priceData = firstVariant ? prices[firstVariant] : {};
+      }
+
+      const marketPrice = priceData?.market || 0;
+
+      return {
+        card_id: card.id,
+        tcgplayer_market: marketPrice,
+        tcgplayer_low: priceData?.low || marketPrice * 0.8,
+        tcgplayer_high: priceData?.high || marketPrice * 1.3,
+        last_updated: new Date().toISOString(),
+      };
+    });
+
+    // Batch upsert prices
+    const { error: priceError } = await supabase
+      .from("prices")
+      .upsert(priceUpdates, { onConflict: "card_id" });
+
+    if (priceError) {
+      console.error("Error updating prices:", priceError);
+      return { success: false, cardsUpdated: 0, setsProcessed: 0 };
     }
 
-    // Delay between batches
-    if (i + BATCH_SIZE < setsToSync.length) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    }
+    // Update progress
+    const newProgress = startFrom + cardsToProcess.length;
+    const isComplete = newProgress >= set.total_cards;
+
+    await supabase
+      .from("sets")
+      .update({ 
+        price_sync_progress: isComplete ? 0 : newProgress, // Reset to 0 when complete
+        last_price_sync: isComplete ? new Date().toISOString() : set.last_price_sync // Only update timestamp when complete
+      })
+      .eq("id", set.id);
+
+    console.log(`✓ Updated ${cardsToProcess.length} card prices. Progress: ${newProgress}/${set.total_cards}`);
+
+    return {
+      success: true,
+      cardsUpdated: cardsToProcess.length,
+      setsProcessed: isComplete ? 1 : 0,
+      progress: newProgress,
+      total: set.total_cards,
+      setName: set.name,
+      isComplete
+    };
+
+  } catch (error) {
+    console.error(`Error processing price sync:`, error);
+    return { success: false, cardsUpdated: 0, setsProcessed: 0, error: error.message };
   }
-
-  // Update sync metadata
-  await supabase
-    .from("sync_metadata")
-    .upsert({
-      entity_type: "prices",
-      status: "success",
-      message: `Updated prices for ${totalCards} cards from ${successCount} sets`,
-      last_sync: new Date().toISOString(),
-    }, { onConflict: "entity_type" });
-
-  console.log(`Price sync complete: ${totalCards} cards from ${successCount} sets`);
-  return {
-    success: true,
-    cardsUpdated: totalCards,
-    setsProcessed: successCount,
-  };
 }
 
-// Card metadata sync - updates static fields (types, supertype, etc.) in batches
-// This is for one-time updates of card metadata that doesn't change
+// NEW: Card metadata sync - processes CHUNKS of cards within a single set
+// This avoids timeout by processing 50 cards at a time, tracking progress
 async function syncCardMetadataBatch(supabase: any, headers: Record<string, string>, limit: number = 1) {
-  console.log(`Syncing card metadata (limit: ${limit} sets)...`);
+  console.log(`Syncing card metadata...`);
 
-  // Get sets that haven't had metadata synced yet (or oldest sync)
+  // Get 1 set that needs metadata sync (incomplete or never synced)
   const { data: setsToSync, error: setsError } = await supabase
     .from("sets")
-    .select("id, name, last_metadata_sync")
+    .select("id, name, total_cards, metadata_sync_progress, last_metadata_sync")
+    .or("metadata_sync_progress.is.null,metadata_sync_progress.lt.total_cards")
     .order("last_metadata_sync", { ascending: true, nullsFirst: true })
     .limit(limit);
 
@@ -446,116 +459,93 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
     };
   }
 
-  console.log(`Processing metadata for sets: ${setsToSync.map((s: any) => s.name || s.id).join(", ")}`);
+  const set = setsToSync[0];
+  const startFrom = set.metadata_sync_progress || 0;
+  const CHUNK_SIZE = 50; // Process 50 cards at a time to avoid timeout
 
-  let totalCardsUpdated = 0;
-  let successCount = 0;
+  console.log(`Processing metadata for ${set.name}: cards ${startFrom + 1} to ${startFrom + CHUNK_SIZE}`);
 
-  // Process each set
-  for (const set of setsToSync) {
-    try {
-      console.log(`Fetching cards for set ${set.id}...`);
-      
-      // Add 25-second timeout to Pokemon API call
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => {
-        controller.abort();
-        console.error(`Timeout fetching ${set.id} - Pokemon API too slow`);
-      }, 25000);
-      
-      const response = await fetch(
-        `${POKEMON_API}/cards?q=set.id:${set.id}&orderBy=number&pageSize=250`,
-        { 
-          headers,
-          signal: controller.signal
-        }
-      );
-      
-      clearTimeout(timeoutId);
+  return await processMetadataSync(supabase, headers, set, startFrom, CHUNK_SIZE);
+}
 
-      if (!response.ok) {
-        console.error(`Failed to fetch cards for ${set.id}: ${response.statusText}`);
-        // DON'T mark as synced - let it retry next time
-        continue;
-      }
+// NEW: Process metadata sync for a CHUNK of cards within a single set
+async function processMetadataSync(supabase: any, headers: Record<string, string>, set: any, startFrom: number, chunkSize: number) {
+  try {
+    console.log(`Fetching cards from Pokemon API for set ${set.id}...`);
+    
+    // Fetch ALL cards for the set (with pagination info)
+    const response = await fetch(
+      `${POKEMON_API}/cards?q=set.id:${set.id}&select=id,number,types,supertype&orderBy=number&page=${Math.floor(startFrom / 250) + 1}&pageSize=250`,
+      { headers }
+    );
 
-      const data = await response.json();
-      const cards = data.data;
+    if (!response.ok) {
+      console.error(`Failed to fetch cards for ${set.id}: ${response.statusText}`);
+      return { success: false, cardsUpdated: 0, setsProcessed: 0 };
+    }
 
-      if (!cards || cards.length === 0) {
-        console.log(`No cards found for set ${set.id}`);
-        // Empty set is considered synced
-        await supabase
-          .from("sets")
-          .update({ last_metadata_sync: new Date().toISOString() })
-          .eq("id", set.id);
-        successCount++;
-        continue;
-      }
+    const data = await response.json();
+    const allCards = data.data;
 
-      console.log(`Updating metadata for ${cards.length} cards in set ${set.id}...`);
+    // Get the specific chunk we want to process
+    const localStartIndex = startFrom % 250;
+    const cardsToProcess = allCards.slice(localStartIndex, localStartIndex + chunkSize);
 
-      // Process in smaller batches of 50 cards
-      const BATCH_SIZE = 50;
-      for (let i = 0; i < cards.length; i += BATCH_SIZE) {
-        const cardBatch = cards.slice(i, i + BATCH_SIZE);
-        
-        // Update each card individually (fast for just 2 fields)
-        for (const card of cardBatch) {
-          await supabase
-            .from("cards")
-            .update({
-              types: card.types || null,
-              supertype: card.supertype || null,
-            })
-            .eq("id", card.id);
-        }
-        
-        totalCardsUpdated += cardBatch.length;
-      }
-
-      // ONLY mark as synced if everything succeeded
+    if (cardsToProcess.length === 0) {
+      console.log(`No more cards to process for ${set.id} - marking as complete`);
+      // Reset progress and update timestamp
       await supabase
         .from("sets")
-        .update({ last_metadata_sync: new Date().toISOString() })
+        .update({ 
+          metadata_sync_progress: 0,
+          last_metadata_sync: new Date().toISOString() 
+        })
         .eq("id", set.id);
 
-      successCount++;
-      console.log(`✓ Completed metadata sync for ${set.name} (${cards.length} cards)`);
-
-    } catch (error) {
-      console.error(`Error processing set ${set.id}:`, error);
-      // DON'T mark as synced - it will retry next time
-      // But don't throw - continue to next set
-      if (error.name === 'AbortError') {
-        console.error(`Skipping ${set.id} - Pokemon API timeout, will retry later`);
-        continue; // Skip this set, try next one
-      }
-      throw error; // Throw for other errors to stop processing
+      return { success: true, cardsUpdated: 0, setsProcessed: 1 };
     }
+
+    console.log(`Processing ${cardsToProcess.length} cards...`);
+
+    // Batch update metadata for this chunk
+    for (const card of cardsToProcess) {
+      await supabase
+        .from("cards")
+        .update({
+          types: card.types || null,
+          supertype: card.supertype || null,
+        })
+        .eq("id", card.id);
+    }
+
+    // Update progress
+    const newProgress = startFrom + cardsToProcess.length;
+    const isComplete = newProgress >= set.total_cards;
+
+    await supabase
+      .from("sets")
+      .update({ 
+        metadata_sync_progress: isComplete ? 0 : newProgress, // Reset to 0 when complete
+        last_metadata_sync: isComplete ? new Date().toISOString() : set.last_metadata_sync // Only update timestamp when complete
+      })
+      .eq("id", set.id);
+
+    console.log(`✓ Updated ${cardsToProcess.length} card metadata. Progress: ${newProgress}/${set.total_cards}`);
+
+    return {
+      success: true,
+      cardsUpdated: cardsToProcess.length,
+      setsProcessed: isComplete ? 1 : 0,
+      progress: newProgress,
+      total: set.total_cards,
+      setName: set.name,
+      isComplete
+    };
+
+  } catch (error) {
+    console.error(`Error processing metadata sync:`, error);
+    return { success: false, cardsUpdated: 0, setsProcessed: 0, error: error.message };
   }
-
-  // Update sync metadata
-  await supabase
-    .from("sync_metadata")
-    .upsert({
-      entity_type: "card_metadata",
-      status: "success",
-      message: `Updated metadata for ${totalCardsUpdated} cards from ${successCount}/${setsToSync.length} sets`,
-      last_sync: new Date().toISOString(),
-    }, { onConflict: "entity_type" });
-
-  console.log(`Card metadata sync complete: ${totalCardsUpdated} cards from ${successCount} sets`);
-  
-  return {
-    success: true,
-    cardsUpdated: totalCardsUpdated,
-    setsProcessed: successCount,
-    totalSets: setsToSync.length,
-    message: successCount === setsToSync.length 
-      ? `All ${successCount} sets synced successfully!` 
-      : `${successCount}/${setsToSync.length} sets synced successfully`
-  };
 }
 
 // Sync ALL card metadata in batches - runs until complete
@@ -563,20 +553,19 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
 async function syncAllCardMetadata(supabase: any, headers: Record<string, string>) {
   console.log("Starting complete card metadata sync (all sets)...");
   
-  const BATCH_SIZE = 1;
   let totalCardsUpdated = 0;
   let totalSetsProcessed = 0;
-  let batchNumber = 0;
+  let callNumber = 0;
   
   while (true) {
-    batchNumber++;
-    console.log(`\n--- Batch ${batchNumber} ---`);
+    callNumber++;
+    console.log(`\n--- Call ${callNumber} ---`);
     
     // Check if there are any sets left to sync
     const { data: remainingSets, error: checkError } = await supabase
       .from("sets")
       .select("id")
-      .order("last_metadata_sync", { ascending: true, nullsFirst: true })
+      .or("metadata_sync_progress.is.null,metadata_sync_progress.lt.total_cards")
       .limit(1);
     
     if (checkError) throw checkError;
@@ -586,45 +575,35 @@ async function syncAllCardMetadata(supabase: any, headers: Record<string, string
       break;
     }
     
-    // Process one batch
-    const result = await syncCardMetadataBatch(supabase, headers, BATCH_SIZE);
+    // Process one chunk (50 cards from 1 set)
+    const result = await syncCardMetadataBatch(supabase, headers, 1);
     
     if (!result.success) {
-      console.error("Batch failed:", result);
+      console.error("Call failed:", result);
       break;
     }
     
     totalCardsUpdated += result.cardsUpdated || 0;
     totalSetsProcessed += result.setsProcessed || 0;
     
-    console.log(`Batch ${batchNumber} complete: ${result.cardsUpdated} cards, ${result.setsProcessed} sets`);
+    console.log(`Call ${callNumber} complete: ${result.cardsUpdated} cards, ${result.setsProcessed} sets completed`);
     
-    // Check if we're done (no more sets processed means we're complete)
-    if (result.setsProcessed === 0 || result.message?.includes("No sets to sync")) {
+    // Check if we're done
+    if (result.message?.includes("No sets to sync")) {
       console.log("✅ All sets synced - metadata sync complete!");
       break;
     }
     
-    // Small delay between batches to avoid overwhelming the system
-    console.log("Waiting 2 seconds before next batch...");
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // Small delay between calls
+    console.log("Waiting 1 second before next chunk...");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
-  
-  // Final update to sync metadata
-  await supabase
-    .from("sync_metadata")
-    .upsert({
-      entity_type: "card_metadata",
-      status: "success",
-      message: `Complete sync: Updated metadata for ${totalCardsUpdated} cards from ${totalSetsProcessed} sets in ${batchNumber} batches`,
-      last_sync: new Date().toISOString(),
-    }, { onConflict: "entity_type" });
   
   return {
     success: true,
     cardsUpdated: totalCardsUpdated,
     setsProcessed: totalSetsProcessed,
-    totalBatches: batchNumber,
-    message: `Complete! Synced ${totalSetsProcessed} sets (${totalCardsUpdated} cards) in ${batchNumber} batches`
+    totalCalls: callNumber,
+    message: `Complete! Synced ${totalSetsProcessed} sets (${totalCardsUpdated} cards) in ${callNumber} calls`
   };
 }
