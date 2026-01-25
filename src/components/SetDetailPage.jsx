@@ -284,13 +284,6 @@ const SetDetailPage = ({ set }) => {
                     </td>
                   )}
                 </tr>
-                        >
-                          Sign In
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
               ))}
             </tbody>
           </table>
