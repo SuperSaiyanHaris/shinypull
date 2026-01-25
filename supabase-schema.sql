@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS cards (
   rarity TEXT,
   image_small TEXT,
   image_large TEXT,
+  tcgplayer_url TEXT, -- Direct TCGPlayer product page URL from Pokemon TCG API
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
