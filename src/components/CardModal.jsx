@@ -232,13 +232,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
             <div className="p-4 space-y-4">
               <div>
                 <h2 className="text-2xl font-display text-adaptive-primary">{card.name}</h2>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-sm text-adaptive-secondary">{card.set} • {card.number}</p>
-                  {/* Rarity Badge - moved from card image */}
-                  <span className="px-2 py-0.5 bg-yellow-400 text-slate-900 text-xs font-bold rounded-full">
-                    {card.rarity}
-                  </span>
-                </div>
+                <p className="text-sm text-adaptive-secondary mt-1">{card.set} • {card.number}</p>
               </div>
 
               {/* Price Box */}
@@ -461,10 +455,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                     <span className="text-lg">{card.set}</span>
                     <span className="text-slate-400">•</span>
                     <span className="text-lg font-mono">{card.number}</span>
-                    {/* Rarity Badge - moved from card image */}
-                    <span className="px-3 py-1 bg-yellow-400 text-slate-900 text-sm font-bold rounded-full">
-                      {card.rarity}
-                    </span>
                   </div>
 
                   {/* Current Price Display */}

@@ -50,15 +50,9 @@ const CardItem = ({ card, index }) => {
           <h3 className="text-xl font-display text-adaptive-primary mb-1 line-clamp-1">
             {card.name}
           </h3>
-          <div className="flex items-center gap-2 mb-4">
-            <p className="text-sm text-adaptive-secondary font-medium">
-              {card.set} • {card.number}
-            </p>
-            {/* Rarity Badge - moved from card image */}
-            <span className="px-2 py-0.5 bg-yellow-400 text-slate-900 text-xs font-bold rounded-full">
-              {card.rarity}
-            </span>
-          </div>
+          <p className="text-sm text-adaptive-secondary font-medium mb-4">
+            {card.set} • {card.number}
+          </p>
         </div>
 
         {/* Price Tabs */}
@@ -108,25 +102,25 @@ const CardItem = ({ card, index }) => {
           <div className="space-y-2">
             <div className={!user ? 'blur-sm select-none' : ''}>
               <PriceCompareRow
-                platform="Pokemon TCG"
+                platform="TCG"
                 price={card.prices.tcgplayer.market}
                 highlight
                 verified
               />
               <PriceCompareRow
-                platform={card.prices.ebay.verified ? "eBay" : "eBay (est.)"}
-                price={card.prices.ebay.avg}
-                verified={card.prices.ebay.verified}
-                estimated={!card.prices.ebay.verified}
+                platform={card.prices.ebay?.verified ? "eBay Raw Card" : "eBay Raw Card (est.)"}
+                price={card.prices.ebay?.avg || 0}
+                verified={card.prices.ebay?.verified}
+                estimated={!card.prices.ebay?.verified}
               />
               <PriceCompareRow
-                platform={card.prices.psa10.verified ? "PSA 10" : "PSA 10 (est.)"}
-                price={card.prices.psa10.avg}
-                verified={card.prices.psa10.verified}
-                estimated={!card.prices.psa10.verified}
+                platform={card.prices.psa10?.verified ? "eBay PSA 10" : "eBay PSA 10 (est.)"}
+                price={card.prices.psa10?.avg || 0}
+                verified={card.prices.psa10?.verified}
+                estimated={!card.prices.psa10?.verified}
               />
               <p className="text-xs text-adaptive-tertiary mt-3 text-center font-medium">
-                {card.prices.ebay.verified || card.prices.psa10.verified
+                {card.prices.ebay?.verified || card.prices.psa10?.verified
                   ? "✓ Live prices from Pokemon TCG & eBay APIs"
                   : "Verified prices from Pokemon TCG API. Others estimated."}
               </p>
@@ -150,7 +144,7 @@ const CardItem = ({ card, index }) => {
         {/* Auth Gate Overlay - covers entire pricing section */}
         {!user && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/95 backdrop-blur-sm rounded-2xl">
-            <p className="text-sm text-adaptive-secondary mb-3">Sign in to view pricing</p>
+            <p className="text-sm text-adaptive-secondary mb-3 text-center px-4">Sign in to view pricing and actions</p>
             <button
               onClick={() => openAuthModal()}
               className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
@@ -195,7 +189,7 @@ const PriceCompareRow = ({ platform, price, highlight, verified, estimated }) =>
     <span className={`text-sm font-bold ${
       highlight ? 'text-blue-600 dark:text-blue-400' : 'text-adaptive-primary'
     }`}>
-      {formatPrice(price)}
+      {price > 0 ? formatPrice(price) : 'N/A'}
     </span>
   </div>
 );
