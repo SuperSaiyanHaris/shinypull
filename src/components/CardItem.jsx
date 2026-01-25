@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, ExternalLink } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
+import { useAuth } from '../contexts/AuthContext';
+import { useAuthModal } from '../contexts/AuthModalContext';
 import CardModal from './CardModal';
 import AddToCollectionButton from './AddToCollectionButton';
 import PriceAlertButton from './PriceAlertButton';
@@ -9,6 +11,8 @@ const CardItem = ({ card, index }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [selectedView, setSelectedView] = useState('overview');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user } = useAuth();
+  const { openAuthModal } = useAuthModal();
 
   const trend = getPriceTrend(card.priceHistory);
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
@@ -83,12 +87,12 @@ const CardItem = ({ card, index }) => {
 
         {/* Price Display */}
         {selectedView === 'overview' && (
-          <div className="space-y-3">
+          <div className="space-y-3 relative">
             {/* Market Price */}
             <div className="flex items-center justify-between p-4 bg-adaptive-card rounded-xl border border-adaptive">
               <div>
                 <p className="text-xs text-adaptive-secondary font-medium mb-1">Market Price</p>
-                <p className="text-2xl font-bold price-gradient">
+                <p className={`text-2xl font-bold price-gradient ${!user ? 'blur-sm select-none' : ''}`}>
                   {formatPrice(card.prices.tcgplayer.market)}
                 </p>
                 <p className="text-xs text-adaptive-tertiary mt-1 font-medium">
@@ -97,34 +101,60 @@ const CardItem = ({ card, index }) => {
               </div>
               <TrendIcon className={`w-6 h-6 ${trendColor}`} />
             </div>
+            
+            {/* Auth Gate Overlay */}
+            {!user && (
+              <div className="absolute inset-0 flex items-center justify-center bg-adaptive-card/80 backdrop-blur-[2px] rounded-xl">
+                <button
+                  onClick={() => openAuthModal()}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+                >
+                  Sign in to view pricing
+                </button>
+              </div>
+            )}
           </div>
         )}
 
         {selectedView === 'compare' && (
-          <div className="space-y-2">
-            <PriceCompareRow
-              platform="Pokemon TCG"
-              price={card.prices.tcgplayer.market}
-              highlight
-              verified
-            />
-            <PriceCompareRow
-              platform={card.prices.ebay.verified ? "eBay" : "eBay (est.)"}
-              price={card.prices.ebay.avg}
-              verified={card.prices.ebay.verified}
-              estimated={!card.prices.ebay.verified}
-            />
-            <PriceCompareRow
-              platform={card.prices.psa10.verified ? "PSA 10" : "PSA 10 (est.)"}
-              price={card.prices.psa10.avg}
-              verified={card.prices.psa10.verified}
-              estimated={!card.prices.psa10.verified}
-            />
-            <p className="text-xs text-adaptive-tertiary mt-3 text-center font-medium">
-              {card.prices.ebay.verified || card.prices.psa10.verified
-                ? "✓ Live prices from Pokemon TCG & eBay APIs"
-                : "Verified prices from Pokemon TCG API. Others estimated."}
-            </p>
+          <div className="space-y-2 relative">
+            <div className={!user ? 'blur-sm select-none' : ''}>
+              <PriceCompareRow
+                platform="Pokemon TCG"
+                price={card.prices.tcgplayer.market}
+                highlight
+                verified
+              />
+              <PriceCompareRow
+                platform={card.prices.ebay.verified ? "eBay" : "eBay (est.)"}
+                price={card.prices.ebay.avg}
+                verified={card.prices.ebay.verified}
+                estimated={!card.prices.ebay.verified}
+              />
+              <PriceCompareRow
+                platform={card.prices.psa10.verified ? "PSA 10" : "PSA 10 (est.)"}
+                price={card.prices.psa10.avg}
+                verified={card.prices.psa10.verified}
+                estimated={!card.prices.psa10.verified}
+              />
+              <p className="text-xs text-adaptive-tertiary mt-3 text-center font-medium">
+                {card.prices.ebay.verified || card.prices.psa10.verified
+                  ? "✓ Live prices from Pokemon TCG & eBay APIs"
+                  : "Verified prices from Pokemon TCG API. Others estimated."}
+              </p>
+            </div>
+            
+            {/* Auth Gate Overlay */}
+            {!user && (
+              <div className="absolute inset-0 flex items-center justify-center bg-adaptive-card/80 backdrop-blur-[2px] rounded-xl">
+                <button
+                  onClick={() => openAuthModal()}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+                >
+                  Sign in to view pricing
+                </button>
+              </div>
+            )}
           </div>
         )}
 

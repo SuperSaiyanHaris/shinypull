@@ -3,6 +3,8 @@ import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info, Award, Loader2 
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import { getEbayPriceAPI, getEbayPSA10Price, estimateEbayPrice, estimatePSA10Price } from '../services/ebayService';
 import { fetchAndUpdateTCGPrice } from '../services/priceUpdateService';
+import { useAuth } from '../contexts/AuthContext';
+import { useAuthModal } from '../contexts/AuthModalContext';
 import AddToCollectionButton from './AddToCollectionButton';
 import PriceAlertButton from './PriceAlertButton';
 
@@ -24,6 +26,8 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   const [loadingEbay, setLoadingEbay] = useState(false);
   const [tcgPrices, setTcgPrices] = useState(null);
   const [loadingTcg, setLoadingTcg] = useState(false);
+  const { user } = useAuth();
+  const { openAuthModal } = useAuthModal();
 
   // Close modal when clicking backdrop
   const handleBackdropClick = (e) => {
@@ -52,6 +56,12 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   // Fetch eBay prices on-demand when modal opens
   useEffect(() => {
     if (!isOpen || !card) return;
+
+    // Skip price fetching for non-authenticated users
+    if (!user) {
+      console.log('Skipping price fetch - user not authenticated');
+      return;
+    }
 
     // Fetch fresh TCG market price and update database
     setLoadingTcg(true);
@@ -232,9 +242,10 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               </div>
 
               {/* Price Box */}
-              <div className="p-4 modal-price-box rounded-xl border">
-                {/* Variant Prices Grid - adjust columns based on available variants */}
-                <div className={`grid gap-3 mb-3 ${(displayTcgPrices.normal > 0 && displayTcgPrices.holofoil > 0) ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              <div className="relative">
+                <div className={`p-4 modal-price-box rounded-xl border ${!user ? 'blur-sm select-none' : ''}`}>
+                  {/* Variant Prices Grid - adjust columns based on available variants */}
+                  <div className={`grid gap-3 mb-3 ${(displayTcgPrices.normal > 0 && displayTcgPrices.holofoil > 0) ? 'grid-cols-2' : 'grid-cols-1'}`}>
                   {displayTcgPrices.normal > 0 && (
                     <div className="text-center bg-adaptive-hover rounded-lg p-3">
                       <p className="text-xs text-adaptive-secondary font-medium mb-1">Normal</p>
@@ -270,6 +281,22 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   </div>
                 </div>
               </div>
+                
+                {/* Auth Gate Overlay for Price Box */}
+                {!user && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/90 backdrop-blur-[2px] rounded-xl">
+                    <p className="text-sm text-adaptive-secondary mb-3 text-center px-4">
+                      Create a free account to view live pricing
+                    </p>
+                    <button
+                      onClick={() => openAuthModal()}
+                      className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+                    >
+                      Sign Up Free
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-3">
@@ -295,9 +322,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               </div>
 
               {/* Price Comparison */}
-              <div className="space-y-2">
+              <div className="space-y-2 relative">
                 <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide">Price Comparison</h3>
-                <div className="space-y-2">
+                <div className={`space-y-2 ${!user ? 'blur-sm select-none' : ''}`}>
                   {/* TCGPlayer */}
                   {card.tcgplayerUrl && (
                     <div className="p-3 modal-card rounded-lg border">
@@ -385,6 +412,21 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                     </>
                   )}
                 </div>
+                
+                {/* Auth Gate Overlay for Price Comparison */}
+                {!user && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/90 backdrop-blur-[2px] rounded-xl mt-8">
+                    <p className="text-sm text-adaptive-secondary mb-3 text-center px-4">
+                      Sign in to compare prices across platforms
+                    </p>
+                    <button
+                      onClick={() => openAuthModal()}
+                      className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+                    >
+                      Sign In
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Source info */}
@@ -426,9 +468,10 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   </div>
 
                   {/* Current Price Display */}
-                  <div className="p-6 modal-price-box rounded-xl border">
-                    {/* Variant Prices Grid - adjust columns based on available variants */}
-                    <div className={`grid gap-4 mb-4 ${(displayTcgPrices.normal > 0 && displayTcgPrices.holofoil > 0) ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                  <div className="relative">
+                    <div className={`p-6 modal-price-box rounded-xl border ${!user ? 'blur-sm select-none' : ''}`}>
+                      {/* Variant Prices Grid - adjust columns based on available variants */}
+                      <div className={`grid gap-4 mb-4 ${(displayTcgPrices.normal > 0 && displayTcgPrices.holofoil > 0) ? 'grid-cols-2' : 'grid-cols-1'}`}>
                       {displayTcgPrices.normal > 0 && (
                         <div className="text-center bg-adaptive-hover rounded-lg p-4">
                           <p className="text-sm text-adaptive-secondary font-medium mb-2">Normal</p>
@@ -468,6 +511,22 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                       </div>
                     </div>
                   </div>
+                    
+                    {/* Auth Gate Overlay for Desktop Price Box */}
+                    {!user && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/90 backdrop-blur-[2px] rounded-xl">
+                        <p className="text-base text-adaptive-secondary mb-4 text-center px-4">
+                          Create a free account to view live pricing
+                        </p>
+                        <button
+                          onClick={() => openAuthModal()}
+                          className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+                        >
+                          Sign Up Free
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Quick Actions */}
                   <div className="grid grid-cols-2 gap-3">
@@ -497,9 +556,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
 
             {/* Content */}
             <div className="p-8 modal-content space-y-6">
-              <div>
+              <div className="relative">
                 <h3 className="text-xl font-display text-adaptive-primary mb-4">Price Comparison</h3>
-                <div className="space-y-3">
+                <div className={`space-y-3 ${!user ? 'blur-sm select-none' : ''}`}>
                   <PriceCompareRow
                     platform="TCG"
                     price={card.prices.tcgplayer.market}
@@ -526,6 +585,21 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                 <p className="text-xs text-adaptive-tertiary mt-4 text-center">
                   Links may be affiliate links. We may earn a commission from purchases.
                 </p>
+                
+                {/* Auth Gate Overlay for Desktop Price Comparison */}
+                {!user && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/90 backdrop-blur-[2px] rounded-xl mt-12">
+                    <p className="text-base text-adaptive-secondary mb-4 text-center px-4">
+                      Sign in to compare prices across platforms
+                    </p>
+                    <button
+                      onClick={() => openAuthModal()}
+                      className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors"
+                    >
+                      Sign In
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
