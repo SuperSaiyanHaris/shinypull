@@ -15,8 +15,10 @@ const PRICE_CACHE_DURATION_MS = 6 * 60 * 60 * 1000;
  * we'd need direct TCGPlayer API access (requires paid partnership).
  * 
  * CACHING: Only fetches fresh data if last update was more than 6 hours ago
+ * @param {string} cardId - The card ID to fetch prices for
+ * @param {boolean} forceRefresh - If true, bypasses cache and fetches fresh data
  */
-export const fetchAndUpdateTCGPrice = async (cardId) => {
+export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
   try {
     // Check if we have recent cached prices in the database
     const { data: existingPrice, error: fetchError } = await supabase
@@ -25,7 +27,7 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
       .eq('card_id', cardId)
       .single();
 
-    if (!fetchError && existingPrice?.last_updated) {
+    if (!forceRefresh && !fetchError && existingPrice?.last_updated) {
       const lastUpdated = new Date(existingPrice.last_updated);
       const now = new Date();
       const timeSinceUpdate = now - lastUpdated;
@@ -47,7 +49,7 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
     }
 
     // Cache expired or no cached data - fetch fresh prices
-    console.log(`🔄 Fetching fresh TCG prices for ${cardId} (cache expired or missing)`);
+    console.log(`🔄 Fetching fresh TCG prices for ${cardId} ${forceRefresh ? '(FORCE REFRESH - Admin)' : '(cache expired or missing)'}`);
     
     // Fetch card data from Pokemon TCG API via our serverless function to avoid CORS
     const response = await fetch(`/api/tcg-prices?cardId=${cardId}`);

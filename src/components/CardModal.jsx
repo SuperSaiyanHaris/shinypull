@@ -29,6 +29,27 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   const { user } = useAuth();
   const { openAuthModal } = useAuthModal();
 
+  // Admin check
+  const ADMIN_EMAILS = ['haris.lilic@gmail.com', 'shinypull@proton.me'];
+  const isAdmin = user?.email && ADMIN_EMAILS.includes(user.email);
+
+  // Admin force refresh handler
+  const handleForceRefresh = async () => {
+    console.log('🔧 Admin forcing price refresh...');
+    setLoadingTcg(true);
+    try {
+      const freshPrice = await fetchAndUpdateTCGPrice(card.id, true); // Force refresh
+      if (freshPrice) {
+        setTcgPrices(freshPrice);
+        console.log('✅ Prices refreshed successfully');
+      }
+    } catch (error) {
+      console.error('❌ Error forcing refresh:', error);
+    } finally {
+      setLoadingTcg(false);
+    }
+  };
+
   // Close modal when clicking backdrop
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -212,6 +233,24 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
         >
           <X className="w-5 h-5 text-adaptive-secondary group-hover:text-adaptive-primary" />
         </button>
+
+        {/* Admin Force Refresh Button (hidden, next to close button) */}
+        {isAdmin && (
+          <button
+            onClick={handleForceRefresh}
+            disabled={loadingTcg}
+            className="hidden md:block absolute top-4 right-16 z-10 p-2 modal-button rounded-lg transition-colors group border hover:bg-amber-500/10 hover:border-amber-500/30"
+            title="Admin: Force refresh prices (bypass cache)"
+          >
+            {loadingTcg ? (
+              <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500 group-hover:text-amber-400">
+                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+              </svg>
+            )}
+          </button>
+        )}
 
         {/* Scrollable Content */}
         <div className="overflow-y-auto flex-1 md:max-h-[90vh] bg-adaptive-card">
