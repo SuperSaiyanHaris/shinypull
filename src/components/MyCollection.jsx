@@ -411,17 +411,6 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
         </div>
       )}
 
-      {/* Filters Sidebar */}
-      {showFilters && selectedSetId && (
-        <div className="animate-slide-up">
-          <CardFilters 
-            filters={filters}
-            onFiltersChange={setFilters}
-            showOwnershipFilter={true}
-          />
-        </div>
-      )}
-
       {/* Loading State */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -491,6 +480,9 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
         </div>
       ) : (
         /* Card Grid/List for Selected Set */
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Main Content Area */}
+          <div className={`${showFilters ? 'lg:col-span-9' : 'lg:col-span-12'}`}>
         <>
           {/* Set Statistics Header */}
           {selectedSetStats && (
@@ -769,6 +761,21 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
             </div>
           )}
         </>
+          </div>
+
+          {/* Filters Sidebar - Right side on desktop */}
+          {showFilters && (
+            <div className="lg:col-span-3">
+              <div className="lg:sticky lg:top-6">
+                <CardFilters 
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  showOwnershipFilter={true}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Card Modal */}

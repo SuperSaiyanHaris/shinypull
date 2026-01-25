@@ -98,6 +98,8 @@ export const getSetCards = async (setId) => {
       name: card.name,
       number: card.number,
       rarity: card.rarity,
+      types: card.types || [], // Pokemon types array
+      supertype: card.supertype || 'Pokémon', // Default to Pokemon if not set
       image: card.image_large || card.image_small,
       images: {
         small: card.image_small,

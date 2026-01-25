@@ -228,6 +228,8 @@ async function syncSetCards(supabase: any, headers: Record<string, string>, setI
     name: card.name,
     number: card.number || "N/A",
     rarity: card.rarity || "Common",
+    types: card.types || null, // Array of Pokemon types (e.g., ['Fire', 'Dragon'])
+    supertype: card.supertype || null, // 'Pokémon', 'Trainer', or 'Energy'
     image_small: card.images?.small,
     image_large: card.images?.large,
     tcgplayer_url: card.tcgplayer?.url || null,

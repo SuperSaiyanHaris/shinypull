@@ -167,22 +167,15 @@ const SetDetailPage = ({ set }) => {
         </div>
       </div>
 
-      {/* Filters Sidebar */}
-      {showFilters && (
-        <div className="animate-slide-up">
-          <CardFilters 
-            filters={filters}
-            onFiltersChange={setFilters}
-          />
-        </div>
-      )}
-
       {/* Loading State */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Main Content Area */}
+          <div className={`${showFilters ? 'lg:col-span-9' : 'lg:col-span-12'}`}>
         <>
       {/* Mobile Card List - Hidden on desktop */}
       <div className="md:hidden space-y-3">
@@ -339,9 +332,21 @@ const SetDetailPage = ({ set }) => {
         </div>
       </div>
         </>
-      )}
+          </div>
 
-      {/* Card Modal */}
+          {/* Filters Sidebar - Right side on desktop */}
+          {showFilters && (
+            <div className="lg:col-span-3">
+              <div className="lg:sticky lg:top-6">
+                <CardFilters 
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
       {selectedCard && (
         <CardModal
           card={selectedCard}
