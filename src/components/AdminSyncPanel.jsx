@@ -160,6 +160,23 @@ const AdminSyncPanel = () => {
     }
   };
 
+  const handleEdgeFunctionCardMetadataAll = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+
+    try {
+      console.log('🎴 Starting complete card metadata sync (all batches)...');
+      const result = await triggerEdgeFunctionSync('card-metadata-all'); // Syncs ALL sets
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      console.error('💥 Edge Function complete metadata sync failed:', error);
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'success':
@@ -276,7 +293,7 @@ const AdminSyncPanel = () => {
           <Zap className="w-4 h-4 text-yellow-500" />
           Supabase Edge Function Sync (Server-Side)
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
           <button
             onClick={handleEdgeFunctionFullSync}
             disabled={syncing}
@@ -299,7 +316,15 @@ const AdminSyncPanel = () => {
             className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
             <Database className="w-5 h-5" />
-            Card Metadata (4 sets)
+            Metadata (4 sets)
+          </button>
+          <button
+            onClick={handleEdgeFunctionCardMetadataAll}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 disabled:bg-gray-400 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+          >
+            <Zap className="w-5 h-5" />
+            Metadata ALL
           </button>
           <button
             onClick={handleEdgeFunctionPricesSync}
@@ -311,7 +336,7 @@ const AdminSyncPanel = () => {
           </button>
         </div>
         <p className="text-xs text-adaptive-tertiary italic">
-          💡 <strong>Card Metadata</strong> syncs types/supertype fields (run multiple times until all sets done). <strong>Prices Only</strong> updates pricing data (auto-rotates through sets).
+          💡 <strong>Metadata (4 sets)</strong> syncs one batch. <strong>Metadata ALL</strong> syncs all remaining sets automatically (click once and done!). <strong>Prices Only</strong> updates pricing data.
         </p>
       </div>
 

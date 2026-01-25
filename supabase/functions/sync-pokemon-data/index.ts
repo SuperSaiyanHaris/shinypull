@@ -14,7 +14,7 @@ const corsHeaders = {
 };
 
 interface SyncOptions {
-  mode: "full" | "prices" | "sets" | "single-set" | "card-metadata";
+  mode: "full" | "prices" | "sets" | "single-set" | "card-metadata" | "card-metadata-all";
   setId?: string;
   limit?: number; // Max number of sets to process (prevents timeout)
 }
@@ -80,6 +80,9 @@ serve(async (req) => {
         break;
       case "card-metadata":
         result = await syncCardMetadataBatch(supabase, headers, options.limit);
+        break;
+      case "card-metadata-all":
+        result = await syncAllCardMetadata(supabase, headers);
         break;
       case "prices":
       default:
@@ -547,5 +550,76 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
     message: successCount === setsToSync.length 
       ? `All ${successCount} sets synced successfully!` 
       : `${successCount}/${setsToSync.length} sets synced successfully`
+  };
+}
+
+// Sync ALL card metadata in batches - runs until complete
+// This is a wrapper that calls syncCardMetadataBatch repeatedly
+async function syncAllCardMetadata(supabase: any, headers: Record<string, string>) {
+  console.log("Starting complete card metadata sync (all sets)...");
+  
+  const BATCH_SIZE = 4;
+  let totalCardsUpdated = 0;
+  let totalSetsProcessed = 0;
+  let batchNumber = 0;
+  
+  while (true) {
+    batchNumber++;
+    console.log(`\n--- Batch ${batchNumber} ---`);
+    
+    // Check if there are any sets left to sync
+    const { data: remainingSets, error: checkError } = await supabase
+      .from("sets")
+      .select("id")
+      .order("last_metadata_sync", { ascending: true, nullsFirst: true })
+      .limit(1);
+    
+    if (checkError) throw checkError;
+    
+    if (!remainingSets || remainingSets.length === 0) {
+      console.log("✅ All sets have been synced!");
+      break;
+    }
+    
+    // Process one batch
+    const result = await syncCardMetadataBatch(supabase, headers, BATCH_SIZE);
+    
+    if (!result.success) {
+      console.error("Batch failed:", result);
+      break;
+    }
+    
+    totalCardsUpdated += result.cardsUpdated || 0;
+    totalSetsProcessed += result.setsProcessed || 0;
+    
+    console.log(`Batch ${batchNumber} complete: ${result.cardsUpdated} cards, ${result.setsProcessed} sets`);
+    
+    // Check if we're done (no more sets processed means we're complete)
+    if (result.setsProcessed === 0 || result.message?.includes("No sets to sync")) {
+      console.log("✅ All sets synced - metadata sync complete!");
+      break;
+    }
+    
+    // Small delay between batches to avoid overwhelming the system
+    console.log("Waiting 2 seconds before next batch...");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }
+  
+  // Final update to sync metadata
+  await supabase
+    .from("sync_metadata")
+    .upsert({
+      entity_type: "card_metadata",
+      status: "success",
+      message: `Complete sync: Updated metadata for ${totalCardsUpdated} cards from ${totalSetsProcessed} sets in ${batchNumber} batches`,
+      last_sync: new Date().toISOString(),
+    }, { onConflict: "entity_type" });
+  
+  return {
+    success: true,
+    cardsUpdated: totalCardsUpdated,
+    setsProcessed: totalSetsProcessed,
+    totalBatches: batchNumber,
+    message: `Complete! Synced ${totalSetsProcessed} sets (${totalCardsUpdated} cards) in ${batchNumber} batches`
   };
 }
