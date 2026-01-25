@@ -6,6 +6,10 @@ const POKEMON_TCG_API = 'https://api.pokemontcg.io/v2';
 /**
  * Fetch latest TCG market price from Pokemon API and update database
  * Called when card modal opens to ensure real-time prices
+ * 
+ * NOTE: Pokemon TCG API prices are NOT real-time - they cache TCGPlayer data
+ * and update periodically (every few hours). For truly real-time prices, 
+ * we'd need direct TCGPlayer API access (requires paid partnership).
  */
 export const fetchAndUpdateTCGPrice = async (cardId) => {
   try {
@@ -24,10 +28,12 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
     const prices = card.tcgplayer?.prices || {};
     const priceVariants = ['holofoil', 'reverseHolofoil', '1stEditionHolofoil', 'unlimitedHolofoil', 'normal'];
     let priceData = null;
+    let variantUsed = null;
 
     for (const variant of priceVariants) {
       if (prices[variant]?.market) {
         priceData = prices[variant];
+        variantUsed = variant;
         break;
       }
     }
@@ -35,11 +41,22 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
     if (!priceData) {
       const firstVariant = Object.keys(prices)[0];
       priceData = firstVariant ? prices[firstVariant] : {};
+      variantUsed = firstVariant;
     }
 
     const marketPrice = priceData?.market || 0;
     const lowPrice = priceData?.low || marketPrice * 0.8;
     const highPrice = priceData?.high || marketPrice * 1.3;
+    const updatedAt = card.tcgplayer?.updatedAt || new Date().toISOString();
+
+    console.log(`📊 TCG API Data for ${cardId}:`, {
+      variant: variantUsed,
+      market: marketPrice,
+      low: lowPrice,
+      high: highPrice,
+      apiUpdatedAt: updatedAt,
+      note: 'Pokemon TCG API may have cached/delayed prices from TCGPlayer'
+    });
 
     // Update database with fresh prices
     const { error } = await supabase
@@ -57,13 +74,15 @@ export const fetchAndUpdateTCGPrice = async (cardId) => {
       return null;
     }
 
-    console.log(`✅ Updated TCG price for ${cardId}: $${marketPrice}`);
+    console.log(`✅ Updated TCG price for ${cardId}: $${marketPrice} (${variantUsed})`);
 
     // Return fresh price data
     return {
       market: marketPrice,
       low: lowPrice,
       high: highPrice,
+      variant: variantUsed,
+      apiUpdatedAt: updatedAt,
       lastUpdated: new Date().toISOString()
     };
 
