@@ -336,12 +336,12 @@ const SetDetailPage = ({ set }) => {
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/50 z-40 animate-fade-in"
+            className="fixed inset-0 bg-black/60 z-[100] animate-fade-in"
             onClick={() => setShowFilters(false)}
           />
           
           {/* Slide-out Panel */}
-          <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-adaptive z-50 shadow-2xl animate-slide-in-right overflow-y-auto">
+          <div className="fixed top-0 right-0 bottom-0 w-full sm:max-w-md bg-adaptive z-[101] shadow-2xl animate-slide-in-right overflow-y-auto">
             <CardFilters 
               filters={filters}
               onFiltersChange={setFilters}

@@ -246,7 +246,6 @@ const CardFilters = ({ filters, onFiltersChange, showOwnershipFilter = false, on
             'Ultra Rare',
             'Promo'
           ].map(rarity => (
-      </div>
             <FilterButton
               key={rarity}
               active={filters.rarities?.includes(rarity)}
@@ -257,6 +256,7 @@ const CardFilters = ({ filters, onFiltersChange, showOwnershipFilter = false, on
           ))}
         </div>
       </FilterSection>
+      </div>
     </div>
   );
 };
