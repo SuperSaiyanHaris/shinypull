@@ -1,16 +1,14 @@
 import { supabase } from '../lib/supabase';
 
-const POKEMON_API = 'https://api.pokemontcg.io/v2';
-
 /**
  * Sync metadata (types, supertype) for all sets that need it
- * Runs in the browser - NO TIMEOUT ISSUES!
+ * Calls Edge Function in batches to avoid CORS issues and timeouts
  */
 export const syncAllCardMetadata = async (onProgress) => {
   try {
-    console.log('🎴 Starting complete metadata sync...');
+    console.log('🎴 Starting complete metadata sync via Edge Function...');
 
-    // Get all sets that haven't been synced yet (or oldest sync)
+    // Get all sets that haven't been synced yet
     const { data: sets, error: setsError } = await supabase
       .from('sets')
       .select('id, name, last_metadata_sync')
@@ -27,7 +25,7 @@ export const syncAllCardMetadata = async (onProgress) => {
       };
     }
 
-    // Filter sets that actually need syncing (no last_metadata_sync)
+    // Filter sets that actually need syncing
     const setsToSync = sets.filter(s => !s.last_metadata_sync);
     
     if (setsToSync.length === 0) {
@@ -42,105 +40,81 @@ export const syncAllCardMetadata = async (onProgress) => {
     console.log(`📊 Found ${setsToSync.length} sets needing metadata sync`);
 
     let totalCardsUpdated = 0;
-    let setsProcessed = 0;
+    let totalSetsProcessed = 0;
+    let batchNumber = 0;
 
-    // Process each set
-    for (let i = 0; i < setsToSync.length; i++) {
-      const set = setsToSync[i];
+    // Call Edge Function in batches of 2 sets (stays under 2-min timeout)
+    const BATCH_SIZE = 2;
+    
+    while (totalSetsProcessed < setsToSync.length) {
+      batchNumber++;
       
+      // Progress callback
+      if (onProgress) {
+        onProgress({
+          current: totalSetsProcessed + 1,
+          total: setsToSync.length,
+          setName: `Batch ${batchNumber}`,
+          cardsUpdated: totalCardsUpdated
+        });
+      }
+
+      console.log(`\n📦 Batch ${batchNumber}: Calling Edge Function for ${BATCH_SIZE} sets...`);
+
       try {
-        // Progress callback
-        if (onProgress) {
-          onProgress({
-            current: i + 1,
-            total: setsToSync.length,
-            setName: set.name,
-            cardsUpdated: totalCardsUpdated
-          });
+        // Get auth token
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          throw new Error('Not authenticated');
         }
 
-        console.log(`\n📦 [${i + 1}/${setsToSync.length}] Syncing ${set.name}...`);
-
-        // Fetch cards from Pokemon API
-        const response = await fetch(
-          `${POKEMON_API}/cards?q=set.id:${set.id}&orderBy=number&pageSize=250`,
-          {
-            headers: {
-              'X-Api-Key': import.meta.env.VITE_POKEMON_API_KEY || ''
-            }
+        // Call Edge Function for one batch
+        const response = await fetch('/api/trigger-sync?mode=card-metadata', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
           }
-        );
+        });
 
         if (!response.ok) {
-          console.error(`❌ Failed to fetch cards for ${set.name}`);
-          continue;
+          throw new Error(`Edge Function failed: ${response.statusText}`);
         }
 
-        const data = await response.json();
-        const cards = data.data;
-
-        console.log(`✓ Fetched ${cards.length} cards`);
-
-        // Update cards in batches of 50 to avoid overwhelming the database
-        const BATCH_SIZE = 50;
-        for (let j = 0; j < cards.length; j += BATCH_SIZE) {
-          const cardBatch = cards.slice(j, j + BATCH_SIZE);
-          
-          const updates = cardBatch.map(card => ({
-            id: card.id,
-            types: card.types || null,
-            supertype: card.supertype || null,
-          }));
-
-          const { error: updateError } = await supabase
-            .from('cards')
-            .upsert(updates, { 
-              onConflict: 'id',
-              ignoreDuplicates: false 
-            });
-
-          if (updateError) {
-            console.error(`Error updating batch:`, updateError);
-          } else {
-            totalCardsUpdated += cardBatch.length;
-          }
+        const result = await response.json();
+        
+        if (result.success) {
+          totalCardsUpdated += result.cardsUpdated || 0;
+          totalSetsProcessed += result.setsProcessed || 0;
+          console.log(`✅ Batch ${batchNumber} complete: ${result.cardsUpdated} cards, ${result.setsProcessed} sets`);
+        } else {
+          console.error(`❌ Batch ${batchNumber} failed:`, result.error);
         }
 
-        // Mark this set as synced
-        await supabase
-          .from('sets')
-          .update({ last_metadata_sync: new Date().toISOString() })
-          .eq('id', set.id);
-
-        setsProcessed++;
-        console.log(`✅ Completed ${set.name} (${cards.length} cards)`);
-
-        // Small delay to be nice to the API
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Check if we're done
+        if (result.setsProcessed === 0 || result.message?.includes('No sets to sync')) {
+          console.log('✅ All sets synced!');
+          break;
+        }
 
       } catch (error) {
-        console.error(`Error processing ${set.name}:`, error);
+        console.error(`Error in batch ${batchNumber}:`, error);
+        // Continue to next batch even if one fails
       }
+
+      // Small delay between batches
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
 
-    // Update sync metadata
-    await supabase
-      .from('sync_metadata')
-      .upsert({
-        entity_type: 'card_metadata',
-        status: 'success',
-        message: `Updated metadata for ${totalCardsUpdated} cards from ${setsProcessed} sets`,
-        last_sync: new Date().toISOString(),
-      }, { onConflict: 'entity_type' });
-
     console.log(`\n🎉 Metadata sync complete!`);
-    console.log(`   Sets: ${setsProcessed}/${setsToSync.length}`);
+    console.log(`   Batches: ${batchNumber}`);
+    console.log(`   Sets: ${totalSetsProcessed}/${setsToSync.length}`);
     console.log(`   Cards: ${totalCardsUpdated}`);
 
     return {
       success: true,
-      message: `Complete! Synced ${setsProcessed} sets (${totalCardsUpdated} cards)`,
-      setsProcessed,
+      message: `Complete! Synced ${totalSetsProcessed} sets (${totalCardsUpdated} cards) in ${batchNumber} batches`,
+      setsProcessed: totalSetsProcessed,
       totalSets: setsToSync.length,
       cardsUpdated: totalCardsUpdated
     };
@@ -148,15 +122,6 @@ export const syncAllCardMetadata = async (onProgress) => {
   } catch (error) {
     console.error('❌ Metadata sync failed:', error);
     
-    await supabase
-      .from('sync_metadata')
-      .upsert({
-        entity_type: 'card_metadata',
-        status: 'failed',
-        message: error.message,
-        last_sync: new Date().toISOString(),
-      }, { onConflict: 'entity_type' });
-
     return {
       success: false,
       error: error.message
