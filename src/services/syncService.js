@@ -303,6 +303,13 @@ export const triggerEdgeFunctionSync = async (mode = 'prices', setId = null) => 
   try {
     console.log(`🚀 Triggering Edge Function sync with mode: ${mode}${setId ? `, setId: ${setId}` : ''}`);
     
+    // Get the user's session token for authentication
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+      throw new Error('Not authenticated. Please sign in to trigger sync.');
+    }
+    
     const startTime = Date.now();
     
     // Build URL with query params
@@ -317,6 +324,7 @@ export const triggerEdgeFunctionSync = async (mode = 'prices', setId = null) => 
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
       },
     });
 
