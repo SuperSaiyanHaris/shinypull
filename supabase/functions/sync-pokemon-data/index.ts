@@ -334,21 +334,21 @@ async function processPriceSync(supabase: any, headers: Record<string, string>, 
           const data = await response.json();
           const cards = data.data;
 
-          // Update tcgplayer_url in cards table
-          const cardUpdates = cards.map((card: any) => ({
-            id: card.id,
-            tcgplayer_url: card.tcgplayer?.url || null,
-          }));
-
-          const { error: cardUpdateError } = await supabase
-            .from("cards")
-            .upsert(cardUpdates, { onConflict: "id", ignoreDuplicates: false });
-          
-          if (cardUpdateError) {
-            console.error(`Error updating tcgplayer_url for set ${set.id}:`, cardUpdateError);
-          } else {
-            console.log(`Updated tcgplayer_url for ${cardUpdates.length} cards in set ${set.id}`);
+          // Update tcgplayer_url in cards table using individual updates
+          let updateCount = 0;
+          for (const card of cards) {
+            const { error: cardUpdateError } = await supabase
+              .from("cards")
+              .update({ tcgplayer_url: card.tcgplayer?.url || null })
+              .eq("id", card.id);
+            
+            if (cardUpdateError) {
+              console.error(`Error updating tcgplayer_url for card ${card.id}:`, cardUpdateError);
+            } else {
+              updateCount++;
+            }
           }
+          console.log(`Updated tcgplayer_url for ${updateCount}/${cards.length} cards in set ${set.id}`);
 
           // Update prices
           const priceUpdates = cards.map((card: any) => {
