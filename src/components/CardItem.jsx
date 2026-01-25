@@ -38,13 +38,6 @@ const CardItem = ({ card, index }) => {
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
         />
-
-        {/* Rarity Badge */}
-        <div className="absolute top-4 right-4">
-          <span className="px-3 py-1 bg-yellow-400 text-slate-900 text-xs font-bold rounded-full shadow-lg">
-            {card.rarity}
-          </span>
-        </div>
       </div>
 
       {/* Card Info */}
@@ -53,9 +46,15 @@ const CardItem = ({ card, index }) => {
           <h3 className="text-xl font-display text-adaptive-primary mb-1 line-clamp-1">
             {card.name}
           </h3>
-          <p className="text-sm text-adaptive-secondary mb-4 font-medium">
-            {card.set} • {card.number}
-          </p>
+          <div className="flex items-center gap-2 mb-4">
+            <p className="text-sm text-adaptive-secondary font-medium">
+              {card.set} • {card.number}
+            </p>
+            {/* Rarity Badge - moved from card image */}
+            <span className="px-2 py-0.5 bg-yellow-400 text-slate-900 text-xs font-bold rounded-full">
+              {card.rarity}
+            </span>
+          </div>
         </div>
 
         {/* Price Tabs */}

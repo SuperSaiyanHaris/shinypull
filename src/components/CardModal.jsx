@@ -215,11 +215,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   alt={card.name}
                   className="w-full h-full object-contain rounded-lg shadow-xl"
                 />
-                <div className="absolute top-2 right-2">
-                  <span className="px-2 py-1 bg-yellow-400 text-slate-900 text-xs font-bold rounded-full shadow">
-                    {card.rarity}
-                  </span>
-                </div>
               </div>
             </div>
 
@@ -227,7 +222,13 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
             <div className="p-4 space-y-4">
               <div>
                 <h2 className="text-2xl font-display text-adaptive-primary">{card.name}</h2>
-                <p className="text-sm text-adaptive-secondary mt-1">{card.set}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-sm text-adaptive-secondary">{card.set} • {card.number}</p>
+                  {/* Rarity Badge - moved from card image */}
+                  <span className="px-2 py-0.5 bg-yellow-400 text-slate-900 text-xs font-bold rounded-full">
+                    {card.rarity}
+                  </span>
+                </div>
               </div>
 
               {/* Price Box */}
@@ -406,12 +407,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                       alt={card.name}
                       className="w-full h-full object-contain rounded-xl shadow-2xl"
                     />
-                    {/* Rarity Badge */}
-                    <div className="absolute top-4 right-4">
-                      <span className="px-3 py-1.5 bg-yellow-400 text-slate-900 text-sm font-bold rounded-full shadow-lg">
-                        {card.rarity}
-                      </span>
-                    </div>
                   </div>
                 </div>
 
@@ -424,6 +419,10 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                     <span className="text-lg">{card.set}</span>
                     <span className="text-slate-400">•</span>
                     <span className="text-lg font-mono">{card.number}</span>
+                    {/* Rarity Badge - moved from card image */}
+                    <span className="px-3 py-1 bg-yellow-400 text-slate-900 text-sm font-bold rounded-full">
+                      {card.rarity}
+                    </span>
                   </div>
 
                   {/* Current Price Display */}
