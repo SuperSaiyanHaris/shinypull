@@ -204,22 +204,46 @@ const AdminSyncPanel = () => {
       {/* Progress Indicator */}
       {syncProgress && (
         <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-3">
             <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
             <div className="flex-1">
               <p className="font-semibold text-blue-900 dark:text-blue-100">
-                Syncing {syncProgress.setName}...
+                {syncProgress.setName}
               </p>
               <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                Set {syncProgress.current} of {syncProgress.total} • {syncProgress.cardsUpdated} cards updated
+                Set {syncProgress.current} of {syncProgress.total} • {syncProgress.cardsUpdated} cards total
               </p>
             </div>
           </div>
-          <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2">
-            <div
-              className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(syncProgress.current / syncProgress.total) * 100}%` }}
-            />
+          
+          {/* Card-level progress bar (if available) */}
+          {syncProgress.currentTotal && (
+            <div className="mb-2">
+              <div className="flex justify-between text-xs text-blue-700 dark:text-blue-300 mb-1">
+                <span>Current Set Progress</span>
+                <span>{syncProgress.currentProgress || 0}/{syncProgress.currentTotal} cards</span>
+              </div>
+              <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2">
+                <div
+                  className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${((syncProgress.currentProgress || 0) / syncProgress.currentTotal) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+          
+          {/* Overall set progress bar */}
+          <div>
+            <div className="flex justify-between text-xs text-blue-700 dark:text-blue-300 mb-1">
+              <span>Overall Progress</span>
+              <span>{syncProgress.current}/{syncProgress.total} sets</span>
+            </div>
+            <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2">
+              <div
+                className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(syncProgress.current / syncProgress.total) * 100}%` }}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -278,14 +302,17 @@ const AdminSyncPanel = () => {
       {/* Instructions */}
       <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
         <p className="text-sm text-blue-900 dark:text-blue-100 mb-2">
-          <strong>✨ Optimized Sync:</strong> All syncs now run directly in your browser with NO timeout limits!
+          <strong>✨ Card-Level Chunking:</strong> All syncs now process 50 cards at a time with NO timeouts!
         </p>
         <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1 ml-4 list-disc">
           <li><strong>Full Sync:</strong> Complete database initialization (sets + all cards)</li>
           <li><strong>Sync Sets:</strong> Updates list of Pokemon TCG sets</li>
-          <li><strong>Sync Metadata:</strong> Updates card types/supertype for ALL sets (click once, done!)</li>
-          <li><strong>Update Prices:</strong> Refreshes pricing data for cards with stale prices</li>
+          <li><strong>Sync Metadata:</strong> Updates card types/supertype - 50 cards per call (click once, done!)</li>
+          <li><strong>Update Prices:</strong> Refreshes pricing data - 50 cards per call</li>
         </ul>
+        <p className="text-xs text-blue-700 dark:text-blue-300 mt-2 italic">
+          💡 Large sets (like sv4 with 266 cards) now complete in 6 calls instead of timing out!
+        </p>
       </div>
     </div>
   );

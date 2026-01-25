@@ -2,16 +2,17 @@ import { supabase } from '../lib/supabase';
 
 /**
  * Sync metadata (types, supertype) for all sets that need it
- * Calls Edge Function in batches to avoid CORS issues and timeouts
+ * NEW: Uses card-level chunking (50 cards at a time) to avoid timeouts
  */
 export const syncAllCardMetadata = async (onProgress) => {
   try {
     console.log('🎴 Starting complete metadata sync via Edge Function...');
 
-    // Get all sets that haven't been synced yet
+    // Get all sets that need syncing (incomplete or never synced)
     const { data: sets, error: setsError } = await supabase
       .from('sets')
-      .select('id, name, last_metadata_sync')
+      .select('id, name, total_cards, metadata_sync_progress, last_metadata_sync')
+      .or('metadata_sync_progress.is.null,metadata_sync_progress.lt.total_cards')
       .order('last_metadata_sync', { ascending: true, nullsFirst: true });
 
     if (setsError) throw setsError;
@@ -25,41 +26,46 @@ export const syncAllCardMetadata = async (onProgress) => {
       };
     }
 
-    // Filter sets that actually need syncing
-    const setsToSync = sets.filter(s => !s.last_metadata_sync);
-    
-    if (setsToSync.length === 0) {
-      return {
-        success: true,
-        message: 'All sets already synced!',
-        setsProcessed: 0,
-        cardsUpdated: 0
-      };
-    }
-
-    console.log(`📊 Found ${setsToSync.length} sets needing metadata sync`);
+    console.log(`📊 Found ${sets.length} sets needing metadata sync`);
 
     let totalCardsUpdated = 0;
     let totalSetsProcessed = 0;
-    let batchNumber = 0;
+    let callNumber = 0;
 
-    // Call Edge Function processing 1 set at a time (ensures completion under 30s timeout)
-    const BATCH_SIZE = 1;
-    
-    while (totalSetsProcessed < setsToSync.length) {
-      batchNumber++;
+    // Call Edge Function repeatedly - it processes 50 cards at a time
+    // Each call returns progress info
+    while (true) {
+      callNumber++;
       
+      // Get current status for progress display
+      const { data: currentSets } = await supabase
+        .from('sets')
+        .select('id, name, total_cards, metadata_sync_progress')
+        .or('metadata_sync_progress.is.null,metadata_sync_progress.lt.total_cards')
+        .order('last_metadata_sync', { ascending: true, nullsFirst: true })
+        .limit(1);
+
+      if (!currentSets || currentSets.length === 0) {
+        console.log('✅ All sets complete!');
+        break;
+      }
+
+      const currentSet = currentSets[0];
+      const progress = currentSet.metadata_sync_progress || 0;
+
       // Progress callback
       if (onProgress) {
         onProgress({
           current: totalSetsProcessed + 1,
-          total: setsToSync.length,
-          setName: `Batch ${batchNumber}`,
-          cardsUpdated: totalCardsUpdated
+          total: sets.length,
+          setName: `${currentSet.name} (${progress}/${currentSet.total_cards} cards)`,
+          cardsUpdated: totalCardsUpdated,
+          currentProgress: progress,
+          currentTotal: currentSet.total_cards
         });
       }
 
-      console.log(`\n📦 Batch ${batchNumber}: Calling Edge Function for ${BATCH_SIZE} sets...`);
+      console.log(`\n📦 Call ${callNumber}: Processing ${currentSet.name}...`);
 
       try {
         // Get auth token
@@ -68,8 +74,7 @@ export const syncAllCardMetadata = async (onProgress) => {
           throw new Error('Not authenticated');
         }
 
-        // Call Edge Function for one batch (1 set to stay under 30s timeout)
-        // Add timestamp to bust any caching
+        // Call Edge Function - it will process 50 cards from current set
         const timestamp = Date.now();
         const response = await fetch(`/api/trigger-sync?mode=card-metadata&limit=1&t=${timestamp}`, {
           method: 'GET',
@@ -87,37 +92,41 @@ export const syncAllCardMetadata = async (onProgress) => {
         
         if (result.success) {
           totalCardsUpdated += result.cardsUpdated || 0;
-          totalSetsProcessed += result.setsProcessed || 0;
-          console.log(`✅ Batch ${batchNumber} complete: ${result.cardsUpdated} cards, ${result.setsProcessed} sets`);
+          if (result.isComplete) {
+            totalSetsProcessed++;
+            console.log(`✅ ${currentSet.name} COMPLETE! Total sets done: ${totalSetsProcessed}`);
+          } else {
+            console.log(`✅ Call ${callNumber}: ${result.cardsUpdated} cards updated (${result.progress}/${result.total})`);
+          }
         } else {
-          console.error(`❌ Batch ${batchNumber} failed:`, result.error);
+          console.error(`❌ Call ${callNumber} failed:`, result.error);
         }
 
-        // Check if we're done
-        if (result.setsProcessed === 0 || result.message?.includes('No sets to sync')) {
+        // Check if all done
+        if (result.message?.includes('No sets to sync')) {
           console.log('✅ All sets synced!');
           break;
         }
 
       } catch (error) {
-        console.error(`Error in batch ${batchNumber}:`, error);
-        // Continue to next batch even if one fails
+        console.error(`Error in call ${callNumber}:`, error);
+        // Continue even if one call fails
       }
 
-      // Small delay between batches to avoid overwhelming Edge Functions
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Small delay between calls (1 second)
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     console.log(`\n🎉 Metadata sync complete!`);
-    console.log(`   Batches: ${batchNumber}`);
-    console.log(`   Sets: ${totalSetsProcessed}/${setsToSync.length}`);
+    console.log(`   Calls: ${callNumber}`);
+    console.log(`   Sets: ${totalSetsProcessed}`);
     console.log(`   Cards: ${totalCardsUpdated}`);
 
     return {
       success: true,
-      message: `Complete! Synced ${totalSetsProcessed} sets (${totalCardsUpdated} cards) in ${batchNumber} batches`,
+      message: `Complete! Synced ${totalSetsProcessed} sets (${totalCardsUpdated} cards) in ${callNumber} calls`,
       setsProcessed: totalSetsProcessed,
-      totalSets: setsToSync.length,
+      totalSets: sets.length,
       cardsUpdated: totalCardsUpdated
     };
 
