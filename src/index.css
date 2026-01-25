@@ -130,6 +130,14 @@
     @apply bg-slate-900/40;
   }
 
+  .backdrop-adaptive {
+    @apply bg-slate-950/70;
+  }
+
+  .light-mode .backdrop-adaptive {
+    @apply bg-slate-900/30;
+  }
+
   .modal-container {
     @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700;
   }
@@ -328,6 +336,14 @@
   }
 
   /* Adaptive backgrounds */
+  .bg-adaptive {
+    @apply bg-slate-950;
+  }
+
+  .light-mode .bg-adaptive {
+    @apply bg-white;
+  }
+
   .bg-adaptive-card {
     @apply bg-slate-800/50;
   }

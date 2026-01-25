@@ -309,7 +309,7 @@ const MyAlerts = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div className="fixed inset-0 modal-backdrop backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="relative w-full max-w-md modal-container border rounded-2xl overflow-hidden shadow-2xl animate-slide-up">
             <div className="p-6 modal-content">
               <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10">
