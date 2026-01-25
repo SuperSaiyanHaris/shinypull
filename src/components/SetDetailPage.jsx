@@ -140,7 +140,7 @@ const SetDetailPage = ({ set }) => {
         {filteredCards.map((card, index) => (
           <div
             key={card.id}
-            className="glass-effect rounded-xl border border-adaptive p-4 flex items-center gap-4 animate-slide-up"
+            className="glass-effect rounded-xl border border-adaptive p-4 flex items-center gap-4 animate-slide-up relative"
             style={{ animationDelay: `${index * 20}ms` }}
           >
             {/* Card Image */}
@@ -178,6 +178,19 @@ const SetDetailPage = ({ set }) => {
             <div className={!user ? 'blur-sm pointer-events-none' : ''}>
               <AddToCollectionButton card={card} variant="icon" />
             </div>
+            
+            {/* Auth Gate Overlay */}
+            {!user && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/95 backdrop-blur-sm rounded-xl">
+                <p className="text-xs text-adaptive-tertiary mb-2">Sign in to view pricing and actions</p>
+                <button
+                  onClick={(e) => { e.stopPropagation(); openAuthModal(); }}
+                  className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-lg transition-colors"
+                >
+                  Sign In
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -209,7 +222,7 @@ const SetDetailPage = ({ set }) => {
               {filteredCards.map((card, index) => (
                 <tr
                   key={card.id}
-                  className="hover:bg-adaptive-hover transition-colors animate-slide-up cursor-pointer"
+                  className="hover:bg-adaptive-hover transition-colors animate-slide-up cursor-pointer relative"
                   style={{ animationDelay: `${index * 30}ms` }}
                   onClick={() => handleViewDetails(card)}
                 >
@@ -242,22 +255,35 @@ const SetDetailPage = ({ set }) => {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
-                      {user ? (
-                        <>
-                          <AddToCollectionButton card={card} variant="compact" />
-                          <PriceAlertButton card={card} className="!px-3 !py-1.5 !text-sm !rounded-lg" />
+                    <div className={`flex items-center justify-center gap-2 ${!user ? 'blur-sm pointer-events-none' : ''}`} onClick={(e) => e.stopPropagation()}>
+                      <AddToCollectionButton card={card} variant="compact" />
+                      <PriceAlertButton card={card} className="!px-3 !py-1.5 !text-sm !rounded-lg" />
+                      <button
+                        onClick={() => handleViewDetails(card)}
+                        className="px-3 py-1.5 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-medium rounded-lg transition-colors border border-adaptive"
+                      >
+                        Details
+                      </button>
+                    </div>
+                  </td>
+                  
+                  {/* Auth Gate Overlay for entire row */}
+                  {!user && (
+                    <td colSpan="5" className="absolute inset-0 pointer-events-none">
+                      <div className="flex items-center justify-center h-full pointer-events-auto">
+                        <div className="px-4 py-2 bg-adaptive-card/95 backdrop-blur-sm rounded-lg border border-adaptive shadow-lg flex items-center gap-3">
+                          <p className="text-xs text-adaptive-tertiary">Sign in to view pricing and actions</p>
                           <button
-                            onClick={() => handleViewDetails(card)}
-                            className="px-3 py-1.5 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-medium rounded-lg transition-colors border border-adaptive"
+                            onClick={(e) => { e.stopPropagation(); openAuthModal(); }}
+                            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
                           >
-                            Details
+                            Sign In
                           </button>
-                        </>
-                      ) : (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); openAuthModal(); }}
-                          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                        </div>
+                      </div>
+                    </td>
+                  )}
+                </tr>
                         >
                           Sign In
                         </button>
