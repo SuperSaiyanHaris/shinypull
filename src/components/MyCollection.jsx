@@ -430,6 +430,7 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
                       <p className="text-lg font-bold price-gradient">
                         {formatPrice(selectedSetStats.ownedMarketValue)}
                       </p>
+                      <p className="text-xs text-adaptive-tertiary mt-1">Prices updated regularly</p>
                     </div>
                     <div>
                       <p className="text-sm text-adaptive-tertiary">Total Set Value</p>

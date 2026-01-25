@@ -16,6 +16,7 @@ const Hero = () => {
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-display text-adaptive-primary mb-6 leading-tight text-balance">
             Pull the best <span className="shiny-gradient">prices.</span>
           </h2>
+          <p className="text-sm text-adaptive-tertiary">Market prices updated regularly throughout the day</p>
         </div>
 
         {/* Feature Pills */}

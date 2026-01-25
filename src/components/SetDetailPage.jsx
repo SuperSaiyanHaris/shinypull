@@ -116,6 +116,8 @@ const SetDetailPage = ({ set }) => {
             ) : (
               <>
                 Showing <span className="font-semibold text-adaptive-primary">{filteredCards.length}</span> of {cards.length} cards
+                <span className="mx-2">•</span>
+                <span className="text-xs">Prices updated regularly</span>
               </>
             )}
           </p>

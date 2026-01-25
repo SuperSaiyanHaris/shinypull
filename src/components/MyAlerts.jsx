@@ -90,7 +90,7 @@ const MyAlerts = () => {
             <div className="flex-1">
               <h1 className="text-2xl font-display text-adaptive-primary">My Price Alerts</h1>
               <p className="text-sm text-adaptive-secondary mt-1">
-                {activeCount} active alert{activeCount !== 1 ? 's' : ''}
+                {activeCount} active alert{activeCount !== 1 ? 's' : ''} • Prices updated regularly
               </p>
             </div>
           </div>
