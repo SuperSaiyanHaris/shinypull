@@ -488,27 +488,22 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
 // NEW: Process metadata sync for a CHUNK of cards within a single set
 async function processMetadataSync(supabase: any, headers: Record<string, string>, set: any, startFrom: number, chunkSize: number) {
   try {
-    console.log(`Fetching cards from Pokemon API for set ${set.id}...`);
+    console.log(`Getting ${chunkSize} cards from database for set ${set.id}...`);
     
-    // Fetch ALL cards for the set (with pagination info)
-    const response = await fetch(
-      `${POKEMON_API}/cards?q=set.id:${set.id}&select=id,number,types,supertype&orderBy=number&page=${Math.floor(startFrom / 250) + 1}&pageSize=250`,
-      { headers }
-    );
+    // STEP 1: Get card IDs from OUR database (fast - no external API call)
+    const { data: dbCards, error: dbError } = await supabase
+      .from("cards")
+      .select("id, number")
+      .eq("set_id", set.id)
+      .order("number")
+      .range(startFrom, startFrom + chunkSize - 1);
 
-    if (!response.ok) {
-      console.error(`Failed to fetch cards for ${set.id}: ${response.statusText}`);
+    if (dbError) {
+      console.error(`Database error fetching cards:`, dbError);
       return { success: false, cardsUpdated: 0, setsProcessed: 0 };
     }
 
-    const data = await response.json();
-    const allCards = data.data;
-
-    // Get the specific chunk we want to process
-    const localStartIndex = startFrom % 250;
-    const cardsToProcess = allCards.slice(localStartIndex, localStartIndex + chunkSize);
-
-    if (cardsToProcess.length === 0) {
+    if (!dbCards || dbCards.length === 0) {
       console.log(`No more cards to process for ${set.id} - marking as complete`);
       // Reset progress and update timestamp
       await supabase
@@ -522,10 +517,32 @@ async function processMetadataSync(supabase: any, headers: Record<string, string
       return { success: true, cardsUpdated: 0, setsProcessed: 1 };
     }
 
-    console.log(`Processing ${cardsToProcess.length} cards...`);
+    console.log(`Fetching metadata for ${dbCards.length} cards from Pokemon API...`);
 
-    // Batch update metadata for this chunk
-    for (const card of cardsToProcess) {
+    // STEP 2: Fetch these cards from Pokemon API using a query (faster than individual calls)
+    const cardIds = dbCards.map(c => c.id).join(" OR id:");
+    const response = await fetch(
+      `${POKEMON_API}/cards?q=id:${cardIds}`,
+      { headers }
+    );
+
+    if (!response.ok) {
+      console.error(`Failed to fetch cards from Pokemon API: ${response.statusText}`);
+      return { success: false, cardsUpdated: 0, setsProcessed: 0 };
+    }
+
+    const data = await response.json();
+    const apiCards = data.data;
+
+    if (!apiCards || apiCards.length === 0) {
+      console.error(`No cards returned from Pokemon API`);
+      return { success: false, cardsUpdated: 0, setsProcessed: 0 };
+    }
+
+    console.log(`Updating ${apiCards.length} cards in database...`);
+
+    // STEP 3: Batch update our database
+    for (const card of apiCards) {
       await supabase
         .from("cards")
         .update({
@@ -536,22 +553,22 @@ async function processMetadataSync(supabase: any, headers: Record<string, string
     }
 
     // Update progress
-    const newProgress = startFrom + cardsToProcess.length;
+    const newProgress = startFrom + apiCards.length;
     const isComplete = newProgress >= set.total_cards;
 
     await supabase
       .from("sets")
       .update({ 
-        metadata_sync_progress: isComplete ? 0 : newProgress, // Reset to 0 when complete
-        last_metadata_sync: isComplete ? new Date().toISOString() : set.last_metadata_sync // Only update timestamp when complete
+        metadata_sync_progress: isComplete ? 0 : newProgress,
+        last_metadata_sync: isComplete ? new Date().toISOString() : set.last_metadata_sync
       })
       .eq("id", set.id);
 
-    console.log(`✓ Updated ${cardsToProcess.length} card metadata. Progress: ${newProgress}/${set.total_cards}`);
+    console.log(`✓ Updated ${apiCards.length} card metadata. Progress: ${newProgress}/${set.total_cards}`);
 
     return {
       success: true,
-      cardsUpdated: cardsToProcess.length,
+      cardsUpdated: apiCards.length,
       setsProcessed: isComplete ? 1 : 0,
       progress: newProgress,
       total: set.total_cards,
