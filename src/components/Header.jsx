@@ -36,6 +36,8 @@ const Header = () => {
   const handleLogoClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     navigate('/');
+    // Trigger custom event to clear search
+    window.dispatchEvent(new CustomEvent('clearSearch'));
   };
 
   const handleSignOut = async () => {

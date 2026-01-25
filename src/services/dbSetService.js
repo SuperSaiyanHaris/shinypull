@@ -133,7 +133,7 @@ export const getSetCards = async (setId) => {
 };
 
 /**
- * Search cards by name across all sets
+ * Search cards by name or card number across all sets
  */
 export const searchCards = async (query) => {
   // Return empty array for empty queries
@@ -141,6 +141,7 @@ export const searchCards = async (query) => {
     return [];
   }
 
+  // Search by both name and card number
   const { data, error } = await supabase
     .from('cards')
     .select(`
@@ -161,7 +162,7 @@ export const searchCards = async (query) => {
         psa10_verified
       )
     `)
-    .ilike('name', `%${query}%`)
+    .or(`name.ilike.%${query}%,number.ilike.%${query}%`)
     .order('name', { ascending: true })
     .limit(100);
 

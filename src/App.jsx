@@ -95,6 +95,15 @@ function AppContent() {
     navigate('/');
   };
 
+  // Listen for logo click to clear search
+  useEffect(() => {
+    const handleClearSearch = () => {
+      setQuery('');
+    };
+    window.addEventListener('clearSearch', handleClearSearch);
+    return () => window.removeEventListener('clearSearch', handleClearSearch);
+  }, [setQuery]);
+
   const handleSetClick = (set) => {
     setSelectedSet(set);
     navigate(`/sets/${set.id}`);
@@ -132,18 +141,21 @@ function AppContent() {
       <ScrollToTop />
 
       <main>
-        <Hero />
+        {/* Hero - Only show on home page */}
+        {location.pathname === '/' && <Hero />}
 
-        {/* Search Section */}
+        {/* Search Section - Hide on collection and alerts pages */}
         <section className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-12 animate-slide-up" style={{ animationDelay: '300ms' }}>
-              <SearchBar
-                value={query}
-                onChange={setQuery}
-                onClear={handleClear}
-              />
-            </div>
+            {!location.pathname.startsWith('/collection') && !location.pathname.startsWith('/alerts') && (
+              <div className="mb-12 animate-slide-up" style={{ animationDelay: '300ms' }}>
+                <SearchBar
+                  value={query}
+                  onChange={setQuery}
+                  onClear={handleClear}
+                />
+              </div>
+            )}
 
             {/* Admin Panel */}
             {showAdmin && (

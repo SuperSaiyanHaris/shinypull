@@ -13,7 +13,7 @@ const SearchBar = ({ value, onChange, onClear }) => {
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Search for any Pokémon card..."
+          placeholder="Search by card name or number..."
           className="w-full pl-16 pr-14 py-5 bg-white dark:bg-slate-800
                      border-2 border-slate-300 dark:border-slate-700 rounded-2xl
                      text-lg text-slate-900 dark:text-slate-100

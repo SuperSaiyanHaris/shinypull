@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Bell, Trash2, ToggleLeft, ToggleRight, Loader2, Edit, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Bell, Trash2, ToggleLeft, ToggleRight, Loader2, Edit, AlertTriangle, Search, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { alertService } from '../services/alertService';
 import { formatPrice } from '../services/cardService';
@@ -12,6 +12,7 @@ const MyAlerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'active', 'inactive'
+  const [searchQuery, setSearchQuery] = useState('');
   const [editingAlert, setEditingAlert] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null); // { id, cardName }
 
@@ -68,8 +69,19 @@ const MyAlerts = () => {
   };
 
   const filteredAlerts = alerts.filter(alert => {
-    if (filter === 'active') return alert.is_active;
-    if (filter === 'inactive') return !alert.is_active;
+    // Filter by status
+    if (filter === 'active' && !alert.is_active) return false;
+    if (filter === 'inactive' && alert.is_active) return false;
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      return (
+        alert.card_name.toLowerCase().includes(query) ||
+        alert.card_set?.toLowerCase().includes(query)
+      );
+    }
+    
     return true;
   });
 
@@ -131,6 +143,40 @@ const MyAlerts = () => {
             Inactive ({alerts.length - activeCount})
           </button>
         </div>
+
+        {/* Search Bar for Alerts */}
+        {alerts.length > 0 && (
+          <div className="mt-4">
+            <div className="relative max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-adaptive-tertiary" />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search alerts by card name or set..."
+                className="w-full pl-10 pr-10 py-2.5 bg-adaptive-card border border-adaptive rounded-lg
+                         text-adaptive-primary placeholder-adaptive-tertiary
+                         focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500
+                         transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-adaptive-tertiary hover:text-adaptive-primary transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            {searchQuery && (
+              <p className="text-xs text-adaptive-tertiary mt-2">
+                Found {filteredAlerts.length} alert{filteredAlerts.length !== 1 ? 's' : ''}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Alerts List */}
