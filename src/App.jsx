@@ -119,6 +119,7 @@ function AppContent() {
   };
 
   // Listen for Ctrl+Shift+A to toggle admin panel (admin users only)
+  // Also check URL param ?admin=true for mobile access
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'A') {
@@ -134,6 +135,14 @@ function AppContent() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isAdmin]);
+
+  // Check URL for ?admin=true (mobile-friendly access)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('admin') === 'true' && isAdmin) {
+      setShowAdmin(true);
+    }
+  }, [location.search, isAdmin]);
 
   return (
     <div className="min-h-screen">
