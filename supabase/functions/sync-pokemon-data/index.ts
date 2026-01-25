@@ -334,7 +334,17 @@ async function processPriceSync(supabase: any, headers: Record<string, string>, 
           const data = await response.json();
           const cards = data.data;
 
-          // Update prices only
+          // Update tcgplayer_url in cards table
+          const cardUpdates = cards.map((card: any) => ({
+            id: card.id,
+            tcgplayer_url: card.tcgplayer?.url || null,
+          }));
+
+          await supabase
+            .from("cards")
+            .upsert(cardUpdates, { onConflict: "id", ignoreDuplicates: false });
+
+          // Update prices
           const priceUpdates = cards.map((card: any) => {
             const prices = card.tcgplayer?.prices || {};
             const priceVariants = ["holofoil", "reverseHolofoil", "1stEditionHolofoil", "unlimitedHolofoil", "normal"];
