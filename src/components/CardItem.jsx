@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, TrendingDown, Minus, ExternalLink } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
@@ -9,7 +9,6 @@ import PriceAlertButton from './PriceAlertButton';
 
 const CardItem = ({ card, index }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [selectedView, setSelectedView] = useState('overview');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuth();
   const { openAuthModal } = useAuthModal();
@@ -58,79 +57,36 @@ const CardItem = ({ card, index }) => {
         {/* Price Tabs */}
         <div className="flex gap-2 mb-4">
           <button
-            onClick={() => setSelectedView('overview')}
-            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              selectedView === 'overview'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-adaptive-card text-adaptive-secondary hover:bg-adaptive-hover border border-adaptive'
-            }`}
+            className="flex-1 px-3 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white shadow-md"
           >
             Overview
           </button>
           <button
-            onClick={() => setSelectedView('compare')}
-            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              selectedView === 'compare'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-adaptive-card text-adaptive-secondary hover:bg-adaptive-hover border border-adaptive'
-            }`}
+            onClick={() => setIsModalOpen(true)}
+            className="flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-adaptive-card text-adaptive-secondary hover:bg-adaptive-hover border border-adaptive"
           >
-            Compare
+            Details
           </button>
         </div>
 
         {/* Price Display */}
-        {selectedView === 'overview' && (
-          <div className="space-y-3">
-            {/* Market Price */}
-            <div className="flex items-center justify-between p-4 bg-adaptive-card rounded-xl border border-adaptive">
-              <div>
-                <p className="text-xs text-adaptive-secondary font-medium mb-1">Market Price</p>
-                <p className={`text-2xl font-bold price-gradient ${!user ? 'blur-sm select-none' : ''}`}>
-                  {formatPrice(card.prices.tcgplayer.market)}
-                </p>
-              </div>
-              <TrendIcon className={`w-6 h-6 ${trendColor}`} />
+        <div className="space-y-3">
+          {/* Market Price */}
+          <div className="flex items-center justify-between p-4 bg-adaptive-card rounded-xl border border-adaptive">
+            <div>
+              <p className="text-xs text-adaptive-secondary font-medium mb-1">Market Price</p>
+              <p className={`text-2xl font-bold price-gradient ${!user ? 'blur-sm select-none' : ''}`}>
+                {formatPrice(card.prices.tcgplayer.market)}
+              </p>
             </div>
+            <TrendIcon className={`w-6 h-6 ${trendColor}`} />
           </div>
-        )}
-
-        {selectedView === 'compare' && (
-          <div className="space-y-2">
-            <div className={!user ? 'blur-sm select-none' : ''}>
-              <PriceCompareRow
-                platform="TCG"
-                price={card.prices.tcgplayer.market}
-                highlight
-                verified
-              />
-              <PriceCompareRow
-                platform={card.prices.ebay?.verified ? "eBay Raw Card" : "eBay Raw Card (est.)"}
-                price={card.prices.ebay?.avg || 0}
-                verified={card.prices.ebay?.verified}
-                estimated={!card.prices.ebay?.verified}
-              />
-              <PriceCompareRow
-                platform={card.prices.psa10?.verified ? "eBay PSA 10" : "eBay PSA 10 (est.)"}
-                price={card.prices.psa10?.avg || 0}
-                verified={card.prices.psa10?.verified}
-                estimated={!card.prices.psa10?.verified}
-              />
-            </div>
-          </div>
-        )}
+        </div>
 
         {/* Action Buttons */}
         <div className={`mt-4 flex gap-2 ${!user ? 'blur-sm select-none pointer-events-none' : ''}`}>
           <AddToCollectionButton card={card} className="flex-1" />
           <PriceAlertButton card={card} className="flex-1" />
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-3 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-secondary rounded-xl transition-colors border border-adaptive"
-            title="View Details"
-          >
-            <ExternalLink className="w-5 h-5" />
-          </button>
         </div>
         
         {/* Auth Gate Overlay - covers entire pricing section */}
@@ -158,32 +114,5 @@ const CardItem = ({ card, index }) => {
     </>
   );
 };
-
-const PriceCompareRow = ({ platform, price, highlight, verified, estimated }) => (
-  <div className={`flex items-center justify-between p-3 rounded-lg border ${
-    highlight
-      ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/30'
-      : 'bg-adaptive-card border-adaptive'
-  }`}>
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-adaptive-primary font-medium">{platform}</span>
-      {verified && (
-        <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-semibold rounded-full border border-green-500/30">
-          ✓ Live
-        </span>
-      )}
-      {estimated && (
-        <span className="px-2 py-0.5 badge-estimated text-xs font-semibold rounded-full">
-          ~Est
-        </span>
-      )}
-    </div>
-    <span className={`text-sm font-bold ${
-      highlight ? 'text-blue-600 dark:text-blue-400' : 'text-adaptive-primary'
-    }`}>
-      {price > 0 ? formatPrice(price) : 'N/A'}
-    </span>
-  </div>
-);
 
 export default CardItem;
