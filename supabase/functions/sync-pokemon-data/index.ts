@@ -498,30 +498,34 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
 
       console.log(`Updating metadata for ${cards.length} cards in set ${set.id}...`);
 
-      // Batch update - process in chunks of 100 cards
-      const BATCH_SIZE = 100;
-      for (let i = 0; i < cards.length; i += BATCH_SIZE) {
-        const cardBatch = cards.slice(i, i + BATCH_SIZE);
-        const cardIds = cardBatch.map((c: any) => c.id);
-        
-        // Update all cards in batch with their respective data
-        for (const card of cardBatch) {
-          const { error: updateError } = await supabase
-            .from("cards")
-            .update({
-              types: card.types || null,
-              supertype: card.supertype || null,
-            })
-            .eq("id", card.id);
+      // Prepare all updates
+      const updates = cards.map((card: any) => ({
+        id: card.id,
+        set_id: set.id, // Required for upsert
+        name: card.name || "Unknown", // Required fields
+        number: card.number || "N/A",
+        rarity: card.rarity || "Common",
+        image_small: card.images?.small,
+        image_large: card.images?.large,
+        tcgplayer_url: card.tcgplayer?.url || null,
+        types: card.types || null,
+        supertype: card.supertype || null,
+      }));
 
-          if (updateError) {
-            console.error(`Error updating card ${card.id}:`, updateError);
-            throw updateError; // Throw to prevent marking set as synced
-          }
-        }
-        
-        totalCardsUpdated += cardBatch.length;
+      // Batch upsert - MUCH faster than individual updates
+      const { error: updateError } = await supabase
+        .from("cards")
+        .upsert(updates, { 
+          onConflict: "id",
+          ignoreDuplicates: false 
+        });
+
+      if (updateError) {
+        console.error(`Error updating cards for ${set.id}:`, updateError);
+        throw updateError; // Throw to prevent marking set as synced
       }
+      
+      totalCardsUpdated += cards.length;
 
       // ONLY mark as synced if everything succeeded
       await supabase
