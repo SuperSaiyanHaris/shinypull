@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, SortDesc, Info } from 'lucide-react';
+import { ArrowLeft, Search, SortDesc, Info, Filter } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import CardModal from './CardModal';
+import CardFilters from './CardFilters';
 import AddToCollectionButton from './AddToCollectionButton';
 import PriceAlertButton from './PriceAlertButton';
 import { formatPrice } from '../services/cardService';
@@ -12,13 +13,21 @@ import { getSetCards } from '../services/dbSetService';
 const SetDetailPage = ({ set }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('price'); // price, name, number
   const [selectedCard, setSelectedCard] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const { user } = useAuth();
   const { openAuthModal } = useAuthModal();
+  
+  // Filter state
+  const [filters, setFilters] = useState({
+    sortBy: 'number',
+    types: [],
+    supertypes: [],
+    rarities: []
+  });
 
   useEffect(() => {
     const loadCards = async () => {
@@ -31,12 +40,42 @@ const SetDetailPage = ({ set }) => {
     loadCards();
   }, [set]);
 
+  // Apply filters to cards
   const filteredCards = cards
-    .filter(card => card.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter(card => {
+      // Search filter
+      if (searchQuery && !card.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      
+      // Type filter
+      if (filters.types.length > 0) {
+        const cardTypes = card.types || [];
+        if (!cardTypes.some(type => filters.types.includes(type))) {
+          return false;
+        }
+      }
+      
+      // Supertype filter
+      if (filters.supertypes.length > 0) {
+        if (!filters.supertypes.includes(card.supertype)) {
+          return false;
+        }
+      }
+      
+      // Rarity filter
+      if (filters.rarities.length > 0) {
+        if (!filters.rarities.includes(card.rarity)) {
+          return false;
+        }
+      }
+      
+      return true;
+    })
     .sort((a, b) => {
-      if (sortBy === 'price') return b.prices.tcgplayer.market - a.prices.tcgplayer.market;
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      if (sortBy === 'number') return parseInt(a.number) - parseInt(b.number);
+      if (filters.sortBy === 'price') return (b.prices?.tcgplayer?.market || 0) - (a.prices?.tcgplayer?.market || 0);
+      if (filters.sortBy === 'name') return a.name.localeCompare(b.name);
+      if (filters.sortBy === 'number') return parseInt(a.number) - parseInt(b.number);
       return 0;
     });
 
@@ -98,18 +137,18 @@ const SetDetailPage = ({ set }) => {
           </div>
 
           <div className="md:col-span-4">
-            <div className="relative">
-              <SortDesc className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-adaptive-tertiary" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-adaptive-card border border-adaptive rounded-xl text-adaptive-primary focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
-              >
-                <option value="price">Price (High to Low)</option>
-                <option value="name">Name (A-Z)</option>
-                <option value="number">Card Number</option>
-              </select>
-            </div>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="w-full px-4 py-3 bg-adaptive-card border border-adaptive rounded-xl text-adaptive-primary hover:bg-adaptive-hover transition-colors flex items-center justify-center gap-2 font-medium"
+            >
+              <Filter className="w-5 h-5" />
+              <span>Filters</span>
+              {(filters.types.length + filters.supertypes.length + filters.rarities.length) > 0 && (
+                <span className="px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">
+                  {filters.types.length + filters.supertypes.length + filters.rarities.length}
+                </span>
+              )}
+            </button>
           </div>
         </div>
 
@@ -121,12 +160,22 @@ const SetDetailPage = ({ set }) => {
               <>
                 Showing <span className="font-semibold text-adaptive-primary">{filteredCards.length}</span> of {cards.length} cards
                 <span className="mx-2">•</span>
-                <span className="text-xs">Prices updated regularly</span>
+                <span className="text-xs">Sorted by: {filters.sortBy === 'price' ? 'Price (High to Low)' : filters.sortBy === 'name' ? 'Name (A-Z)' : 'Card Number'}</span>
               </>
             )}
           </p>
         </div>
       </div>
+
+      {/* Filters Sidebar */}
+      {showFilters && (
+        <div className="animate-slide-up">
+          <CardFilters 
+            filters={filters}
+            onFiltersChange={setFilters}
+          />
+        </div>
+      )}
 
       {/* Loading State */}
       {loading ? (

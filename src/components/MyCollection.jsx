@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Plus, Minus, Package, Sparkles, Layers, Grid, List, ChevronRight, Check } from 'lucide-react';
+import { ArrowLeft, Search, Plus, Minus, Package, Sparkles, Layers, Grid, List, ChevronRight, Check, Filter } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { collectionService } from '../services/collectionService';
 import { getSetCards } from '../services/dbSetService';
 import { formatPrice } from '../services/cardService';
 import CardModal from './CardModal';
+import CardFilters from './CardFilters';
 import AddToCollectionButton from './AddToCollectionButton';
 
 const MyCollection = ({ selectedSetId: propSetId }) => {
@@ -21,6 +22,16 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
   const [loadingSetCards, setLoadingSetCards] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Filter state
+  const [filters, setFilters] = useState({
+    sortBy: 'number',
+    ownership: 'all',
+    types: [],
+    supertypes: [],
+    rarities: []
+  });
 
   // Modal state
   const [selectedCard, setSelectedCard] = useState(null);
@@ -149,10 +160,49 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
 
   const selectedSetStats = getSetStatistics();
 
-  // Filter cards based on search
-  const filteredSetCards = setCards.filter(card =>
-    card.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter cards based on search and filters
+  const filteredSetCards = setCards
+    .filter(card => {
+      // Search filter
+      if (searchQuery && !card.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      
+      // Ownership filter
+      const isOwned = collectedCards.has(card.id);
+      if (filters.ownership === 'owned' && !isOwned) return false;
+      if (filters.ownership === 'not-owned' && isOwned) return false;
+      
+      // Type filter
+      if (filters.types.length > 0) {
+        const cardTypes = card.types || [];
+        if (!cardTypes.some(type => filters.types.includes(type))) {
+          return false;
+        }
+      }
+      
+      // Supertype filter
+      if (filters.supertypes.length > 0) {
+        if (!filters.supertypes.includes(card.supertype)) {
+          return false;
+        }
+      }
+      
+      // Rarity filter
+      if (filters.rarities.length > 0) {
+        if (!filters.rarities.includes(card.rarity)) {
+          return false;
+        }
+      }
+      
+      return true;
+    })
+    .sort((a, b) => {
+      if (filters.sortBy === 'price') return (b.prices?.tcgplayer?.market || 0) - (a.prices?.tcgplayer?.market || 0);
+      if (filters.sortBy === 'name') return a.name.localeCompare(b.name);
+      if (filters.sortBy === 'number') return parseInt(a.number) - parseInt(b.number);
+      return 0;
+    });
 
   const handleUpdateQuantity = async (cardId, newQuantity) => {
     try {
@@ -318,19 +368,57 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
         </div>
       </div>
 
-      {/* Search Bar - Only show when viewing a set */}
+      {/* Search Bar & Filters - Only show when viewing a set */}
       {selectedSetId && !loadingSetCards && (
         <div className="glass-effect rounded-2xl p-4 border border-adaptive">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-adaptive-tertiary" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search cards in this set..."
-              className="w-full pl-12 pr-4 py-3 bg-adaptive-card border border-adaptive rounded-xl text-adaptive-primary placeholder-adaptive-tertiary focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div className="md:col-span-8">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-adaptive-tertiary" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search cards in this set..."
+                  className="w-full pl-12 pr-4 py-3 bg-adaptive-card border border-adaptive rounded-xl text-adaptive-primary placeholder-adaptive-tertiary focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                />
+              </div>
+            </div>
+
+            <div className="md:col-span-4">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="w-full px-4 py-3 bg-adaptive-card border border-adaptive rounded-xl text-adaptive-primary hover:bg-adaptive-hover transition-colors flex items-center justify-center gap-2 font-medium"
+              >
+                <Filter className="w-5 h-5" />
+                <span>Filters</span>
+                {(filters.types.length + filters.supertypes.length + filters.rarities.length + (filters.ownership !== 'all' ? 1 : 0)) > 0 && (
+                  <span className="px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">
+                    {filters.types.length + filters.supertypes.length + filters.rarities.length + (filters.ownership !== 'all' ? 1 : 0)}
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
+          
+          <div className="mt-3 pt-3 border-t border-adaptive">
+            <p className="text-sm text-adaptive-tertiary">
+              Showing <span className="font-semibold text-adaptive-primary">{filteredSetCards.length}</span> of {setCards.length} cards
+              <span className="mx-2">•</span>
+              <span className="text-xs">Sorted by: {filters.sortBy === 'price' ? 'Price (High to Low)' : filters.sortBy === 'name' ? 'Name (A-Z)' : 'Card Number'}</span>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Filters Sidebar */}
+      {showFilters && selectedSetId && (
+        <div className="animate-slide-up">
+          <CardFilters 
+            filters={filters}
+            onFiltersChange={setFilters}
+            showOwnershipFilter={true}
+          />
         </div>
       )}
 
