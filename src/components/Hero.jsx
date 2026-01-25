@@ -3,7 +3,7 @@ import { Bell, Sparkles, Package } from 'lucide-react';
 
 const Hero = () => {
   return (
-    <section className="relative py-16 overflow-hidden">
+    <section className="relative py-16 overflow-hidden hidden md:block">
       {/* Animated background elements - Sparkle theme */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-amber-400/15 rounded-full blur-3xl animate-pulse-slow" />
