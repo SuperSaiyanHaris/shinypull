@@ -46,25 +46,38 @@ CREATE INDEX IF NOT EXISTS idx_cards_supertype ON cards(supertype);
 
 ## After Migration: Re-sync Data
 
-Once the migration is complete, you need to re-sync your card data to populate the new fields:
+⚠️ **IMPORTANT: Supabase Free Tier has a 2-minute timeout for Edge Functions!**
 
-### Option 1: Full Sync (Recommended - updates all cards)
-1. Go to your app's Collection page
-2. Use the Admin Sync Panel
-3. Select "Full Sync (Sets + Cards + Prices)"
-4. Click "Start Sync"
+The "Full Sync" will timeout because it tries to process all sets at once. Use this strategy instead:
 
-### Option 2: API Trigger
-```bash
-# Using curl or Postman
-POST https://your-project.supabase.co/functions/v1/sync-pokemon-data
-Authorization: Bearer YOUR_SUPABASE_ANON_KEY
-Content-Type: application/json
+### ✅ Recommended Strategy: Batch Sync
 
-{
-  "mode": "full"
-}
-```
+**Option 1: Prices-Only Sync (Fastest - adds types to existing cards)**
+1. First, make sure you have sets in your database
+2. Go to Admin Sync Panel
+3. Click **"Prices Only (Edge)"** 
+4. This syncs 3 sets at a time and rotates through all sets
+5. Click it **multiple times** (once per 3 sets) until all sets are updated
+6. Each run takes ~30-60 seconds
+
+**Option 2: Full Manual Batch (Most reliable)**
+1. Run **"Sync Sets (Edge)"** first (syncs all set metadata - fast, ~10 seconds)
+2. Then run **"Prices Only (Edge)"** multiple times
+3. Check sync status between runs
+4. Continue until all sets show recent sync times
+
+**Option 3: Do Nothing (Wait for automatic rotation)**
+- The "Prices Only" mode automatically rotates through sets
+- Each scheduled run updates 3 more sets
+- All sets will eventually get the new `types` and `supertype` fields
+- Just be patient and check back in a few hours/days
+
+### Why This Works
+The Edge Function was updated to store `types` and `supertype` when fetching cards. So:
+- Existing cards: Will get types/supertype added on next price update
+- New cards: Will have types/supertype from first sync
+
+You don't need a "full sync" - just let the price rotation do its job!
 
 ## Filter Features Now Working
 
