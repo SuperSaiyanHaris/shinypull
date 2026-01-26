@@ -93,7 +93,7 @@ export const collectionService = {
   },
 
   // Add a card to collection
-  async addToCollection(userId, card) {
+  async addToCollection(userId, card, edition = 'Unlimited') {
     const { data, error } = await supabase
       .from('user_collections')
       .upsert({
@@ -103,6 +103,7 @@ export const collectionService = {
         card_image: card.image,
         card_number: card.number,
         card_rarity: card.rarity,
+        card_edition: edition,
         set_id: card.setId || card.set_id,
         set_name: card.set || card.setName,
         quantity: 1

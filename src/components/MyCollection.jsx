@@ -9,6 +9,21 @@ import CardModal from './CardModal';
 import CardFilters from './CardFilters';
 import AddToCollectionButton from './AddToCollectionButton';
 
+// Edition badge helper
+const getEditionBadge = (edition) => {
+  if (!edition || edition === 'Unlimited') return null;
+  
+  const badges = {
+    '1st Edition': { text: '1st Ed', icon: '🥇', class: 'bg-yellow-500/90 text-black' },
+    'Shadowless': { text: 'Shadow', icon: '👻', class: 'bg-purple-500/90 text-white' },
+    'Reverse Holofoil': { text: 'Rev', icon: '✨', class: 'bg-blue-500/90 text-white' },
+    'Limited Edition': { text: 'Ltd', icon: '💎', class: 'bg-pink-500/90 text-white' },
+    'Normal': { text: 'Normal', icon: '', class: 'bg-gray-500/90 text-white' }
+  };
+  
+  return badges[edition] || { text: edition, icon: '', class: 'bg-gray-500/90 text-white' };
+};
+
 const MyCollection = ({ selectedSetId: propSetId }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -611,6 +626,13 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
                     {isCollected && (
                       <div className="absolute top-1 right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow pointer-events-none">
                         <Check className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+
+                    {/* Edition Badge */}
+                    {isCollected && collectedItem?.card_edition && getEditionBadge(collectedItem.card_edition) && (
+                      <div className={`absolute top-1 left-1 px-1.5 py-0.5 text-xs font-bold rounded shadow-lg pointer-events-none ${getEditionBadge(collectedItem.card_edition).class}`}>
+                        {getEditionBadge(collectedItem.card_edition).icon} {getEditionBadge(collectedItem.card_edition).text}
                       </div>
                     )}
 
