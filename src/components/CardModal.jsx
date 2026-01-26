@@ -9,21 +9,6 @@ import { useAuthModal } from '../contexts/AuthModalContext';
 import AddToCollectionButton from './AddToCollectionButton';
 import PriceAlertButton from './PriceAlertButton';
 
-// Edition badge helper
-const getEditionDisplay = (edition) => {
-  if (!edition || edition === 'Unlimited') return null;
-  
-  const displays = {
-    '1st Edition': { text: '1st Edition', icon: '🥇', class: 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30' },
-    'Shadowless': { text: 'Shadowless', icon: '👻', class: 'bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/30' },
-    'Reverse Holofoil': { text: 'Reverse Holo', icon: '✨', class: 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30' },
-    'Limited Edition': { text: 'Limited', icon: '💎', class: 'bg-pink-500/20 text-pink-600 dark:text-pink-400 border-pink-500/30' },
-    'Normal': { text: 'Normal', icon: '', class: 'bg-gray-500/20 text-gray-600 dark:text-gray-400 border-gray-500/30' }
-  };
-  
-  return displays[edition] || { text: edition, icon: '', class: 'bg-gray-500/20 text-gray-600 dark:text-gray-400 border-gray-500/30' };
-};
-
 // Reusable tooltip component for High price explanation
 const HighPriceTooltip = ({ className = "" }) => (
   <div className={`group relative inline-flex items-center ${className}`}>
@@ -309,14 +294,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
             {/* Card Info */}
             <div className="p-4 space-y-4">
               <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="text-2xl font-display text-adaptive-primary">{card.name}</h2>
-                  {card.edition && getEditionDisplay(card.edition) && (
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-bold rounded-lg border ${getEditionDisplay(card.edition).class}`}>
-                      {getEditionDisplay(card.edition).icon} {getEditionDisplay(card.edition).text}
-                    </span>
-                  )}
-                </div>
+                <h2 className="text-2xl font-display text-adaptive-primary">{card.name}</h2>
                 <p className="text-sm text-adaptive-secondary mt-1">{card.set} • {card.number}</p>
               </div>
 
@@ -533,18 +511,9 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
 
                 {/* Right: Card Info */}
                 <div className="flex flex-col justify-center space-y-4">
-                  <div>
-                    <div className="flex items-center gap-3 flex-wrap mb-2">
-                      <h2 className="text-4xl font-display text-adaptive-primary">
-                        {card.name}
-                      </h2>
-                      {card.edition && getEditionDisplay(card.edition) && (
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold rounded-lg border ${getEditionDisplay(card.edition).class}`}>
-                          {getEditionDisplay(card.edition).icon} {getEditionDisplay(card.edition).text}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                  <h2 className="text-4xl font-display text-adaptive-primary mb-2">
+                    {card.name}
+                  </h2>
                   <div className="flex items-center gap-3 text-adaptive-secondary">
                     <span className="text-lg">{card.set}</span>
                     <span className="text-slate-400">•</span>

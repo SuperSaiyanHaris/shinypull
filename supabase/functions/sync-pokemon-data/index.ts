@@ -4,7 +4,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { transformCardWithEditions, deduplicateEditions, parseEditionsFromCard, generateEditionCardId } from "./edition-utils.ts";
 
 const POKEMON_API = "https://api.pokemontcg.io/v2";
 
@@ -211,9 +210,9 @@ async function syncSets(supabase: any, headers: Record<string, string>) {
   return { success: true, count: sets.length };
 }
 
-// Sync cards for a single set - NOW WITH EDITION SUPPORT
+// Sync cards for a single set
 async function syncSetCards(supabase: any, headers: Record<string, string>, setId: string) {
-  console.log(`Syncing cards for set ${setId} with edition support...`);
+  console.log(`Syncing cards for set ${setId}...`);
 
   const response = await fetch(
     `${POKEMON_API}/cards?q=set.id:${setId}&orderBy=number&pageSize=250`,
@@ -226,23 +225,21 @@ async function syncSetCards(supabase: any, headers: Record<string, string>, setI
   }
 
   const data = await response.json();
-  const pokemonCards = data.data;
+  const cards = data.data;
 
-  console.log(`Fetched ${pokemonCards.length} cards from Pokemon API`);
-
-  // Transform cards with edition support
-  const allCardData: Array<{card: any, price: any}> = [];
-  
-  for (const pokemonCard of pokemonCards) {
-    const cardData = transformCardWithEditions(pokemonCard, setId);
-    allCardData.push(...cardData);
-  }
-
-  console.log(`Transformed into ${allCardData.length} card records (with editions)`);
-
-  // Separate cards and prices
-  const transformedCards = allCardData.map(item => item.card);
-  const transformedPrices = allCardData.map(item => item.price);
+  // Transform cards
+  const transformedCards = cards.map((card: any) => ({
+    id: card.id,
+    set_id: setId,
+    name: card.name,
+    number: card.number || "N/A",
+    rarity: card.rarity || "Common",
+    types: card.types || null, // Array of Pokemon types (e.g., ['Fire', 'Dragon'])
+    supertype: card.supertype || null, // 'Pokémon', 'Trainer', or 'Energy'
+    image_small: card.images?.small,
+    image_large: card.images?.large,
+    tcgplayer_url: card.tcgplayer?.url || null,
+  }));
 
   // Upsert cards
   const { error: cardsError } = await supabase
@@ -254,7 +251,35 @@ async function syncSetCards(supabase: any, headers: Record<string, string>, setI
     return { success: false, error: cardsError.message };
   }
 
-  // Upsert prices
+  // Transform and upsert prices
+  const transformedPrices = cards.map((card: any) => {
+    const prices = card.tcgplayer?.prices || {};
+    const priceVariants = ["holofoil", "reverseHolofoil", "1stEditionHolofoil", "unlimitedHolofoil", "normal"];
+    let priceData: any = null;
+
+    for (const variant of priceVariants) {
+      if (prices[variant]?.market) {
+        priceData = prices[variant];
+        break;
+      }
+    }
+
+    if (!priceData) {
+      const firstVariant = Object.keys(prices)[0];
+      priceData = firstVariant ? prices[firstVariant] : {};
+    }
+
+    const marketPrice = priceData?.market || 0;
+
+    return {
+      card_id: card.id,
+      tcgplayer_market: marketPrice,
+      tcgplayer_low: priceData?.low || marketPrice * 0.8,
+      tcgplayer_high: priceData?.high || marketPrice * 1.3,
+      last_updated: new Date().toISOString(),
+    };
+  });
+
   const { error: pricesError } = await supabase
     .from("prices")
     .upsert(transformedPrices, { onConflict: "card_id" });
@@ -264,8 +289,8 @@ async function syncSetCards(supabase: any, headers: Record<string, string>, setI
     return { success: false, error: pricesError.message };
   }
 
-  console.log(`Synced ${transformedCards.length} card editions for set ${setId}`);
-  return { success: true, count: transformedCards.length, baseCards: pokemonCards.length };
+  console.log(`Synced ${cards.length} cards for set ${setId}`);
+  return { success: true, count: cards.length };
 }
 
 // Prices-only sync - faster, updates only price data
@@ -335,28 +360,36 @@ async function processPriceSync(supabase: any, headers: Record<string, string>, 
       return { success: true, cardsUpdated: 0, setsProcessed: 1 };
     }
 
-    console.log(`Processing ${cardsToProcess.length} cards with edition support...`);
+    console.log(`Processing ${cardsToProcess.length} cards...`);
 
-    // Process price updates with edition support
-    const priceUpdates: any[] = [];
-    
-    for (const pokemonCard of cardsToProcess) {
-      const editions = parseEditionsFromCard(pokemonCard);
-      const dedupedEditions = deduplicateEditions(editions);
-      
-      // Create price update for each edition
-      for (const editionData of dedupedEditions) {
-        const editionCardId = generateEditionCardId(pokemonCard.id, editionData.edition);
-        
-        priceUpdates.push({
-          card_id: editionCardId,
-          tcgplayer_market: editionData.prices.market,
-          tcgplayer_low: editionData.prices.low,
-          tcgplayer_high: editionData.prices.high,
-          last_updated: new Date().toISOString(),
-        });
+    // Process price updates
+    const priceUpdates = cardsToProcess.map((card: any) => {
+      const prices = card.tcgplayer?.prices || {};
+      const priceVariants = ["holofoil", "reverseHolofoil", "1stEditionHolofoil", "unlimitedHolofoil", "normal"];
+      let priceData: any = null;
+
+      for (const variant of priceVariants) {
+        if (prices[variant]?.market) {
+          priceData = prices[variant];
+          break;
+        }
       }
-    }
+
+      if (!priceData) {
+        const firstVariant = Object.keys(prices)[0];
+        priceData = firstVariant ? prices[firstVariant] : {};
+      }
+
+      const marketPrice = priceData?.market || 0;
+
+      return {
+        card_id: card.id,
+        tcgplayer_market: marketPrice,
+        tcgplayer_low: priceData?.low || marketPrice * 0.8,
+        tcgplayer_high: priceData?.high || marketPrice * 1.3,
+        last_updated: new Date().toISOString(),
+      };
+    });
 
     // Batch upsert prices
     const { error: priceError } = await supabase
@@ -445,7 +478,7 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
 
   const set = setsToSync[0];
   const startFrom = set.metadata_sync_progress || 0;
-  const CHUNK_SIZE = 50; // Process 50 cards at a time - we have 20k API calls/day now!
+  const CHUNK_SIZE = 10; // Process 10 cards at a time - Pokemon API is slow
 
   console.log(`Processing metadata for ${set.name}: cards ${startFrom + 1} to ${startFrom + CHUNK_SIZE}`);
 

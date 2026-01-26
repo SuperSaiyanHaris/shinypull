@@ -10,7 +10,6 @@ import SetDetailPage from './components/SetDetailPage';
 import MyCollection from './components/MyCollection';
 import MyAlerts from './components/MyAlerts';
 import AdminSyncPanel from './components/AdminSyncPanel';
-import CardPage from './components/CardPage';
 import TermsOfUse from './components/TermsOfUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import ScrollToTop from './components/ScrollToTop';
@@ -199,11 +198,6 @@ function AppContent() {
                   selectedSet={selectedSet} 
                   onSetLoaded={handleSetLoaded}
                 />
-              } />
-
-              {/* Card Detail Page */}
-              <Route path="/card/:cardId" element={
-                <CardPage />
               } />
 
               {/* Search Results */}
