@@ -445,7 +445,7 @@ async function syncCardMetadataBatch(supabase: any, headers: Record<string, stri
 
   const set = setsToSync[0];
   const startFrom = set.metadata_sync_progress || 0;
-  const CHUNK_SIZE = 10; // Process 10 cards at a time - Pokemon API is slow
+  const CHUNK_SIZE = 50; // Process 50 cards at a time - we have 20k API calls/day now!
 
   console.log(`Processing metadata for ${set.name}: cards ${startFrom + 1} to ${startFrom + CHUNK_SIZE}`);
 
