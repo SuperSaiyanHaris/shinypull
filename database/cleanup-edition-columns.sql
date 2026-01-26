@@ -3,10 +3,13 @@
 
 BEGIN;
 
--- Remove edition columns from cards table
+-- Drop any views that depend on edition columns
+DROP VIEW IF EXISTS card_editions CASCADE;
+
+-- Remove edition columns from cards table (use CASCADE to drop dependencies)
 ALTER TABLE cards 
-  DROP COLUMN IF EXISTS edition,
-  DROP COLUMN IF EXISTS base_card_id;
+  DROP COLUMN IF EXISTS edition CASCADE,
+  DROP COLUMN IF EXISTS base_card_id CASCADE;
 
 -- Remove edition column from user_collections table
 ALTER TABLE user_collections 
