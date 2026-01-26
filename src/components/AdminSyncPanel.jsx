@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Database, CheckCircle, XCircle, Clock, DollarSign, Zap, Loader2 } from 'lucide-react';
-import { syncAllSets, syncAllCards, checkSyncStatus, performFullSync } from '../services/syncService';
+import { syncAllSets, syncAllCards, checkSyncStatus, performFullSync, triggerEdgeFunctionSync } from '../services/syncService';
 import { syncAllCardMetadata } from '../services/metadataSync';
 import { updateStalePrices } from '../services/priceUpdateService';
 
@@ -25,7 +25,8 @@ const AdminSyncPanel = () => {
     setSyncProgress(null);
 
     try {
-      const result = await performFullSync();
+      // Use Edge Function instead of direct DB calls
+      const result = await triggerEdgeFunctionSync('full');
       setLastSyncResult(result);
       await loadSyncStatus();
     } catch (error) {
@@ -41,7 +42,8 @@ const AdminSyncPanel = () => {
     setSyncProgress(null);
 
     try {
-      const result = await syncAllSets();
+      // Use Edge Function instead of direct DB calls
+      const result = await triggerEdgeFunctionSync('sets');
       setLastSyncResult(result);
       await loadSyncStatus();
     } catch (error) {
