@@ -213,8 +213,8 @@ async function sendAlertEmail(supabase: any, userEmail: string, alert: any, curr
       return
     }
 
-    // Link to search page with card name - will show search results with this card
-    const cardUrl = `https://www.shinypull.com/search?q=${encodeURIComponent(alert.card_name)}`
+    // Link directly to the card detail page
+    const cardUrl = `https://www.shinypull.com/card/${alert.card_id}`
     const alertTypeText = alert.alert_type === 'below' ? 'dropped below' : 'risen above'
     const priceIcon = alert.alert_type === 'below' ? '📉' : '📈'
     
