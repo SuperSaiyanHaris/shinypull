@@ -9,6 +9,7 @@ const AdminSyncPanel = () => {
   const [syncStatus, setSyncStatus] = useState([]);
   const [lastSyncResult, setLastSyncResult] = useState(null);
   const [syncProgress, setSyncProgress] = useState(null);
+  const [setIdToSync, setSetIdToSync] = useState('base1'); // Default to base1 for testing
 
   useEffect(() => {
     loadSyncStatus();
@@ -44,6 +45,28 @@ const AdminSyncPanel = () => {
     try {
       // Use Edge Function instead of direct DB calls
       const result = await triggerEdgeFunctionSync('sets');
+      setLastSyncResult(result);
+      await loadSyncStatus();
+    } catch (error) {
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleSyncSingleSet = async () => {
+    if (!setIdToSync || !setIdToSync.trim()) {
+      setLastSyncResult({ success: false, error: 'Please enter a set ID' });
+      return;
+    }
+
+    setSyncing(true);
+    setLastSyncResult(null);
+    setSyncProgress(null);
+
+    try {
+      console.log(`🎴 Syncing set ${setIdToSync} with edition support...`);
+      const result = await triggerEdgeFunctionSync('single-set', null, setIdToSync.trim());
       setLastSyncResult(result);
       await loadSyncStatus();
     } catch (error) {
@@ -201,6 +224,37 @@ const AdminSyncPanel = () => {
         <p className="text-xs text-adaptive-tertiary italic">
           ✨ <strong>Direct API calls</strong> run in your browser with NO timeout limits! Click once and let it finish.
         </p>
+
+        {/* Edition Sync Section */}
+        <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border-2 border-yellow-400 dark:border-yellow-600">
+          <h4 className="font-bold text-yellow-900 dark:text-yellow-100 mb-3 flex items-center gap-2">
+            <Zap className="w-5 h-5" />
+            🎴 Sync Set with Editions (NEW!)
+          </h4>
+          <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-3">
+            Syncs a specific set and creates separate cards for each edition (1st Ed, Unlimited, Shadowless, etc.)
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={setIdToSync}
+              onChange={(e) => setSetIdToSync(e.target.value)}
+              placeholder="Set ID (e.g., base1, jungle, fossil)"
+              className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-yellow-400 dark:border-yellow-600 rounded-lg text-adaptive-primary placeholder-adaptive-tertiary"
+              disabled={syncing}
+            />
+            <button
+              onClick={handleSyncSingleSet}
+              disabled={syncing}
+              className="px-6 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 disabled:bg-gray-400 text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl whitespace-nowrap"
+            >
+              Sync Set
+            </button>
+          </div>
+          <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-2">
+            💡 Try "base1" to test with Base Set Charizard editions
+          </p>
+        </div>
       </div>
 
       {/* Progress Indicator */}
