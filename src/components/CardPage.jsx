@@ -16,38 +16,49 @@ const CardPage = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch card from database
-        const { data, error: dbError } = await supabase
+        // Fetch card with prices from database
+        const { data: cardData, error: cardError } = await supabase
           .from('cards')
           .select('*')
           .eq('id', cardId)
           .single();
 
-        if (dbError) throw dbError;
-
-        if (!data) {
+        if (cardError) throw cardError;
+        if (!cardData) {
           setError('Card not found');
           return;
         }
 
-        // Transform to match expected format
+        // Fetch prices
+        const { data: pricesData } = await supabase
+          .from('prices')
+          .select('*')
+          .eq('card_id', cardId)
+          .single();
+
+        // Transform to match CardModal expected format
         const transformedCard = {
-          id: data.id,
-          name: data.name,
-          number: data.number,
-          rarity: data.rarity,
-          types: data.types,
-          supertype: data.supertype,
-          images: {
-            small: data.image_small,
-            large: data.image_large
+          id: cardData.id,
+          name: cardData.name,
+          number: cardData.number,
+          rarity: cardData.rarity,
+          types: cardData.types,
+          supertype: cardData.supertype,
+          image: cardData.image_large || cardData.image_small,
+          set: cardData.set_id,
+          tcgplayerUrl: cardData.tcgplayer_url,
+          prices: {
+            tcgplayer: {
+              market: pricesData?.tcgplayer_market || 0,
+              low: pricesData?.tcgplayer_low || 0,
+              high: pricesData?.tcgplayer_high || 0,
+              normal: pricesData?.normal_market || 0,
+              holofoil: pricesData?.holofoil_market || 0
+            },
+            ebay: null,
+            psa10: null
           },
-          tcgplayer: {
-            url: data.tcgplayer_url
-          },
-          set: {
-            id: data.set_id
-          }
+          priceHistory: []
         };
 
         setCard(transformedCard);
