@@ -180,7 +180,7 @@ serve(async (req) => {
  */
 async function fetchCardPrice(cardId: string) {
   try {
-    const apiKey = Deno.env.get('POKEMON_TCG_API_KEY') || ''
+    const apiKey = Deno.env.get('POKEMON_API_KEY') || ''
     const response = await fetch(
       `https://api.pokemontcg.io/v2/cards/${cardId}`,
       {
