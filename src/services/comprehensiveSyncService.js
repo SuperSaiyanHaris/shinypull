@@ -10,30 +10,26 @@
 
 import { supabase } from '../lib/supabase';
 
-const POKEMON_API = 'https://api.pokemontcg.io/v2';
-const API_KEY = import.meta.env.VITE_POKEMON_API_KEY;
+// Use Vercel serverless proxy to avoid CORS issues
+// The proxy adds the API key server-side for 20k requests/day limit
+const PROXY_ENDPOINT = '/api/pokemon-api';
 
 // Delay between API calls to respect rate limits (300ms = ~12k calls/hour max)
 const API_DELAY_MS = 300;
 
 /**
- * Helper to make API requests with proper headers and rate limiting
+ * Helper to make API requests through our Vercel proxy
+ * This avoids CORS issues and keeps API key server-side
  */
 const fetchFromPokemonAPI = async (endpoint) => {
-  const headers = {
-    'Content-Type': 'application/json'
-  };
+  // Encode the endpoint to handle query strings properly
+  const proxyUrl = `${PROXY_ENDPOINT}?endpoint=${encodeURIComponent(endpoint)}`;
 
-  if (API_KEY) {
-    headers['X-Api-Key'] = API_KEY;
-  } else {
-    console.warn('WARNING: No POKEMON_API_KEY - limited to 100 requests/day!');
-  }
-
-  const response = await fetch(`${POKEMON_API}${endpoint}`, { headers });
+  const response = await fetch(proxyUrl);
 
   if (!response.ok) {
-    throw new Error(`Pokemon API error: ${response.status} ${response.statusText}`);
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(`Pokemon API error: ${response.status} ${errorData.error || response.statusText}`);
   }
 
   return response.json();
