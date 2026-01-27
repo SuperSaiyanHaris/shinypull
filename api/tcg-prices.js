@@ -1,6 +1,11 @@
 // Vercel Serverless Function - Pokemon TCG API Price Fetcher
 // Proxies requests to Pokemon TCG API to avoid CORS issues
 
+// Increase timeout (Hobby: 10s max, Pro: 60s max)
+export const config = {
+  maxDuration: 60
+};
+
 export default async function handler(req, res) {
   // Restrict CORS to your domains only
   const allowedOrigins = [

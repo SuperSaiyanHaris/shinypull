@@ -2,6 +2,12 @@
 // Proxies ALL requests to Pokemon TCG API to avoid CORS issues
 // This is used by the comprehensive sync service for bulk operations
 
+// Increase timeout to 60 seconds (requires Vercel Pro for full duration)
+// Hobby plan gets 10s max, Pro gets 60s
+export const config = {
+  maxDuration: 60
+};
+
 export default async function handler(req, res) {
   // Restrict CORS to your domains only
   const allowedOrigins = [
@@ -62,22 +68,45 @@ export default async function handler(req, res) {
       console.warn('WARNING: No POKEMON_API_KEY configured - limited to 100 requests/day!');
     }
 
-    // Fetch from Pokemon TCG API
+    // Fetch from Pokemon TCG API with timeout
     const apiUrl = `https://api.pokemontcg.io/v2${endpoint}`;
-    const response = await fetch(apiUrl, { headers });
 
-    if (!response.ok) {
-      console.error(`Pokemon TCG API error: ${response.status} for ${endpoint}`);
-      return res.status(response.status).json({
-        error: `Pokemon API error: ${response.statusText}`,
-        endpoint
+    // Create abort controller for timeout (55 seconds to leave buffer)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 55000);
+
+    try {
+      const response = await fetch(apiUrl, {
+        headers,
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        console.error(`Pokemon TCG API error: ${response.status} for ${endpoint}`);
+        return res.status(response.status).json({
+          error: `Pokemon API error: ${response.statusText}`,
+          endpoint
+        });
+      }
+
+      const data = await response.json();
+
+      // Return the raw API response
+      return res.status(200).json(data);
+
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        console.error(`Pokemon API timeout for ${endpoint}`);
+        return res.status(504).json({
+          error: 'Pokemon API request timed out',
+          message: 'The Pokemon TCG API took too long to respond. Try again.',
+          endpoint
+        });
+      }
+      throw fetchError;
     }
-
-    const data = await response.json();
-
-    // Return the raw API response
-    return res.status(200).json(data);
 
   } catch (error) {
     console.error('Pokemon API Proxy error:', error);
