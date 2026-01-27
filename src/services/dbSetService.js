@@ -123,12 +123,18 @@ export const getSetCards = async (setId) => {
         ebay: {
           market: price.market_price ?? 0,
           low: price.market_low ?? 0,
-          high: price.market_high ?? 0
+          high: price.market_high ?? 0,
+          verified: price.market_price > 0,
+          searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(`Pokemon ${card.name} ${card.number} ${setData.name}`)}&_sacat=183454&mkcid=1&mkrid=711-53200-19255-0&campid=5339138366&toolid=10001`,
+          searchTerms: `Pokemon ${card.name} ${card.number} ${setData.name}`
         },
         psa10: {
           market: price.psa10_market ?? 0,
           low: price.psa10_low ?? 0,
-          high: price.psa10_high ?? 0
+          high: price.psa10_high ?? 0,
+          verified: price.psa10_market > 0,
+          searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(`Pokemon ${card.name} ${card.number} PSA 10`)}&_sacat=183454&mkcid=1&mkrid=711-53200-19255-0&campid=5339138366&toolid=10001`,
+          searchTerms: `Pokemon ${card.name} ${card.number} PSA 10`
         },
         variants: {
           normal: price.normal_market ? { market: price.normal_market } : null,
@@ -239,12 +245,18 @@ export const searchCards = async (query) => {
         ebay: {
           market: price.market_price ?? 0,
           low: price.market_low ?? 0,
-          high: price.market_high ?? 0
+          high: price.market_high ?? 0,
+          verified: price.market_price > 0,
+          searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(`Pokemon ${card.name} ${card.number} ${set.name}`)}&_sacat=183454&mkcid=1&mkrid=711-53200-19255-0&campid=5339138366&toolid=10001`,
+          searchTerms: `Pokemon ${card.name} ${card.number} ${set.name}`
         },
         psa10: {
           market: price.psa10_market ?? 0,
           low: price.psa10_low ?? 0,
-          high: price.psa10_high ?? 0
+          high: price.psa10_high ?? 0,
+          verified: price.psa10_market > 0,
+          searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(`Pokemon ${card.name} ${card.number} PSA 10`)}&_sacat=183454&mkcid=1&mkrid=711-53200-19255-0&campid=5339138366&toolid=10001`,
+          searchTerms: `Pokemon ${card.name} ${card.number} PSA 10`
         },
         variants: {
           normal: price.normal_market ? { market: price.normal_market } : null,

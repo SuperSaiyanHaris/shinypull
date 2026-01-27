@@ -309,8 +309,8 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   if (!isOpen || !card) return null;
 
   // Use fetched prices or fall back to card's original prices
-  const displayEbayPrices = ebayPrices || card.prices?.ebay || { avg: 0, market: 0, verified: false, searchTerms: '', searchUrl: '' };
-  const displayPsa10Prices = psa10Prices || card.prices?.psa10 || { avg: 0, market: 0, verified: false, searchTerms: '', searchUrl: '' };
+  const displayEbayPrices = ebayPrices || card.prices?.ebay || { market: 0, verified: false, searchTerms: '', searchUrl: '' };
+  const displayPsa10Prices = psa10Prices || card.prices?.psa10 || { market: 0, verified: false, searchTerms: '', searchUrl: '' };
 
   // Primary market price: Use eBay median if available, otherwise fall back to DB market price
   const primaryMarketPrice = card.prices?.market || displayEbayPrices.market || displayEbayPrices.median || 0;
@@ -464,13 +464,12 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-xs text-adaptive-tertiary">
-                              {displayEbayPrices.verified ? 'eBay Raw Card' : 'eBay Raw Card (est.)'}
-                              {displayEbayPrices.count && <span className="text-[10px]"> • {displayEbayPrices.count} listings</span>}
+                              eBay Raw Card
                             </p>
                             <p className="text-lg font-bold text-blue-500">
-                              {displayEbayPrices.verified && displayEbayPrices.low !== undefined
+                              {displayEbayPrices.low && displayEbayPrices.high
                                 ? `${formatPrice(displayEbayPrices.low)} - ${formatPrice(displayEbayPrices.high)}`
-                                : formatPrice(displayEbayPrices.avg || displayEbayPrices.market || 0)}
+                                : formatPrice(displayEbayPrices.market)}
                             </p>
                           </div>
                           {displayEbayPrices.searchUrl && (
@@ -493,12 +492,12 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                           <div>
                             <p className="text-xs text-adaptive-tertiary flex items-center gap-1">
                               <Award className="w-3 h-3 text-yellow-500" />
-                              {displayPsa10Prices.verified ? 'eBay PSA 10' : 'eBay PSA 10 (est.)'}
+                              eBay PSA 10
                             </p>
                             <p className="text-lg font-bold text-blue-500">
-                              {displayPsa10Prices.verified && displayPsa10Prices.low !== undefined
+                              {displayPsa10Prices.low && displayPsa10Prices.high
                                 ? `${formatPrice(displayPsa10Prices.low)} - ${formatPrice(displayPsa10Prices.high)}`
-                                : formatPrice(displayPsa10Prices.avg)}
+                                : formatPrice(displayPsa10Prices.market)}
                             </p>
                           </div>
                           {displayPsa10Prices.searchUrl && (
@@ -750,7 +749,7 @@ const EbayPriceRow = ({ ebayData, label = "eBay" }) => {
         </span>
       </div>
       <div className="flex items-center gap-3">
-        {verified && low !== undefined && high !== undefined ? (
+        {low > 0 && high > 0 ? (
           <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
             {formatPrice(low)} - {formatPrice(high)}
           </span>
@@ -791,7 +790,7 @@ const PSA10PriceRow = ({ psa10Data }) => {
         </span>
       </div>
       <div className="flex items-center gap-3">
-        {verified && low !== undefined && high !== undefined ? (
+        {low > 0 && high > 0 ? (
           <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
             {formatPrice(low)} - {formatPrice(high)}
           </span>
