@@ -1,4 +1,8 @@
-// Pokemon TCG API Integration
+// ⚠️ DEPRECATED - Pokemon TCG API Integration
+// Pokemon TCG API (https://pokemontcg.io/) is no longer functional
+// Card data now comes from Supabase (populated via GitHub bulk import)
+// This file is kept for reference only - can be deleted
+//
 // API Docs: https://pokemontcg.io/
 
 import { getEbayPriceAPI, estimateEbayPrice, getEbayPSA10Price, estimatePSA10Price } from './ebayService.js';

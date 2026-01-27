@@ -112,26 +112,64 @@ export default async function handler(req, res) {
       });
     }
 
-    const { market, low, high, normal, holofoil, updatedAt } = tcgData.prices;
+    const { prices } = tcgData;
 
     // Use service role to update the database (bypasses RLS)
     const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
-    
+
+    // Build the update object with all available variants
+    const dbUpdate = {
+      card_id: cardId,
+      tcgplayer_market: prices.market,
+      tcgplayer_low: prices.low,
+      tcgplayer_high: prices.high,
+      last_updated: new Date().toISOString()
+    };
+
+    // Add variant prices if available
+    if (prices.normal) {
+      dbUpdate.normal_market = prices.normal.market;
+      dbUpdate.normal_low = prices.normal.low;
+      dbUpdate.normal_high = prices.normal.high;
+    }
+    if (prices.holofoil) {
+      dbUpdate.holofoil_market = prices.holofoil.market;
+      dbUpdate.holofoil_low = prices.holofoil.low;
+      dbUpdate.holofoil_high = prices.holofoil.high;
+    }
+    if (prices.reverseHolofoil) {
+      dbUpdate.reverse_holofoil_market = prices.reverseHolofoil.market;
+      dbUpdate.reverse_holofoil_low = prices.reverseHolofoil.low;
+      dbUpdate.reverse_holofoil_high = prices.reverseHolofoil.high;
+    }
+    if (prices.firstEditionHolofoil) {
+      dbUpdate.first_ed_holofoil_market = prices.firstEditionHolofoil.market;
+      dbUpdate.first_ed_holofoil_low = prices.firstEditionHolofoil.low;
+      dbUpdate.first_ed_holofoil_high = prices.firstEditionHolofoil.high;
+    }
+    if (prices.firstEditionNormal) {
+      dbUpdate.first_ed_normal_market = prices.firstEditionNormal.market;
+      dbUpdate.first_ed_normal_low = prices.firstEditionNormal.low;
+      dbUpdate.first_ed_normal_high = prices.firstEditionNormal.high;
+    }
+    if (prices.unlimited) {
+      dbUpdate.unlimited_market = prices.unlimited.market;
+      dbUpdate.unlimited_low = prices.unlimited.low;
+      dbUpdate.unlimited_high = prices.unlimited.high;
+    }
+    if (prices.unlimitedHolofoil) {
+      dbUpdate.unlimited_holofoil_market = prices.unlimitedHolofoil.market;
+      dbUpdate.unlimited_holofoil_low = prices.unlimitedHolofoil.low;
+      dbUpdate.unlimited_holofoil_high = prices.unlimitedHolofoil.high;
+    }
+
     const { error: updateError } = await supabaseService
       .from('prices')
-      .upsert({
-        card_id: cardId,
-        tcgplayer_market: market,
-        tcgplayer_low: low,
-        tcgplayer_high: high,
-        tcgplayer_normal: normal,
-        tcgplayer_holofoil: holofoil,
-        last_updated: new Date().toISOString()
-      }, { onConflict: 'card_id' });
+      .upsert(dbUpdate, { onConflict: 'card_id' });
 
     if (updateError) {
       console.error('Error updating price:', updateError);
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: 'Failed to update price in database',
         details: updateError.message
       });
@@ -142,11 +180,16 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       prices: {
-        market,
-        low,
-        high,
-        normal,
-        holofoil,
+        market: prices.market,
+        low: prices.low,
+        high: prices.high,
+        normal: prices.normal,
+        holofoil: prices.holofoil,
+        reverseHolofoil: prices.reverseHolofoil,
+        firstEditionHolofoil: prices.firstEditionHolofoil,
+        firstEditionNormal: prices.firstEditionNormal,
+        unlimited: prices.unlimited,
+        unlimitedHolofoil: prices.unlimitedHolofoil,
         lastUpdated: new Date().toISOString(),
         cached: false
       }

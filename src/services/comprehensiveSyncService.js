@@ -1,7 +1,15 @@
 /**
- * Comprehensive Sync Service
+ * ⚠️ DEPRECATED - Comprehensive Sync Service
  *
- * Philosophy: Sync ALL static data ONCE, then only update prices.
+ * This service used the Pokemon TCG API which is no longer functional.
+ * 
+ * CURRENT APPROACH:
+ * - Bulk data: Use scripts/bulk-import-from-github.js (GitHub static data)
+ * - Price updates: Use /api/incremental-price-update (eBay API)
+ * 
+ * Kept for reference only - can be deleted
+ *
+ * Original Philosophy: Sync ALL static data ONCE, then only update prices.
  * Pokemon TCG data is static - cards don't change once released.
  *
  * API Rate Limits with key: 20,000 requests/day
@@ -29,7 +37,8 @@ const fetchFromPokemonAPI = async (endpoint) => {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(`Pokemon API error: ${response.status} ${errorData.error || response.statusText}`);
+    // Include status code in error message for better handling
+    throw new Error(`Pokemon API error: ${response.status} - ${errorData.error || response.statusText}`);
   }
 
   return response.json();
@@ -562,6 +571,7 @@ export const updatePricesOnly = async (hoursThreshold = 24, onProgress) => {
     console.log(`📊 Found ${staleCards.length} cards with stale prices`);
 
     let updated = 0;
+    let skipped = 0;
     let failed = 0;
 
     for (let i = 0; i < staleCards.length; i++) {
@@ -572,7 +582,8 @@ export const updatePricesOnly = async (hoursThreshold = 24, onProgress) => {
           phase: 'prices',
           current: i + 1,
           total: staleCards.length,
-          updated
+          updated,
+          skipped
         });
       }
 
@@ -593,15 +604,31 @@ export const updatePricesOnly = async (hoursThreshold = 24, onProgress) => {
         updated++;
 
       } catch (err) {
-        console.warn(`Failed to update price for ${card_id}:`, err.message);
-        failed++;
+        // Handle 404 errors gracefully - card doesn't exist in Pokemon API
+        // This is expected for older cards that were removed or don't have TCGPlayer data
+        if (err.message?.includes('404') || err.message?.includes('Not Found')) {
+          // Mark as updated so we don't keep retrying this card
+          // Set last_updated far in future to skip for longer (7 days)
+          const skipUntil = new Date();
+          skipUntil.setDate(skipUntil.getDate() + 7);
+          await supabase
+            .from('prices')
+            .upsert({
+              card_id,
+              last_updated: skipUntil.toISOString()
+            }, { onConflict: 'card_id' });
+          skipped++;
+        } else {
+          console.warn(`Failed to update price for ${card_id}:`, err.message);
+          failed++;
+        }
       }
 
       // Rate limiting
       await sleep(API_DELAY_MS);
     }
 
-    console.log(`✅ Updated ${updated} prices (${failed} failed)`);
+    console.log(`✅ Updated ${updated} prices, ${skipped} not in API, ${failed} failed`);
 
     // Update sync metadata
     await supabase
@@ -609,11 +636,11 @@ export const updatePricesOnly = async (hoursThreshold = 24, onProgress) => {
       .upsert({
         entity_type: 'prices',
         status: 'success',
-        message: `Updated ${updated} prices`,
+        message: `Updated ${updated} prices (${skipped} cards not in API)`,
         last_sync: new Date().toISOString()
       }, { onConflict: 'entity_type' });
 
-    return { success: true, updated, failed };
+    return { success: true, updated, skipped, failed };
 
   } catch (error) {
     console.error('❌ Price update failed:', error);

@@ -1,3 +1,10 @@
+// ⚠️ DEPRECATED - Pokemon TCG API is no longer functional
+// This proxy endpoint is no longer used.
+// Price updates now use eBay API via /api/incremental-price-update
+// Bulk data imports use GitHub static data via scripts/bulk-import-from-github.js
+//
+// Kept for reference only - can be deleted
+
 // Vercel Serverless Function - Pokemon TCG API Proxy
 // Proxies ALL requests to Pokemon TCG API to avoid CORS issues
 // This is used by the comprehensive sync service for bulk operations

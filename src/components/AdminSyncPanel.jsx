@@ -11,12 +11,7 @@ import {
   Package,
   Info
 } from 'lucide-react';
-import {
-  performCompleteInitialSync,
-  syncNewSetsOnly,
-  updatePricesOnly,
-  getSyncStatus
-} from '../services/comprehensiveSyncService';
+import { getSyncStatus } from '../services/comprehensiveSyncService';
 
 const AdminSyncPanel = () => {
   const [syncing, setSyncing] = useState(false);
@@ -35,53 +30,21 @@ const AdminSyncPanel = () => {
   };
 
   const handleCompleteSync = async () => {
-    if (!confirm(
-      '⚠️ COMPLETE INITIAL SYNC\n\n' +
-      'This will sync ALL sets and ALL cards with COMPLETE data.\n\n' +
-      'This should only be run ONCE to populate the database.\n' +
-      'It may take 30-60 minutes and use ~40,000 API calls.\n\n' +
-      'Continue?'
-    )) {
-      return;
-    }
-
-    setSyncing(true);
-    setSyncType('complete');
-    setLastSyncResult(null);
-    setSyncProgress(null);
-
-    try {
-      const result = await performCompleteInitialSync((progress) => {
-        setSyncProgress(progress);
-      });
-      setLastSyncResult(result);
-      await loadSyncStatus();
-    } catch (error) {
-      setLastSyncResult({ success: false, error: error.message });
-    } finally {
-      setSyncing(false);
-      setSyncType(null);
-    }
+    alert(
+      '⚠️ COMPLETE SYNC DEPRECATED\n\n' +
+      'The Pokemon TCG API is no longer functional.\n\n' +
+      'Use the bulk-import script instead:\n' +
+      'npm run bulk-import'
+    );
   };
 
   const handleSyncNewSets = async () => {
-    setSyncing(true);
-    setSyncType('new_sets');
-    setLastSyncResult(null);
-    setSyncProgress(null);
-
-    try {
-      const result = await syncNewSetsOnly((progress) => {
-        setSyncProgress(progress);
-      });
-      setLastSyncResult(result);
-      await loadSyncStatus();
-    } catch (error) {
-      setLastSyncResult({ success: false, error: error.message });
-    } finally {
-      setSyncing(false);
-      setSyncType(null);
-    }
+    alert(
+      '⚠️ NEW SETS SYNC DEPRECATED\n\n' +
+      'The Pokemon TCG API is no longer functional.\n\n' +
+      'Use the bulk-import script to sync new sets:\n' +
+      'npm run bulk-import'
+    );
   };
 
   const handleUpdatePrices = async () => {
@@ -91,10 +54,18 @@ const AdminSyncPanel = () => {
     setSyncProgress(null);
 
     try {
-      const result = await updatePricesOnly(24, (progress) => {
-        setSyncProgress(progress);
+      // Call new eBay-based incremental price update endpoint
+      const response = await fetch('/api/incremental-price-update?limit=10');
+      const result = await response.json();
+      
+      setLastSyncResult({
+        success: result.success,
+        updated: result.updated || 0,
+        message: result.success 
+          ? `Updated ${result.updated} cards with eBay prices` 
+          : result.error
       });
-      setLastSyncResult(result);
+      
       await loadSyncStatus();
     } catch (error) {
       setLastSyncResult({ success: false, error: error.message });
@@ -350,6 +321,9 @@ const AdminSyncPanel = () => {
                   {lastSyncResult.sets !== undefined && <p>✓ {lastSyncResult.sets} sets</p>}
                   {lastSyncResult.cards !== undefined && <p>✓ {lastSyncResult.cards.toLocaleString()} cards</p>}
                   {lastSyncResult.updated !== undefined && <p>✓ {lastSyncResult.updated} prices updated</p>}
+                  {lastSyncResult.skipped !== undefined && lastSyncResult.skipped > 0 && (
+                    <p className="text-yellow-700 dark:text-yellow-300">⚠ {lastSyncResult.skipped} cards not in Pokemon API (skipped for 7 days)</p>
+                  )}
                   {lastSyncResult.setNames && (
                     <p>✓ New sets: {lastSyncResult.setNames.join(', ')}</p>
                   )}

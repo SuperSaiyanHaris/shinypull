@@ -1,16 +1,17 @@
 /**
  * Incremental Price Update API
  * 
- * Updates prices for a small batch of cards at a time.
+ * Updates prices for a small batch of cards at a time using eBay market data.
  * Can be called repeatedly to gradually update all prices.
  * Stays well within Vercel's 10 second timeout.
  * 
  * Query params:
- *   - limit: Number of cards to update (default 20, max 50)
+ *   - limit: Number of cards to update (default 5, max 10)
  *   - setId: Optional - only update cards from this set
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { getEbayCardPrice } from './services/ebayPriceService.js';
 
 // Vercel timeout: 10 seconds on hobby, 60 on pro
 export const config = {
@@ -47,17 +48,21 @@ export default async function handler(req, res) {
       process.env.VITE_SUPABASE_ANON_KEY
     );
 
-    // Parse query params
-    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+    // Parse query params (reduced limits since eBay calls are slower)
+    const limit = Math.min(parseInt(req.query.limit) || 5, 10);
     const setId = req.query.setId;
 
     // Get cards that need price updates (oldest first from prices table)
-    // Join with cards to get card IDs that exist
+    // Join with cards to get card names and set info
     let query = supabase
       .from('prices')
-      .select('card_id, last_updated')
+      .select('card_id, last_updated, cards!inner(name, set_id, sets!inner(name))')
       .order('last_updated', { ascending: true, nullsFirst: true })
       .limit(limit);
+
+    if (setId) {
+      query = query.eq('cards.set_id', setId);
+    }
 
     const { data: priceRecords, error: fetchError } = await query;
 
@@ -73,119 +78,50 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`Updating prices for ${priceRecords.length} cards...`);
+    console.log(`Updating prices for ${priceRecords.length} cards using eBay...`);
 
-    // Get Pokemon API key
-    const apiKey = process.env.POKEMON_API_KEY || process.env.VITE_POKEMON_API_KEY;
-    const headers = {
-      'Content-Type': 'application/json'
-    };
-    if (apiKey) {
-      headers['X-Api-Key'] = apiKey;
-    }
-
-    // Update each card's price
+    // Update each card's price from eBay
     const priceUpdates = [];
     const errors = [];
 
     for (const priceRecord of priceRecords) {
       try {
-        const response = await fetch(
-          `https://api.pokemontcg.io/v2/cards/${priceRecord.card_id}`,
-          { headers, signal: AbortSignal.timeout(3000) }
-        );
-
-        // Skip 404s - card doesn't exist in API (old/removed cards)
-        if (response.status === 404) {
-          console.log(`Card ${priceRecord.card_id} not found in API (likely removed/old card)`);
+        const card = priceRecord.cards;
+        const setName = card.sets?.name || '';
+        
+        console.log(`Fetching eBay price for: ${card.name} (${setName})`);
+        
+        // Get eBay market price
+        const ebayPrice = await getEbayCardPrice(card.name, setName);
+        
+        if (!ebayPrice.success || ebayPrice.market === null) {
+          console.log(`  No eBay prices found for ${card.name}`);
           continue;
         }
+        
+        console.log(`  Found: $${ebayPrice.market} (${ebayPrice.sampleSize} listings)`);
 
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const apiCard = data.data;
-        const prices = apiCard.tcgplayer?.prices || {};
-
-        // Skip if no prices available
-        if (!prices || Object.keys(prices).length === 0) {
-          console.log(`No prices available for ${priceRecord.card_id}`);
-          continue;
-        }
-
-        const normal = prices.normal || {};
-        const holofoil = prices.holofoil || {};
-        const reverseHolofoil = prices.reverseHolofoil || {};
-        const firstEdHolo = prices['1stEditionHolofoil'] || {};
-        const firstEdNormal = prices['1stEditionNormal'] || {};
-        const unlimited = prices.unlimited || {};
-        const unlimitedHolo = prices.unlimitedHolofoil || {};
-
+        // Update prices table with eBay data
         priceUpdates.push({
           card_id: priceRecord.card_id,
           
-          // Legacy columns (best available)
-          tcgplayer_market: holofoil.market || reverseHolofoil.market || normal.market || unlimited.market || firstEdHolo.market || null,
-          tcgplayer_low: holofoil.low || reverseHolofoil.low || normal.low || null,
-          tcgplayer_high: holofoil.high || reverseHolofoil.high || normal.high || null,
+          // Use eBay prices for main fields
+          tcgplayer_market: ebayPrice.market,
+          tcgplayer_low: ebayPrice.low,
+          tcgplayer_high: ebayPrice.high,
           
-          // Normal variant
-          normal_market: normal.market || null,
-          normal_low: normal.low || null,
-          normal_high: normal.high || null,
-          normal_mid: normal.mid || null,
-          normal_direct_low: normal.directLow || null,
-          
-          // Holofoil variant
-          holofoil_market: holofoil.market || null,
-          holofoil_low: holofoil.low || null,
-          holofoil_high: holofoil.high || null,
-          holofoil_mid: holofoil.mid || null,
-          holofoil_direct_low: holofoil.directLow || null,
-          
-          // Reverse holofoil variant
-          reverse_holofoil_market: reverseHolofoil.market || null,
-          reverse_holofoil_low: reverseHolofoil.low || null,
-          reverse_holofoil_high: reverseHolofoil.high || null,
-          reverse_holofoil_mid: reverseHolofoil.mid || null,
-          reverse_holofoil_direct_low: reverseHolofoil.directLow || null,
-          
-          // 1st Edition Holofoil
-          first_ed_holofoil_market: firstEdHolo.market || null,
-          first_ed_holofoil_low: firstEdHolo.low || null,
-          first_ed_holofoil_high: firstEdHolo.high || null,
-          first_ed_holofoil_mid: firstEdHolo.mid || null,
-          first_ed_holofoil_direct_low: firstEdHolo.directLow || null,
-          
-          // 1st Edition Normal
-          first_ed_normal_market: firstEdNormal.market || null,
-          first_ed_normal_low: firstEdNormal.low || null,
-          first_ed_normal_high: firstEdNormal.high || null,
-          first_ed_normal_mid: firstEdNormal.mid || null,
-          first_ed_normal_direct_low: firstEdNormal.directLow || null,
-          
-          // Unlimited
-          unlimited_market: unlimited.market || null,
-          unlimited_low: unlimited.low || null,
-          unlimited_high: unlimited.high || null,
-          unlimited_mid: unlimited.mid || null,
-          unlimited_direct_low: unlimited.directLow || null,
-          
-          // Unlimited Holofoil
-          unlimited_holofoil_market: unlimitedHolo.market || null,
-          unlimited_holofoil_low: unlimitedHolo.low || null,
-          unlimited_holofoil_high: unlimitedHolo.high || null,
-          unlimited_holofoil_mid: unlimitedHolo.mid || null,
-          unlimited_holofoil_direct_low: unlimitedHolo.directLow || null,
+          // Store eBay data in normal variant (most common)
+          normal_market: ebayPrice.market,
+          normal_low: ebayPrice.low,
+          normal_high: ebayPrice.high,
+          normal_mid: ebayPrice.average,
           
           last_updated: new Date().toISOString(),
           tcgplayer_updated_at: new Date().toISOString()
         });
 
-        // Small delay between requests
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Small delay between eBay requests to avoid rate limits
+        await new Promise(resolve => setTimeout(resolve, 500));
 
       } catch (error) {
         console.error(`Failed to update ${priceRecord.card_id}:`, error.message);

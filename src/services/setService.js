@@ -1,4 +1,7 @@
-// Pokemon TCG Sets API Integration
+// ⚠️ DEPRECATED - Pokemon TCG Sets API Integration
+// Pokemon TCG API is no longer functional
+// Sets data now comes from Supabase (populated via GitHub bulk import)
+// This file is kept for reference only - can be deleted
 
 const POKEMON_API = 'https://api.pokemontcg.io/v2';
 const API_KEY = import.meta.env.VITE_POKEMON_API_KEY;

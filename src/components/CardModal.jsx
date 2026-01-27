@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, ExternalLink, TrendingUp, TrendingDown, Minus, Info, Award, Loader2 } from 'lucide-react';
 import { formatPrice, getPriceTrend } from '../services/cardService';
 import { getEbayPriceAPI, getEbayPSA10Price, estimateEbayPrice, estimatePSA10Price } from '../services/ebayService';
-import { fetchAndUpdateTCGPrice } from '../services/priceUpdateService';
+import { getDBPrices } from '../services/priceUpdateService';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
@@ -207,12 +207,12 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
       return;
     }
 
-    // Fetch fresh TCG market price and update database
+    // Load prices from database only - no API calls on modal open
     setLoadingTcg(true);
-    fetchAndUpdateTCGPrice(card.id)
-      .then(freshPrice => {
-        if (freshPrice) {
-          setTcgPrices(freshPrice);
+    getDBPrices(card.id)
+      .then(dbPrices => {
+        if (dbPrices) {
+          setTcgPrices(dbPrices);
         }
       })
       .finally(() => setLoadingTcg(false));

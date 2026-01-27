@@ -1,3 +1,7 @@
+// ⚠️ DEPRECATED - This service used Pokemon TCG API which is no longer functional
+// Price updates now use /api/incremental-price-update with eBay API
+// Kept for reference only - can be deleted
+
 import { supabase } from '../lib/supabase';
 import { getEbayPriceAPI, getEbayPSA10Price, estimateEbayPrice, estimatePSA10Price } from './ebayService';
 
@@ -5,6 +9,38 @@ const POKEMON_TCG_API = 'https://api.pokemontcg.io/v2';
 
 // Price cache duration: 6 hours (prices don't update that frequently)
 const PRICE_CACHE_DURATION_MS = 6 * 60 * 60 * 1000;
+
+/**
+ * Get prices from database ONLY - no API calls
+ * Use this for displaying prices on modal open
+ * @param {string} cardId - The card ID to get prices for
+ */
+export const getDBPrices = async (cardId) => {
+  try {
+    const { data } = await supabase
+      .from('prices')
+      .select(`
+        tcgplayer_market, tcgplayer_low, tcgplayer_high, last_updated,
+        normal_market, normal_low, normal_high,
+        holofoil_market, holofoil_low, holofoil_high,
+        reverse_holofoil_market, reverse_holofoil_low, reverse_holofoil_high,
+        first_ed_holofoil_market, first_ed_holofoil_low, first_ed_holofoil_high,
+        first_ed_normal_market, first_ed_normal_low, first_ed_normal_high,
+        unlimited_market, unlimited_low, unlimited_high,
+        unlimited_holofoil_market, unlimited_holofoil_low, unlimited_holofoil_high
+      `)
+      .eq('card_id', cardId)
+      .single();
+
+    if (data) {
+      return formatPriceResponse(data, true);
+    }
+    return null;
+  } catch (e) {
+    console.warn(`No DB prices for ${cardId}`);
+    return null;
+  }
+};
 
 /**
  * Fetch latest TCG market price from Pokemon API and update database
