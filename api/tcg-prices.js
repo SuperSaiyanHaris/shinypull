@@ -39,8 +39,20 @@ export default async function handler(req, res) {
   try {
     console.log(`Fetching TCG prices for card: ${cardId}`);
 
+    // Get API key from environment (Vercel uses non-VITE_ prefix)
+    const apiKey = process.env.POKEMON_API_KEY || process.env.VITE_POKEMON_API_KEY;
+
+    // Build headers - API key is crucial for 20k/day rate limit
+    const headers = {};
+    if (apiKey) {
+      headers['X-Api-Key'] = apiKey;
+      console.log('Using Pokemon API key for enhanced rate limits');
+    } else {
+      console.warn('WARNING: No POKEMON_API_KEY configured - limited to 100 requests/day!');
+    }
+
     // Fetch from Pokemon TCG API
-    const response = await fetch(`https://api.pokemontcg.io/v2/cards/${cardId}`);
+    const response = await fetch(`https://api.pokemontcg.io/v2/cards/${cardId}`, { headers });
 
     if (!response.ok) {
       console.error(`Pokemon TCG API error: ${response.status}`);
