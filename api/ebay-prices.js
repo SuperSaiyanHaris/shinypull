@@ -144,7 +144,8 @@ export default async function handler(req, res) {
 
     // eBay Browse API endpoint
     // Category 183454 = Pokemon TCG
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodedQuery}&category_ids=183454&limit=50&sort=price`;
+    // Add minimum price filter to exclude cheap bulk/damaged cards
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodedQuery}&category_ids=183454&filter=price:%5B10..%5D&limit=50&sort=price`;
 
     console.log(`🔍 Fetching eBay active listings for: ${searchTerms}`);
     console.log(`🌐 Encoded query: ${encodedQuery}`);
@@ -212,16 +213,10 @@ export default async function handler(req, res) {
 
     // Calculate statistics
     const prices = listings.map(l => l.price).sort((a, b) => a - b);
-    const rawAvg = prices.reduce((a, b) => a + b, 0) / prices.length;
+    const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
     const low = prices[0];
     const high = prices[prices.length - 1];
-    const rawMedian = prices[Math.floor(prices.length / 2)];
-    
-    // Apply 15% discount to estimate actual sold prices (active listings vs sold prices)
-    // Market studies show items typically sell for 85% of listing price
-    const MARKET_DISCOUNT = 0.85;
-    const avg = rawAvg * MARKET_DISCOUNT;
-    const median = rawMedian * MARKET_DISCOUNT;
+    const median = prices[Math.floor(prices.length / 2)];
 
     // Get top 5 listings (or 3 minimum if fewer available)
     const topListings = listings.slice(0, 5).map(l => ({
