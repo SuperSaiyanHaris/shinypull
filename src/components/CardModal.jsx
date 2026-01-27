@@ -234,6 +234,8 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
           if (ebayData) {
             setEbayPrices({
               avg: ebayData.avg,
+              market: ebayData.market,
+              median: ebayData.median,
               low: ebayData.low,
               high: ebayData.high,
               count: ebayData.count,
@@ -259,6 +261,8 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
           if (psa10Data) {
             setPsa10Prices({
               avg: psa10Data.avg,
+              market: psa10Data.market,
+              median: psa10Data.median,
               low: psa10Data.low,
               high: psa10Data.high,
               count: psa10Data.count,
@@ -311,7 +315,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
 
   // Primary market price: Use eBay median if available, otherwise fall back to TCGPlayer
   const primaryMarketPrice = displayEbayPrices.market || displayEbayPrices.median || tcgPrices?.market || card.prices?.tcgplayer?.market || 0;
-  const priceSource = (displayEbayPrices.market || displayEbayPrices.median) ? 'eBay Active Listings' : 'TCGPlayer (estimated)';
 
   const trend = getPriceTrend(card.priceHistory);
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
@@ -397,10 +400,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                       ) : (
                         formatPrice(primaryMarketPrice)
                       )}
-                    </p>
-                    <p className="text-[10px] text-adaptive-tertiary mt-1">
-                      {loadingEbay ? 'Fetching...' : priceSource}
-                      {displayEbayPrices.count && ` (${displayEbayPrices.count} listings)`}
                     </p>
                   </div>
                   {/* TCGPlayer Variants - Collapsed view for mobile */}
@@ -583,10 +582,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                           ) : (
                             formatPrice(primaryMarketPrice)
                           )}
-                        </p>
-                        <p className="text-xs text-adaptive-tertiary mt-2">
-                          {loadingEbay ? 'Fetching live prices...' : priceSource}
-                          {displayEbayPrices.count && ` • ${displayEbayPrices.count} active listings`}
                         </p>
                       </div>
                       {/* TCGPlayer Variants */}
