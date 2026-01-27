@@ -11,7 +11,6 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { getEbayCardPrice } from './services/ebayPriceService.js';
 
 // Vercel timeout: 10 seconds on hobby, 60 on pro
 export const config = {
@@ -80,7 +79,7 @@ export default async function handler(req, res) {
 
     console.log(`Updating prices for ${priceRecords.length} cards using eBay...`);
 
-    // Update each card's price from eBay
+    // Update each card's price from eBay using the WORKING ebay-prices endpoint
     const priceUpdates = [];
     const errors = [];
 
@@ -91,30 +90,47 @@ export default async function handler(req, res) {
         
         console.log(`Fetching eBay price for: ${card.name} (${setName})`);
         
-        // Get eBay market price
-        const ebayPrice = await getEbayCardPrice(card.name, setName);
+        // Call the working ebay-prices endpoint
+        const protocol = req.headers['x-forwarded-proto'] || 'https';
+        const host = req.headers['x-forwarded-host'] || req.headers.host;
         
-        if (!ebayPrice.success || ebayPrice.market === null) {
+        const params = new URLSearchParams({
+          cardName: card.name,
+          setName: setName
+        });
+        
+        const ebayUrl = `${protocol}://${host}/api/ebay-prices?${params}`;
+        const ebayResponse = await fetch(ebayUrl);
+        
+        if (!ebayResponse.ok) {
+          console.log(`  eBay API error for ${card.name}`);
+          continue;
+        }
+        
+        const ebayData = await ebayResponse.json();
+        
+        if (!ebayData.found) {
           console.log(`  No eBay prices found for ${card.name}`);
           continue;
         }
         
-        console.log(`  Found: $${ebayPrice.market} (${ebayPrice.sampleSize} listings)`);
+        const marketPrice = ebayData.median || ebayData.avg;
+        console.log(`  Found: $${marketPrice} (${ebayData.count} listings)`);
 
         // Update prices table with eBay data
         priceUpdates.push({
           card_id: priceRecord.card_id,
           
           // Use eBay prices for main fields
-          tcgplayer_market: ebayPrice.market,
-          tcgplayer_low: ebayPrice.low,
-          tcgplayer_high: ebayPrice.high,
+          tcgplayer_market: marketPrice,
+          tcgplayer_low: ebayData.low,
+          tcgplayer_high: ebayData.high,
           
           // Store eBay data in normal variant (most common)
-          normal_market: ebayPrice.market,
-          normal_low: ebayPrice.low,
-          normal_high: ebayPrice.high,
-          normal_mid: ebayPrice.average,
+          normal_market: marketPrice,
+          normal_low: ebayData.low,
+          normal_high: ebayData.high,
+          normal_mid: ebayData.avg,
           
           last_updated: new Date().toISOString(),
           tcgplayer_updated_at: new Date().toISOString()
