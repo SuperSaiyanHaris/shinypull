@@ -188,7 +188,7 @@ function transformCardPrice(githubCard) {
     unlimited_holofoil_direct_low: unlimitedHolo.directLow || null,
     
     last_updated: new Date().toISOString(),
-    tcgplayer_updated_at: new Date().toISOString()
+    price_updated_at: new Date().toISOString()
   };
 }
 

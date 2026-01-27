@@ -76,7 +76,7 @@ const CardItem = ({ card, index }) => {
             <div>
               <p className="text-xs text-adaptive-secondary font-medium mb-1">Market Price</p>
               <p className={`text-2xl font-bold price-gradient ${!user ? 'blur-sm select-none' : ''}`}>
-                {formatPrice(card.prices.tcgplayer.market)}
+                {formatPrice(card.prices.market)}
               </p>
               <p className="text-[9px] text-adaptive-tertiary mt-0.5">Click for live eBay prices</p>
             </div>

@@ -142,15 +142,15 @@ export default async function handler(req, res) {
     // Update database with eBay prices
     const dbUpdate = {
       card_id: cardId,
-      tcgplayer_market: prices.market,
-      tcgplayer_low: prices.low,
-      tcgplayer_high: prices.high,
+      market_price: prices.market,
+      market_low: prices.low,
+      market_high: prices.high,
       normal_market: prices.market,
       normal_low: prices.low,
       normal_high: prices.high,
       normal_mid: prices.average,
       last_updated: new Date().toISOString(),
-      tcgplayer_updated_at: new Date().toISOString()
+      price_updated_at: new Date().toISOString()
     };
 
     const { error: updateError } = await supabaseService

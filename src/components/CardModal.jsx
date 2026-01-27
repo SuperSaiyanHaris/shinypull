@@ -312,8 +312,8 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   const displayEbayPrices = ebayPrices || card.prices?.ebay || { avg: 0, market: 0, verified: false, searchTerms: '', searchUrl: '' };
   const displayPsa10Prices = psa10Prices || card.prices?.psa10 || { avg: 0, market: 0, verified: false, searchTerms: '', searchUrl: '' };
 
-  // Primary market price: Use eBay median if available, otherwise fall back to TCGPlayer
-  const primaryMarketPrice = displayEbayPrices.market || displayEbayPrices.median || tcgPrices?.market || card.prices?.tcgplayer?.market || 0;
+  // Primary market price: Use eBay median if available, otherwise fall back to DB market price
+  const primaryMarketPrice = card.prices?.market || displayEbayPrices.market || displayEbayPrices.median || 0;
 
   const trend = getPriceTrend(card.priceHistory);
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
@@ -637,12 +637,13 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               <div className="relative">
                 <h3 className="text-xl font-display text-adaptive-primary mb-4">Price Comparison</h3>
                 <div className={`space-y-3 ${!user ? 'blur-sm select-none' : ''}`}>
-                  <PriceCompareRow
-                    platform="TCG"
-                    price={card.prices.tcgplayer.market}
-                    verified
-                    link={card.tcgplayerUrl}
-                  />
+                  {card.prices?.tcgplayer?.market > 0 && (
+                    <PriceCompareRow
+                      platform="TCG"
+                      price={card.prices.tcgplayer.market}
+                      link={card.prices.tcgplayer.url || card.tcgplayerUrl}
+                    />
+                  )}
                   {loadingEbay ? (
                     <div className="flex items-center justify-center p-4 modal-card rounded-lg border">
                       <Loader2 className="w-5 h-5 animate-spin text-blue-500 mr-2" />

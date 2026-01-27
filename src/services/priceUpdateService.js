@@ -112,10 +112,10 @@ export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
     // Build database update object with all variants
     const dbUpdate = {
       card_id: cardId,
-      tcgplayer_market: prices.market,
-      tcgplayer_low: prices.low,
-      tcgplayer_high: prices.high,
-      last_updated: new Date().toISOString()
+      market_price: prices.market,
+      market_low: prices.low,
+      market_high: prices.high,
+      price_updated_at: new Date().toISOString()
     };
 
     // Add all variant prices if they exist
@@ -191,9 +191,9 @@ export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
  */
 function formatPriceResponse(dbRow, cached = false) {
   return {
-    market: dbRow.tcgplayer_market,
-    low: dbRow.tcgplayer_low,
-    high: dbRow.tcgplayer_high,
+    market: dbRow.market_price,
+    low: dbRow.market_low,
+    high: dbRow.market_high,
     normal: dbRow.normal_market ? {
       market: dbRow.normal_market,
       low: dbRow.normal_low,
@@ -248,11 +248,11 @@ export const updateCardPrices = async (cardId, cardName, setName, cardNumber, ra
     // Get current TCGPlayer market price for estimation fallback
     const { data: currentPrice } = await supabase
       .from('prices')
-      .select('tcgplayer_market')
+      .select('market_price')
       .eq('card_id', cardId)
       .single();
 
-    const marketPrice = currentPrice?.tcgplayer_market || 0;
+    const marketPrice = currentPrice?.market_price || 0;
 
     // Use real data if available, otherwise estimate
     const ebayAvg = ebayData?.avg || estimateEbayPrice(marketPrice);
@@ -262,11 +262,8 @@ export const updateCardPrices = async (cardId, cardName, setName, cardNumber, ra
     const { error } = await supabase
       .from('prices')
       .update({
-        ebay_avg: parseFloat(ebayAvg.toFixed(2)),
-        ebay_verified: !!ebayData,
-        psa10_avg: parseFloat(psa10Avg.toFixed(2)),
-        psa10_verified: !!psa10Data,
-        last_updated: new Date().toISOString()
+        psa10_market: parseFloat(psa10Avg.toFixed(2)),
+        price_updated_at: new Date().toISOString()
       })
       .eq('card_id', cardId);
 

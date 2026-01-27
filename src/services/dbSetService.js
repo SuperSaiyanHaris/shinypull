@@ -65,14 +65,18 @@ export const getSetCards = async (setId) => {
         series
       ),
       prices (
-        tcgplayer_market,
-        tcgplayer_low,
-        tcgplayer_high,
-        ebay_avg,
-        ebay_verified,
-        psa10_avg,
-        psa10_verified,
-        last_updated
+        market_price,
+        market_low,
+        market_high,
+        tcg_comparison_price,
+        tcg_affiliate_url,
+        psa10_market,
+        psa10_low,
+        psa10_high,
+        price_updated_at,
+        normal_market,
+        holofoil_market,
+        reverse_holofoil_market
       )
     `)
     .eq('set_id', setId)
@@ -109,25 +113,27 @@ export const getSetCards = async (setId) => {
       setId: card.set_id,
       tcgplayerUrl: card.tcgplayer_url || tcgplayerSearchUrl,
       prices: {
+        market: price.market_price ?? 0,
+        low: price.market_low ?? 0,
+        high: price.market_high ?? 0,
         tcgplayer: {
-          market: price.tcgplayer_market ?? 0,
-          low: price.tcgplayer_low ?? 0,
-          high: price.tcgplayer_high ?? 0
+          market: price.tcg_comparison_price ?? 0,
+          url: price.tcg_affiliate_url || card.tcgplayer_url || tcgplayerSearchUrl
         },
         ebay: {
-          market: price.tcgplayer_market ?? 0, // eBay market price is stored in tcgplayer_market
-          avg: price.ebay_avg ?? 0,
-          verified: price.ebay_verified ?? false,
-          recentListings: [],
-          searchTerms: '',
-          searchUrl: ''
+          market: price.market_price ?? 0,
+          low: price.market_low ?? 0,
+          high: price.market_high ?? 0
         },
         psa10: {
-          avg: price.psa10_avg ?? 0,
-          verified: price.psa10_verified ?? false,
-          recentListings: [],
-          searchTerms: '',
-          searchUrl: ''
+          market: price.psa10_market ?? 0,
+          low: price.psa10_low ?? 0,
+          high: price.psa10_high ?? 0
+        },
+        variants: {
+          normal: price.normal_market ? { market: price.normal_market } : null,
+          holofoil: price.holofoil_market ? { market: price.holofoil_market } : null,
+          reverseHolofoil: price.reverse_holofoil_market ? { market: price.reverse_holofoil_market } : null
         }
       },
       priceHistory: []
@@ -163,13 +169,18 @@ export const searchCards = async (query) => {
         logo
       ),
       prices (
-        tcgplayer_market,
-        tcgplayer_low,
-        tcgplayer_high,
-        ebay_avg,
-        ebay_verified,
-        psa10_avg,
-        psa10_verified
+        market_price,
+        market_low,
+        market_high,
+        tcg_comparison_price,
+        tcg_affiliate_url,
+        psa10_market,
+        psa10_low,
+        psa10_high,
+        price_updated_at,
+        normal_market,
+        holofoil_market,
+        reverse_holofoil_market
       )
     `);
   
@@ -218,25 +229,27 @@ export const searchCards = async (query) => {
       setId: card.set_id,
       tcgplayerUrl: card.tcgplayer_url || tcgplayerSearchUrl,
       prices: {
+        market: price.market_price ?? 0,
+        low: price.market_low ?? 0,
+        high: price.market_high ?? 0,
         tcgplayer: {
-          market: price.tcgplayer_market ?? 0,
-          low: price.tcgplayer_low ?? 0,
-          high: price.tcgplayer_high ?? 0
+          market: price.tcg_comparison_price ?? 0,
+          url: price.tcg_affiliate_url || card.tcgplayer_url || tcgplayerSearchUrl
         },
         ebay: {
-          market: price.tcgplayer_market ?? 0, // eBay market price is stored in tcgplayer_market
-          avg: price.ebay_avg ?? 0,
-          verified: price.ebay_verified ?? false,
-          recentListings: [],
-          searchTerms: '',
-          searchUrl: ''
+          market: price.market_price ?? 0,
+          low: price.market_low ?? 0,
+          high: price.market_high ?? 0
         },
         psa10: {
-          avg: price.psa10_avg ?? 0,
-          verified: price.psa10_verified ?? false,
-          recentListings: [],
-          searchTerms: '',
-          searchUrl: ''
+          market: price.psa10_market ?? 0,
+          low: price.psa10_low ?? 0,
+          high: price.psa10_high ?? 0
+        },
+        variants: {
+          normal: price.normal_market ? { market: price.normal_market } : null,
+          holofoil: price.holofoil_market ? { market: price.holofoil_market } : null,
+          reverseHolofoil: price.reverse_holofoil_market ? { market: price.reverse_holofoil_market } : null
         }
       },
       priceHistory: []

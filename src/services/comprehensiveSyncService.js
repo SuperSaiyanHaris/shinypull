@@ -199,17 +199,17 @@ const transformCardPrice = (card) => {
   const unlimited = extractVariantPrices('unlimited');
   const unlimitedHolofoil = extractVariantPrices('unlimitedHolofoil');
 
-  // Calculate best available market price for the legacy tcgplayer_market field
+  // Calculate best available market price for the main market_price field
   const marketPrice = holofoil.market || reverseHolofoil.market || normal.market ||
                       firstEdHolofoil.market || firstEdNormal.market || unlimited.market || 0;
 
   return {
     card_id: card.id,
 
-    // Legacy fields (keeping for backwards compatibility)
-    tcgplayer_market: marketPrice,
-    tcgplayer_low: holofoil.low || normal.low || (marketPrice > 0 ? marketPrice * 0.8 : null),
-    tcgplayer_high: holofoil.high || normal.high || (marketPrice > 0 ? marketPrice * 1.3 : null),
+    // Main pricing fields (eBay-based)
+    market_price: marketPrice,
+    market_low: holofoil.low || normal.low || (marketPrice > 0 ? marketPrice * 0.8 : null),
+    market_high: holofoil.high || normal.high || (marketPrice > 0 ? marketPrice * 1.3 : null),
 
     // Normal variant (non-holo)
     normal_market: normal.market,
@@ -261,13 +261,10 @@ const transformCardPrice = (card) => {
     unlimited_holofoil_direct_low: unlimitedHolofoil.direct_low,
 
     // TCGPlayer metadata
-    tcgplayer_updated_at: tcgplayerUpdatedAt,
+    price_updated_at: tcgplayerUpdatedAt,
 
-    // eBay fields (populated separately)
-    ebay_avg: null,
-    ebay_verified: false,
-    psa10_avg: null,
-    psa10_verified: false
+    // eBay fields (populated separately) - removed ebay_verified
+    psa10_market: null
   };
 };
 

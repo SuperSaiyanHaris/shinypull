@@ -122,9 +122,9 @@ export default async function handler(req, res) {
           card_id: priceRecord.card_id,
           
           // Use eBay prices for main fields
-          tcgplayer_market: marketPrice,
-          tcgplayer_low: ebayData.low,
-          tcgplayer_high: ebayData.high,
+          market_price: marketPrice,
+          market_low: ebayData.low,
+          market_high: ebayData.high,
           
           // Store eBay data in normal variant (most common)
           normal_market: marketPrice,
@@ -132,8 +132,7 @@ export default async function handler(req, res) {
           normal_high: ebayData.high,
           normal_mid: ebayData.avg,
           
-          last_updated: new Date().toISOString(),
-          tcgplayer_updated_at: new Date().toISOString()
+          price_updated_at: new Date().toISOString()
         });
 
         // Small delay between eBay requests to avoid rate limits
