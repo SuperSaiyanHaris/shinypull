@@ -133,10 +133,10 @@ function transformCardPrice(githubCard) {
   return {
     card_id: githubCard.id,
     
-    // Legacy columns (best available)
-    tcgplayer_market: holofoil.market || reverseHolofoil.market || normal.market || unlimited.market || firstEdHolo.market || null,
-    tcgplayer_low: holofoil.low || reverseHolofoil.low || normal.low || null,
-    tcgplayer_high: holofoil.high || reverseHolofoil.high || normal.high || null,
+    // Market price columns (best available)
+    market_price: holofoil.market || reverseHolofoil.market || normal.market || unlimited.market || firstEdHolo.market || null,
+    market_low: holofoil.low || reverseHolofoil.low || normal.low || null,
+    market_high: holofoil.high || reverseHolofoil.high || normal.high || null,
     
     // Normal variant
     normal_market: normal.market || null,

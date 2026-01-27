@@ -20,7 +20,7 @@ export const getDBPrices = async (cardId) => {
     const { data } = await supabase
       .from('prices')
       .select(`
-        tcgplayer_market, tcgplayer_low, tcgplayer_high, last_updated,
+        market_price, market_low, market_high, last_updated,
         normal_market, normal_low, normal_high,
         holofoil_market, holofoil_low, holofoil_high,
         reverse_holofoil_market, reverse_holofoil_low, reverse_holofoil_high,
@@ -61,7 +61,7 @@ export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
     const { data } = await supabase
       .from('prices')
       .select(`
-        tcgplayer_market, tcgplayer_low, tcgplayer_high, last_updated,
+        market_price, market_low, market_high, last_updated,
         normal_market, normal_low, normal_high,
         holofoil_market, holofoil_low, holofoil_high,
         reverse_holofoil_market, reverse_holofoil_low, reverse_holofoil_high,
