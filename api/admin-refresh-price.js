@@ -88,80 +88,58 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'cardId is required' });
     }
 
-    // Fetch fresh prices from Pokemon TCG API via our tcg-prices endpoint
-    const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const host = req.headers['x-forwarded-host'] || req.headers.host;
-    const apiUrl = `${protocol}://${host}/api/tcg-prices?cardId=${cardId}`;
+    // Get card details from database to fetch eBay prices
+    const { data: card, error: cardError } = await supabaseService
+      .from('cards')
+      .select('name, sets!inner(name)')
+      .eq('id', cardId)
+      .single();
+
+    if (cardError || !card) {
+      return res.status(404).json({ error: 'Card not found' });
+    }
+
+    // Fetch fresh prices from eBay API
+    const ebayModule = await import('./services/ebayPriceService.js');
+    const ebayPrice = await ebayModule.getEbayCardPrice(card.name, card.sets.name);
     
-    console.log(`📡 Fetching prices from: ${apiUrl}`);
-    
-    const tcgResponse = await fetch(apiUrl);
-    
-    if (!tcgResponse.ok) {
+    if (!ebayPrice.success) {
       return res.status(500).json({ 
-        error: 'Failed to fetch prices from TCG API',
-        details: await tcgResponse.text()
+        error: 'Failed to fetch prices from eBay API',
+        details: ebayPrice.error
       });
     }
 
-    const tcgData = await tcgResponse.json();
-    
-    if (!tcgData.success || !tcgData.prices) {
+    if (ebayPrice.market === null) {
       return res.status(500).json({ 
-        error: 'No price data returned from TCG API' 
+        error: 'No price data returned from eBay API' 
       });
     }
 
-    const { prices } = tcgData;
+    const prices = {
+      market: ebayPrice.market,
+      low: ebayPrice.low,
+      high: ebayPrice.high,
+      average: ebayPrice.average,
+      updatedAt: ebayPrice.lastUpdated
+    };
 
     // Use service role to update the database (bypasses RLS)
     const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Build the update object with all available variants
+    // Update database with eBay prices
     const dbUpdate = {
       card_id: cardId,
       tcgplayer_market: prices.market,
       tcgplayer_low: prices.low,
       tcgplayer_high: prices.high,
-      last_updated: new Date().toISOString()
+      normal_market: prices.market,
+      normal_low: prices.low,
+      normal_high: prices.high,
+      normal_mid: prices.average,
+      last_updated: new Date().toISOString(),
+      tcgplayer_updated_at: new Date().toISOString()
     };
-
-    // Add variant prices if available
-    if (prices.normal) {
-      dbUpdate.normal_market = prices.normal.market;
-      dbUpdate.normal_low = prices.normal.low;
-      dbUpdate.normal_high = prices.normal.high;
-    }
-    if (prices.holofoil) {
-      dbUpdate.holofoil_market = prices.holofoil.market;
-      dbUpdate.holofoil_low = prices.holofoil.low;
-      dbUpdate.holofoil_high = prices.holofoil.high;
-    }
-    if (prices.reverseHolofoil) {
-      dbUpdate.reverse_holofoil_market = prices.reverseHolofoil.market;
-      dbUpdate.reverse_holofoil_low = prices.reverseHolofoil.low;
-      dbUpdate.reverse_holofoil_high = prices.reverseHolofoil.high;
-    }
-    if (prices.firstEditionHolofoil) {
-      dbUpdate.first_ed_holofoil_market = prices.firstEditionHolofoil.market;
-      dbUpdate.first_ed_holofoil_low = prices.firstEditionHolofoil.low;
-      dbUpdate.first_ed_holofoil_high = prices.firstEditionHolofoil.high;
-    }
-    if (prices.firstEditionNormal) {
-      dbUpdate.first_ed_normal_market = prices.firstEditionNormal.market;
-      dbUpdate.first_ed_normal_low = prices.firstEditionNormal.low;
-      dbUpdate.first_ed_normal_high = prices.firstEditionNormal.high;
-    }
-    if (prices.unlimited) {
-      dbUpdate.unlimited_market = prices.unlimited.market;
-      dbUpdate.unlimited_low = prices.unlimited.low;
-      dbUpdate.unlimited_high = prices.unlimited.high;
-    }
-    if (prices.unlimitedHolofoil) {
-      dbUpdate.unlimited_holofoil_market = prices.unlimitedHolofoil.market;
-      dbUpdate.unlimited_holofoil_low = prices.unlimitedHolofoil.low;
-      dbUpdate.unlimited_holofoil_high = prices.unlimitedHolofoil.high;
-    }
 
     const { error: updateError } = await supabaseService
       .from('prices')
@@ -183,15 +161,10 @@ export default async function handler(req, res) {
         market: prices.market,
         low: prices.low,
         high: prices.high,
-        normal: prices.normal,
-        holofoil: prices.holofoil,
-        reverseHolofoil: prices.reverseHolofoil,
-        firstEditionHolofoil: prices.firstEditionHolofoil,
-        firstEditionNormal: prices.firstEditionNormal,
-        unlimited: prices.unlimited,
-        unlimitedHolofoil: prices.unlimitedHolofoil,
+        average: prices.average,
         lastUpdated: new Date().toISOString(),
-        cached: false
+        cached: false,
+        source: 'ebay'
       }
     });
 

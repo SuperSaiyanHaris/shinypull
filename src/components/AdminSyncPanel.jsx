@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
   RefreshCw,
-  Database,
   CheckCircle,
   XCircle,
   Clock,
   DollarSign,
-  Zap,
   Loader2,
-  Package,
   Info
 } from 'lucide-react';
 import { getSyncStatus } from '../services/comprehensiveSyncService';
@@ -27,24 +24,6 @@ const AdminSyncPanel = () => {
   const loadSyncStatus = async () => {
     const status = await getSyncStatus();
     setSyncStatus(status);
-  };
-
-  const handleCompleteSync = async () => {
-    alert(
-      '⚠️ COMPLETE SYNC DEPRECATED\n\n' +
-      'The Pokemon TCG API is no longer functional.\n\n' +
-      'Use the bulk-import script instead:\n' +
-      'npm run bulk-import'
-    );
-  };
-
-  const handleSyncNewSets = async () => {
-    alert(
-      '⚠️ NEW SETS SYNC DEPRECATED\n\n' +
-      'The Pokemon TCG API is no longer functional.\n\n' +
-      'Use the bulk-import script to sync new sets:\n' +
-      'npm run bulk-import'
-    );
   };
 
   const handleUpdatePrices = async () => {
@@ -179,66 +158,15 @@ const AdminSyncPanel = () => {
           Sync Actions
         </h3>
 
-        {/* Complete Initial Sync */}
-        <div className="p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl border border-purple-200 dark:border-purple-800">
-          <div className="flex items-start gap-3 mb-3">
-            <Zap className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <h4 className="font-semibold text-adaptive-primary">Complete Initial Sync</h4>
-              <p className="text-xs text-adaptive-tertiary mt-1">
-                One-time sync of ALL sets and ALL cards with complete data (types, supertype, attacks, etc.).
-                Run this once to populate your database fully.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={handleCompleteSync}
-            disabled={syncing}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 text-white rounded-xl font-semibold transition-all"
-          >
-            {syncing && syncType === 'complete' ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Database className="w-5 h-5" />
-            )}
-            {syncing && syncType === 'complete' ? 'Syncing All Data...' : 'Run Complete Sync'}
-          </button>
-        </div>
-
-        {/* Sync New Sets */}
-        <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-teal-500/10 rounded-xl border border-cyan-200 dark:border-cyan-800">
-          <div className="flex items-start gap-3 mb-3">
-            <Package className="w-5 h-5 text-cyan-500 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <h4 className="font-semibold text-adaptive-primary">Sync New Sets</h4>
-              <p className="text-xs text-adaptive-tertiary mt-1">
-                Check for newly released sets and sync them. Run this when new Pokemon sets are announced (every 3-4 months).
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={handleSyncNewSets}
-            disabled={syncing}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 disabled:opacity-50 text-white rounded-xl font-semibold transition-all"
-          >
-            {syncing && syncType === 'new_sets' ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Package className="w-5 h-5" />
-            )}
-            {syncing && syncType === 'new_sets' ? 'Checking for New Sets...' : 'Sync New Sets'}
-          </button>
-        </div>
-
         {/* Update Prices */}
         <div className="p-4 bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-xl border border-emerald-200 dark:border-emerald-800">
           <div className="flex items-start gap-3 mb-3">
             <DollarSign className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h4 className="font-semibold text-adaptive-primary">Update Prices</h4>
+              <h4 className="font-semibold text-adaptive-primary">Update eBay Prices</h4>
               <p className="text-xs text-adaptive-tertiary mt-1">
-                Refresh TCGPlayer prices for cards with stale data (older than 24 hours).
-                This is the only sync that needs to run regularly.
+                Refresh market prices from eBay sold listings for cards with stale data (oldest first).
+                Updates 5-10 cards per run. Run regularly to keep prices current.
               </p>
             </div>
           </div>

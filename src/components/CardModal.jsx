@@ -14,7 +14,7 @@ const HighPriceTooltip = ({ className = "" }) => (
   <div className={`group relative inline-flex items-center ${className}`}>
     <Info className="w-3.5 h-3.5 text-adaptive-tertiary cursor-help ml-1" />
     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-3 price-tooltip text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] font-normal normal-case tracking-normal pointer-events-none">
-      Highest listed price on TCGPlayer. May be inflated by individual sellers and not reflect actual market value.
+      Highest listed price on eBay. May be inflated by individual sellers and not reflect actual market value.
       <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent price-tooltip-arrow"></div>
     </div>
   </div>
@@ -394,7 +394,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               <div className="relative">
                 <div className={`p-4 modal-price-box rounded-xl border ${!user ? 'blur-sm select-none' : ''}`}>
                   <PriceVariantsDisplay prices={tcgPrices} loading={loadingTcg} compact />
-                  <p className="text-[10px] text-adaptive-tertiary text-center mt-2">TCGPlayer Market Prices</p>
+                  <p className="text-xs text-adaptive-tertiary text-center mt-3">eBay Market Prices</p>
                 </div>
 
                 {/* Auth Gate Overlay for Price Box */}
@@ -440,28 +440,28 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               <div className="space-y-2 relative">
                 <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide">Price Comparison</h3>
                 <div className={`space-y-2 ${!user ? 'blur-sm select-none' : ''}`}>
-                  {/* TCGPlayer */}
-                  {card.tcgplayerUrl && (
-                    <div className="p-3 modal-card rounded-lg border">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs text-adaptive-tertiary">TCG {loadingTcg && <span className="text-[10px]">(updating...)</span>}</p>
-                          <p className="text-lg font-bold text-blue-500">
-                            {formatPrice(tcgPrices?.market || card.prices?.tcgplayer?.market || 0)}
-                          </p>
-                        </div>
+                  {/* eBay Market Price */}
+                  <div className="p-3 modal-card rounded-lg border">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-adaptive-tertiary">eBay Market {loadingTcg && <span className="text-[10px]">(updating...)</span>}</p>
+                        <p className="text-lg font-bold text-blue-500">
+                          {formatPrice(tcgPrices?.market || 0)}
+                        </p>
+                      </div>
+                      {card.tcgplayerUrl && (
                         <a
                           href={card.tcgplayerUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-3 py-2 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-colors flex items-center gap-1.5"
+                          className="px-3 py-2 bg-gray-500/10 hover:bg-gray-500/20 rounded-lg transition-colors flex items-center gap-1.5"
                         >
-                          <span className="text-xs font-medium text-green-500">View</span>
-                          <ExternalLink className="w-3.5 h-3.5 text-green-500" />
+                          <span className="text-[10px] font-medium text-gray-500">TCG Est.</span>
+                          <ExternalLink className="w-3 h-3 text-gray-500" />
                         </a>
-                      </div>
+                      )}
                     </div>
-                  )}
+                  </div>
 
                   {loadingEbay ? (
                     <div className="flex items-center justify-center p-3 modal-card rounded-lg border">
@@ -582,7 +582,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   <div className="relative">
                     <div className={`p-6 modal-price-box rounded-xl border ${!user ? 'blur-sm select-none' : ''}`}>
                       <PriceVariantsDisplay prices={tcgPrices} loading={loadingTcg} />
-                      <p className="text-xs text-adaptive-tertiary text-center mt-3">TCGPlayer Market Prices</p>
+                      <p className="text-xs text-adaptive-tertiary text-center mt-3">eBay Market Prices</p>
                     </div>
 
                     {/* Auth Gate Overlay for Desktop Price Box */}

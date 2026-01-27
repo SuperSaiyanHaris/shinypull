@@ -7,8 +7,8 @@
  * Get eBay OAuth token
  */
 export async function getEbayToken() {
-  const appId = process.env.VITE_EBAY_APP_ID;
-  const certId = process.env.VITE_EBAY_CERT_ID;
+  const appId = process.env.EBAY_APP_ID || process.env.VITE_EBAY_APP_ID;
+  const certId = process.env.EBAY_CERT_ID || process.env.VITE_EBAY_CERT_ID;
   
   if (!appId || !certId) {
     throw new Error('Missing eBay credentials');
