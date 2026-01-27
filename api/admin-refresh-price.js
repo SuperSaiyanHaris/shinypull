@@ -102,29 +102,41 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Card not found' });
     }
 
-    // Fetch fresh prices from eBay API
-    const ebayModule = await import('./services/ebayPriceService.js');
-    const ebayPrice = await ebayModule.getEbayCardPrice(card.name, card.sets.name);
+    // Fetch fresh prices from eBay API using the WORKING ebay-prices endpoint
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
     
-    if (!ebayPrice.success) {
+    const params = new URLSearchParams({
+      cardName: card.name,
+      setName: card.sets.name
+    });
+    
+    const ebayUrl = `${protocol}://${host}/api/ebay-prices?${params}`;
+    console.log(`📡 Fetching eBay prices from: ${ebayUrl}`);
+    
+    const ebayResponse = await fetch(ebayUrl);
+    
+    if (!ebayResponse.ok) {
       return res.status(500).json({ 
         error: 'Failed to fetch prices from eBay API',
-        details: ebayPrice.error
+        details: await ebayResponse.text()
       });
     }
 
-    if (ebayPrice.market === null) {
+    const ebayData = await ebayResponse.json();
+    
+    if (!ebayData.found) {
       return res.status(500).json({ 
-        error: 'No price data returned from eBay API' 
+        error: 'No eBay listings found for this card'
       });
     }
 
     const prices = {
-      market: ebayPrice.market,
-      low: ebayPrice.low,
-      high: ebayPrice.high,
-      average: ebayPrice.average,
-      updatedAt: ebayPrice.lastUpdated
+      market: ebayData.median || ebayData.avg,
+      low: ebayData.low,
+      high: ebayData.high,
+      average: ebayData.avg,
+      updatedAt: new Date().toISOString()
     };
 
     // Update database with eBay prices
