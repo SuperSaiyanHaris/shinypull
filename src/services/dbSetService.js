@@ -115,6 +115,7 @@ export const getSetCards = async (setId) => {
           high: price.tcgplayer_high ?? 0
         },
         ebay: {
+          market: price.tcgplayer_market ?? 0, // eBay market price is stored in tcgplayer_market
           avg: price.ebay_avg ?? 0,
           verified: price.ebay_verified ?? false,
           recentListings: [],
@@ -223,6 +224,7 @@ export const searchCards = async (query) => {
           high: price.tcgplayer_high ?? 0
         },
         ebay: {
+          market: price.tcgplayer_market ?? 0, // eBay market price is stored in tcgplayer_market
           avg: price.ebay_avg ?? 0,
           verified: price.ebay_verified ?? false,
           recentListings: [],

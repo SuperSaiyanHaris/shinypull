@@ -208,22 +208,20 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
       })
       .finally(() => setLoadingTcg(false));
 
-    // Check if we already have verified eBay data
-    const hasEbayData = card.prices?.ebay?.verified;
-    const hasPsa10Data = card.prices?.psa10?.verified;
-
-    // If we already have good data, use it
-    if (hasEbayData) {
+    // Load eBay prices from card data (DB) only - no automatic API fetching
+    // Admin can manually refresh if needed
+    if (card.prices?.ebay) {
       setEbayPrices(card.prices.ebay);
     }
-    if (hasPsa10Data) {
+    if (card.prices?.psa10) {
       setPsa10Prices(card.prices.psa10);
     }
 
-    // If missing data, fetch from eBay API
-    if (!hasEbayData || !hasPsa10Data) {
-      setLoadingEbay(true);
+    // DISABLED: Automatic eBay fetching removed - admin manual refresh only
+    // if (!hasEbayData || !hasPsa10Data) {
+    //   setLoadingEbay(true);
 
+    /*
       const fetchPrices = async () => {
         try {
           const [ebayData, psa10Data] = await Promise.all([
@@ -293,6 +291,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
 
       fetchPrices();
     }
+    */
   }, [isOpen, card]);
 
   // Reset state when modal closes
@@ -392,7 +391,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               <div className="relative">
                 <div className={`p-4 modal-price-box rounded-xl border ${!user ? 'blur-sm select-none' : ''}`}>
                   {/* Primary Market Price - eBay Based */}
-                  <div className="text-center mb-3">
+                  <div className="text-center">
                     <p className="text-xs text-adaptive-secondary font-medium mb-1">Market Price</p>
                     <p className="text-3xl font-bold price-gradient">
                       {loadingEbay ? (
@@ -402,11 +401,10 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                       )}
                     </p>
                   </div>
-                  {/* TCGPlayer Variants - Collapsed view for mobile */}
-                  {tcgPrices && Object.keys(tcgPrices).some(key => key !== 'market' && tcgPrices[key]?.market) && (
-                    <div className="pt-3 border-t border-adaptive/30">
+                  {/* TCGPlayer Variants - Only show if more than 1 variant */}
+                  {tcgPrices && Object.keys(tcgPrices).filter(key => key !== 'market' && tcgPrices[key]?.market).length > 1 && (
+                    <div className="pt-3 border-t border-adaptive/30 mt-3">
                       <PriceVariantsDisplay prices={tcgPrices} loading={loadingTcg} compact />
-                      <p className="text-[10px] text-adaptive-tertiary text-center mt-2">TCGPlayer Variants</p>
                     </div>
                   )}
                 </div>
@@ -584,11 +582,10 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                           )}
                         </p>
                       </div>
-                      {/* TCGPlayer Variants */}
-                      {tcgPrices && Object.keys(tcgPrices).some(key => key !== 'market' && tcgPrices[key]?.market) && (
-                        <div className="pt-4 border-t border-adaptive/30">
+                      {/* TCGPlayer Variants - Only show if more than 1 variant */}
+                      {tcgPrices && Object.keys(tcgPrices).filter(key => key !== 'market' && tcgPrices[key]?.market).length > 1 && (
+                        <div className="pt-4 border-t border-adaptive/30 mt-4">
                           <PriceVariantsDisplay prices={tcgPrices} loading={loadingTcg} />
-                          <p className="text-xs text-adaptive-tertiary text-center mt-3">TCGPlayer Variant Prices</p>
                         </div>
                       )}
                     </div>
@@ -714,18 +711,8 @@ const InfoCard = ({ label, value }) => (
 
 const PriceCompareRow = ({ platform, price, verified, estimated, link }) => (
   <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border">
-    <div className="flex items-center gap-3">
+    <div>
       <span className="text-adaptive-primary font-semibold">{platform}</span>
-      {verified && (
-        <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
-          ✓ Verified
-        </span>
-      )}
-      {estimated && (
-        <span className="px-2 py-0.5 badge-estimated text-xs font-bold rounded-full">
-          ~Estimated
-        </span>
-      )}
     </div>
     <div className="flex items-center gap-3">
       <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
@@ -756,26 +743,10 @@ const EbayPriceRow = ({ ebayData, label = "eBay" }) => {
 
   return (
     <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border group">
-      <div className="flex items-center gap-3">
-        <div>
-          <span className="text-adaptive-primary font-semibold">
-            {verified ? label : `${label} (estimated)`}
-          </span>
-          {verified && count && (
-            <span className="block text-[10px] text-adaptive-tertiary mt-0.5">
-              {count} active listings
-            </span>
-          )}
-        </div>
-        {verified ? (
-          <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
-            ✓ Live data
-          </span>
-        ) : (
-          <span className="px-2 py-0.5 badge-estimated text-xs font-bold rounded-full">
-            ~Estimated
-          </span>
-        )}
+      <div>
+        <span className="text-adaptive-primary font-semibold">
+          {label}
+        </span>
       </div>
       <div className="flex items-center gap-3">
         {verified && low !== undefined && high !== undefined ? (
@@ -813,29 +784,10 @@ const PSA10PriceRow = ({ psa10Data }) => {
 
   return (
     <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border group">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <Award className="w-5 h-5 text-yellow-500" />
-          <div>
-            <span className="text-adaptive-primary font-semibold">
-              {verified ? 'eBay PSA 10' : 'eBay PSA 10 (estimated)'}
-            </span>
-            {verified && count && (
-              <span className="block text-[10px] text-adaptive-tertiary mt-0.5">
-                {count} active listings
-              </span>
-            )}
-          </div>
-        </div>
-        {verified ? (
-          <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
-            ✓ Live data
-          </span>
-        ) : (
-          <span className="px-2 py-0.5 badge-estimated text-xs font-bold rounded-full">
-            ~Estimated
-          </span>
-        )}
+      <div>
+        <span className="text-adaptive-primary font-semibold">
+          eBay PSA 10
+        </span>
       </div>
       <div className="flex items-center gap-3">
         {verified && low !== undefined && high !== undefined ? (
