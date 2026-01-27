@@ -19,9 +19,10 @@ const PRICE_CACHE_DURATION_MS = 6 * 60 * 60 * 1000;
  * @param {boolean} forceRefresh - If true, bypasses cache and fetches fresh data
  */
 export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
+  // First, get cached price from database (always do this first)
+  let cachedPrice = null;
   try {
-    // Check if we have recent cached prices in the database
-    const { data: existingPrice, error: fetchError } = await supabase
+    const { data } = await supabase
       .from('prices')
       .select(`
         tcgplayer_market, tcgplayer_low, tcgplayer_high, last_updated,
@@ -35,36 +36,39 @@ export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
       `)
       .eq('card_id', cardId)
       .single();
+    cachedPrice = data;
+  } catch (e) {
+    // No cached price exists
+  }
 
-    if (!forceRefresh && !fetchError && existingPrice?.last_updated) {
-      const lastUpdated = new Date(existingPrice.last_updated);
-      const now = new Date();
-      const timeSinceUpdate = now - lastUpdated;
+  // Check if cached price is fresh enough
+  if (!forceRefresh && cachedPrice?.last_updated) {
+    const lastUpdated = new Date(cachedPrice.last_updated);
+    const timeSinceUpdate = Date.now() - lastUpdated.getTime();
 
-      // If prices were updated within the cache duration, return cached data
-      if (timeSinceUpdate < PRICE_CACHE_DURATION_MS) {
-        const hoursAgo = Math.floor(timeSinceUpdate / (60 * 60 * 1000));
-        console.log(`✅ Using cached TCG prices for ${cardId} (updated ${hoursAgo}h ago)`);
-        return formatPriceResponse(existingPrice, true);
-      }
+    if (timeSinceUpdate < PRICE_CACHE_DURATION_MS) {
+      const hoursAgo = Math.floor(timeSinceUpdate / (60 * 60 * 1000));
+      console.log(`✅ Using cached TCG prices for ${cardId} (updated ${hoursAgo}h ago)`);
+      return formatPriceResponse(cachedPrice, true);
     }
+  }
 
-    // Cache expired or no cached data - fetch fresh prices
-    console.log(`🔄 Fetching fresh TCG prices for ${cardId} ${forceRefresh ? '(FORCE REFRESH - Admin)' : '(cache expired or missing)'}`);
+  // Cache expired or missing - try to fetch fresh prices
+  console.log(`🔄 Fetching fresh TCG prices for ${cardId} ${forceRefresh ? '(FORCE REFRESH)' : '(cache expired)'}`);
 
-    // Fetch card data from Pokemon TCG API via our serverless function to avoid CORS
+  try {
     const response = await fetch(`/api/tcg-prices?cardId=${cardId}`);
 
     if (!response.ok) {
-      console.warn(`Failed to fetch price for card ${cardId}`);
-      return null;
+      console.warn(`API error for ${cardId} - falling back to cached data`);
+      return cachedPrice ? formatPriceResponse(cachedPrice, true) : null;
     }
 
     const data = await response.json();
 
     if (!data.success || !data.prices) {
-      console.warn(`No price data returned for card ${cardId}`);
-      return null;
+      console.warn(`No price data for ${cardId} - falling back to cached data`);
+      return cachedPrice ? formatPriceResponse(cachedPrice, true) : null;
     }
 
     const { prices } = data;
@@ -115,17 +119,12 @@ export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
       dbUpdate.unlimited_holofoil_high = prices.unlimitedHolofoil.high;
     }
 
-    // Update database with fresh prices
-    const { error } = await supabase
+    // Update database with fresh prices (don't fail if this errors)
+    await supabase
       .from('prices')
-      .upsert(dbUpdate, { onConflict: 'card_id' });
-
-    if (error) {
-      console.error('Error updating price in database:', error);
-      return null;
-    }
-
-    console.log(`✅ Updated TCG prices for ${cardId} with all variants`);
+      .upsert(dbUpdate, { onConflict: 'card_id' })
+      .then(() => console.log(`✅ Updated TCG prices for ${cardId}`))
+      .catch(e => console.warn(`Failed to cache prices for ${cardId}:`, e.message));
 
     // Return formatted response
     return {
@@ -145,8 +144,9 @@ export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
     };
 
   } catch (error) {
-    console.error('Error fetching/updating TCG price:', error);
-    return null;
+    console.error('Error fetching TCG price:', error);
+    // Always fall back to cached data if available
+    return cachedPrice ? formatPriceResponse(cachedPrice, true) : null;
   }
 };
 
