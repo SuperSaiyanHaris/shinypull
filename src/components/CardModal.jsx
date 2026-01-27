@@ -54,11 +54,7 @@ const PriceVariantCard = ({ variant, data, compact = false }) => {
       <p className={`text-xl font-bold ${config.color}`}>
         {formatPrice(data.market)}
       </p>
-      {data.low && data.high && (
-        <p className="text-[10px] text-adaptive-tertiary mt-1">
-          {formatPrice(data.low)} - {formatPrice(data.high)}
-        </p>
-      )}
+
     </div>
   );
 };
@@ -86,11 +82,6 @@ const PriceVariantsDisplay = ({ prices, loading = false, compact = false }) => {
         <div className="text-center bg-adaptive-hover rounded-lg p-4">
           <p className="text-sm text-adaptive-secondary font-medium mb-2">Market Price</p>
           <p className="text-3xl font-bold price-gradient">{formatPrice(prices.market)}</p>
-          {prices.low && prices.high && (
-            <p className="text-xs text-adaptive-tertiary mt-2">
-              Range: {formatPrice(prices.low)} - {formatPrice(prices.high)}
-            </p>
-          )}
         </div>
       );
     }

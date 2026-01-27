@@ -39,15 +39,16 @@ export async function getEbayToken() {
 export async function searchEbaySoldListings(cardName, setName, limit = 20) {
   const token = await getEbayToken();
   
-  // Build search query - Pokemon card name + set
-  const query = `${cardName} Pokemon ${setName}`;
+  // Build search query - Be very specific for Pokemon cards
+  // Include "card" and "TCG" to avoid getting toys, plushies, etc.
+  const query = `"${cardName}" Pokemon Card ${setName} -lot -bulk -pack -booster`;
   
-  // Search for completed listings (sold items)
+  // Search for SOLD completed listings only with minimum price filter
   const searchParams = new URLSearchParams({
     q: query,
-    filter: 'buyingOptions:{FIXED_PRICE},itemLocationCountry:US,deliveryCountry:US,priceCurrency:USD,conditions:{NEW|LIKE_NEW|EXCELLENT|VERY_GOOD|GOOD}',
+    filter: 'buyingOptions:{FIXED_PRICE},itemLocationCountry:US,priceCurrency:USD,conditions:{NEW|LIKE_NEW|EXCELLENT|VERY_GOOD|GOOD},price:[5..],soldItems',
     limit: limit.toString(),
-    sort: 'price', // Sort by price to get market range
+    sort: 'price',
     fieldgroups: 'MATCHING_ITEMS'
   });
   
