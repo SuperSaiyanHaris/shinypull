@@ -88,6 +88,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'cardId is required' });
     }
 
+    // Use service role to query database (bypasses RLS)
+    const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+
     // Get card details from database to fetch eBay prices
     const { data: card, error: cardError } = await supabaseService
       .from('cards')
@@ -123,9 +126,6 @@ export default async function handler(req, res) {
       average: ebayPrice.average,
       updatedAt: ebayPrice.lastUpdated
     };
-
-    // Use service role to update the database (bypasses RLS)
-    const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
 
     // Update database with eBay prices
     const dbUpdate = {
