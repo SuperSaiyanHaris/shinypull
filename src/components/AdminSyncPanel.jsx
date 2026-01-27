@@ -8,7 +8,6 @@ import {
   DollarSign,
   Zap,
   Loader2,
-  AlertTriangle,
   Package,
   Info
 } from 'lucide-react';
@@ -178,29 +177,28 @@ const AdminSyncPanel = () => {
         )}
       </div>
 
-      {/* Sync Metadata */}
+      {/* Last Price Sync */}
       {syncStatus?.syncMetadata && (
         <div className="space-y-3 mb-6">
-          <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wider">
-            Last Sync Times
-          </h3>
-          {syncStatus.syncMetadata.map((meta) => (
-            <div
-              key={meta.entity_type}
-              className="flex items-center justify-between p-3 bg-adaptive-card rounded-xl border border-adaptive"
-            >
-              <div className="flex items-center gap-3">
-                {getStatusIcon(meta.status)}
-                <div>
-                  <p className="font-medium text-adaptive-primary capitalize">{meta.entity_type}</p>
-                  <p className="text-xs text-adaptive-tertiary">{meta.message || 'Not synced'}</p>
+          {syncStatus.syncMetadata
+            .filter((meta) => meta.entity_type === 'prices')
+            .map((meta) => (
+              <div
+                key={meta.entity_type}
+                className="flex items-center justify-between p-3 bg-adaptive-card rounded-xl border border-adaptive"
+              >
+                <div className="flex items-center gap-3">
+                  {getStatusIcon(meta.status)}
+                  <div>
+                    <p className="font-medium text-adaptive-primary">Last Price Update</p>
+                    <p className="text-xs text-adaptive-tertiary">{meta.message || 'Not synced'}</p>
+                  </div>
                 </div>
+                <p className="text-xs text-adaptive-tertiary">
+                  {meta.last_sync ? new Date(meta.last_sync).toLocaleString() : 'Never'}
+                </p>
               </div>
-              <p className="text-xs text-adaptive-tertiary">
-                {meta.last_sync ? new Date(meta.last_sync).toLocaleString() : 'Never'}
-              </p>
-            </div>
-          ))}
+            ))}
         </div>
       )}
 
@@ -366,24 +364,6 @@ const AdminSyncPanel = () => {
           </div>
         </div>
       )}
-
-      {/* Instructions */}
-      <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
-        <div className="flex items-start gap-2">
-          <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2">
-              Sync Philosophy
-            </p>
-            <ul className="text-xs text-amber-800 dark:text-amber-200 space-y-1 list-disc ml-4">
-              <li><strong>Complete Sync:</strong> Run ONCE to populate all data (types, attacks, etc.)</li>
-              <li><strong>New Sets:</strong> Run when new Pokemon sets release (every 3-4 months)</li>
-              <li><strong>Update Prices:</strong> Run daily - this is the only recurring sync needed</li>
-              <li>Card data is static - once synced, it never changes!</li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
