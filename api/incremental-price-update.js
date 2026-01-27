@@ -95,6 +95,12 @@ export default async function handler(req, res) {
           { headers, signal: AbortSignal.timeout(3000) }
         );
 
+        // Skip 404s - card doesn't exist in API (old/removed cards)
+        if (response.status === 404) {
+          console.log(`Card ${priceRecord.card_id} not found in API (likely removed/old card)`);
+          continue;
+        }
+
         if (!response.ok) {
           throw new Error(`API error: ${response.status}`);
         }
@@ -102,6 +108,12 @@ export default async function handler(req, res) {
         const data = await response.json();
         const apiCard = data.data;
         const prices = apiCard.tcgplayer?.prices || {};
+
+        // Skip if no prices available
+        if (!prices || Object.keys(prices).length === 0) {
+          console.log(`No prices available for ${priceRecord.card_id}`);
+          continue;
+        }
 
         const normal = prices.normal || {};
         const holofoil = prices.holofoil || {};
