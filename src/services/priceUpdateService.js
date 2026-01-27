@@ -9,11 +9,11 @@ const PRICE_CACHE_DURATION_MS = 6 * 60 * 60 * 1000;
 /**
  * Fetch latest TCG market price from Pokemon API and update database
  * Called when card modal opens to ensure real-time prices
- * 
+ *
  * NOTE: Pokemon TCG API prices are NOT real-time - they cache TCGPlayer data
- * and update periodically (every few hours). For truly real-time prices, 
+ * and update periodically (every few hours). For truly real-time prices,
  * we'd need direct TCGPlayer API access (requires paid partnership).
- * 
+ *
  * CACHING: Only fetches fresh data if last update was more than 6 hours ago
  * @param {string} cardId - The card ID to fetch prices for
  * @param {boolean} forceRefresh - If true, bypasses cache and fetches fresh data
@@ -23,7 +23,16 @@ export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
     // Check if we have recent cached prices in the database
     const { data: existingPrice, error: fetchError } = await supabase
       .from('prices')
-      .select('tcgplayer_market, tcgplayer_low, tcgplayer_high, tcgplayer_normal, tcgplayer_holofoil, last_updated')
+      .select(`
+        tcgplayer_market, tcgplayer_low, tcgplayer_high, last_updated,
+        normal_market, normal_low, normal_high,
+        holofoil_market, holofoil_low, holofoil_high,
+        reverse_holofoil_market, reverse_holofoil_low, reverse_holofoil_high,
+        first_ed_holofoil_market, first_ed_holofoil_low, first_ed_holofoil_high,
+        first_ed_normal_market, first_ed_normal_low, first_ed_normal_high,
+        unlimited_market, unlimited_low, unlimited_high,
+        unlimited_holofoil_market, unlimited_holofoil_low, unlimited_holofoil_high
+      `)
       .eq('card_id', cardId)
       .single();
 
@@ -36,77 +45,101 @@ export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
       if (timeSinceUpdate < PRICE_CACHE_DURATION_MS) {
         const hoursAgo = Math.floor(timeSinceUpdate / (60 * 60 * 1000));
         console.log(`✅ Using cached TCG prices for ${cardId} (updated ${hoursAgo}h ago)`);
-        return {
-          market: existingPrice.tcgplayer_market,
-          low: existingPrice.tcgplayer_low,
-          high: existingPrice.tcgplayer_high,
-          normal: existingPrice.tcgplayer_normal,
-          holofoil: existingPrice.tcgplayer_holofoil,
-          lastUpdated: existingPrice.last_updated,
-          cached: true
-        };
+        return formatPriceResponse(existingPrice, true);
       }
     }
 
     // Cache expired or no cached data - fetch fresh prices
     console.log(`🔄 Fetching fresh TCG prices for ${cardId} ${forceRefresh ? '(FORCE REFRESH - Admin)' : '(cache expired or missing)'}`);
-    
+
     // Fetch card data from Pokemon TCG API via our serverless function to avoid CORS
     const response = await fetch(`/api/tcg-prices?cardId=${cardId}`);
-    
+
     if (!response.ok) {
       console.warn(`Failed to fetch price for card ${cardId}`);
       return null;
     }
 
     const data = await response.json();
-    
+
     if (!data.success || !data.prices) {
       console.warn(`No price data returned for card ${cardId}`);
       return null;
     }
 
-    // Extract prices from API response
-    const { market: marketPrice, low: lowPrice, high: highPrice, normal: normalPrice, holofoil: holofoilPrice, updatedAt } = data.prices;
+    const { prices } = data;
 
-    console.log(`📊 TCG API Data for ${cardId}:`, {
-      normal: normalPrice,
-      holofoil: holofoilPrice,
-      market: marketPrice,
-      low: lowPrice,
-      high: highPrice,
-      apiUpdatedAt: updatedAt,
-      note: 'Fetched via serverless function to avoid CORS'
-    });
+    // Build database update object with all variants
+    const dbUpdate = {
+      card_id: cardId,
+      tcgplayer_market: prices.market,
+      tcgplayer_low: prices.low,
+      tcgplayer_high: prices.high,
+      last_updated: new Date().toISOString()
+    };
+
+    // Add all variant prices if they exist
+    if (prices.normal) {
+      dbUpdate.normal_market = prices.normal.market;
+      dbUpdate.normal_low = prices.normal.low;
+      dbUpdate.normal_high = prices.normal.high;
+    }
+    if (prices.holofoil) {
+      dbUpdate.holofoil_market = prices.holofoil.market;
+      dbUpdate.holofoil_low = prices.holofoil.low;
+      dbUpdate.holofoil_high = prices.holofoil.high;
+    }
+    if (prices.reverseHolofoil) {
+      dbUpdate.reverse_holofoil_market = prices.reverseHolofoil.market;
+      dbUpdate.reverse_holofoil_low = prices.reverseHolofoil.low;
+      dbUpdate.reverse_holofoil_high = prices.reverseHolofoil.high;
+    }
+    if (prices.firstEditionHolofoil) {
+      dbUpdate.first_ed_holofoil_market = prices.firstEditionHolofoil.market;
+      dbUpdate.first_ed_holofoil_low = prices.firstEditionHolofoil.low;
+      dbUpdate.first_ed_holofoil_high = prices.firstEditionHolofoil.high;
+    }
+    if (prices.firstEditionNormal) {
+      dbUpdate.first_ed_normal_market = prices.firstEditionNormal.market;
+      dbUpdate.first_ed_normal_low = prices.firstEditionNormal.low;
+      dbUpdate.first_ed_normal_high = prices.firstEditionNormal.high;
+    }
+    if (prices.unlimited) {
+      dbUpdate.unlimited_market = prices.unlimited.market;
+      dbUpdate.unlimited_low = prices.unlimited.low;
+      dbUpdate.unlimited_high = prices.unlimited.high;
+    }
+    if (prices.unlimitedHolofoil) {
+      dbUpdate.unlimited_holofoil_market = prices.unlimitedHolofoil.market;
+      dbUpdate.unlimited_holofoil_low = prices.unlimitedHolofoil.low;
+      dbUpdate.unlimited_holofoil_high = prices.unlimitedHolofoil.high;
+    }
 
     // Update database with fresh prices
     const { error } = await supabase
       .from('prices')
-      .upsert({
-        card_id: cardId,
-        tcgplayer_market: marketPrice,
-        tcgplayer_low: lowPrice,
-        tcgplayer_high: highPrice,
-        tcgplayer_normal: normalPrice,
-        tcgplayer_holofoil: holofoilPrice,
-        last_updated: new Date().toISOString()
-      }, { onConflict: 'card_id' });
+      .upsert(dbUpdate, { onConflict: 'card_id' });
 
     if (error) {
       console.error('Error updating price in database:', error);
       return null;
     }
 
-    console.log(`✅ Updated TCG price for ${cardId}: Normal: $${normalPrice}, Holofoil: $${holofoilPrice}`);
+    console.log(`✅ Updated TCG prices for ${cardId} with all variants`);
 
-    // Return fresh price data
+    // Return formatted response
     return {
-      market: marketPrice,
-      low: lowPrice,
-      high: highPrice,
-      normal: normalPrice,
-      holofoil: holofoilPrice,
-      apiUpdatedAt: updatedAt,
+      market: prices.market,
+      low: prices.low,
+      high: prices.high,
+      normal: prices.normal,
+      holofoil: prices.holofoil,
+      reverseHolofoil: prices.reverseHolofoil,
+      firstEditionHolofoil: prices.firstEditionHolofoil,
+      firstEditionNormal: prices.firstEditionNormal,
+      unlimited: prices.unlimited,
+      unlimitedHolofoil: prices.unlimitedHolofoil,
+      apiUpdatedAt: prices.updatedAt,
       lastUpdated: new Date().toISOString(),
       cached: false
     };
@@ -116,6 +149,54 @@ export const fetchAndUpdateTCGPrice = async (cardId, forceRefresh = false) => {
     return null;
   }
 };
+
+/**
+ * Format database price row into API response format
+ */
+function formatPriceResponse(dbRow, cached = false) {
+  return {
+    market: dbRow.tcgplayer_market,
+    low: dbRow.tcgplayer_low,
+    high: dbRow.tcgplayer_high,
+    normal: dbRow.normal_market ? {
+      market: dbRow.normal_market,
+      low: dbRow.normal_low,
+      high: dbRow.normal_high
+    } : null,
+    holofoil: dbRow.holofoil_market ? {
+      market: dbRow.holofoil_market,
+      low: dbRow.holofoil_low,
+      high: dbRow.holofoil_high
+    } : null,
+    reverseHolofoil: dbRow.reverse_holofoil_market ? {
+      market: dbRow.reverse_holofoil_market,
+      low: dbRow.reverse_holofoil_low,
+      high: dbRow.reverse_holofoil_high
+    } : null,
+    firstEditionHolofoil: dbRow.first_ed_holofoil_market ? {
+      market: dbRow.first_ed_holofoil_market,
+      low: dbRow.first_ed_holofoil_low,
+      high: dbRow.first_ed_holofoil_high
+    } : null,
+    firstEditionNormal: dbRow.first_ed_normal_market ? {
+      market: dbRow.first_ed_normal_market,
+      low: dbRow.first_ed_normal_low,
+      high: dbRow.first_ed_normal_high
+    } : null,
+    unlimited: dbRow.unlimited_market ? {
+      market: dbRow.unlimited_market,
+      low: dbRow.unlimited_low,
+      high: dbRow.unlimited_high
+    } : null,
+    unlimitedHolofoil: dbRow.unlimited_holofoil_market ? {
+      market: dbRow.unlimited_holofoil_market,
+      low: dbRow.unlimited_holofoil_low,
+      high: dbRow.unlimited_holofoil_high
+    } : null,
+    lastUpdated: dbRow.last_updated,
+    cached
+  };
+}
 
 /**
  * Update eBay and PSA10 prices for a specific card

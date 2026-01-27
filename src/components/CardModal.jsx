@@ -20,6 +20,105 @@ const HighPriceTooltip = ({ className = "" }) => (
   </div>
 );
 
+// Price variant display configuration
+const VARIANT_CONFIG = {
+  normal: { label: 'Normal', color: 'text-adaptive-primary', bgColor: 'bg-slate-500/10' },
+  holofoil: { label: 'Holofoil', color: 'price-gradient', bgColor: 'bg-purple-500/10' },
+  reverseHolofoil: { label: 'Reverse Holo', color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+  firstEditionHolofoil: { label: '1st Ed. Holo', color: 'text-yellow-500', bgColor: 'bg-yellow-500/10' },
+  firstEditionNormal: { label: '1st Ed. Normal', color: 'text-amber-600', bgColor: 'bg-amber-500/10' },
+  unlimited: { label: 'Unlimited', color: 'text-gray-500', bgColor: 'bg-gray-500/10' },
+  unlimitedHolofoil: { label: 'Unltd. Holo', color: 'text-indigo-500', bgColor: 'bg-indigo-500/10' }
+};
+
+// Component to display a single price variant card
+const PriceVariantCard = ({ variant, data, compact = false }) => {
+  if (!data?.market) return null;
+
+  const config = VARIANT_CONFIG[variant] || { label: variant, color: 'text-adaptive-primary', bgColor: 'bg-slate-500/10' };
+
+  if (compact) {
+    return (
+      <div className={`text-center ${config.bgColor} rounded-lg p-2`}>
+        <p className="text-[10px] text-adaptive-secondary font-medium mb-0.5 truncate">{config.label}</p>
+        <p className={`text-sm font-bold ${config.color}`}>
+          {formatPrice(data.market)}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`${config.bgColor} rounded-lg p-3 border border-adaptive/50`}>
+      <p className="text-xs text-adaptive-secondary font-medium mb-1">{config.label}</p>
+      <p className={`text-xl font-bold ${config.color}`}>
+        {formatPrice(data.market)}
+      </p>
+      {data.low && data.high && (
+        <p className="text-[10px] text-adaptive-tertiary mt-1">
+          {formatPrice(data.low)} - {formatPrice(data.high)}
+        </p>
+      )}
+    </div>
+  );
+};
+
+// Component to display all available price variants
+const PriceVariantsDisplay = ({ prices, loading = false, compact = false }) => {
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <Loader2 className="w-5 h-5 animate-spin text-blue-500 mr-2" />
+        <span className="text-sm text-adaptive-secondary">Loading prices...</span>
+      </div>
+    );
+  }
+
+  // Get all variants that have data
+  const availableVariants = Object.keys(VARIANT_CONFIG).filter(
+    variant => prices?.[variant]?.market
+  );
+
+  if (availableVariants.length === 0) {
+    // Fallback to legacy market price if no variants
+    if (prices?.market) {
+      return (
+        <div className="text-center bg-adaptive-hover rounded-lg p-4">
+          <p className="text-sm text-adaptive-secondary font-medium mb-2">Market Price</p>
+          <p className="text-3xl font-bold price-gradient">{formatPrice(prices.market)}</p>
+          {prices.low && prices.high && (
+            <p className="text-xs text-adaptive-tertiary mt-2">
+              Range: {formatPrice(prices.low)} - {formatPrice(prices.high)}
+            </p>
+          )}
+        </div>
+      );
+    }
+    return (
+      <p className="text-sm text-adaptive-tertiary text-center py-4">No price data available</p>
+    );
+  }
+
+  // Determine grid columns based on number of variants
+  const gridCols = availableVariants.length === 1 ? 'grid-cols-1' :
+                   availableVariants.length === 2 ? 'grid-cols-2' :
+                   availableVariants.length <= 4 ? 'grid-cols-2 md:grid-cols-4' :
+                   'grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+
+  return (
+    <div className={`grid ${gridCols} gap-2 ${compact ? '' : 'gap-3'}`}>
+      {availableVariants.map(variant => (
+        <PriceVariantCard
+          key={variant}
+          variant={variant}
+          data={prices[variant]}
+          compact={compact}
+        />
+      ))}
+    </div>
+  );
+};
+
 const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [ebayPrices, setEbayPrices] = useState(null);
@@ -218,13 +317,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   // Use fetched prices or fall back to card's original prices
   const displayEbayPrices = ebayPrices || card.prices?.ebay || { avg: 0, verified: false, searchTerms: '', searchUrl: '' };
   const displayPsa10Prices = psa10Prices || card.prices?.psa10 || { avg: 0, verified: false, searchTerms: '', searchUrl: '' };
-  
-  // Use fresh TCG prices if available, otherwise fall back to card data
-  const displayTcgPrices = tcgPrices || {
-    market: card.prices?.tcgplayer?.market || 0,
-    low: card.prices?.tcgplayer?.low || 0,
-    high: card.prices?.tcgplayer?.high || 0
-  };
 
   const trend = getPriceTrend(card.priceHistory);
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
@@ -301,44 +393,10 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               {/* Price Box */}
               <div className="relative">
                 <div className={`p-4 modal-price-box rounded-xl border ${!user ? 'blur-sm select-none' : ''}`}>
-                  {/* Variant Prices Grid - adjust columns based on available variants */}
-                  <div className={`grid gap-3 mb-3 ${(displayTcgPrices.normal > 0 && displayTcgPrices.holofoil > 0) ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                  {displayTcgPrices.normal > 0 && (
-                    <div className="text-center bg-adaptive-hover rounded-lg p-3">
-                      <p className="text-xs text-adaptive-secondary font-medium mb-1">Normal</p>
-                      <p className="text-xl font-bold text-adaptive-primary">
-                        {formatPrice(displayTcgPrices.normal)}
-                      </p>
-                    </div>
-                  )}
-                  {displayTcgPrices.holofoil > 0 && (
-                    <div className="text-center bg-adaptive-hover rounded-lg p-3">
-                      <p className="text-xs text-adaptive-secondary font-medium mb-1">Holofoil</p>
-                      <p className="text-xl font-bold price-gradient">
-                        {formatPrice(displayTcgPrices.holofoil)}
-                      </p>
-                    </div>
-                  )}
+                  <PriceVariantsDisplay prices={tcgPrices} loading={loadingTcg} compact />
+                  <p className="text-[10px] text-adaptive-tertiary text-center mt-2">TCGPlayer Market Prices</p>
                 </div>
-                {loadingTcg && <p className="text-xs text-adaptive-tertiary text-center mb-2">(updating...)</p>}
 
-                {/* Price Range Row */}
-                <div className="flex gap-3 mt-3 pt-3 border-t border-adaptive">
-                  <div className="flex-1">
-                    <p className="text-xs text-adaptive-tertiary">Low</p>
-                    <p className="text-base font-semibold text-green-500">
-                      {formatPrice(displayTcgPrices.low)}
-                    </p>
-                  </div>
-                  <div className="flex-1 text-right">
-                    <p className="text-xs text-adaptive-tertiary">High</p>
-                    <p className="text-base font-semibold text-red-500">
-                      {formatPrice(displayTcgPrices.high)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-                
                 {/* Auth Gate Overlay for Price Box */}
                 {!user && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/95 backdrop-blur-sm rounded-xl">
@@ -389,7 +447,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                         <div>
                           <p className="text-xs text-adaptive-tertiary">TCG {loadingTcg && <span className="text-[10px]">(updating...)</span>}</p>
                           <p className="text-lg font-bold text-blue-500">
-                            {formatPrice(displayTcgPrices.market)}
+                            {formatPrice(tcgPrices?.market || card.prices?.tcgplayer?.market || 0)}
                           </p>
                         </div>
                         <a
@@ -523,48 +581,10 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   {/* Current Price Display */}
                   <div className="relative">
                     <div className={`p-6 modal-price-box rounded-xl border ${!user ? 'blur-sm select-none' : ''}`}>
-                      {/* Variant Prices Grid - adjust columns based on available variants */}
-                      <div className={`grid gap-4 mb-4 ${(displayTcgPrices.normal > 0 && displayTcgPrices.holofoil > 0) ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                      {displayTcgPrices.normal > 0 && (
-                        <div className="text-center bg-adaptive-hover rounded-lg p-4">
-                          <p className="text-sm text-adaptive-secondary font-medium mb-2">Normal</p>
-                          <p className="text-3xl font-bold text-adaptive-primary">
-                            {formatPrice(displayTcgPrices.normal)}
-                          </p>
-                        </div>
-                      )}
-                      {displayTcgPrices.holofoil > 0 && (
-                        <div className="text-center bg-adaptive-hover rounded-lg p-4">
-                          <p className="text-sm text-adaptive-secondary font-medium mb-2">Holofoil</p>
-                          <p className="text-3xl font-bold price-gradient">
-                            {formatPrice(displayTcgPrices.holofoil)}
-                          </p>
-                        </div>
-                      )}
+                      <PriceVariantsDisplay prices={tcgPrices} loading={loadingTcg} />
+                      <p className="text-xs text-adaptive-tertiary text-center mt-3">TCGPlayer Market Prices</p>
                     </div>
-                    <p className="text-xs text-adaptive-tertiary text-center mb-3">Prices updated regularly</p>
-                    {loadingTcg && <p className="text-xs text-adaptive-tertiary text-center mb-3">(updating...)</p>}
 
-                    {/* Price Range */}
-                    <div className="grid grid-cols-2 gap-3 mt-4">
-                      <div className="p-3 modal-price-card rounded-lg border">
-                        <p className="text-xs text-adaptive-tertiary mb-1">Low</p>
-                        <p className="text-lg font-semibold text-green-500">
-                          {formatPrice(displayTcgPrices.low)}
-                        </p>
-                      </div>
-                      <div className="p-3 modal-price-card rounded-lg border">
-                        <p className="text-xs text-adaptive-tertiary mb-1 flex items-center">
-                          High
-                          <HighPriceTooltip />
-                        </p>
-                        <p className="text-lg font-semibold text-red-500">
-                          {formatPrice(displayTcgPrices.high)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                    
                     {/* Auth Gate Overlay for Desktop Price Box */}
                     {!user && (
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-adaptive-card/95 backdrop-blur-sm rounded-xl">

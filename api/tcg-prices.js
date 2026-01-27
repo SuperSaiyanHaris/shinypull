@@ -64,41 +64,57 @@ export default async function handler(req, res) {
     const data = await response.json();
     const card = data.data;
 
-    // Extract both normal and holofoil prices
+    // Extract ALL price variants from the API
     const prices = card.tcgplayer?.prices || {};
-    const normalPrice = prices.normal?.market || 0;
-    const holofoilPrice = prices.holofoil?.market || prices.reverseHolofoil?.market || prices['1stEditionHolofoil']?.market || 0;
-    
-    // Use holofoil as primary if available
-    const marketPrice = holofoilPrice || normalPrice;
-    
-    // Get raw low/high from same variant as market price
-    let rawLow = holofoilPrice 
-      ? (prices.holofoil?.low || prices.reverseHolofoil?.low || 0)
-      : (prices.normal?.low || 0);
-    let rawHigh = holofoilPrice
-      ? (prices.holofoil?.high || prices.reverseHolofoil?.high || 0)
-      : (prices.normal?.high || 0);
-    
-    // Ensure logical consistency: low <= market <= high
-    // If low is missing or > market, use market * 0.8
-    const lowPrice = (rawLow > 0 && rawLow <= marketPrice) ? rawLow : marketPrice * 0.8;
-    // If high is missing or < market, use market * 1.3
-    const highPrice = (rawHigh > 0 && rawHigh >= marketPrice) ? rawHigh : marketPrice * 1.3;
-    
     const updatedAt = card.tcgplayer?.updatedAt || new Date().toISOString();
 
-    // Return formatted price data
+    // Helper to extract all price points for a variant
+    const extractVariant = (variantName) => {
+      const v = prices[variantName];
+      if (!v) return null;
+      return {
+        market: v.market || null,
+        low: v.low || null,
+        high: v.high || null,
+        mid: v.mid || null,
+        directLow: v.directLow || null
+      };
+    };
+
+    // Extract all variants
+    const normal = extractVariant('normal');
+    const holofoil = extractVariant('holofoil');
+    const reverseHolofoil = extractVariant('reverseHolofoil');
+    const firstEditionHolofoil = extractVariant('1stEditionHolofoil');
+    const firstEditionNormal = extractVariant('1stEditionNormal');
+    const unlimited = extractVariant('unlimited');
+    const unlimitedHolofoil = extractVariant('unlimitedHolofoil');
+
+    // Calculate best market price for legacy support
+    const marketPrice = holofoil?.market || reverseHolofoil?.market || normal?.market ||
+                        firstEditionHolofoil?.market || firstEditionNormal?.market || 0;
+    const lowPrice = holofoil?.low || normal?.low || (marketPrice > 0 ? marketPrice * 0.8 : 0);
+    const highPrice = holofoil?.high || normal?.high || (marketPrice > 0 ? marketPrice * 1.3 : 0);
+
+    // Return ALL price variants
     return res.status(200).json({
       success: true,
       cardId,
       prices: {
+        // Legacy fields for backwards compatibility
         market: marketPrice,
         low: lowPrice,
         high: highPrice,
-        normal: normalPrice,
-        holofoil: holofoilPrice,
-        updatedAt
+        updatedAt,
+
+        // All variants with full price data
+        normal,
+        holofoil,
+        reverseHolofoil,
+        firstEditionHolofoil,
+        firstEditionNormal,
+        unlimited,
+        unlimitedHolofoil
       }
     });
 
