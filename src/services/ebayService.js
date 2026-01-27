@@ -62,14 +62,17 @@ export async function getEbayPriceAPI(cardName, cardSet = '', cardNumber = '', r
       high: data.high,
       avg: data.avg,
       median: data.median,
+      market: data.market || data.median, // Primary market price (median of 10-15 listings)
       count: data.count,
+      totalListings: data.totalListings || data.count,
       cheapestListing: data.cheapestListing,
       searchTerms: data.searchTerms,
       searchUrl: data.searchUrl,
       lastUpdated: Date.now()
     };
 
-    console.log(`✅ Found ${data.count} eBay listings for "${cardName}": $${data.low} - $${data.high}`);
+    console.log(`✅ Found ${data.totalListings || data.count} eBay listings for "${cardName}"`);
+    console.log(`💰 Market Price (median of ${data.count}): $${result.market}`);
 
     EBAY_CACHE.set(cacheKey, { data: result, timestamp: Date.now() });
     return result;
@@ -122,14 +125,17 @@ export async function getEbayPSA10Price(cardName, cardSet = '', cardNumber = '',
       high: data.high,
       avg: data.avg,
       median: data.median,
+      market: data.market || data.median, // Primary market price (median of 10-15 listings)
       count: data.count,
+      totalListings: data.totalListings || data.count,
       cheapestListing: data.cheapestListing,
       searchTerms: data.searchTerms,
       searchUrl: data.searchUrl,
       lastUpdated: Date.now()
     };
 
-    console.log(`✅ Found ${data.count} PSA 10 listings for "${cardName}": $${data.low} - $${data.high}`);
+    console.log(`✅ Found ${data.totalListings || data.count} PSA 10 listings for "${cardName}"`);
+    console.log(`💰 PSA 10 Market Price (median of ${data.count}): $${result.market}`);
 
     EBAY_CACHE.set(cacheKey, { data: result, timestamp: Date.now() });
     return result;

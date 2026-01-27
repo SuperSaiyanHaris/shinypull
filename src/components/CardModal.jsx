@@ -306,8 +306,12 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   if (!isOpen || !card) return null;
 
   // Use fetched prices or fall back to card's original prices
-  const displayEbayPrices = ebayPrices || card.prices?.ebay || { avg: 0, verified: false, searchTerms: '', searchUrl: '' };
-  const displayPsa10Prices = psa10Prices || card.prices?.psa10 || { avg: 0, verified: false, searchTerms: '', searchUrl: '' };
+  const displayEbayPrices = ebayPrices || card.prices?.ebay || { avg: 0, market: 0, verified: false, searchTerms: '', searchUrl: '' };
+  const displayPsa10Prices = psa10Prices || card.prices?.psa10 || { avg: 0, market: 0, verified: false, searchTerms: '', searchUrl: '' };
+
+  // Primary market price: Use eBay median if available, otherwise fall back to TCGPlayer
+  const primaryMarketPrice = displayEbayPrices.market || displayEbayPrices.median || tcgPrices?.market || card.prices?.tcgplayer?.market || 0;
+  const priceSource = (displayEbayPrices.market || displayEbayPrices.median) ? 'eBay Active Listings' : 'TCGPlayer (estimated)';
 
   const trend = getPriceTrend(card.priceHistory);
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
@@ -384,8 +388,28 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               {/* Price Box */}
               <div className="relative">
                 <div className={`p-4 modal-price-box rounded-xl border ${!user ? 'blur-sm select-none' : ''}`}>
-                  <PriceVariantsDisplay prices={tcgPrices} loading={loadingTcg} compact />
-                  <p className="text-xs text-adaptive-tertiary text-center mt-3">eBay Market Prices</p>
+                  {/* Primary Market Price - eBay Based */}
+                  <div className="text-center mb-3">
+                    <p className="text-xs text-adaptive-secondary font-medium mb-1">Market Price</p>
+                    <p className="text-3xl font-bold price-gradient">
+                      {loadingEbay ? (
+                        <Loader2 className="w-8 h-8 animate-spin inline-block text-blue-500" />
+                      ) : (
+                        formatPrice(primaryMarketPrice)
+                      )}
+                    </p>
+                    <p className="text-[10px] text-adaptive-tertiary mt-1">
+                      {loadingEbay ? 'Fetching...' : priceSource}
+                      {displayEbayPrices.count && ` (${displayEbayPrices.count} listings)`}
+                    </p>
+                  </div>
+                  {/* TCGPlayer Variants - Collapsed view for mobile */}
+                  {tcgPrices && Object.keys(tcgPrices).some(key => key !== 'market' && tcgPrices[key]?.market) && (
+                    <div className="pt-3 border-t border-adaptive/30">
+                      <PriceVariantsDisplay prices={tcgPrices} loading={loadingTcg} compact />
+                      <p className="text-[10px] text-adaptive-tertiary text-center mt-2">TCGPlayer Variants</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Auth Gate Overlay for Price Box */}
@@ -431,29 +455,6 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
               <div className="space-y-2 relative">
                 <h3 className="text-sm font-semibold text-adaptive-secondary uppercase tracking-wide">Price Comparison</h3>
                 <div className={`space-y-2 ${!user ? 'blur-sm select-none' : ''}`}>
-                  {/* eBay Market Price */}
-                  <div className="p-3 modal-card rounded-lg border">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-adaptive-tertiary">eBay Market {loadingTcg && <span className="text-[10px]">(updating...)</span>}</p>
-                        <p className="text-lg font-bold text-blue-500">
-                          {formatPrice(tcgPrices?.market || 0)}
-                        </p>
-                      </div>
-                      {card.tcgplayerUrl && (
-                        <a
-                          href={card.tcgplayerUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-2 bg-gray-500/10 hover:bg-gray-500/20 rounded-lg transition-colors flex items-center gap-1.5"
-                        >
-                          <span className="text-[10px] font-medium text-gray-500">TCG Est.</span>
-                          <ExternalLink className="w-3 h-3 text-gray-500" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-
                   {loadingEbay ? (
                     <div className="flex items-center justify-center p-3 modal-card rounded-lg border">
                       <Loader2 className="w-4 h-4 animate-spin text-blue-500 mr-2" />
@@ -467,11 +468,12 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                           <div>
                             <p className="text-xs text-adaptive-tertiary">
                               {displayEbayPrices.verified ? 'eBay Raw Card' : 'eBay Raw Card (est.)'}
+                              {displayEbayPrices.count && <span className="text-[10px]"> • {displayEbayPrices.count} listings</span>}
                             </p>
                             <p className="text-lg font-bold text-blue-500">
                               {displayEbayPrices.verified && displayEbayPrices.low !== undefined
                                 ? `${formatPrice(displayEbayPrices.low)} - ${formatPrice(displayEbayPrices.high)}`
-                                : formatPrice(displayEbayPrices.avg)}
+                                : formatPrice(displayEbayPrices.avg || displayEbayPrices.market || 0)}
                             </p>
                           </div>
                           {displayEbayPrices.searchUrl && (
@@ -572,8 +574,28 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
                   {/* Current Price Display */}
                   <div className="relative">
                     <div className={`p-6 modal-price-box rounded-xl border ${!user ? 'blur-sm select-none' : ''}`}>
-                      <PriceVariantsDisplay prices={tcgPrices} loading={loadingTcg} />
-                      <p className="text-xs text-adaptive-tertiary text-center mt-3">eBay Market Prices</p>
+                      {/* Primary Market Price - eBay Based */}
+                      <div className="text-center mb-4">
+                        <p className="text-sm text-adaptive-secondary font-medium mb-2">Market Price</p>
+                        <p className="text-4xl font-bold price-gradient">
+                          {loadingEbay ? (
+                            <Loader2 className="w-10 h-10 animate-spin inline-block text-blue-500" />
+                          ) : (
+                            formatPrice(primaryMarketPrice)
+                          )}
+                        </p>
+                        <p className="text-xs text-adaptive-tertiary mt-2">
+                          {loadingEbay ? 'Fetching live prices...' : priceSource}
+                          {displayEbayPrices.count && ` • ${displayEbayPrices.count} active listings`}
+                        </p>
+                      </div>
+                      {/* TCGPlayer Variants */}
+                      {tcgPrices && Object.keys(tcgPrices).some(key => key !== 'market' && tcgPrices[key]?.market) && (
+                        <div className="pt-4 border-t border-adaptive/30">
+                          <PriceVariantsDisplay prices={tcgPrices} loading={loadingTcg} />
+                          <p className="text-xs text-adaptive-tertiary text-center mt-3">TCGPlayer Variant Prices</p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Auth Gate Overlay for Desktop Price Box */}
@@ -732,17 +754,27 @@ const PriceCompareRow = ({ platform, price, verified, estimated, link }) => (
 const EbayPriceRow = ({ ebayData, label = "eBay" }) => {
   if (!ebayData) return null;
 
-  const { avg, low, high, count, verified, searchUrl, cheapestListing } = ebayData;
+  const { avg, market, median, low, high, count, verified, searchUrl, cheapestListing } = ebayData;
+  
+  // Use market (median) if available, otherwise avg
+  const displayPrice = market || median || avg || 0;
 
   return (
     <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border group">
       <div className="flex items-center gap-3">
-        <span className="text-adaptive-primary font-semibold">
-          {verified ? label : `${label} (estimated)`}
-        </span>
+        <div>
+          <span className="text-adaptive-primary font-semibold">
+            {verified ? label : `${label} (estimated)`}
+          </span>
+          {verified && count && (
+            <span className="block text-[10px] text-adaptive-tertiary mt-0.5">
+              {count} active listings
+            </span>
+          )}
+        </div>
         {verified ? (
           <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
-            ✓ Found listings
+            ✓ Live data
           </span>
         ) : (
           <span className="px-2 py-0.5 badge-estimated text-xs font-bold rounded-full">
@@ -757,7 +789,7 @@ const EbayPriceRow = ({ ebayData, label = "eBay" }) => {
           </span>
         ) : (
           <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-            {formatPrice(avg)}
+            {formatPrice(displayPrice)}
           </span>
         )}
         {searchUrl && (
@@ -779,20 +811,30 @@ const EbayPriceRow = ({ ebayData, label = "eBay" }) => {
 const PSA10PriceRow = ({ psa10Data }) => {
   if (!psa10Data) return null;
 
-  const { avg, low, high, count, verified, searchUrl } = psa10Data;
+  const { avg, market, median, low, high, count, verified, searchUrl } = psa10Data;
+  
+  // Use market (median) if available, otherwise avg
+  const displayPrice = market || median || avg || 0;
 
   return (
     <div className="flex items-center justify-between p-4 modal-card rounded-lg hover:shadow-sm transition-all border group">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <Award className="w-5 h-5 text-yellow-500" />
-          <span className="text-adaptive-primary font-semibold">
-            {verified ? 'eBay PSA 10' : 'eBay PSA 10 (estimated)'}
-          </span>
+          <div>
+            <span className="text-adaptive-primary font-semibold">
+              {verified ? 'eBay PSA 10' : 'eBay PSA 10 (estimated)'}
+            </span>
+            {verified && count && (
+              <span className="block text-[10px] text-adaptive-tertiary mt-0.5">
+                {count} active listings
+              </span>
+            )}
+          </div>
         </div>
         {verified ? (
           <span className="px-2 py-0.5 bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold rounded-full border border-green-500/30">
-            ✓ Found listings
+            ✓ Live data
           </span>
         ) : (
           <span className="px-2 py-0.5 badge-estimated text-xs font-bold rounded-full">
@@ -807,7 +849,7 @@ const PSA10PriceRow = ({ psa10Data }) => {
           </span>
         ) : (
           <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-            {formatPrice(avg)}
+            {formatPrice(displayPrice)}
           </span>
         )}
         {searchUrl && (

@@ -78,6 +78,7 @@ const CardItem = ({ card, index }) => {
               <p className={`text-2xl font-bold price-gradient ${!user ? 'blur-sm select-none' : ''}`}>
                 {formatPrice(card.prices.tcgplayer.market)}
               </p>
+              <p className="text-[9px] text-adaptive-tertiary mt-0.5">Click for live eBay prices</p>
             </div>
             <TrendIcon className={`w-6 h-6 ${trendColor}`} />
           </div>

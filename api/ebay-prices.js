@@ -145,6 +145,7 @@ export default async function handler(req, res) {
     // eBay Browse API endpoint
     // Category 183454 = Pokemon TCG
     // Add minimum price filter to exclude cheap bulk/damaged cards
+    // Fetch up to 50 listings (will use 10-15 for pricing, but get more for better selection)
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodedQuery}&category_ids=183454&filter=price:%5B10..%5D&limit=50&sort=price`;
 
     console.log(`🔍 Fetching eBay active listings for: ${searchTerms}`);
@@ -211,15 +212,26 @@ export default async function handler(req, res) {
       return res.status(200).json({ found: false, searchTerms });
     }
 
-    // Calculate statistics
-    const prices = listings.map(l => l.price).sort((a, b) => a - b);
+    // Use 10-15 listings for pricing calculation (or all if less available)
+    // This gives us a good sample size while avoiding outliers
+    const targetSampleSize = Math.min(listings.length, 15);
+    const pricingListings = listings.slice(0, targetSampleSize);
+    
+    console.log(`📊 Using ${pricingListings.length} listings for price calculation (target: 10-15)`);
+
+    // Calculate statistics from the pricing sample
+    const prices = pricingListings.map(l => l.price).sort((a, b) => a - b);
     const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
     const low = prices[0];
     const high = prices[prices.length - 1];
-    const median = prices[Math.floor(prices.length / 2)];
+    
+    // Calculate median (more stable than average for market price)
+    const median = prices.length % 2 === 0
+      ? (prices[Math.floor(prices.length / 2) - 1] + prices[Math.floor(prices.length / 2)]) / 2
+      : prices[Math.floor(prices.length / 2)];
 
-    // Get top 5 listings (or 3 minimum if fewer available)
-    const topListings = listings.slice(0, 5).map(l => ({
+    // Get top 5 listings for display
+    const topListings = pricingListings.slice(0, 5).map(l => ({
       price: l.price,
       title: l.title,
       url: l.url,
@@ -238,19 +250,22 @@ export default async function handler(req, res) {
       low: parseFloat(low.toFixed(2)),
       high: parseFloat(high.toFixed(2)),
       median: parseFloat(median.toFixed(2)),
-      count: listings.length,
+      market: parseFloat(median.toFixed(2)), // Use median as the primary market price
+      count: pricingListings.length,
+      totalListings: listings.length, // Total found vs used for calculation
       topListings,
       cheapestListing: {
-        price: cheapestListing.price,
-        title: cheapestListing.title,
-        url: cheapestListing.url
+        price: pricingListings[0].price,
+        title: pricingListings[0].title,
+        url: pricingListings[0].url
       },
       searchTerms,
       searchUrl: ebaySearchUrl,
       timestamp: Date.now()
     };
 
-    console.log(`✅ Found ${listings.length} active eBay listings: $${low.toFixed(2)} - $${high.toFixed(2)}`);
+    console.log(`✅ Found ${listings.length} listings, used ${pricingListings.length} for pricing`);
+    console.log(`💰 Market Price (median): $${median.toFixed(2)} | Range: $${low.toFixed(2)} - $${high.toFixed(2)}`);
 
     return res.status(200).json(result);
 
