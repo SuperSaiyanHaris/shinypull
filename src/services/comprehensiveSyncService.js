@@ -165,26 +165,100 @@ const transformCard = (card, setId) => {
 };
 
 /**
- * Transform card to price record
+ * Transform card to price record with ALL price variants
+ * Each variant has: market, low, high, mid, directLow
  */
 const transformCardPrice = (card) => {
   const prices = card.tcgplayer?.prices || {};
+  const tcgplayerUpdatedAt = card.tcgplayer?.updatedAt || null;
 
-  // Get all price variants
-  const normalPrice = prices.normal?.market || null;
-  const holofoilPrice = prices.holofoil?.market || prices.reverseHolofoil?.market || null;
-  const firstEditionPrice = prices['1stEditionHolofoil']?.market || prices['1stEdition']?.market || null;
+  // Helper to extract all price points for a variant
+  const extractVariantPrices = (variant) => {
+    const v = prices[variant];
+    if (!v) return {};
+    return {
+      market: v.market || null,
+      low: v.low || null,
+      high: v.high || null,
+      mid: v.mid || null,
+      direct_low: v.directLow || null
+    };
+  };
 
-  // Use best available for market price
-  const marketPrice = holofoilPrice || normalPrice || firstEditionPrice || 0;
+  // Extract all variants
+  const normal = extractVariantPrices('normal');
+  const holofoil = extractVariantPrices('holofoil');
+  const reverseHolofoil = extractVariantPrices('reverseHolofoil');
+  const firstEdHolofoil = extractVariantPrices('1stEditionHolofoil');
+  const firstEdNormal = extractVariantPrices('1stEditionNormal');
+  const unlimited = extractVariantPrices('unlimited');
+  const unlimitedHolofoil = extractVariantPrices('unlimitedHolofoil');
+
+  // Calculate best available market price for the legacy tcgplayer_market field
+  const marketPrice = holofoil.market || reverseHolofoil.market || normal.market ||
+                      firstEdHolofoil.market || firstEdNormal.market || unlimited.market || 0;
 
   return {
     card_id: card.id,
+
+    // Legacy fields (keeping for backwards compatibility)
     tcgplayer_market: marketPrice,
-    tcgplayer_low: prices.holofoil?.low || prices.normal?.low || marketPrice * 0.8,
-    tcgplayer_high: prices.holofoil?.high || prices.normal?.high || marketPrice * 1.3,
-    tcgplayer_normal: normalPrice,
-    tcgplayer_holofoil: holofoilPrice,
+    tcgplayer_low: holofoil.low || normal.low || (marketPrice > 0 ? marketPrice * 0.8 : null),
+    tcgplayer_high: holofoil.high || normal.high || (marketPrice > 0 ? marketPrice * 1.3 : null),
+
+    // Normal variant (non-holo)
+    normal_market: normal.market,
+    normal_low: normal.low,
+    normal_high: normal.high,
+    normal_mid: normal.mid,
+    normal_direct_low: normal.direct_low,
+
+    // Holofoil variant
+    holofoil_market: holofoil.market,
+    holofoil_low: holofoil.low,
+    holofoil_high: holofoil.high,
+    holofoil_mid: holofoil.mid,
+    holofoil_direct_low: holofoil.direct_low,
+
+    // Reverse Holofoil variant
+    reverse_holofoil_market: reverseHolofoil.market,
+    reverse_holofoil_low: reverseHolofoil.low,
+    reverse_holofoil_high: reverseHolofoil.high,
+    reverse_holofoil_mid: reverseHolofoil.mid,
+    reverse_holofoil_direct_low: reverseHolofoil.direct_low,
+
+    // 1st Edition Holofoil (older sets like Base Set)
+    first_ed_holofoil_market: firstEdHolofoil.market,
+    first_ed_holofoil_low: firstEdHolofoil.low,
+    first_ed_holofoil_high: firstEdHolofoil.high,
+    first_ed_holofoil_mid: firstEdHolofoil.mid,
+    first_ed_holofoil_direct_low: firstEdHolofoil.direct_low,
+
+    // 1st Edition Normal (older sets)
+    first_ed_normal_market: firstEdNormal.market,
+    first_ed_normal_low: firstEdNormal.low,
+    first_ed_normal_high: firstEdNormal.high,
+    first_ed_normal_mid: firstEdNormal.mid,
+    first_ed_normal_direct_low: firstEdNormal.direct_low,
+
+    // Unlimited variant
+    unlimited_market: unlimited.market,
+    unlimited_low: unlimited.low,
+    unlimited_high: unlimited.high,
+    unlimited_mid: unlimited.mid,
+    unlimited_direct_low: unlimited.direct_low,
+
+    // Unlimited Holofoil variant
+    unlimited_holofoil_market: unlimitedHolofoil.market,
+    unlimited_holofoil_low: unlimitedHolofoil.low,
+    unlimited_holofoil_high: unlimitedHolofoil.high,
+    unlimited_holofoil_mid: unlimitedHolofoil.mid,
+    unlimited_holofoil_direct_low: unlimitedHolofoil.direct_low,
+
+    // TCGPlayer metadata
+    tcgplayer_updated_at: tcgplayerUpdatedAt,
+
+    // eBay fields (populated separately)
     ebay_avg: null,
     ebay_verified: false,
     psa10_avg: null,
