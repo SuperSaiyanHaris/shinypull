@@ -212,8 +212,8 @@ export default async function handler(req, res) {
       return res.status(200).json({ found: false, searchTerms });
     }
 
-    // Use 10-15 listings for pricing calculation (or all if less available)
-    // This gives us a good sample size while avoiding outliers
+    // Use first 10-15 listings for pricing calculation (already sorted by price)
+    // This gives us a good sample size while avoiding outliers from high-priced listings
     const targetSampleSize = Math.min(listings.length, 15);
     const pricingListings = listings.slice(0, targetSampleSize);
     

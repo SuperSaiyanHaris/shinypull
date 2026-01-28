@@ -112,7 +112,10 @@ async function fetchEbayPrices(accessToken, cardName, cardNumber, setName, isPSA
     return null;
   }
 
-  const pricingListings = listings.slice(0, 15);
+  // Use first 10-15 listings for pricing (already sorted by price)
+  const targetSampleSize = Math.min(listings.length, 15);
+  const pricingListings = listings.slice(0, targetSampleSize);
+  
   const prices = pricingListings.map(l => l.price).sort((a, b) => a - b);
 
   const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
@@ -124,6 +127,8 @@ async function fetchEbayPrices(accessToken, cardName, cardNumber, setName, isPSA
 
   // Build eBay search URL for users
   const ebaySearchUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454&mkcid=1&mkrid=711-53200-19255-0&campid=5339138366&toolid=10001`;
+
+  console.log(`💰 ${isPSA10 ? 'PSA 10' : 'Raw'} pricing: $${low.toFixed(2)} - $${high.toFixed(2)} (median: $${median.toFixed(2)}, ${pricingListings.length} listings)`);
 
   return {
     market: parseFloat(median.toFixed(2)),

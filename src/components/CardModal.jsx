@@ -128,6 +128,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
   const handleForceRefresh = async () => {
     console.log('🔧 Admin forcing price refresh...');
     setLoadingTcg(true);
+    setLoadingEbay(true);
     try {
       // Get user's session token
       const { data: { session } } = await supabase.auth.getSession();
@@ -153,7 +154,35 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
       }
 
       if (result.success && result.prices) {
-        setTcgPrices(result.prices);
+        // Update TCG prices (primary market price and variants)
+        const { ebay, psa10, ...mainPrices } = result.prices;
+        setTcgPrices(mainPrices);
+        
+        // Update eBay Raw Card prices separately
+        if (ebay) {
+          setEbayPrices({
+            market: ebay.market,
+            low: ebay.low,
+            high: ebay.high,
+            count: ebay.count,
+            searchUrl: ebay.searchUrl,
+            searchTerms: ebay.searchTerms,
+            verified: true
+          });
+        }
+        
+        // Update PSA 10 prices separately
+        if (psa10) {
+          setPsa10Prices({
+            market: psa10.market,
+            low: psa10.low,
+            high: psa10.high,
+            count: psa10.count,
+            searchUrl: psa10.searchUrl,
+            verified: true
+          });
+        }
+        
         console.log('✅ Prices refreshed successfully');
       }
     } catch (error) {
@@ -161,6 +190,7 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
       alert('Failed to refresh prices: ' + error.message);
     } finally {
       setLoadingTcg(false);
+      setLoadingEbay(false);
     }
   };
 
@@ -204,6 +234,34 @@ const CardModal = ({ card, isOpen, onClose, onCardAdded, onCardRemoved }) => {
       .then(dbPrices => {
         if (dbPrices) {
           setTcgPrices(dbPrices);
+          
+          // Also set eBay raw card prices from DB (market/low/high are eBay raw prices)
+          if (dbPrices.market > 0 || dbPrices.low > 0) {
+            const searchTerms = `Pokemon ${card.name} ${card.number || ''} ${card.set || ''}`;
+            const encodedQuery = encodeURIComponent(searchTerms);
+            setEbayPrices({
+              market: dbPrices.market,
+              low: dbPrices.low,
+              high: dbPrices.high,
+              verified: true,
+              searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454&mkcid=1&mkrid=711-53200-19255-0&campid=5339138366&toolid=10001`,
+              searchTerms
+            });
+          }
+          
+          // Also set PSA 10 prices from DB
+          if (dbPrices.psa10Avg > 0 || dbPrices.psa10Low > 0) {
+            const searchTerms = `Pokemon ${card.name} ${card.number || ''} PSA 10`;
+            const encodedQuery = encodeURIComponent(searchTerms);
+            setPsa10Prices({
+              market: dbPrices.psa10Avg,
+              low: dbPrices.psa10Low,
+              high: dbPrices.psa10High,
+              verified: true,
+              searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodedQuery}&_sacat=183454&mkcid=1&mkrid=711-53200-19255-0&campid=5339138366&toolid=10001`,
+              searchTerms
+            });
+          }
         }
       })
       .finally(() => setLoadingTcg(false));
