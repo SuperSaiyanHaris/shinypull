@@ -75,7 +75,9 @@ async function fetchEbayPrices(accessToken, cardName, cardNumber, setName, isPSA
   const searchTerms = buildSearchTerms(cardName, cardNumber, setName) + (isPSA10 ? ' PSA 10' : '');
   const encodedQuery = encodeURIComponent(searchTerms);
 
-  const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodedQuery}&category_ids=183454&filter=price:%5B10..%5D&limit=50&sort=price`;
+  // CRITICAL: Use buyingOptions:{FIXED_PRICE} to exclude auctions with low starting bids
+  // Only fetch Buy It Now listings for accurate market pricing
+  const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodedQuery}&category_ids=183454&filter=buyingOptions:{FIXED_PRICE},price:%5B10..%5D&limit=50&sort=price`;
 
   const response = await fetch(url, {
     headers: {

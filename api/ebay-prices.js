@@ -144,9 +144,11 @@ export default async function handler(req, res) {
 
     // eBay Browse API endpoint
     // Category 183454 = Pokemon TCG
+    // CRITICAL: Use buyingOptions:{FIXED_PRICE} to exclude auctions with low starting bids
+    // Auctions starting at $0.99-$5 would skew prices down - we want actual Buy It Now prices
     // Add minimum price filter to exclude cheap bulk/damaged cards
     // Fetch up to 50 listings (will use 10-15 for pricing, but get more for better selection)
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodedQuery}&category_ids=183454&filter=price:%5B10..%5D&limit=50&sort=price`;
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodedQuery}&category_ids=183454&filter=buyingOptions:{FIXED_PRICE},price:%5B10..%5D&limit=50&sort=price`;
 
     console.log(`🔍 Fetching eBay active listings for: ${searchTerms}`);
     console.log(`🌐 Encoded query: ${encodedQuery}`);
