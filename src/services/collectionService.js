@@ -94,6 +94,10 @@ export const collectionService = {
 
   // Add a card to collection
   async addToCollection(userId, card) {
+    // Extract set name from card object (could be card.set or card.setName)
+    const setName = typeof card.set === 'string' ? card.set : card.set?.name || card.setName || 'Unknown Set';
+    const setId = card.setId || card.set_id || card.set?.id || null;
+    
     const { data, error } = await supabase
       .from('user_collections')
       .upsert({
@@ -103,8 +107,8 @@ export const collectionService = {
         card_image: card.image,
         card_number: card.number,
         card_rarity: card.rarity,
-        set_id: card.setId || card.set_id,
-        set_name: card.set || card.setName,
+        set_id: setId,
+        set_name: setName,
         quantity: 1
       }, {
         onConflict: 'user_id,card_id'

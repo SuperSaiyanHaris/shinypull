@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sun, Moon, LogOut, User, Package, Bell } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Package } from 'lucide-react';
 import logo from '../imgs/shinypulllogo.png';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
@@ -55,11 +55,6 @@ const Header = () => {
     navigate('/collection');
   };
 
-  const handleAlertsClick = () => {
-    setShowUserMenu(false);
-    navigate('/alerts');
-  };
-
   const getUserDisplayName = () => {
     if (profile?.display_name) return profile.display_name;
     if (user?.user_metadata?.display_name) return user.user_metadata.display_name;
@@ -102,17 +97,6 @@ const Header = () => {
                 >
                   <Package className="w-5 h-5 text-blue-500" />
                   <span className="hidden md:inline text-sm font-medium">My Collection</span>
-                </button>
-              )}
-
-              {/* My Alerts Button - Only shown when logged in */}
-              {user && (
-                <button
-                  onClick={handleAlertsClick}
-                  className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary border border-adaptive transition-colors"
-                >
-                  <Bell className="w-5 h-5 text-amber-500" />
-                  <span className="hidden md:inline text-sm font-medium">My Alerts</span>
                 </button>
               )}
 
@@ -173,13 +157,6 @@ const Header = () => {
                         >
                           <Package className="w-4 h-4 text-blue-500" />
                           My Collection
-                        </button>
-                        <button
-                          onClick={handleAlertsClick}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-amber-500 hover:bg-amber-500/10 transition-colors font-medium"
-                        >
-                          <Bell className="w-4 h-4" />
-                          My Alerts
                         </button>
                         <button
                           onClick={handleSignOut}

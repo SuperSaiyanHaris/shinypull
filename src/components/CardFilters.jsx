@@ -130,12 +130,6 @@ const CardFilters = ({ filters, onFiltersChange, showOwnershipFilter = false, on
           >
             Number
           </FilterButton>
-          <FilterButton
-            active={filters.sortBy === 'price'}
-            onClick={() => handleSortChange('price')}
-          >
-            Price (High to Low)
-          </FilterButton>
         </div>
       </FilterSection>
 
