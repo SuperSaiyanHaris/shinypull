@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   RefreshCw,
   Database,
@@ -6,10 +6,10 @@ import {
   XCircle,
   Clock,
   DollarSign,
-  Zap,
   Loader2,
-  Package,
-  Info
+  Info,
+  Play,
+  Square
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -19,6 +19,8 @@ const AdminSyncPanel = () => {
   const [syncStatus, setSyncStatus] = useState(null);
   const [lastSyncResult, setLastSyncResult] = useState(null);
   const [syncProgress, setSyncProgress] = useState(null);
+  const [autoSyncing, setAutoSyncing] = useState(false);
+  const stopSyncRef = useRef(false);
 
   useEffect(() => {
     loadSyncStatus();
@@ -68,8 +70,7 @@ const AdminSyncPanel = () => {
     setSyncProgress(null);
 
     try {
-      // Call the incremental price update endpoint
-      const response = await fetch('/api/incremental-price-update?limit=20');
+      const response = await fetch('/api/incremental-price-update?limit=10');
       const result = await response.json();
 
       setLastSyncResult({
@@ -88,6 +89,104 @@ const AdminSyncPanel = () => {
       setSyncing(false);
       setSyncType(null);
     }
+  };
+
+  const handleSyncAllPrices = async () => {
+    setAutoSyncing(true);
+    stopSyncRef.current = false;
+    setSyncType('all-prices');
+    setLastSyncResult(null);
+
+    let totalUpdated = 0;
+    let totalFailed = 0;
+    let batchCount = 0;
+    const startTime = Date.now();
+
+    try {
+      // Get initial count of cards needing prices
+      const { count: totalCards } = await supabase
+        .from('cards')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: initialWithPrices } = await supabase
+        .from('prices')
+        .select('*', { count: 'exact', head: true })
+        .not('market_price', 'is', null);
+
+      const cardsNeedingPrices = totalCards - initialWithPrices;
+
+      setSyncProgress({
+        phase: 'prices',
+        current: 0,
+        total: cardsNeedingPrices,
+        updated: 0
+      });
+
+      // Loop until stopped or all done
+      while (!stopSyncRef.current) {
+        batchCount++;
+        console.log(`🔄 Batch ${batchCount}: Fetching prices...`);
+
+        const response = await fetch('/api/incremental-price-update?limit=10');
+        const result = await response.json();
+
+        if (!result.success) {
+          console.error('Batch failed:', result.error);
+          totalFailed += 10;
+          continue;
+        }
+
+        totalUpdated += result.updated || 0;
+        totalFailed += result.failed || 0;
+
+        // Update progress
+        setSyncProgress({
+          phase: 'prices',
+          current: totalUpdated,
+          total: cardsNeedingPrices,
+          updated: totalUpdated,
+          batch: batchCount
+        });
+
+        // Refresh status every 5 batches
+        if (batchCount % 5 === 0) {
+          await loadSyncStatus();
+        }
+
+        // Check if we're done (no more cards updated)
+        if (result.updated === 0) {
+          console.log('✅ All cards processed!');
+          break;
+        }
+
+        // Small delay between batches to avoid overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+
+      setLastSyncResult({
+        success: true,
+        updated: totalUpdated,
+        failed: totalFailed,
+        message: stopSyncRef.current
+          ? `Stopped after ${totalUpdated} prices (${batchCount} batches, ${elapsed}s)`
+          : `Completed! Updated ${totalUpdated} prices in ${batchCount} batches (${elapsed}s)`
+      });
+
+      await loadSyncStatus();
+    } catch (error) {
+      setLastSyncResult({ success: false, error: error.message });
+    } finally {
+      setAutoSyncing(false);
+      setSyncType(null);
+      setSyncProgress(null);
+    }
+  };
+
+  const handleStopSync = () => {
+    console.log('🛑 Stopping sync...');
+    stopSyncRef.current = true;
   };
 
   const getCompletionPercentage = () => {
@@ -196,21 +295,52 @@ const AdminSyncPanel = () => {
           Sync Actions
         </h3>
 
-        {/* Update Prices */}
+        {/* Sync All Prices - Primary Action */}
+        <div className="p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-200 dark:border-blue-800">
+          <div className="flex items-start gap-3 mb-3">
+            <Play className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-semibold text-adaptive-primary">Sync All Prices</h4>
+              <p className="text-xs text-adaptive-tertiary mt-1">
+                Automatically fetch eBay prices for ALL cards. Runs in batches of 10.
+                You can stop at any time.
+              </p>
+            </div>
+          </div>
+          {autoSyncing ? (
+            <button
+              onClick={handleStopSync}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-xl font-semibold transition-all"
+            >
+              <Square className="w-5 h-5" />
+              Stop Sync
+            </button>
+          ) : (
+            <button
+              onClick={handleSyncAllPrices}
+              disabled={syncing}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 text-white rounded-xl font-semibold transition-all"
+            >
+              <Play className="w-5 h-5" />
+              Start Full Price Sync
+            </button>
+          )}
+        </div>
+
+        {/* Update Single Batch */}
         <div className="p-4 bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-xl border border-emerald-200 dark:border-emerald-800">
           <div className="flex items-start gap-3 mb-3">
             <DollarSign className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h4 className="font-semibold text-adaptive-primary">Update Prices</h4>
+              <h4 className="font-semibold text-adaptive-primary">Update Single Batch</h4>
               <p className="text-xs text-adaptive-tertiary mt-1">
-                Fetch fresh prices from Pokemon TCG API for cards with stale data.
-                Updates 20 cards per batch.
+                Fetch eBay prices for 10 cards with the oldest price data.
               </p>
             </div>
           </div>
           <button
             onClick={handleUpdatePrices}
-            disabled={syncing}
+            disabled={syncing || autoSyncing}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 disabled:opacity-50 text-white rounded-xl font-semibold transition-all"
           >
             {syncing && syncType === 'prices' ? (
@@ -218,7 +348,7 @@ const AdminSyncPanel = () => {
             ) : (
               <DollarSign className="w-5 h-5" />
             )}
-            {syncing && syncType === 'prices' ? 'Updating Prices...' : 'Update Stale Prices'}
+            {syncing && syncType === 'prices' ? 'Updating...' : 'Update 10 Cards'}
           </button>
         </div>
       </div>
@@ -230,22 +360,20 @@ const AdminSyncPanel = () => {
             <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
             <div className="flex-1">
               <p className="font-semibold text-blue-900 dark:text-blue-100">
-                {syncProgress.phase === 'prices' && 'Updating Prices...'}
+                Syncing Prices...
               </p>
-              {syncProgress.current && syncProgress.total && (
-                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                  {syncProgress.current} of {syncProgress.total}
-                  {syncProgress.updated !== undefined && ` • ${syncProgress.updated} prices updated`}
-                </p>
-              )}
+              <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                {syncProgress.updated?.toLocaleString() || 0} prices updated
+                {syncProgress.batch && ` • Batch ${syncProgress.batch}`}
+              </p>
             </div>
           </div>
 
-          {syncProgress.current && syncProgress.total && (
+          {syncProgress.total > 0 && (
             <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2">
               <div
                 className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(syncProgress.current / syncProgress.total) * 100}%` }}
+                style={{ width: `${Math.min((syncProgress.current / syncProgress.total) * 100, 100)}%` }}
               />
             </div>
           )}
@@ -275,13 +403,12 @@ const AdminSyncPanel = () => {
                     : 'text-red-900 dark:text-red-100'
                 }`}
               >
-                {lastSyncResult.success ? 'Update Successful!' : 'Update Failed'}
+                {lastSyncResult.success ? 'Sync Complete!' : 'Sync Failed'}
               </p>
               {lastSyncResult.success ? (
                 <div className="text-sm text-green-800 dark:text-green-200 mt-1 space-y-1">
                   {lastSyncResult.message && <p>{lastSyncResult.message}</p>}
-                  {lastSyncResult.updated !== undefined && <p>✓ {lastSyncResult.updated} prices updated</p>}
-                  {lastSyncResult.failed !== undefined && lastSyncResult.failed > 0 && (
+                  {lastSyncResult.failed > 0 && (
                     <p className="text-yellow-700 dark:text-yellow-300">⚠ {lastSyncResult.failed} failed</p>
                   )}
                 </div>
