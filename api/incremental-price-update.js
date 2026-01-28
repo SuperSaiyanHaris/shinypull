@@ -1,21 +1,151 @@
 /**
  * Incremental Price Update API
- * 
- * Updates prices for a small batch of cards at a time using eBay market data.
+ *
+ * Updates prices for a small batch of cards at a time using eBay Browse API.
  * Can be called repeatedly to gradually update all prices.
  * Stays well within Vercel's 10 second timeout.
- * 
+ *
  * Query params:
- *   - limit: Number of cards to update (default 5, max 10)
- *   - setId: Optional - only update cards from this set
+ *   - limit: Number of cards to update (default 10, max 20)
  */
 
 import { createClient } from '@supabase/supabase-js';
 
 // Vercel timeout: 10 seconds on hobby, 60 on pro
 export const config = {
-  maxDuration: 10
+  maxDuration: 60
 };
+
+// eBay OAuth token cache
+let cachedToken = null;
+let tokenExpiry = 0;
+
+/**
+ * Get OAuth access token using client credentials grant
+ */
+async function getEbayAccessToken(clientId, clientSecret) {
+  if (cachedToken && Date.now() < tokenExpiry - 300000) {
+    return cachedToken;
+  }
+
+  const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+
+  const response = await fetch('https://api.ebay.com/identity/v1/oauth2/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${credentials}`
+    },
+    body: 'grant_type=client_credentials&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope'
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`eBay OAuth failed: ${response.status} - ${error}`);
+  }
+
+  const data = await response.json();
+  cachedToken = data.access_token;
+  tokenExpiry = Date.now() + (data.expires_in * 1000);
+
+  return cachedToken;
+}
+
+/**
+ * Build eBay search terms for a Pokemon card
+ */
+function buildSearchTerms(cardName, cardNumber, setName) {
+  const parts = ['Pokemon'];
+
+  // Clean up card name
+  const cleanName = cardName
+    .replace(/\s+ex$/i, '')
+    .replace(/\s+EX$/i, '')
+    .replace(/\s+gx$/i, '')
+    .replace(/\s+GX$/i, '')
+    .trim();
+
+  parts.push(cleanName);
+  if (cardNumber) parts.push(cardNumber);
+  if (setName) parts.push(setName);
+
+  return parts.join(' ');
+}
+
+/**
+ * Check if a listing title contains PSA 10 indicators
+ */
+function isPSA10Listing(title) {
+  const lowerTitle = title.toLowerCase();
+  return lowerTitle.includes('psa 10') ||
+         lowerTitle.includes('psa10') ||
+         lowerTitle.includes('psa-10');
+}
+
+/**
+ * Fetch eBay prices for a card
+ */
+async function fetchEbayPrices(accessToken, cardName, cardNumber, setName, isPSA10 = false) {
+  const searchTerms = buildSearchTerms(cardName, cardNumber, setName) + (isPSA10 ? ' PSA 10' : '');
+  const encodedQuery = encodeURIComponent(searchTerms);
+
+  // eBay Browse API - Category 183454 = Pokemon TCG, min price $10 to filter junk
+  const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodedQuery}&category_ids=183454&filter=price:%5B10..%5D&limit=50&sort=price`;
+
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const data = await response.json();
+  const items = data.itemSummaries || [];
+
+  if (items.length === 0) {
+    return null;
+  }
+
+  // Filter listings based on search type (PSA vs raw)
+  const listings = items
+    .map(item => ({
+      price: parseFloat(item.price?.value || 0),
+      title: item.title || ''
+    }))
+    .filter(item => {
+      if (item.price <= 0) return false;
+      const hasPSA = isPSA10Listing(item.title);
+      return isPSA10 ? hasPSA : !hasPSA;
+    });
+
+  if (listings.length === 0) {
+    return null;
+  }
+
+  // Use 10-15 listings for pricing
+  const pricingListings = listings.slice(0, 15);
+  const prices = pricingListings.map(l => l.price).sort((a, b) => a - b);
+
+  const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+  const low = prices[0];
+  const high = prices[prices.length - 1];
+  const median = prices.length % 2 === 0
+    ? (prices[Math.floor(prices.length / 2) - 1] + prices[Math.floor(prices.length / 2)]) / 2
+    : prices[Math.floor(prices.length / 2)];
+
+  return {
+    market: parseFloat(median.toFixed(2)),
+    low: parseFloat(low.toFixed(2)),
+    high: parseFloat(high.toFixed(2)),
+    avg: parseFloat(avg.toFixed(2)),
+    count: pricingListings.length
+  };
+}
 
 export default async function handler(req, res) {
   // CORS
@@ -42,34 +172,50 @@ export default async function handler(req, res) {
 
   try {
     // Initialize Supabase
-    const supabase = createClient(
-      process.env.VITE_SUPABASE_URL,
-      process.env.VITE_SUPABASE_ANON_KEY
-    );
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    // Parse query params (reduced limits since eBay calls are slower)
-    const limit = Math.min(parseInt(req.query.limit) || 5, 10);
-    const setId = req.query.setId;
-
-    // Get cards that need price updates (oldest first from prices table)
-    // Join with cards to get card names and set info
-    let query = supabase
-      .from('prices')
-      .select('card_id, last_updated, cards!inner(name, set_id, sets!inner(name))')
-      .order('last_updated', { ascending: true, nullsFirst: true })
-      .limit(limit);
-
-    if (setId) {
-      query = query.eq('cards.set_id', setId);
+    if (!supabaseUrl || !supabaseKey) {
+      return res.status(500).json({ error: 'Supabase not configured' });
     }
 
-    const { data: priceRecords, error: fetchError } = await query;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Get eBay credentials
+    const ebayClientId = process.env.EBAY_APP_ID;
+    const ebayClientSecret = process.env.EBAY_CERT_ID;
+
+    if (!ebayClientId || !ebayClientSecret) {
+      return res.status(500).json({ error: 'eBay API credentials not configured' });
+    }
+
+    // Parse query params
+    const limit = Math.min(parseInt(req.query.limit) || 10, 20);
+
+    // Get cards that need price updates (oldest first)
+    // Join with cards table to get name/number/set for eBay search
+    const { data: cardsToUpdate, error: fetchError } = await supabase
+      .from('prices')
+      .select(`
+        card_id,
+        price_updated_at,
+        cards!inner (
+          name,
+          number,
+          set_id,
+          sets (
+            name
+          )
+        )
+      `)
+      .order('price_updated_at', { ascending: true, nullsFirst: true })
+      .limit(limit);
 
     if (fetchError) {
       throw fetchError;
     }
 
-    if (!priceRecords || priceRecords.length === 0) {
+    if (!cardsToUpdate || cardsToUpdate.length === 0) {
       return res.status(200).json({
         success: true,
         message: 'No prices need updating',
@@ -77,70 +223,70 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`Updating prices for ${priceRecords.length} cards using eBay...`);
+    console.log(`Updating prices for ${cardsToUpdate.length} cards via eBay API...`);
 
-    // Update each card's price from eBay using the WORKING ebay-prices endpoint
+    // Get eBay OAuth token
+    const accessToken = await getEbayAccessToken(ebayClientId, ebayClientSecret);
+
+    // Update each card's price
     const priceUpdates = [];
     const errors = [];
 
-    for (const priceRecord of priceRecords) {
+    for (const record of cardsToUpdate) {
       try {
-        const card = priceRecord.cards;
+        const card = record.cards;
         const setName = card.sets?.name || '';
-        
-        console.log(`Fetching eBay price for: ${card.name} (${setName})`);
-        
-        // Call the working ebay-prices endpoint
-        const protocol = req.headers['x-forwarded-proto'] || 'https';
-        const host = req.headers['x-forwarded-host'] || req.headers.host;
-        
-        const params = new URLSearchParams({
-          cardName: card.name,
-          setName: setName
-        });
-        
-        const ebayUrl = `${protocol}://${host}/api/ebay-prices?${params}`;
-        const ebayResponse = await fetch(ebayUrl);
-        
-        if (!ebayResponse.ok) {
-          console.log(`  eBay API error for ${card.name}`);
-          continue;
-        }
-        
-        const ebayData = await ebayResponse.json();
-        
-        if (!ebayData.found) {
-          console.log(`  No eBay prices found for ${card.name}`);
-          continue;
-        }
-        
-        const marketPrice = ebayData.median || ebayData.avg;
-        console.log(`  Found: $${marketPrice} (${ebayData.count} listings)`);
 
-        // Update prices table with eBay data
-        priceUpdates.push({
-          card_id: priceRecord.card_id,
-          
-          // Use eBay prices for main fields
-          market_price: marketPrice,
-          market_low: ebayData.low,
-          market_high: ebayData.high,
-          
-          // Store eBay data in normal variant (most common)
-          normal_market: marketPrice,
-          normal_low: ebayData.low,
-          normal_high: ebayData.high,
-          normal_mid: ebayData.avg,
-          
+        // Fetch raw card prices from eBay
+        const rawPrices = await fetchEbayPrices(
+          accessToken,
+          card.name,
+          card.number,
+          setName,
+          false // raw cards
+        );
+
+        // Fetch PSA 10 prices from eBay
+        const psa10Prices = await fetchEbayPrices(
+          accessToken,
+          card.name,
+          card.number,
+          setName,
+          true // PSA 10
+        );
+
+        const update = {
+          card_id: record.card_id,
           price_updated_at: new Date().toISOString()
-        });
+        };
 
-        // Small delay between eBay requests to avoid rate limits
+        if (rawPrices) {
+          update.market_price = rawPrices.market;
+          update.market_low = rawPrices.low;
+          update.market_high = rawPrices.high;
+          update.normal_market = rawPrices.market;
+          update.normal_low = rawPrices.low;
+          update.normal_high = rawPrices.high;
+          update.normal_mid = rawPrices.avg;
+          console.log(`✅ ${card.name} #${card.number}: $${rawPrices.market} (${rawPrices.count} listings)`);
+        } else {
+          console.log(`⚠️ ${card.name} #${card.number}: No eBay listings found`);
+        }
+
+        if (psa10Prices) {
+          update.psa10_market = psa10Prices.market;
+          update.psa10_low = psa10Prices.low;
+          update.psa10_high = psa10Prices.high;
+        }
+
+        priceUpdates.push(update);
+
+        // Rate limiting - 500ms between requests
         await new Promise(resolve => setTimeout(resolve, 500));
 
       } catch (error) {
-        console.error(`Failed to update ${priceRecord.card_id}:`, error.message);
-        errors.push({ card_id: priceRecord.card_id, error: error.message });
+        console.error(`Failed to update ${record.card_id}:`, error.message);
+        errors.push({ card_id: record.card_id, error: error.message });
       }
     }
 
@@ -155,11 +301,21 @@ export default async function handler(req, res) {
       }
     }
 
+    // Update sync metadata
+    await supabase
+      .from('sync_metadata')
+      .upsert({
+        entity_type: 'prices',
+        status: 'success',
+        message: `Updated ${priceUpdates.length} prices via eBay API`,
+        last_sync: new Date().toISOString()
+      }, { onConflict: 'entity_type' });
+
     return res.status(200).json({
       success: true,
       updated: priceUpdates.length,
       failed: errors.length,
-      total: priceRecords.length,
+      total: cardsToUpdate.length,
       errors: errors.length > 0 ? errors : undefined
     });
 

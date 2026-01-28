@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import {
   RefreshCw,
+  Database,
   CheckCircle,
   XCircle,
   Clock,
   DollarSign,
+  Zap,
   Loader2,
+  Package,
   Info
 } from 'lucide-react';
-import { getSyncStatus } from '../services/comprehensiveSyncService';
+import { supabase } from '../lib/supabase';
 
 const AdminSyncPanel = () => {
   const [syncing, setSyncing] = useState(false);
@@ -22,8 +25,40 @@ const AdminSyncPanel = () => {
   }, []);
 
   const loadSyncStatus = async () => {
-    const status = await getSyncStatus();
-    setSyncStatus(status);
+    try {
+      // Get sync metadata
+      const { data: syncMeta } = await supabase
+        .from('sync_metadata')
+        .select('*');
+
+      // Count sets
+      const { count: totalSets } = await supabase
+        .from('sets')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: syncedSets } = await supabase
+        .from('sets')
+        .select('*', { count: 'exact', head: true })
+        .not('last_full_sync', 'is', null);
+
+      // Count cards
+      const { count: totalCards } = await supabase
+        .from('cards')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: cardsWithPrices } = await supabase
+        .from('prices')
+        .select('*', { count: 'exact', head: true })
+        .not('market_price', 'is', null);
+
+      setSyncStatus({
+        syncMetadata: syncMeta,
+        sets: { total: totalSets, synced: syncedSets },
+        cards: { total: totalCards, withPrices: cardsWithPrices }
+      });
+    } catch (error) {
+      console.error('Error loading sync status:', error);
+    }
   };
 
   const handleUpdatePrices = async () => {
@@ -33,18 +68,19 @@ const AdminSyncPanel = () => {
     setSyncProgress(null);
 
     try {
-      // Call new eBay-based incremental price update endpoint
-      const response = await fetch('/api/incremental-price-update?limit=10');
+      // Call the incremental price update endpoint
+      const response = await fetch('/api/incremental-price-update?limit=20');
       const result = await response.json();
-      
+
       setLastSyncResult({
         success: result.success,
         updated: result.updated || 0,
-        message: result.success 
-          ? `Updated ${result.updated} cards with eBay prices` 
+        failed: result.failed || 0,
+        message: result.success
+          ? `Updated ${result.updated} card prices`
           : result.error
       });
-      
+
       await loadSyncStatus();
     } catch (error) {
       setLastSyncResult({ success: false, error: error.message });
@@ -55,8 +91,10 @@ const AdminSyncPanel = () => {
   };
 
   const getCompletionPercentage = () => {
-    if (!syncStatus?.sets) return 0;
-    return Math.round((syncStatus.sets.synced / syncStatus.sets.total) * 100);
+    if (!syncStatus?.cards) return 0;
+    const withPrices = syncStatus.cards.withPrices || 0;
+    const total = syncStatus.cards.total || 1;
+    return Math.round((withPrices / total) * 100);
   };
 
   const getStatusIcon = (status) => {
@@ -94,15 +132,15 @@ const AdminSyncPanel = () => {
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-green-500">{syncStatus.sets?.synced || 0}</p>
-              <p className="text-xs text-adaptive-tertiary">Fully Synced</p>
+              <p className="text-xs text-adaptive-tertiary">Synced Sets</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-adaptive-primary">{syncStatus.cards?.total?.toLocaleString() || 0}</p>
               <p className="text-xs text-adaptive-tertiary">Total Cards</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-green-500">{syncStatus.cards?.withCompleteData?.toLocaleString() || 0}</p>
-              <p className="text-xs text-adaptive-tertiary">Complete Data</p>
+              <p className="text-2xl font-bold text-green-500">{syncStatus.cards?.withPrices?.toLocaleString() || 0}</p>
+              <p className="text-xs text-adaptive-tertiary">With Prices</p>
             </div>
           </div>
         ) : (
@@ -112,7 +150,7 @@ const AdminSyncPanel = () => {
         {syncStatus && (
           <div className="mt-4">
             <div className="flex justify-between text-xs text-adaptive-tertiary mb-1">
-              <span>Sync Completion</span>
+              <span>Price Coverage</span>
               <span>{getCompletionPercentage()}%</span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -163,10 +201,10 @@ const AdminSyncPanel = () => {
           <div className="flex items-start gap-3 mb-3">
             <DollarSign className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h4 className="font-semibold text-adaptive-primary">Update eBay Prices</h4>
+              <h4 className="font-semibold text-adaptive-primary">Update Prices</h4>
               <p className="text-xs text-adaptive-tertiary mt-1">
-                Refresh market prices from eBay sold listings for cards with stale data (oldest first).
-                Updates 5-10 cards per run. Run regularly to keep prices current.
+                Fetch fresh prices from Pokemon TCG API for cards with stale data.
+                Updates 20 cards per batch.
               </p>
             </div>
           </div>
@@ -192,15 +230,11 @@ const AdminSyncPanel = () => {
             <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
             <div className="flex-1">
               <p className="font-semibold text-blue-900 dark:text-blue-100">
-                {syncProgress.phase === 'sets' && 'Syncing Sets...'}
-                {syncProgress.phase === 'cards' && `Syncing: ${syncProgress.setName}`}
-                {syncProgress.phase === 'new_sets' && `New Set: ${syncProgress.setName}`}
                 {syncProgress.phase === 'prices' && 'Updating Prices...'}
               </p>
               {syncProgress.current && syncProgress.total && (
                 <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
                   {syncProgress.current} of {syncProgress.total}
-                  {syncProgress.totalCards !== undefined && ` • ${syncProgress.totalCards.toLocaleString()} cards synced`}
                   {syncProgress.updated !== undefined && ` • ${syncProgress.updated} prices updated`}
                 </p>
               )}
@@ -241,21 +275,15 @@ const AdminSyncPanel = () => {
                     : 'text-red-900 dark:text-red-100'
                 }`}
               >
-                {lastSyncResult.success ? 'Sync Successful!' : 'Sync Failed'}
+                {lastSyncResult.success ? 'Update Successful!' : 'Update Failed'}
               </p>
               {lastSyncResult.success ? (
                 <div className="text-sm text-green-800 dark:text-green-200 mt-1 space-y-1">
                   {lastSyncResult.message && <p>{lastSyncResult.message}</p>}
-                  {lastSyncResult.sets !== undefined && <p>✓ {lastSyncResult.sets} sets</p>}
-                  {lastSyncResult.cards !== undefined && <p>✓ {lastSyncResult.cards.toLocaleString()} cards</p>}
                   {lastSyncResult.updated !== undefined && <p>✓ {lastSyncResult.updated} prices updated</p>}
-                  {lastSyncResult.skipped !== undefined && lastSyncResult.skipped > 0 && (
-                    <p className="text-yellow-700 dark:text-yellow-300">⚠ {lastSyncResult.skipped} cards not in Pokemon API (skipped for 7 days)</p>
+                  {lastSyncResult.failed !== undefined && lastSyncResult.failed > 0 && (
+                    <p className="text-yellow-700 dark:text-yellow-300">⚠ {lastSyncResult.failed} failed</p>
                   )}
-                  {lastSyncResult.setNames && (
-                    <p>✓ New sets: {lastSyncResult.setNames.join(', ')}</p>
-                  )}
-                  {lastSyncResult.elapsed && <p className="text-xs opacity-75">Time: {lastSyncResult.elapsed}</p>}
                 </div>
               ) : (
                 <p className="text-sm text-red-800 dark:text-red-200 mt-1 font-mono bg-red-100 dark:bg-red-900/30 p-2 rounded">
