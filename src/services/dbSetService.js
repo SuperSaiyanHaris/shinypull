@@ -1,5 +1,4 @@
 import { supabase } from '../lib/supabase';
-import { getAllSets as getApiSets, getSetCards as getApiCards } from './setService';
 
 // In-memory cache to avoid refetching sets on every navigation
 const setsCache = {
@@ -19,19 +18,17 @@ export const getAllSets = async () => {
   }
 
   console.log('[dbSetService] Fetching sets from database...');
-  
+
   const { data, error } = await supabase
     .from('sets')
     .select('*')
     .order('release_date', { ascending: false });
 
-  console.log('[dbSetService] Query completed. Error:', error, 'Data length:', data?.length);
-
   if (error) {
     console.error('[dbSetService] DB error:', error);
     throw error;
   }
-  
+
   console.log('[dbSetService] DB returned', data?.length || 0, 'sets');
 
   // Transform to match app format
@@ -48,7 +45,7 @@ export const getAllSets = async () => {
   // Update cache
   setsCache.data = transformed;
   setsCache.timestamp = Date.now();
-  
+
   return transformed;
 };
 
@@ -56,42 +53,51 @@ export const getAllSets = async () => {
  * Get all cards for a specific set from the database
  */
 export const getSetCards = async (setId) => {
-  const { data, error } = await supabase
+  // Fetch cards
+  const { data: cards, error: cardsError } = await supabase
     .from('cards')
     .select(`
       *,
       sets (
         name,
         series
-      ),
-      prices (
-        market_price,
-        market_low,
-        market_high,
-        tcg_comparison_price,
-        tcg_affiliate_url,
-        psa10_market,
-        psa10_low,
-        psa10_high,
-        price_updated_at,
-        normal_market,
-        holofoil_market,
-        reverse_holofoil_market
       )
     `)
     .eq('set_id', setId)
     .order('number', { ascending: true });
 
-  if (error) {
-    console.error('Error fetching cards:', error);
-    throw error;
+  if (cardsError) {
+    console.error('Error fetching cards:', cardsError);
+    throw cardsError;
   }
 
+  // Get card IDs
+  const cardIds = cards.map(c => c.id);
+
+  // Fetch prices separately (no foreign key relation needed)
+  const { data: prices, error: pricesError } = await supabase
+    .from('prices')
+    .select('*')
+    .in('card_id', cardIds);
+
+  if (pricesError) {
+    console.error('Error fetching prices:', pricesError);
+    // Don't throw - continue without prices
+  }
+
+  // Create a map of card_id -> price data
+  const priceMap = {};
+  if (prices) {
+    prices.forEach(p => {
+      priceMap[p.card_id] = p;
+    });
+  }
+
+  console.log(`[dbSetService] Fetched ${cards.length} cards, ${prices?.length || 0} prices for set ${setId}`);
+
   // Transform to match app format
-  return data.map(card => {
-    // prices comes as an array from the relation - get first element or empty object
-    const priceData = Array.isArray(card.prices) ? card.prices[0] : card.prices;
-    const price = priceData || {};
+  return cards.map(card => {
+    const price = priceMap[card.id] || {};
     const setData = card.sets || {};
 
     // Build TCGPlayer search URL as fallback
@@ -102,8 +108,8 @@ export const getSetCards = async (setId) => {
       name: card.name,
       number: card.number,
       rarity: card.rarity,
-      types: card.types || [], // Pokemon types array
-      supertype: card.supertype || 'Pokémon', // Default to Pokemon if not set
+      types: card.types || [],
+      supertype: card.supertype || 'Pokémon',
       image: card.image_large || card.image_small,
       images: {
         small: card.image_small,
@@ -151,19 +157,17 @@ export const getSetCards = async (setId) => {
  * Search cards by name or card number across all sets
  */
 export const searchCards = async (query) => {
-  // Return empty array for empty queries
   if (!query || query.trim() === '') {
     return [];
   }
 
   const trimmedQuery = query.trim();
-  
+
   // Check if query contains both text and numbers (e.g., "Charizard 125")
-  // Split by spaces and check if we have both text and number parts
   const parts = trimmedQuery.split(/\s+/);
   const numberPart = parts.find(part => /^\d+$/.test(part));
   const textParts = parts.filter(part => !/^\d+$/.test(part));
-  
+
   let dbQuery = supabase
     .from('cards')
     .select(`
@@ -173,36 +177,19 @@ export const searchCards = async (query) => {
         series,
         release_date,
         logo
-      ),
-      prices (
-        market_price,
-        market_low,
-        market_high,
-        tcg_comparison_price,
-        tcg_affiliate_url,
-        psa10_market,
-        psa10_low,
-        psa10_high,
-        price_updated_at,
-        normal_market,
-        holofoil_market,
-        reverse_holofoil_market
       )
     `);
-  
-  // If we have both text and number, search for cards matching both conditions
+
   if (numberPart && textParts.length > 0) {
     const nameQuery = textParts.join(' ');
-    console.log(`Searching for name containing "${nameQuery}" AND number containing "${numberPart}"`);
     dbQuery = dbQuery
       .ilike('name', `%${nameQuery}%`)
       .ilike('number', `%${numberPart}%`);
   } else {
-    // Otherwise, search either name OR number
     dbQuery = dbQuery.or(`name.ilike.%${trimmedQuery}%,number.ilike.%${trimmedQuery}%`);
   }
-  
-  const { data, error } = await dbQuery
+
+  const { data: cards, error } = await dbQuery
     .order('name', { ascending: true })
     .limit(100);
 
@@ -211,14 +198,27 @@ export const searchCards = async (query) => {
     throw error;
   }
 
+  // Get card IDs and fetch prices separately
+  const cardIds = cards.map(c => c.id);
+
+  const { data: prices } = await supabase
+    .from('prices')
+    .select('*')
+    .in('card_id', cardIds);
+
+  // Create price map
+  const priceMap = {};
+  if (prices) {
+    prices.forEach(p => {
+      priceMap[p.card_id] = p;
+    });
+  }
+
   // Transform to match app format
-  return data.map(card => {
-    // prices comes as an array from the relation - get first element or empty object
-    const priceData = Array.isArray(card.prices) ? card.prices[0] : card.prices;
-    const price = priceData || {};
+  return cards.map(card => {
+    const price = priceMap[card.id] || {};
     const set = card.sets || {};
 
-    // Build TCGPlayer search URL as fallback
     const tcgplayerSearchUrl = `https://www.tcgplayer.com/search/pokemon/product?q=${encodeURIComponent(card.name + ' ' + card.number)}`;
 
     return {
