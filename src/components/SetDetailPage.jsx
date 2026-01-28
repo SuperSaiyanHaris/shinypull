@@ -73,7 +73,7 @@ const SetDetailPage = ({ set }) => {
       return true;
     })
     .sort((a, b) => {
-      if (filters.sortBy === 'price') return (b.prices?.tcgplayer?.market || 0) - (a.prices?.tcgplayer?.market || 0);
+      if (filters.sortBy === 'price') return (b.prices?.market || 0) - (a.prices?.market || 0);
       if (filters.sortBy === 'name') return a.name.localeCompare(b.name);
       if (filters.sortBy === 'number') return parseInt(a.number) - parseInt(b.number);
       return 0;
@@ -224,7 +224,7 @@ const SetDetailPage = ({ set }) => {
                 <span className="text-xs text-adaptive-tertiary">{card.rarity}</span>
               </div>
               <p className={`text-lg font-bold price-gradient mt-2 ${!user ? 'blur-sm' : ''}`}>
-                {user ? formatPrice(card.prices.tcgplayer.market) : '$---.--'}
+                {user ? formatPrice(card.prices.market) : '$---.--'}
               </p>
             </button>
 
@@ -307,7 +307,7 @@ const SetDetailPage = ({ set }) => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <span className={`text-sm font-bold price-gradient ${!user ? 'blur-sm select-none' : ''}`}>
-                      {user ? formatPrice(card.prices.tcgplayer.market) : '$---.--'}
+                      {user ? formatPrice(card.prices.market) : '$---.--'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
