@@ -4,7 +4,6 @@ import { ArrowLeft, Search, Plus, Minus, Package, Sparkles, Layers, Grid, List, 
 import { useAuth } from '../contexts/AuthContext';
 import { collectionService } from '../services/collectionService';
 import { getSetCards } from '../services/dbSetService';
-import { formatPrice } from '../services/cardService';
 import CardModal from './CardModal';
 import CardFilters from './CardFilters';
 import AddToCollectionButton from './AddToCollectionButton';
@@ -502,19 +501,6 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
                           : 'Unknown'}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm text-adaptive-tertiary">Owned Market Value</p>
-                      <p className="text-lg font-bold price-gradient">
-                        {formatPrice(selectedSetStats.ownedMarketValue)}
-                      </p>
-                      <p className="text-xs text-adaptive-tertiary mt-1">Prices updated regularly</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-adaptive-tertiary">Total Set Value</p>
-                      <p className="text-base font-semibold text-adaptive-primary">
-                        {formatPrice(selectedSetStats.totalSetMarketValue)}
-                      </p>
-                    </div>
                   </div>
                 </div>
 
@@ -551,9 +537,6 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-adaptive-primary truncate">
                                 {card.name}
-                              </p>
-                              <p className="text-lg font-bold price-gradient mt-1">
-                                {formatPrice(card.prices?.tcgplayer?.market || 0)}
                               </p>
                             </div>
                           </div>
@@ -719,10 +702,6 @@ const MyCollection = ({ selectedSetId: propSetId }) => {
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-xs text-adaptive-tertiary">{card.rarity}</span>
-                        <span className="text-xs text-adaptive-tertiary">•</span>
-                        <span className="text-xs font-medium price-gradient">
-                          {formatPrice(card.prices?.tcgplayer?.market || 0)}
-                        </span>
                       </div>
                     </div>
 
