@@ -8,8 +8,6 @@ import CardGrid from './components/CardGrid';
 import SetBrowser from './components/SetBrowser';
 import SetDetailPage from './components/SetDetailPage';
 import MyCollection from './components/MyCollection';
-import MyAlerts from './components/MyAlerts';
-import AdminSyncPanel from './components/AdminSyncPanel';
 import TermsOfUse from './components/TermsOfUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import ScrollToTop from './components/ScrollToTop';
@@ -74,14 +72,8 @@ function SetDetailWrapper({ selectedSet, onSetLoaded }) {
 function AppContent() {
   const { query, setQuery, cards, loading } = useCardSearch();
   const [selectedSet, setSelectedSet] = useState(null);
-  const [showAdmin, setShowAdmin] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
-
-  // Admin emails
-  const ADMIN_EMAILS = ['haris.lilic@gmail.com', 'shinypull@proton.me'];
-  const isAdmin = user?.email && ADMIN_EMAILS.includes(user.email);
 
   // Switch to search view when user types
   useEffect(() => {
@@ -118,32 +110,6 @@ function AppContent() {
     navigate('/');
   };
 
-  // Listen for Ctrl+Shift+A to toggle admin panel (admin users only)
-  // Also check URL param ?admin=true for mobile access
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-        e.preventDefault();
-        // Only allow admin users to open the panel
-        if (isAdmin) {
-          setShowAdmin(prev => !prev);
-        } else {
-          console.warn('Admin panel access denied: not authorized');
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAdmin]);
-
-  // Check URL for ?admin=true (mobile-friendly access)
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    if (params.get('admin') === 'true' && isAdmin) {
-      setShowAdmin(true);
-    }
-  }, [location.search, isAdmin]);
-
   return (
     <div className="min-h-screen">
       <Header />
@@ -157,7 +123,6 @@ function AppContent() {
         <section className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {!location.pathname.startsWith('/collection') && 
-             !location.pathname.startsWith('/alerts') && 
              !location.pathname.startsWith('/sets/') && (
               <div className="mb-12 animate-slide-up" style={{ animationDelay: '300ms' }}>
                 <SearchBar
@@ -165,13 +130,6 @@ function AppContent() {
                   onChange={setQuery}
                   onClear={handleClear}
                 />
-              </div>
-            )}
-
-            {/* Admin Panel */}
-            {showAdmin && (
-              <div className="mb-8">
-                <AdminSyncPanel />
               </div>
             )}
 
@@ -225,11 +183,6 @@ function AppContent() {
               {/* Collection Set View */}
               <Route path="/collection/sets/:setId" element={
                 <CollectionWrapper />
-              } />
-
-              {/* My Alerts */}
-              <Route path="/alerts" element={
-                <MyAlerts onBack={handleBackToSets} />
               } />
 
               {/* Terms of Use */}

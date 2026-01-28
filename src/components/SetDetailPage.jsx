@@ -6,8 +6,6 @@ import { useAuthModal } from '../contexts/AuthModalContext';
 import CardModal from './CardModal';
 import CardFilters from './CardFilters';
 import AddToCollectionButton from './AddToCollectionButton';
-import PriceAlertButton from './PriceAlertButton';
-import { formatPrice } from '../services/cardService';
 import { getSetCards } from '../services/dbSetService';
 
 const SetDetailPage = ({ set }) => {
@@ -160,7 +158,7 @@ const SetDetailPage = ({ set }) => {
               <>
                 Showing <span className="font-semibold text-adaptive-primary">{filteredCards.length}</span> of {cards.length} cards
                 <span className="mx-2">•</span>
-                <span className="text-xs">Sorted by: {filters.sortBy === 'price' ? 'Price (High to Low)' : filters.sortBy === 'name' ? 'Name (A-Z)' : 'Card Number'}</span>
+                <span className="text-xs">Sorted by: {filters.sortBy === 'name' ? 'Name (A-Z)' : 'Card Number'}</span>
               </>
             )}
           </p>
@@ -223,9 +221,6 @@ const SetDetailPage = ({ set }) => {
                 <span className="text-adaptive-tertiary">•</span>
                 <span className="text-xs text-adaptive-tertiary">{card.rarity}</span>
               </div>
-              <p className={`text-lg font-bold price-gradient mt-2 ${!user ? 'blur-sm' : ''}`}>
-                {user ? formatPrice(card.prices.market) : '$---.--'}
-              </p>
             </button>
 
             {/* Add to Collection Button */}
@@ -242,7 +237,7 @@ const SetDetailPage = ({ set }) => {
         {!user && (
           <div className="p-4 bg-blue-600/10 border-b border-blue-600/30 flex items-center justify-between">
             <p className="text-sm text-adaptive-primary">
-              <span className="font-semibold">Sign in</span> to view pricing, add cards to your collection, and set price alerts
+              <span className="font-semibold">Sign in</span> to add cards to your collection
             </p>
             <button
               onClick={() => openAuthModal()}
@@ -265,9 +260,6 @@ const SetDetailPage = ({ set }) => {
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
                   Rarity
-                </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
-                  Market Price
                 </th>
                 <th className="px-6 py-4 text-center text-xs font-semibold text-adaptive-secondary uppercase tracking-wider">
                   Actions
@@ -305,15 +297,9 @@ const SetDetailPage = ({ set }) => {
                   <td className="px-6 py-4">
                     <span className="text-sm text-adaptive-secondary">{card.rarity}</span>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <span className={`text-sm font-bold price-gradient ${!user ? 'blur-sm select-none' : ''}`}>
-                      {user ? formatPrice(card.prices.market) : '$---.--'}
-                    </span>
-                  </td>
                   <td className="px-6 py-4">
                     <div className={`flex items-center justify-center gap-2 ${!user ? 'blur-sm pointer-events-none select-none' : ''}`} onClick={(e) => e.stopPropagation()}>
                       <AddToCollectionButton card={card} variant="compact" />
-                      <PriceAlertButton card={card} className="!px-3 !py-1.5 !text-sm !rounded-lg" />
                       <button
                         onClick={() => handleViewDetails(card)}
                         className="px-3 py-1.5 bg-adaptive-card hover:bg-adaptive-hover text-adaptive-primary text-sm font-medium rounded-lg transition-colors border border-adaptive"
