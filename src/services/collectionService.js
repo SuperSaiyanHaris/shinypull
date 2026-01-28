@@ -98,9 +98,32 @@ export const collectionService = {
     const setName = typeof card.set === 'string' ? card.set : card.set?.name || card.setName || 'Unknown Set';
     const setId = card.setId || card.set_id || card.set?.id || null;
     
+    // Check if card already exists
+    const { data: existing } = await supabase
+      .from('user_collections')
+      .select('id, quantity')
+      .eq('user_id', userId)
+      .eq('card_id', card.id)
+      .maybeSingle();
+
+    if (existing) {
+      // Card already in collection, optionally increase quantity
+      const { data, error } = await supabase
+        .from('user_collections')
+        .update({ quantity: existing.quantity + 1 })
+        .eq('user_id', userId)
+        .eq('card_id', card.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+
+    // Insert new card
     const { data, error } = await supabase
       .from('user_collections')
-      .upsert({
+      .insert({
         user_id: userId,
         card_id: card.id,
         card_name: card.name,
@@ -110,8 +133,6 @@ export const collectionService = {
         set_id: setId,
         set_name: setName,
         quantity: 1
-      }, {
-        onConflict: 'user_id,card_id'
       })
       .select()
       .single();
