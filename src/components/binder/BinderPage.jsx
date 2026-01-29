@@ -79,22 +79,33 @@ const CardSlot = ({ slot, index, onCardClick }) => {
   }
 
   if (slot.isEmpty) {
-    // Card exists but not collected - show silhouette
+    // Card exists but not collected - show actual card at 45% opacity
     return (
       <motion.div
-        className="aspect-[2.5/3.5] rounded-lg bg-slate-300/60 dark:bg-slate-700/60 border-2 border-dashed border-slate-400/50 dark:border-slate-500/50 flex items-center justify-center overflow-hidden group cursor-pointer"
-        whileHover={{ scale: 1.02, borderColor: 'rgba(59, 130, 246, 0.5)' }}
+        className="aspect-[2.5/3.5] rounded-lg overflow-hidden cursor-pointer relative group"
+        whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
+        onClick={() => onCardClick?.(slot)}
       >
-        {/* Card silhouette */}
-        <div className="text-center p-1">
-          <div className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-1 rounded-full bg-slate-400/30 dark:bg-slate-600/30" />
-          <div className="w-12 md:w-16 h-1.5 mx-auto bg-slate-400/30 dark:bg-slate-600/30 rounded mb-1" />
-          <div className="w-8 md:w-12 h-1 mx-auto bg-slate-400/20 dark:bg-slate-600/20 rounded" />
-        </div>
-        <span className="absolute bottom-1 text-[8px] md:text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-          #{slot.index + 1}
-        </span>
+        {/* Card Image at reduced opacity */}
+        <img
+          src={slot.image || slot.images?.small || slot.card_image}
+          alt={slot.name || slot.card_name}
+          className="w-full h-full object-cover opacity-45 grayscale-[30%]"
+          onError={(e) => {
+            e.target.src = 'https://via.placeholder.com/200x280?text=Card';
+          }}
+        />
+
+        {/* Hover overlay to add to collection */}
+        <motion.div
+          className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center"
+        >
+          <p className="text-white text-[10px] md:text-xs font-medium text-center px-1 drop-shadow-lg line-clamp-2 mb-1">
+            {slot.name || slot.card_name}
+          </p>
+          <p className="text-white/60 text-[8px] md:text-[10px]">Not collected</p>
+        </motion.div>
       </motion.div>
     );
   }
