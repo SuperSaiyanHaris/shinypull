@@ -109,6 +109,35 @@ const BinderShelf = () => {
     setOpenBinder(null);
   };
 
+  // Handle collection change (card added/removed)
+  const handleCollectionChange = async () => {
+    if (!user) return;
+
+    try {
+      // Reload collection data
+      const [collectionData, collectionStats] = await Promise.all([
+        collectionService.getCollection(user.id),
+        collectionService.getCollectionStats(user.id)
+      ]);
+
+      setCollection(collectionData);
+      setStats(collectionStats);
+
+      // Update open binder's collected cards if a binder is open
+      if (openBinder) {
+        const updatedCollectedCards = collectionData.filter(
+          card => card.set_id === openBinder.set.id
+        );
+        setOpenBinder(prev => ({
+          ...prev,
+          collectedCards: updatedCollectedCards
+        }));
+      }
+    } catch (error) {
+      console.error('Error reloading collection:', error);
+    }
+  };
+
   const collectedSets = getCollectedSets();
 
   // Not logged in state
@@ -277,6 +306,7 @@ const BinderShelf = () => {
             allCards={openBinder.allCards}
             collectedCards={openBinder.collectedCards}
             onClose={handleCloseBinder}
+            onCollectionChange={handleCollectionChange}
           />
         )}
       </AnimatePresence>

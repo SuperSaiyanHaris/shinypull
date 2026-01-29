@@ -14,7 +14,8 @@ const BinderViewer = ({
   allCards = [], // All cards in the set (sorted by number)
   collectedCards = [], // User's collected cards for this set
   onClose,
-  onCardClick
+  onCardClick,
+  onCollectionChange // Callback when a card is added/removed
 }) => {
   const [currentSpread, setCurrentSpread] = useState(0); // Current page spread (0 = pages 1-2, 1 = pages 3-4, etc.)
   const [isFlipping, setIsFlipping] = useState(false);
@@ -139,10 +140,9 @@ const BinderViewer = ({
   const rightPageIndex = currentSpread * 2 + 1;
 
   const handleCardClick = (card) => {
-    if (!card.isEmpty) {
-      setSelectedCard(card);
-      onCardClick?.(card);
-    }
+    // Open modal for both collected and uncollected cards
+    setSelectedCard(card);
+    onCardClick?.(card);
   };
 
   // Page flip animation variants
@@ -330,6 +330,8 @@ const BinderViewer = ({
           card={selectedCard}
           isOpen={!!selectedCard}
           onClose={() => setSelectedCard(null)}
+          onCardAdded={onCollectionChange}
+          onCardRemoved={onCollectionChange}
         />
       )}
     </motion.div>
