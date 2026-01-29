@@ -12,6 +12,8 @@ const BinderPage = ({
   totalCards,
   startIndex,
   onCardClick,
+  onQuickAdd,
+  onQuickRemove,
   isLeftPage = false,
   isMobile = false
 }) => {
@@ -60,6 +62,8 @@ const BinderPage = ({
               slot={slot}
               index={index}
               onCardClick={onCardClick}
+              onQuickAdd={onQuickAdd}
+              onQuickRemove={onQuickRemove}
               isMobile={isMobile}
             />
           ))}
@@ -80,7 +84,7 @@ const BinderPage = ({
  * Individual Card Slot
  * Can be empty (shows placeholder), filled (shows card), or null (beyond set size)
  */
-const CardSlot = ({ slot, index, onCardClick, isMobile = false }) => {
+const CardSlot = ({ slot, index, onCardClick, onQuickAdd, onQuickRemove, isMobile = false }) => {
   if (slot === null) {
     // Beyond the set size - empty decorative slot
     return (
@@ -90,6 +94,11 @@ const CardSlot = ({ slot, index, onCardClick, isMobile = false }) => {
 
   if (slot.isEmpty) {
     // Card exists but not collected - show actual card at 45% opacity
+    const handleQuickAdd = (e) => {
+      e.stopPropagation();
+      onQuickAdd?.(slot);
+    };
+
     return (
       <motion.div
         className="aspect-[2.5/3.5] rounded-lg overflow-hidden cursor-pointer relative group"
@@ -97,11 +106,12 @@ const CardSlot = ({ slot, index, onCardClick, isMobile = false }) => {
         whileTap={{ scale: 0.96 }}
         onClick={() => onCardClick?.(slot)}
       >
-        {/* Card Image at reduced opacity */}
+        {/* Card Image at reduced opacity - use larger image for better quality */}
         <img
-          src={slot.image || slot.images?.small || slot.card_image}
+          src={slot.images?.large || slot.images?.small || slot.image || slot.card_image}
           alt={slot.name || slot.card_name}
           className="w-full h-full object-cover opacity-45 grayscale-[30%]"
+          loading="lazy"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/200x280?text=Card';
           }}
@@ -116,18 +126,27 @@ const CardSlot = ({ slot, index, onCardClick, isMobile = false }) => {
           <p className="text-white text-xs font-medium text-center px-1 drop-shadow-lg line-clamp-2 mb-1">
             {slot.name || slot.card_name}
           </p>
-          <p className="text-white/60 text-[10px]">Tap to add</p>
+          <p className="text-white/60 text-[10px]">Tap card for details</p>
         </motion.div>
 
-        {/* Uncollected indicator */}
-        <div className="absolute top-1 right-1 w-5 h-5 bg-black/40 rounded-full flex items-center justify-center">
-          <span className="text-white/60 text-xs">+</span>
-        </div>
+        {/* Quick-add button */}
+        <button
+          onClick={handleQuickAdd}
+          className="absolute top-1 right-1 w-7 h-7 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-full flex items-center justify-center shadow-lg transition-colors z-10"
+          aria-label="Quick add to collection"
+        >
+          <span className="text-white text-sm font-bold">+</span>
+        </button>
       </motion.div>
     );
   }
 
   // Collected card - show the actual card
+  const handleQuickRemove = (e) => {
+    e.stopPropagation();
+    onQuickRemove?.(slot);
+  };
+
   return (
     <motion.div
       className="aspect-[2.5/3.5] rounded-lg overflow-hidden shadow-md cursor-pointer relative group"
@@ -142,24 +161,30 @@ const CardSlot = ({ slot, index, onCardClick, isMobile = false }) => {
       whileTap={{ scale: 0.95 }}
       onClick={() => onCardClick?.(slot)}
     >
-      {/* Card Image */}
+      {/* Card Image - use larger image for better quality */}
       <img
-        src={slot.image || slot.images?.small || slot.card_image}
+        src={slot.images?.large || slot.images?.small || slot.image || slot.card_image}
         alt={slot.name || slot.card_name}
         className="w-full h-full object-cover"
+        loading="lazy"
         onError={(e) => {
           e.target.src = 'https://via.placeholder.com/200x280?text=Card';
         }}
       />
 
-      {/* Collected checkmark badge */}
-      <div className="absolute top-1 right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-        <span className="text-white text-xs">✓</span>
-      </div>
+      {/* Collected checkmark badge - clickable to remove */}
+      <button
+        onClick={handleQuickRemove}
+        className="absolute top-1 right-1 w-7 h-7 bg-green-500 hover:bg-red-500 active:bg-red-600 rounded-full flex items-center justify-center shadow-lg transition-colors z-10 group/btn"
+        aria-label="Remove from collection"
+      >
+        <span className="text-white text-xs group-hover/btn:hidden">✓</span>
+        <span className="text-white text-sm font-bold hidden group-hover/btn:block">−</span>
+      </button>
 
       {/* Tap/hover overlay with card name */}
       <motion.div
-        className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end justify-center pb-2 transition-opacity ${
+        className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end justify-center pb-2 transition-opacity pointer-events-none ${
           isMobile ? 'opacity-0 active:opacity-100' : 'opacity-0 group-hover:opacity-100'
         }`}
       >

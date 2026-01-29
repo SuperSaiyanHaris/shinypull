@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react';
 import BinderPage from './BinderPage';
 import CardModal from '../CardModal';
+import { useAuth } from '../../contexts/AuthContext';
+import { collectionService } from '../../services/collectionService';
 
 /**
  * BinderViewer Component
@@ -18,11 +20,13 @@ const BinderViewer = ({
   onCardClick,
   onCollectionChange
 }) => {
+  const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [flipDirection, setFlipDirection] = useState(null);
   const [selectedCard, setSelectedCard] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [isQuickActioning, setIsQuickActioning] = useState(false);
   const containerRef = useRef(null);
 
   const CARDS_PER_PAGE = 9;
@@ -165,6 +169,47 @@ const BinderViewer = ({
     onCardClick?.(card);
   };
 
+  // Quick add card to collection without opening modal
+  const handleQuickAdd = async (card) => {
+    if (!user || isQuickActioning) return;
+
+    try {
+      setIsQuickActioning(true);
+      await collectionService.addToCollection(user.id, {
+        id: card.id,
+        name: card.name,
+        image: card.images?.large || card.images?.small || card.image,
+        number: card.number,
+        rarity: card.rarity,
+        set: set.name,
+        setId: set.id
+      });
+      collectionService.clearCache();
+      onCollectionChange?.();
+    } catch (error) {
+      console.error('Error adding card:', error);
+    } finally {
+      setIsQuickActioning(false);
+    }
+  };
+
+  // Quick remove card from collection without opening modal
+  const handleQuickRemove = async (card) => {
+    if (!user || isQuickActioning) return;
+
+    try {
+      setIsQuickActioning(true);
+      const cardId = card.card_id || card.id;
+      await collectionService.removeFromCollection(user.id, cardId);
+      collectionService.clearCache();
+      onCollectionChange?.();
+    } catch (error) {
+      console.error('Error removing card:', error);
+    } finally {
+      setIsQuickActioning(false);
+    }
+  };
+
   // Page animation variants
   const mobilePageVariants = {
     enter: (direction) => ({
@@ -257,6 +302,8 @@ const BinderViewer = ({
                   totalCards={allCards.length}
                   startIndex={currentPage * CARDS_PER_PAGE}
                   onCardClick={handleCardClick}
+                  onQuickAdd={handleQuickAdd}
+                  onQuickRemove={handleQuickRemove}
                   isLeftPage={false}
                   isMobile={true}
                 />
@@ -354,6 +401,8 @@ const BinderViewer = ({
                         totalCards={allCards.length}
                         startIndex={leftPageIndex * CARDS_PER_PAGE}
                         onCardClick={handleCardClick}
+                        onQuickAdd={handleQuickAdd}
+                        onQuickRemove={handleQuickRemove}
                         isLeftPage={true}
                       />
                     )}
@@ -383,6 +432,8 @@ const BinderViewer = ({
                         totalCards={allCards.length}
                         startIndex={rightPageIndex * CARDS_PER_PAGE}
                         onCardClick={handleCardClick}
+                        onQuickAdd={handleQuickAdd}
+                        onQuickRemove={handleQuickRemove}
                         isLeftPage={false}
                       />
                     ) : (
