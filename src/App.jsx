@@ -6,18 +6,13 @@ import SearchBar from './components/SearchBar';
 import CardGrid from './components/CardGrid';
 import SetBrowser from './components/SetBrowser';
 import SetDetailPage from './components/SetDetailPage';
-import MyCollection from './components/MyCollection';
+import { BinderShelf } from './components/binder';
 import TermsOfUse from './components/TermsOfUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import ScrollToTop from './components/ScrollToTop';
 import { useCardSearch } from './hooks/useCardSearch';
 import { getAllSets } from './services/dbSetService';
 import { useAuth } from './contexts/AuthContext';
-
-function CollectionWrapper() {
-  const { setId } = useParams();
-  return <MyCollection selectedSetId={setId} />;
-}
 
 function SetDetailWrapper({ selectedSet, onSetLoaded }) {
   const { setId } = useParams();
@@ -171,14 +166,9 @@ function AppContent() {
                 </div>
               } />
 
-              {/* My Collection */}
+              {/* My Collection - Binder Experience */}
               <Route path="/collection" element={
-                <MyCollection onBack={handleBackToSets} />
-              } />
-              
-              {/* Collection Set View */}
-              <Route path="/collection/sets/:setId" element={
-                <CollectionWrapper />
+                <BinderShelf />
               } />
 
               {/* Terms of Use */}
