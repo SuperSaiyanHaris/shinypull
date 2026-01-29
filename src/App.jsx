@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import Header from './components/Header';
-import Hero from './components/Hero';
 import SearchBar from './components/SearchBar';
 import CardGrid from './components/CardGrid';
 import SetBrowser from './components/SetBrowser';
@@ -116,15 +115,12 @@ function AppContent() {
       <ScrollToTop />
 
       <main>
-        {/* Hero - Only show on home page */}
-        {location.pathname === '/' && <Hero />}
-
         {/* Search Section - Hide on collection, alerts, and set detail pages */}
-        <section className="py-12">
+        <section className="py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {!location.pathname.startsWith('/collection') && 
              !location.pathname.startsWith('/sets/') && (
-              <div className="mb-12 animate-slide-up" style={{ animationDelay: '300ms' }}>
+              <div className="mb-12">
                 <SearchBar
                   value={query}
                   onChange={setQuery}
