@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "seed:top-creators": "node scripts/seedTopCreators.js"
+    "seed:top-creators": "node scripts/seedTopCreators.js",
+    "backfill:stats": "node scripts/backfillHistoricalStats.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",

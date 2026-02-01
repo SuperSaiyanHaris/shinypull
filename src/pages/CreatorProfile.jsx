@@ -290,39 +290,41 @@ export default function CreatorProfile() {
           </div>
 
           {/* Stats Summary Cards */}
-          {metrics && (
+          {creator.subscribers || creator.followers ? (
             <div className="border-t border-gray-700 pt-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <SummaryCard
                   label={platform === 'twitch' ? 'Followers' : 'Subscribers'}
                   sublabel="For the last 30 days"
-                  value={formatNumber(metrics.last30Days.subs)}
-                  change={metrics.last30Days.subs}
+                  value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
+                  change={metrics?.last30Days.subs}
                 />
                 <SummaryCard
                   label="Views"
                   sublabel="For the last 30 days"
-                  value={formatNumber(metrics.last30Days.views)}
-                  change={metrics.last30Days.views}
+                  value={metrics ? formatNumber(metrics.last30Days.views) : '--'}
+                  change={metrics?.last30Days.views}
                 />
                 {platform !== 'twitch' && (
                   <>
                     <SummaryCard
                       label="Monthly Est. Earnings"
                       sublabel="Based on avg CPM"
-                      value={formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)}
+                      value={metrics ? formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7) : '--'}
                     />
                     <SummaryCard
                       label="Yearly Est. Earnings"
                       sublabel="Based on avg CPM"
-                      value={formatEarnings(metrics.last30Days.views / 1000 * 2 * 12, metrics.last30Days.views / 1000 * 7 * 12)}
+                      value={metrics ? formatEarnings(metrics.last30Days.views / 1000 * 2 * 12, metrics.last30Days.views / 1000 * 7 * 12) : '--'}
                     />
                   </>
                 )}
               </div>
 
-              <h3 className="text-lg font-semibold mb-4">Daily Channel Metrics</h3>
-              <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-x-auto">
+              {metrics ? (
+                <>
+                  <h3 className="text-lg font-semibold mb-4">Daily Channel Metrics</h3>
+                  <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-700 text-left text-gray-400">
@@ -469,8 +471,23 @@ export default function CreatorProfile() {
                   </tbody>
                 </table>
               </div>
+                </>
+              ) : (
+                <div className="bg-gray-800 rounded-lg border border-gray-700 p-8 text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-700 rounded-full mb-4">
+                    <TrendingUp className="w-8 h-8 text-gray-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Collecting Historical Data</h3>
+                  <p className="text-gray-400 text-sm mb-2">
+                    We're tracking this creator's stats. Check back tomorrow to see daily growth metrics!
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {statsHistory.length} data point(s) collected so far
+                  </p>
+                </div>
+              )}
             </div>
-          )}
+          ) : null}
 
           {/* Channel Creation Date */}
           {creator.createdAt && (
