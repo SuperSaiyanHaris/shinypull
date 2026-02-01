@@ -8,7 +8,9 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <BarChart3 className="w-8 h-8 text-blue-500" />
-            <span className="text-xl font-bold">ShinyPull</span>
+            <span className="text-xl">
+              <span className="font-bold">Shiny</span> Pull
+            </span>
           </Link>
 
           <nav className="flex items-center gap-6">
