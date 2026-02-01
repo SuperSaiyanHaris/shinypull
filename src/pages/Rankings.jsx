@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Youtube, Twitch, Instagram, TrendingUp, Users, Eye } from 'lucide-react';
 import { getRankedCreators } from '../services/creatorService';
+import SEO from '../components/SEO';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', available: true },

@@ -4,6 +4,7 @@ import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
+import SEO from '../components/SEO';
 
 const platformIcons = {
   youtube: Youtube,

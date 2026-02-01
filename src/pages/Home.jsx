@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Search, Youtube, Twitch, Instagram } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', stats: '72M+ channels', available: true },
@@ -22,9 +23,15 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-73px)]">
-      {/* Hero Section */}
-      <section className="py-20 px-4 text-center bg-gradient-to-b from-gray-800 to-gray-900">
+    <>
+      <SEO 
+        title="Home"
+        description="Track YouTube, Twitch, TikTok, Instagram & Twitter statistics. View subscriber counts, earnings estimates, rankings and growth analytics for your favorite creators."
+        keywords="youtube statistics, twitch statistics, subscriber count, social blade alternative, creator analytics, earnings calculator"
+      />
+      <div className="min-h-[calc(100vh-73px)]">
+        {/* Hero Section */}
+        <section className="py-20 px-4 text-center bg-gradient-to-b from-gray-800 to-gray-900">
         <h1 className="text-5xl font-bold mb-4">
           Social Media <span className="text-blue-500">Statistics</span>
         </h1>
@@ -135,5 +142,6 @@ export default function Home() {
         </div>
       </section>
     </div>
+    </>
   );
 }

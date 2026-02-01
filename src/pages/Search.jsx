@@ -4,6 +4,7 @@ import { Search as SearchIcon, Youtube, Twitch, Instagram, User, AlertCircle } f
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats } from '../services/creatorService';
+import SEO from '../components/SEO';
 
 const platformIcons = {
   youtube: Youtube,
