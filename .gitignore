@@ -46,3 +46,6 @@ public/workbox-*.js
 
 # Supabase CLI temp files
 supabase/.temp/
+
+.vercel
+.env*.local

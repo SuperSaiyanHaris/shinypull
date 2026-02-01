@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, Twitter, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle } from 'lucide-react';
+import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle } from 'lucide-react';
 import { getChannelByUsername } from '../services/youtubeService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
 
@@ -8,14 +8,12 @@ const platformIcons = {
   youtube: Youtube,
   twitch: Twitch,
   instagram: Instagram,
-  twitter: Twitter,
 };
 
 const platformColors = {
   youtube: 'bg-red-600',
   twitch: 'bg-purple-600',
   instagram: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500',
-  twitter: 'bg-sky-500',
   tiktok: 'bg-pink-500',
 };
 
@@ -23,7 +21,6 @@ const platformUrls = {
   youtube: (username) => `https://youtube.com/@${username}`,
   twitch: (username) => `https://twitch.tv/${username}`,
   instagram: (username) => `https://instagram.com/${username}`,
-  twitter: (username) => `https://twitter.com/${username}`,
   tiktok: (username) => `https://tiktok.com/@${username}`,
 };
 

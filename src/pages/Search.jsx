@@ -1,20 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Search as SearchIcon, Youtube, Twitch, Instagram, Twitter, User, AlertCircle } from 'lucide-react';
+import { Search as SearchIcon, Youtube, Twitch, Instagram, User, AlertCircle } from 'lucide-react';
 import { searchChannels } from '../services/youtubeService';
 
 const platformIcons = {
   youtube: Youtube,
   twitch: Twitch,
   instagram: Instagram,
-  twitter: Twitter,
 };
 
 const platformColors = {
   youtube: 'bg-red-600',
   twitch: 'bg-purple-600',
   instagram: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500',
-  twitter: 'bg-sky-500',
   tiktok: 'bg-pink-500',
 };
 
@@ -23,7 +21,6 @@ const platforms = [
   { id: 'twitch', name: 'Twitch', icon: Twitch, available: false },
   { id: 'tiktok', name: 'TikTok', icon: null, available: false },
   { id: 'instagram', name: 'Instagram', icon: Instagram, available: false },
-  { id: 'twitter', name: 'Twitter', icon: Twitter, available: false },
 ];
 
 export default function Search() {

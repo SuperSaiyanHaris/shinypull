@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, Twitter, TrendingUp, Users, Eye } from 'lucide-react';
+import { Youtube, Twitch, Instagram, TrendingUp, Users, Eye } from 'lucide-react';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600' },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600' },
   { id: 'tiktok', name: 'TikTok', icon: null, color: 'bg-pink-500' },
   { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500' },
-  { id: 'twitter', name: 'Twitter/X', icon: Twitter, color: 'bg-sky-500' },
 ];
 
 const rankTypes = [

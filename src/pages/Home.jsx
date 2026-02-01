@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, Instagram, Twitter } from 'lucide-react';
+import { Search, Youtube, Twitch, Instagram } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', stats: '72M+ channels' },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', stats: '7M+ channels' },
+  { id: 'tiktok', name: 'TikTok', icon: null, color: 'bg-pink-500', stats: '10M+ creators' },
   { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', stats: '11M+ creators' },
-  { id: 'twitter', name: 'Twitter/X', icon: Twitter, color: 'bg-sky-500', stats: '1M+ accounts' },
 ];
 
 export default function Home() {
@@ -29,7 +29,7 @@ export default function Home() {
           Social Media <span className="text-blue-500">Statistics</span>
         </h1>
         <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-          Track followers, views, and growth for YouTube, Twitch, TikTok, Instagram, and Twitter creators.
+          Track followers, views, and growth for YouTube, Twitch, TikTok, and Instagram creators.
         </p>
 
         {/* Search Bar */}
@@ -61,7 +61,11 @@ export default function Home() {
               className="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:border-gray-600 transition-colors group"
             >
               <div className={`w-12 h-12 ${platform.color} rounded-lg flex items-center justify-center mx-auto mb-3`}>
-                <platform.icon className="w-6 h-6 text-white" />
+                {platform.icon ? (
+                  <platform.icon className="w-6 h-6 text-white" />
+                ) : (
+                  <span className="text-white font-bold text-sm">{platform.name.slice(0, 2)}</span>
+                )}
               </div>
               <h3 className="font-semibold mb-1 group-hover:text-blue-400 transition-colors">
                 {platform.name}
@@ -83,7 +87,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Search Creators</h3>
               <p className="text-gray-400">
-                Find any creator across YouTube, Twitch, TikTok, Instagram, and Twitter.
+                Find any creator across YouTube, Twitch, TikTok, and Instagram.
               </p>
             </div>
             <div className="text-center">
