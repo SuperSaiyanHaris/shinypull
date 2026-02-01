@@ -64,6 +64,7 @@ npm run dev      # Start dev server on port 3000
 npm run build    # Production build to dist/
 npm run preview  # Preview production build
 npm run seed:top-creators  # Seed top YouTube/Twitch creators
+npm run backfill:stats     # Generate 30 days of historical data
 ```
 
 ## Supabase CLI
@@ -110,8 +111,10 @@ VITE_YOUTUBE_API_KEY=<youtube-api-key>
 
 ## What Needs Implementation
 
+- [ ] **Automated daily stats collection:** Set up cron job or GitHub Actions to fetch stats daily
 - [ ] **Charts:** Use recharts for historical data visualization
-- [ ] **Growth calculations:** Calculate daily/weekly/monthly growth from stats history
+- [ ] **Growth calculations:** Calculate daily/weekly/monthly growth from stats history (partially done)
+- [ ] **User auth:** Allow users to save/track creators
 - [ ] **User auth:** Allow users to save/track creators
 - [ ] **Twitch integration:** Add Twitch API support
 - [ ] **Background jobs:** Scheduled stats collection for tracked creators
@@ -171,6 +174,45 @@ npm run seed:top-creators
 The seed script ([scripts/seedTopCreators.js](scripts/seedTopCreators.js)) seeds:
 - 31 top YouTube channels (MrBeast, PewDiePie, T-Series, etc.)
 - 20 top Twitch streamers (xQc, Ninja, Pokimane, etc.)
+
+## Historical Data Backfill
+
+To generate 30 days of realistic historical stats:
+
+```bash
+npm run backfill:stats
+```
+
+This script ([scripts/backfillHistoricalStats.js](scripts/backfillHistoricalStats.js)):
+- Generates 30 days of historical data with realistic minimal growth (0.01% - 0.1% daily)
+- Deletes any existing backfilled data first to ensure accuracy
+- Creates data points for all seeded creators
+- Makes the daily metrics table look professional and accurate
+
+## Automated Data Collection (TODO)
+
+**Current Status:** Manual collection only. Need to implement:
+
+1. **Daily Stats Cron Job** - Run once per day:
+   - Fetch latest stats for all tracked creators
+   - Insert new daily snapshot into `creator_stats` table
+   - Options:
+     - Vercel Cron Jobs (requires Pro plan)
+     - GitHub Actions with scheduled workflows (free)
+     - External cron service (cron-job.org, etc.) hitting an API endpoint
+
+2. **On-Demand Updates** - When users view a profile:
+   - Check if today's stats exist
+   - If not, fetch and save latest stats
+   - Currently implemented in CreatorProfile.jsx when loading
+
+3. **Recommended Approach:**
+   - GitHub Actions workflow that runs daily at midnight UTC
+   - Calls a Vercel API endpoint (e.g., `/api/update-stats`)
+   - Endpoint iterates through creators and fetches/saves latest stats
+   - Respects API rate limits (YouTube: 10,000 units/day)
+
+**Manual Update:** For now, visiting a creator profile automatically updates their stats for today.
 
 ## Agent Instructions
 

@@ -14,19 +14,26 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
 
-// Generate realistic growth patterns
+// Generate realistic growth patterns with minimal daily changes
 function generateHistoricalStats(baseStats, daysAgo) {
-  const growthVariance = 0.02; // 2% daily variance
-  const dailyGrowthRate = 0.001 + (Math.random() * 0.002); // 0.1% - 0.3% daily growth
+  // Most big channels have very small daily growth rates
+  // For realism: 0.01% - 0.1% daily subscriber growth, views slightly higher
+  const dailySubGrowthRate = 0.0001 + (Math.random() * 0.0009); // 0.01% - 0.1%
+  const dailyViewGrowthRate = 0.001 + (Math.random() * 0.002); // 0.1% - 0.3%
   
-  // Calculate what the stats would have been X days ago
-  const factor = Math.pow(1 - dailyGrowthRate, daysAgo);
-  const variance = 1 + (Math.random() - 0.5) * growthVariance;
+  // Calculate what the stats would have been X days ago (working backwards)
+  const subsFactor = Math.pow(1 - dailySubGrowthRate, daysAgo);
+  const viewsFactor = Math.pow(1 - dailyViewGrowthRate, daysAgo);
+  
+  // Add very small random variance (±0.5%) to make it look natural
+  const subsVariance = 1 + (Math.random() - 0.5) * 0.005;
+  const viewsVariance = 1 + (Math.random() - 0.5) * 0.01;
   
   return {
-    subscribers: Math.floor(baseStats.subscribers * factor * variance),
-    total_views: Math.floor(baseStats.total_views * factor * variance),
-    total_posts: Math.max(0, baseStats.total_posts - Math.floor(daysAgo * (Math.random() * 2))),
+    subscribers: Math.floor(baseStats.subscribers * subsFactor * subsVariance),
+    total_views: Math.floor(baseStats.total_views * viewsFactor * viewsVariance),
+    // Videos: maybe 1-2 new videos per week for big channels
+    total_posts: Math.max(0, baseStats.total_posts - Math.floor(daysAgo / 7 * (Math.random() < 0.5 ? 1 : 2))),
   };
 }
 
@@ -57,25 +64,40 @@ async function backfillCreatorStats() {
   const creatorsWithStats = creators.filter(c => c.creator_stats && c.creator_stats.length > 0);
   console.log(`Found ${creatorsWithStats.length} creators with stats`);
 
-  const daysToBackfill = 14; // Backfill 14 days of historical data
+  const daysToBackfill = 30; // Backfill 30 days of historical data
   let totalInserted = 0;
+  let totalDeleted = 0;
 
   for (const creator of creatorsWithStats) {
     const latestStat = creator.creator_stats[0];
     const latestDate = new Date(latestStat.recorded_at);
     
-    // Check if we already have historical data
-    const { data: existingStats } = await supabase
+    // Delete existing stats to regenerate with accurate data
+    const { data: existingStats, error: fetchError } = await supabase
       .from('creator_stats')
-      .select('recorded_at')
+      .select('id, recorded_at')
       .eq('creator_id', creator.id);
 
-    if (existingStats && existingStats.length > 5) {
-      console.log(`Skipping ${creator.display_name} - already has ${existingStats.length} data points`);
+    if (fetchError) {
+      console.error(`Error fetching stats for ${creator.display_name}:`, fetchError.message);
       continue;
     }
 
-    console.log(`\nBackfilling ${creator.display_name} (${creator.platform})...`);
+    // Delete all except the most recent one (today's seed data)
+    const statsToDelete = existingStats.filter(s => s.recorded_at !== latestStat.recorded_at);
+    if (statsToDelete.length > 0) {
+      const { error: deleteError } = await supabase
+        .from('creator_stats')
+        .delete()
+        .in('id', statsToDelete.map(s => s.id));
+      
+      if (!deleteError) {
+        totalDeleted += statsToDelete.length;
+        console.log(`Deleted ${statsToDelete.length} old data points for ${creator.display_name}`);
+      }
+    }
+
+    console.log(`Backfilling ${creator.display_name} (${creator.platform})...`);
 
     const baseStats = {
       subscribers: latestStat.subscribers || latestStat.followers || 0,
@@ -89,11 +111,6 @@ async function backfillCreatorStats() {
       const historicalDate = new Date(latestDate);
       historicalDate.setDate(historicalDate.getDate() - i);
       const dateString = historicalDate.toISOString().split('T')[0];
-
-      // Skip if this date already exists
-      if (existingStats?.some(s => s.recorded_at === dateString)) {
-        continue;
-      }
 
       const historicalStats = generateHistoricalStats(baseStats, i);
 
@@ -121,13 +138,16 @@ async function backfillCreatorStats() {
       if (insertError) {
         console.error(`Failed to insert stats for ${creator.display_name}:`, insertError.message);
       } else {
-        console.log(`✔ Inserted ${statsToInsert.length} historical data points`);
+        console.log(`✔ Inserted ${statsToInsert.length} days of historical data`);
         totalInserted += statsToInsert.length;
       }
     }
   }
 
-  console.log(`\n✅ Backfill complete! Inserted ${totalInserted} total data points.`);
+  console.log(`\n✅ Backfill complete!`);
+  console.log(`   Deleted: ${totalDeleted} old data points`);
+  console.log(`   Inserted: ${totalInserted} new data points`);
+  console.log(`   Each creator now has ${daysToBackfill + 1} days of data`);
 }
 
 backfillCreatorStats().catch((error) => {
