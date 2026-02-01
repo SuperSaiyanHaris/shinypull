@@ -86,6 +86,55 @@ export default function CreatorProfile() {
 
   const Icon = platformIcons[platform];
 
+  // Calculate growth metrics from history
+  const calculateGrowthMetrics = () => {
+    if (statsHistory.length < 2) return null;
+
+    const sortedStats = [...statsHistory].sort((a, b) => 
+      new Date(b.recorded_at) - new Date(a.recorded_at)
+    );
+
+    const latest = sortedStats[0];
+    const oldest = sortedStats[sortedStats.length - 1];
+
+    // Calculate daily changes
+    const dailyStats = sortedStats.map((stat, index) => {
+      const prevStat = sortedStats[index + 1];
+      return {
+        ...stat,
+        subsChange: prevStat ? (stat.subscribers || stat.followers) - (prevStat.subscribers || prevStat.followers) : 0,
+        viewsChange: prevStat ? stat.total_views - prevStat.total_views : 0,
+        videosChange: prevStat ? (stat.total_posts || 0) - (prevStat.total_posts || 0) : 0,
+      };
+    });
+
+    const subsGrowth = (latest.subscribers || latest.followers) - (oldest.subscribers || oldest.followers);
+    const viewsGrowth = latest.total_views - oldest.total_views;
+    const videosGrowth = (latest.total_posts || 0) - (oldest.total_posts || 0);
+
+    const days = sortedStats.length;
+    const dailyAvgSubs = Math.round(subsGrowth / days);
+    const dailyAvgViews = Math.round(viewsGrowth / days);
+    const weeklyAvgSubs = Math.round(subsGrowth / (days / 7));
+    const weeklyAvgViews = Math.round(viewsGrowth / (days / 7));
+
+    // Last 14 days metrics
+    const last14Days = sortedStats.slice(0, Math.min(14, sortedStats.length));
+    const last14First = last14Days[last14Days.length - 1];
+    const last14Subs = last14Days.length > 1 ? (latest.subscribers || latest.followers) - (last14First.subscribers || last14First.followers) : 0;
+    const last14Views = last14Days.length > 1 ? latest.total_views - last14First.total_views : 0;
+
+    return {
+      dailyStats: dailyStats.slice(0, 14), // Show last 14 days
+      last30Days: { subs: subsGrowth, views: viewsGrowth, videos: videosGrowth },
+      last14Days: { subs: last14Subs, views: last14Views },
+      dailyAverage: { subs: dailyAvgSubs, views: dailyAvgViews },
+      weeklyAverage: { subs: weeklyAvgSubs, views: weeklyAvgViews },
+    };
+  };
+
+  const metrics = calculateGrowthMetrics();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-73px)]">
@@ -240,13 +289,185 @@ export default function CreatorProfile() {
             )}
           </div>
 
-          {/* Stats History */}
-          {statsHistory.length > 1 && (
+          {/* Stats Summary Cards */}
+          {metrics && (
             <div className="border-t border-gray-700 pt-8">
-              <h3 className="text-lg font-semibold mb-4">Statistics History</h3>
-              <div className="bg-gray-900 rounded-lg p-4 text-sm text-gray-400">
-                <p>Tracking started. Historical data will appear here as we collect more snapshots.</p>
-                <p className="mt-2">{statsHistory.length} data points collected</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <SummaryCard
+                  label={platform === 'twitch' ? 'Followers' : 'Subscribers'}
+                  sublabel="For the last 30 days"
+                  value={formatNumber(metrics.last30Days.subs)}
+                  change={metrics.last30Days.subs}
+                />
+                <SummaryCard
+                  label="Views"
+                  sublabel="For the last 30 days"
+                  value={formatNumber(metrics.last30Days.views)}
+                  change={metrics.last30Days.views}
+                />
+                {platform !== 'twitch' && (
+                  <>
+                    <SummaryCard
+                      label="Monthly Est. Earnings"
+                      sublabel="Based on avg CPM"
+                      value={formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)}
+                    />
+                    <SummaryCard
+                      label="Yearly Est. Earnings"
+                      sublabel="Based on avg CPM"
+                      value={formatEarnings(metrics.last30Days.views / 1000 * 2 * 12, metrics.last30Days.views / 1000 * 7 * 12)}
+                    />
+                  </>
+                )}
+              </div>
+
+              <h3 className="text-lg font-semibold mb-4">Daily Channel Metrics</h3>
+              <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-700 text-left text-gray-400">
+                      <th className="px-4 py-3">Date</th>
+                      <th className="px-4 py-3 text-right">{platform === 'twitch' ? 'Followers' : 'Subscribers'}</th>
+                      <th className="px-4 py-3 text-right">Views</th>
+                      {platform !== 'twitch' && <th className="px-4 py-3 text-right">Videos</th>}
+                      {platform !== 'twitch' && <th className="px-4 py-3 text-right">Est. Earnings</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {metrics.dailyStats.map((stat) => (
+                      <tr key={stat.recorded_at} className="border-b border-gray-700/50 hover:bg-gray-700/30">
+                        <td className="px-4 py-3">
+                          {new Date(stat.recorded_at).toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                          })}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex flex-col items-end">
+                            <span className="text-gray-300">{formatNumber(stat.subscribers || stat.followers)}</span>
+                            {stat.subsChange !== 0 && (
+                              <span className={`text-xs ${stat.subsChange > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                {stat.subsChange > 0 ? '+' : ''}{formatNumber(stat.subsChange)}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex flex-col items-end">
+                            <span className="text-gray-300">{formatNumber(stat.total_views)}</span>
+                            {stat.viewsChange !== 0 && (
+                              <span className={`text-xs ${stat.viewsChange > 0 ? 'text-green-400' : 'text-gray-500'}`}>
+                                {stat.viewsChange > 0 ? '+' : ''}{formatNumber(stat.viewsChange)}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        {platform !== 'twitch' && (
+                          <>
+                            <td className="px-4 py-3 text-right">
+                              <div className="flex flex-col items-end">
+                                <span className="text-gray-300">{formatNumber(stat.total_posts || 0)}</span>
+                                {stat.videosChange !== 0 && (
+                                  <span className="text-xs text-green-400">
+                                    +{stat.videosChange}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-right text-gray-300">
+                              {stat.viewsChange > 0 ? formatEarnings(stat.viewsChange / 1000 * 2, stat.viewsChange / 1000 * 7) : '$0'}
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    ))}
+
+                    {/* Summary Rows */}
+                    <tr className="border-t-2 border-gray-600 bg-gray-700/30 font-semibold">
+                      <td className="px-4 py-3">Daily Average</td>
+                      <td className="px-4 py-3 text-right">
+                        <span className={metrics.dailyAverage.subs >= 0 ? 'text-green-400' : 'text-red-400'}>
+                          {metrics.dailyAverage.subs >= 0 ? '+' : ''}{formatNumber(metrics.dailyAverage.subs)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right text-green-400">
+                        +{formatNumber(metrics.dailyAverage.views)}
+                      </td>
+                      {platform !== 'twitch' && (
+                        <>
+                          <td className="px-4 py-3 text-right"></td>
+                          <td className="px-4 py-3 text-right text-gray-300">
+                            {formatEarnings(metrics.dailyAverage.views / 1000 * 2, metrics.dailyAverage.views / 1000 * 7)}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+
+                    <tr className="bg-gray-700/30 font-semibold">
+                      <td className="px-4 py-3">Weekly Average</td>
+                      <td className="px-4 py-3 text-right">
+                        <span className={metrics.weeklyAverage.subs >= 0 ? 'text-green-400' : 'text-red-400'}>
+                          {metrics.weeklyAverage.subs >= 0 ? '+' : ''}{formatNumber(metrics.weeklyAverage.subs)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right text-green-400">
+                        +{formatNumber(metrics.weeklyAverage.views)}
+                      </td>
+                      {platform !== 'twitch' && (
+                        <>
+                          <td className="px-4 py-3 text-right"></td>
+                          <td className="px-4 py-3 text-right text-gray-300">
+                            {formatEarnings(metrics.weeklyAverage.views / 1000 * 2, metrics.weeklyAverage.views / 1000 * 7)}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+
+                    <tr className="bg-gray-700/30 font-semibold">
+                      <td className="px-4 py-3">Last 30 Days</td>
+                      <td className="px-4 py-3 text-right">
+                        <span className={metrics.last30Days.subs >= 0 ? 'text-green-400' : 'text-red-400'}>
+                          {metrics.last30Days.subs >= 0 ? '+' : ''}{formatNumber(metrics.last30Days.subs)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right text-green-400">
+                        +{formatNumber(metrics.last30Days.views)}
+                      </td>
+                      {platform !== 'twitch' && (
+                        <>
+                          <td className="px-4 py-3 text-right text-green-400">
+                            +{metrics.last30Days.videos}
+                          </td>
+                          <td className="px-4 py-3 text-right text-gray-300">
+                            {formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+
+                    <tr className="bg-gray-700/30 font-semibold">
+                      <td className="px-4 py-3">Last 14 Days</td>
+                      <td className="px-4 py-3 text-right">
+                        <span className={metrics.last14Days.subs >= 0 ? 'text-green-400' : 'text-red-400'}>
+                          {metrics.last14Days.subs >= 0 ? '+' : ''}{formatNumber(metrics.last14Days.subs)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right text-green-400">
+                        +{formatNumber(metrics.last14Days.views)}
+                      </td>
+                      {platform !== 'twitch' && (
+                        <>
+                          <td className="px-4 py-3 text-right"></td>
+                          <td className="px-4 py-3 text-right text-gray-300">
+                            {formatEarnings(metrics.last14Days.views / 1000 * 2, metrics.last14Days.views / 1000 * 7)}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
@@ -293,10 +514,39 @@ function StatCard({ icon: Icon, label, value, sublabel, change }) {
   );
 }
 
+function SummaryCard({ label, sublabel, value, change }) {
+  const isPositive = change !== undefined && change > 0;
+  const isNegative = change !== undefined && change < 0;
+  const changeColor = isPositive ? 'text-green-400' : isNegative ? 'text-red-400' : 'text-gray-400';
+
+  return (
+    <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+      <p className="text-2xl md:text-3xl font-bold mb-1">{value}</p>
+      <p className="text-sm font-medium text-gray-300">{label}</p>
+      {sublabel && <p className="text-xs text-gray-500 mt-1">{sublabel}</p>}
+      {change !== undefined && change !== null && (
+        <p className={`text-xs mt-1 ${changeColor}`}>
+          {isPositive ? '+' : ''}{formatNumber(change)}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function formatNumber(num) {
   if (num === null || num === undefined) return '-';
   if (Math.abs(num) >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
   if (Math.abs(num) >= 1000000) return (num / 1000000).toFixed(1) + 'M';
   if (Math.abs(num) >= 1000) return (num / 1000).toFixed(1) + 'K';
   return num.toLocaleString();
+}
+
+function formatEarnings(low, high) {
+  if (!low || !high) return '$0';
+  const formatCurrency = (num) => {
+    if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `$${(num / 1000).toFixed(0)}K`;
+    return `$${Math.round(num)}`;
+  };
+  return `${formatCurrency(low)} - ${formatCurrency(high)}`;
 }
