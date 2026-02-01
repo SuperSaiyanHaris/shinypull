@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle } from 'lucide-react';
-import { getChannelByUsername } from '../services/youtubeService';
+import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
+import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
 
 const platformIcons = {
@@ -40,35 +41,39 @@ export default function CreatorProfile() {
     setError(null);
 
     try {
+      let channelData = null;
+
       if (platform === 'youtube') {
-        // Fetch fresh data from YouTube API
-        const ytChannel = await getChannelByUsername(username);
-
-        if (ytChannel) {
-          setCreator(ytChannel);
-
-          // Save to database (fire and forget)
-          try {
-            const dbCreator = await upsertCreator(ytChannel);
-            await saveCreatorStats(dbCreator.id, {
-              subscribers: ytChannel.subscribers,
-              totalViews: ytChannel.totalViews,
-              totalPosts: ytChannel.totalPosts,
-            });
-
-            // Fetch stats history
-            const history = await getCreatorStats(dbCreator.id, 30);
-            setStatsHistory(history || []);
-          } catch (dbErr) {
-            console.warn('Failed to save to database:', dbErr);
-            // Continue anyway - we have the data from YouTube
-          }
-        }
+        channelData = await getYouTubeChannel(username);
+      } else if (platform === 'twitch') {
+        channelData = await getTwitchChannel(username);
       } else {
-        // Other platforms - check database only for now
+        // Other platforms - check database only
         const dbCreator = await getCreatorByUsername(platform, username);
         if (dbCreator) {
           setCreator(dbCreator);
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (channelData) {
+        setCreator(channelData);
+
+        // Save to database (fire and forget)
+        try {
+          const dbCreator = await upsertCreator(channelData);
+          await saveCreatorStats(dbCreator.id, {
+            subscribers: channelData.subscribers || channelData.followers,
+            totalViews: channelData.totalViews,
+            totalPosts: channelData.totalPosts,
+          });
+
+          // Fetch stats history
+          const history = await getCreatorStats(dbCreator.id, 30);
+          setStatsHistory(history || []);
+        } catch (dbErr) {
+          console.warn('Failed to save to database:', dbErr);
         }
       }
     } catch (err) {
@@ -203,25 +208,36 @@ export default function CreatorProfile() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <StatCard
               icon={Users}
-              label="Subscribers"
-              value={formatNumber(creator.subscribers)}
-              sublabel={creator.hiddenSubscribers ? '(hidden)' : null}
+              label={platform === 'twitch' ? 'Followers' : 'Subscribers'}
+              value={formatNumber(creator.subscribers || creator.followers)}
+              sublabel={creator.hiddenSubscribers ? '(hidden)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
             />
             <StatCard
               icon={Eye}
               label="Total Views"
               value={formatNumber(creator.totalViews)}
             />
-            <StatCard
-              icon={Video}
-              label="Videos"
-              value={formatNumber(creator.totalPosts)}
-            />
-            <StatCard
-              icon={TrendingUp}
-              label="Avg Views/Video"
-              value={creator.totalPosts > 0 ? formatNumber(Math.round(creator.totalViews / creator.totalPosts)) : '-'}
-            />
+            {platform !== 'twitch' && (
+              <StatCard
+                icon={Video}
+                label="Videos"
+                value={formatNumber(creator.totalPosts)}
+              />
+            )}
+            {platform === 'twitch' && creator.category && (
+              <StatCard
+                icon={Video}
+                label="Category"
+                value={creator.category}
+              />
+            )}
+            {platform !== 'twitch' && (
+              <StatCard
+                icon={TrendingUp}
+                label="Avg Views/Video"
+                value={creator.totalPosts > 0 ? formatNumber(Math.round(creator.totalViews / creator.totalPosts)) : '-'}
+              />
+            )}
           </div>
 
           {/* Stats History */}

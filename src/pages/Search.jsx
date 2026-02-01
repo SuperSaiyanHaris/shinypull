@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Search as SearchIcon, Youtube, Twitch, Instagram, User, AlertCircle } from 'lucide-react';
-import { searchChannels } from '../services/youtubeService';
+import { searchChannels as searchYouTube } from '../services/youtubeService';
+import { searchChannels as searchTwitch } from '../services/twitchService';
 
 const platformIcons = {
   youtube: Youtube,
@@ -18,7 +19,7 @@ const platformColors = {
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, available: true },
-  { id: 'twitch', name: 'Twitch', icon: Twitch, available: false },
+  { id: 'twitch', name: 'Twitch', icon: Twitch, available: true },
   { id: 'tiktok', name: 'TikTok', icon: null, available: false },
   { id: 'instagram', name: 'Instagram', icon: Instagram, available: false },
 ];
@@ -48,13 +49,13 @@ export default function Search() {
     setSearched(true);
 
     try {
+      let channels = [];
       if (selectedPlatform === 'youtube') {
-        const channels = await searchChannels(searchQuery, 10);
-        setResults(channels);
-      } else {
-        // Other platforms not yet implemented
-        setResults([]);
+        channels = await searchYouTube(searchQuery, 10);
+      } else if (selectedPlatform === 'twitch') {
+        channels = await searchTwitch(searchQuery);
       }
+      setResults(channels);
     } catch (err) {
       console.error('Search error:', err);
       setError(err.message || 'Failed to search. Please try again.');
@@ -181,8 +182,8 @@ export default function Search() {
                   <p className="text-gray-400 truncate">@{creator.username}</p>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <p className="font-semibold">{formatNumber(creator.subscribers)}</p>
-                  <p className="text-sm text-gray-400">subscribers</p>
+                  <p className="font-semibold">{formatNumber(creator.subscribers || creator.followers)}</p>
+                  <p className="text-sm text-gray-400">{creator.platform === 'twitch' ? 'followers' : 'subscribers'}</p>
                 </div>
               </Link>
             );
