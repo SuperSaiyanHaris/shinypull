@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "seed:top-creators": "node scripts/seedTopCreators.js",
-    "backfill:stats": "node scripts/backfillHistoricalStats.js"
+    "collect:daily": "node scripts/collectDailyStats.js",
+    "delete:fake-data": "node scripts/deleteFakeData.js",
+    "validate:data": "node scripts/validateData.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",
