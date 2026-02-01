@@ -14,29 +14,43 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
 
-// Generate realistic growth patterns with minimal daily changes
-function generateHistoricalStats(baseStats, daysAgo) {
-  // Most big channels have consistent positive growth
-  // For realism: 0.02% - 0.06% daily subscriber growth (very small and steady)
-  const dailySubGrowthRate = 0.0002 + (Math.random() * 0.0004); // 0.02% - 0.06%
-  const dailyViewGrowthRate = 0.0015 + (Math.random() * 0.0015); // 0.15% - 0.3%
+// Generate 30 days of historical data by walking backwards day-by-day
+// This ensures smooth, consistent daily growth
+function generateHistoricalDataPoints(currentStats, daysToGenerate) {
+  // Pick ONE consistent growth rate for this channel
+  const dailySubGrowthRate = 0.0003 + (Math.random() * 0.0002); // 0.03% - 0.05% daily
+  const dailyViewGrowthRate = 0.002 + (Math.random() * 0.001); // 0.2% - 0.3% daily
+  const videosPerWeek = 1 + Math.random() * 2; // 1-3 videos per week
   
-  // Calculate what the stats would have been X days ago (working backwards)
-  // Use compound growth: stats_past = stats_current / (1 + growth_rate)^days
-  const subsFactor = Math.pow(1 + dailySubGrowthRate, -daysAgo);
-  const viewsFactor = Math.pow(1 + dailyViewGrowthRate, -daysAgo);
+  const dataPoints = [];
+  let currentSubs = currentStats.subscribers;
+  let currentViews = currentStats.total_views;
+  let currentVideos = currentStats.total_posts;
   
-  // Add tiny variance (±0.1%) but keep it positive overall
-  // This ensures smooth growth with minor fluctuations
-  const subsVariance = 1 + (Math.random() - 0.3) * 0.001; // Slightly positive bias
-  const viewsVariance = 1 + (Math.random() - 0.2) * 0.002; // Slightly positive bias
+  // Walk backwards day by day
+  for (let day = 1; day <= daysToGenerate; day++) {
+    // Calculate previous day's stats using inverse compound growth
+    const prevSubs = Math.floor(currentSubs / (1 + dailySubGrowthRate));
+    const prevViews = Math.floor(currentViews / (1 + dailyViewGrowthRate));
+    
+    // Estimate videos (subtract some every ~5 days)
+    const prevVideos = (day % 5 === 0 && currentVideos > 0)
+      ? currentVideos - Math.floor(Math.random() * 2)
+      : currentVideos;
+    
+    dataPoints.push({
+      subscribers: prevSubs,
+      total_views: prevViews,
+      total_posts: Math.max(0, prevVideos),
+      daysAgo: day
+    });
+    
+    currentSubs = prevSubs;
+    currentViews = prevViews;
+    currentVideos = prevVideos;
+  }
   
-  return {
-    subscribers: Math.floor(baseStats.subscribers * subsFactor * subsVariance),
-    total_views: Math.floor(baseStats.total_views * viewsFactor * viewsVariance),
-    // Videos: 0-2 new videos per week for big channels
-    total_posts: Math.max(0, baseStats.total_posts - Math.floor(daysAgo / 4 * Math.random())),
-  };
+  return dataPoints.reverse(); // Return oldest to newest
 }
 
 async function backfillCreatorStats() {
@@ -107,30 +121,29 @@ async function backfillCreatorStats() {
       total_posts: latestStat.total_posts || 0,
     };
 
-    const statsToInsert = [];
-
-    for (let i = 1; i <= daysToBackfill; i++) {
+    // Generate all historical data points at once with consistent growth
+    const historicalDataPoints = generateHistoricalDataPoints(baseStats, daysToBackfill);
+    
+    const statsToInsert = historicalDataPoints.map((dataPoint, index) => {
       const historicalDate = new Date(latestDate);
-      historicalDate.setDate(historicalDate.getDate() - i);
+      historicalDate.setDate(historicalDate.getDate() - (daysToBackfill - index));
       const dateString = historicalDate.toISOString().split('T')[0];
 
-      const historicalStats = generateHistoricalStats(baseStats, i);
-
-      statsToInsert.push({
+      return {
         creator_id: creator.id,
         recorded_at: dateString,
-        subscribers: historicalStats.subscribers,
-        followers: historicalStats.subscribers,
-        total_views: historicalStats.total_views,
-        total_posts: historicalStats.total_posts,
+        subscribers: dataPoint.subscribers,
+        followers: dataPoint.subscribers,
+        total_views: dataPoint.total_views,
+        total_posts: dataPoint.total_posts,
         followers_gained_day: 0,
         followers_gained_week: 0,
         followers_gained_month: 0,
         views_gained_day: 0,
         views_gained_week: 0,
         views_gained_month: 0,
-      });
-    }
+      };
+    });
 
     if (statsToInsert.length > 0) {
       const { error: insertError } = await supabase

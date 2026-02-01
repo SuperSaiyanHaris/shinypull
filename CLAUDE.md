@@ -8,6 +8,12 @@ ShinyPull is a social media analytics platform (similar to SocialBlade) that tra
 
 **Status:** YouTube integration working. Search and profile pages fetch live data from YouTube API.
 
+**⚠️ IMPORTANT - DATA INTEGRITY:**
+- We use REAL API data only - NO fake/generated historical data
+- Historical data builds up naturally as we collect daily snapshots
+- APIs only provide current snapshots, not historical data
+- Daily collection script runs to capture real stats over time
+
 ## Tech Stack
 
 - **Frontend:** React 18 + Vite
@@ -111,14 +117,26 @@ VITE_YOUTUBE_API_KEY=<youtube-api-key>
 
 ## What Needs Implementation
 
-- [ ] **Automated daily stats collection:** Set up cron job or GitHub Actions to fetch stats daily
+- [ ] **Automated daily stats collection:** GitHub Actions cron or Vercel Cron to run collectDailyStats.js
 - [ ] **Charts:** Use recharts for historical data visualization
 - [ ] **Growth calculations:** Calculate daily/weekly/monthly growth from stats history (partially done)
 - [ ] **User auth:** Allow users to save/track creators
-- [ ] **User auth:** Allow users to save/track creators
-- [ ] **Twitch integration:** Add Twitch API support
 - [ ] **Background jobs:** Scheduled stats collection for tracked creators
 - [ ] **Estimated earnings:** Calculate based on views/engagement
+
+## Data Collection Strategy
+
+### Current Approach (REAL DATA ONLY):
+1. **On-Demand Collection:** When a user searches/views a profile, we fetch current stats from API
+2. **Daily Snapshots:** Run `collectDailyStats.js` once per day to capture all tracked creators
+3. **Historical Build-Up:** Data accumulates naturally over time from daily snapshots
+4. **No Backfilling:** We do NOT generate fake historical data - only real API responses
+
+### Scripts:
+- `scripts/seedTopCreators.js` - Initial seed of top 50 creators (one-time)
+- `scripts/collectDailyStats.js` - **Daily collection of REAL stats from APIs**
+- `scripts/deleteFakeData.js` - Emergency cleanup (deletes any non-today data)
+- `scripts/validateData.js` - QA tool to check data integrity
 
 ## Platform API Status
 
