@@ -6,7 +6,7 @@
 
 ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube, Twitch, TikTok, Instagram, and Twitter/X.
 
-**Status:** Early scaffold - basic UI structure exists, no data fetching implemented yet.
+**Status:** YouTube integration working. Search and profile pages fetch live data from YouTube API.
 
 ## Tech Stack
 
@@ -16,26 +16,29 @@ ShinyPull is a social media analytics platform (similar to SocialBlade) that tra
 - **Database:** Supabase (PostgreSQL)
 - **Hosting:** Vercel
 - **Icons:** Lucide React
+- **APIs:** YouTube Data API v3
 
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   └── Header.jsx          # Navigation header
+│   └── Header.jsx            # Navigation header
 ├── pages/
-│   ├── Home.jsx            # Landing page with search + platform cards
-│   ├── Search.jsx          # Creator search (TODO: implement)
-│   ├── Rankings.jsx        # Top creators by platform (TODO: implement)
-│   └── CreatorProfile.jsx  # Individual creator stats (TODO: implement)
+│   ├── Home.jsx              # Landing page with search + platform cards
+│   ├── Search.jsx            # Creator search (YouTube working)
+│   ├── Rankings.jsx          # Top creators by platform (TODO)
+│   └── CreatorProfile.jsx    # Individual creator stats (YouTube working)
+├── services/
+│   ├── youtubeService.js     # YouTube Data API integration
+│   └── creatorService.js     # Supabase CRUD for creators/stats
 ├── lib/
-│   └── supabase.js         # Supabase client
-├── services/               # (empty - add API services here)
-├── hooks/                  # (empty - add custom hooks here)
-├── contexts/               # (empty - add React contexts here)
-├── App.jsx                 # Main app with routes
-├── main.jsx                # Entry point
-└── index.css               # Tailwind + custom styles
+│   └── supabase.js           # Supabase client
+├── hooks/                    # (empty - add custom hooks here)
+├── contexts/                 # (empty - add React contexts here)
+├── App.jsx                   # Main app with routes
+├── main.jsx                  # Entry point
+└── index.css                 # Tailwind + custom styles
 ```
 
 ## Database Schema (Supabase)
@@ -77,6 +80,7 @@ Required in `.env`:
 ```
 VITE_SUPABASE_URL=https://ziiqqbfcncjdewjkbvyq.supabase.co
 VITE_SUPABASE_ANON_KEY=<anon-key>
+VITE_YOUTUBE_API_KEY=<youtube-api-key>
 ```
 
 ## Routes
@@ -84,10 +88,10 @@ VITE_SUPABASE_ANON_KEY=<anon-key>
 | Path | Component | Description |
 |------|-----------|-------------|
 | `/` | Home | Landing page with search and platform cards |
-| `/search` | Search | Search creators across platforms |
+| `/search` | Search | Search creators (YouTube working) |
 | `/rankings` | Rankings | Top creators overall |
 | `/rankings/:platform` | Rankings | Top creators for specific platform |
-| `/:platform/:username` | CreatorProfile | Individual creator stats page |
+| `/:platform/:username` | CreatorProfile | Individual creator stats (YouTube working) |
 
 ## What's Implemented
 
@@ -96,34 +100,56 @@ VITE_SUPABASE_ANON_KEY=<anon-key>
 - [x] Supabase database schema
 - [x] Tailwind styling with platform colors
 - [x] Vercel deployment pipeline
+- [x] **YouTube API integration** - search channels, fetch stats
+- [x] **Creator profiles** - display YouTube channel stats with banner/avatar
+- [x] **Database persistence** - creators and stats saved to Supabase on view
 
 ## What Needs Implementation
 
-- [ ] **Data fetching:** Connect pages to Supabase queries
-- [ ] **Platform APIs:** Fetch real data from YouTube/Twitch/TikTok/Instagram/Twitter
-- [ ] **Creator search:** Implement search against `creators` table
-- [ ] **Rankings display:** Query and display top creators
-- [ ] **Creator profiles:** Show stats, charts, growth history
+- [ ] **Rankings display:** Query and display top creators from database
 - [ ] **Charts:** Use recharts for historical data visualization
+- [ ] **Growth calculations:** Calculate daily/weekly/monthly growth from stats history
 - [ ] **User auth:** Allow users to save/track creators
-- [ ] **Data ingestion:** Background jobs to fetch and store creator stats
+- [ ] **Twitch integration:** Add Twitch API support
+- [ ] **Background jobs:** Scheduled stats collection for tracked creators
+- [ ] **Estimated earnings:** Calculate based on views/engagement
 
-## Platform API Notes
+## Platform API Status
 
-| Platform | API | Auth | Notes |
-|----------|-----|------|-------|
-| YouTube | Data API v3 | API Key | Has daily quotas |
-| Twitch | Helix API | OAuth Client Credentials | Need client ID + secret |
-| TikTok | Research API | Limited access | May need scraping alternative |
-| Instagram | Graph API | Facebook App | Complex auth flow |
-| Twitter/X | API v2 | Paid tiers | Free tier very limited |
+| Platform | Status | Notes |
+|----------|--------|-------|
+| YouTube | Working | Data API v3 with API key |
+| Twitch | Not started | Need OAuth client credentials |
+| TikTok | Not started | Limited API access |
+| Instagram | Not started | Requires Facebook app |
+| Twitter/X | Skipped | Paid API ($100+/month) |
+
+## YouTube Service (`src/services/youtubeService.js`)
+
+```javascript
+searchChannels(query, maxResults)  // Search for channels
+getChannelByUsername(username)     // Get channel by @handle
+getChannelById(channelId)          // Get channel by ID
+getChannelsByIds(channelIds)       // Batch fetch channels
+```
+
+## Creator Service (`src/services/creatorService.js`)
+
+```javascript
+upsertCreator(creatorData)         // Save/update creator
+saveCreatorStats(creatorId, stats) // Save daily stats snapshot
+getCreatorByUsername(platform, username)
+getCreatorStats(creatorId, days)   // Get stats history
+searchCreators(query, platform)    // Search database
+```
 
 ## Conventions
 
 - Use `gen_random_uuid()` for UUIDs in Supabase (not `uuid_generate_v4()`)
 - Platform colors defined in `index.css` as `.platform-{name}` classes
-- Format large numbers with K/M suffixes (see `formatNumber` helper in pages)
+- Format large numbers with K/M/B suffixes (see `formatNumber` helper)
 - All times stored as TIMESTAMPTZ, dates as DATE
+- YouTube usernames stored without @ prefix
 
 ## Deployment
 
@@ -132,4 +158,4 @@ VITE_SUPABASE_ANON_KEY=<anon-key>
 
 ---
 
-*Last updated: 2026-01-31 - Initial scaffold after pivot from Pokemon TCG tracker*
+*Last updated: 2026-01-31 - Added YouTube API integration*
