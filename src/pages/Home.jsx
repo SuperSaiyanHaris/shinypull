@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const platforms = [
-  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', stats: '72M+ channels' },
-  { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', stats: '7M+ channels' },
-  { id: 'tiktok', name: 'TikTok', icon: null, color: 'bg-pink-500', stats: '10M+ creators' },
-  { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', stats: '11M+ creators' },
+  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', stats: '72M+ channels', available: true },
+  { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', stats: '7M+ channels', available: true },
+  { id: 'tiktok', name: 'TikTok', icon: null, color: 'bg-pink-500', stats: 'Coming Soon', available: false },
+  { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', stats: 'Coming Soon', available: false },
 ];
 
 export default function Home() {
@@ -40,7 +40,7 @@ export default function Home() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for a creator (e.g., MrBeast, Ninja, Charli D'Amelio)"
+              placeholder="Search for a creator (e.g., MrBeast, Ninja, PewDiePie)"
               className="w-full pl-12 pr-4 py-4 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-lg"
             />
             <button
@@ -54,25 +54,44 @@ export default function Home() {
 
         {/* Platform Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-          {platforms.map((platform) => (
-            <Link
-              key={platform.id}
-              to={`/rankings/${platform.id}`}
-              className="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:border-gray-600 transition-colors group"
-            >
-              <div className={`w-12 h-12 ${platform.color} rounded-lg flex items-center justify-center mx-auto mb-3`}>
-                {platform.icon ? (
-                  <platform.icon className="w-6 h-6 text-white" />
-                ) : (
-                  <span className="text-white font-bold text-sm">{platform.name.slice(0, 2)}</span>
-                )}
+          {platforms.map((platform) => {
+            const content = (
+              <>
+                <div className={`w-12 h-12 ${platform.color} rounded-lg flex items-center justify-center mx-auto mb-3 ${!platform.available ? 'opacity-50' : ''}`}>
+                  {platform.icon ? (
+                    <platform.icon className="w-6 h-6 text-white" />
+                  ) : (
+                    <span className="text-white font-bold text-sm">{platform.name.slice(0, 2)}</span>
+                  )}
+                </div>
+                <h3 className={`font-semibold mb-1 ${platform.available ? 'group-hover:text-blue-400' : ''} transition-colors`}>
+                  {platform.name}
+                </h3>
+                <p className="text-sm text-gray-500">{platform.stats}</p>
+              </>
+            );
+
+            if (platform.available) {
+              return (
+                <Link
+                  key={platform.id}
+                  to={`/rankings/${platform.id}`}
+                  className="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:border-gray-600 transition-colors group"
+                >
+                  {content}
+                </Link>
+              );
+            }
+
+            return (
+              <div
+                key={platform.id}
+                className="bg-gray-800/50 border border-gray-700/50 rounded-lg p-6 cursor-not-allowed opacity-60"
+              >
+                {content}
               </div>
-              <h3 className="font-semibold mb-1 group-hover:text-blue-400 transition-colors">
-                {platform.name}
-              </h3>
-              <p className="text-sm text-gray-500">{platform.stats}</p>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       </section>
 

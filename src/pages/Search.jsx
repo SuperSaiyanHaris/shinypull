@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Search as SearchIcon, Youtube, Twitch, Instagram, User, AlertCircle } from 'lucide-react';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
+import { upsertCreator, saveCreatorStats } from '../services/creatorService';
 
 const platformIcons = {
   youtube: Youtube,
@@ -59,6 +60,9 @@ export default function Search() {
       let channels = [];
       if (selectedPlatform === 'youtube') {
         channels = await searchYouTube(searchQuery, 10);
+        if (channels.length > 0) {
+          void persistYouTubeResults(channels);
+        }
       } else if (selectedPlatform === 'twitch') {
         channels = await searchTwitch(searchQuery);
       }
@@ -76,6 +80,21 @@ export default function Search() {
     e.preventDefault();
     if (query.trim()) {
       setSearchParams({ q: query.trim() });
+    }
+  };
+
+  const persistYouTubeResults = async (channels) => {
+    for (const channel of channels) {
+      try {
+        const dbCreator = await upsertCreator(channel);
+        await saveCreatorStats(dbCreator.id, {
+          subscribers: channel.subscribers || channel.followers,
+          totalViews: channel.totalViews,
+          totalPosts: channel.totalPosts,
+        });
+      } catch (dbErr) {
+        console.warn('Failed to persist creator:', dbErr);
+      }
     }
   };
 
@@ -171,11 +190,11 @@ export default function Search() {
                 className="flex items-center gap-4 p-4 bg-gray-800 border border-gray-700 rounded-lg hover:border-gray-600 transition-colors"
               >
                 <img
-                  src={creator.profileImage || '/placeholder-avatar.png'}
+                  src={creator.profileImage || '/placeholder-avatar.svg'}
                   alt={creator.displayName}
                   className="w-16 h-16 rounded-full object-cover bg-gray-700"
                   onError={(e) => {
-                    e.target.src = '/placeholder-avatar.png';
+                    e.target.src = '/placeholder-avatar.svg';
                   }}
                 />
                 <div className="flex-1 min-w-0">

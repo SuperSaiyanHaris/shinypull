@@ -27,7 +27,7 @@ src/
 ├── pages/
 │   ├── Home.jsx              # Landing page with search + platform cards
 │   ├── Search.jsx            # Creator search (YouTube working)
-│   ├── Rankings.jsx          # Top creators by platform (TODO)
+│   ├── Rankings.jsx          # Top creators by platform (displaying DB data)
 │   └── CreatorProfile.jsx    # Individual creator stats (YouTube working)
 ├── services/
 │   ├── youtubeService.js     # YouTube Data API integration
@@ -63,6 +63,7 @@ All tables have RLS enabled. `creators`, `creator_stats`, and `rankings` have pu
 npm run dev      # Start dev server on port 3000
 npm run build    # Production build to dist/
 npm run preview  # Preview production build
+npm run seed:top-creators  # Seed top YouTube/Twitch creators
 ```
 
 ## Supabase CLI
@@ -103,10 +104,12 @@ VITE_YOUTUBE_API_KEY=<youtube-api-key>
 - [x] **YouTube API integration** - search channels, fetch stats
 - [x] **Creator profiles** - display YouTube channel stats with banner/avatar
 - [x] **Database persistence** - creators and stats saved to Supabase on view
+- [x] **Rankings display** - Rankings page pulls top creators from Supabase
+- [x] **Seed script** - Seed top 50+ YouTube/Twitch creators into database
+- [x] **Search persistence** - YouTube search results auto-save to database
 
 ## What Needs Implementation
 
-- [ ] **Rankings display:** Query and display top creators from database
 - [ ] **Charts:** Use recharts for historical data visualization
 - [ ] **Growth calculations:** Calculate daily/weekly/monthly growth from stats history
 - [ ] **User auth:** Allow users to save/track creators
@@ -119,7 +122,7 @@ VITE_YOUTUBE_API_KEY=<youtube-api-key>
 | Platform | Status | Notes |
 |----------|--------|-------|
 | YouTube | Working | Data API v3 with API key |
-| Twitch | Not started | Need OAuth client credentials |
+| Twitch | Working | Serverless API + OAuth, search/profile/seeding |
 | TikTok | Not started | Limited API access |
 | Instagram | Not started | Requires Facebook app |
 | Twitter/X | Skipped | Paid API ($100+/month) |
@@ -141,6 +144,7 @@ saveCreatorStats(creatorId, stats) // Save daily stats snapshot
 getCreatorByUsername(platform, username)
 getCreatorStats(creatorId, days)   // Get stats history
 searchCreators(query, platform)    // Search database
+getRankedCreators(platform, rankType, limit) // Get top creators by subs/views/growth
 ```
 
 ## Conventions
@@ -151,6 +155,39 @@ searchCreators(query, platform)    // Search database
 - All times stored as TIMESTAMPTZ, dates as DATE
 - YouTube usernames stored without @ prefix
 
+## Seeding Top Creators
+
+The database can be seeded with top YouTube and Twitch creators using:
+
+```bash
+npm run seed:top-creators
+```
+
+**Required environment variables:**
+- `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (or `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`)
+- `VITE_YOUTUBE_API_KEY` (or `YOUTUBE_API_KEY`)
+- Optional for Twitch: `TWITCH_CLIENT_ID` + `TWITCH_CLIENT_SECRET`
+
+The seed script ([scripts/seedTopCreators.js](scripts/seedTopCreators.js)) seeds:
+- 31 top YouTube channels (MrBeast, PewDiePie, T-Series, etc.)
+- 20 top Twitch streamers (xQc, Ninja, Pokimane, etc.)
+
+## Agent Instructions
+
+**IMPORTANT FOR AI AGENTS:**
+
+- **You have access to Vercel CLI and Supabase CLI** - Use them to run commands, deploy, manage database, etc.
+- **DO NOT ask the user to run commands** - You should run them yourself using `run_in_terminal`
+- **For deployment:** Use `vercel` or `vercel --prod` commands
+- **For database migrations:** Use `supabase db push` or `supabase migration new <name>`
+- **For seeding data:** Run `npm run seed:top-creators` directly
+- **Load .env variables** when running Node scripts:
+  ```powershell
+  Get-Content ".env" | ForEach-Object { if ($_ -match '^([^#][^=]+)=(.*)$') { $name = $matches[1].Trim(); $value = $matches[2].Trim().Trim('"'); [System.Environment]::SetEnvironmentVariable($name, $value, 'Process') } }; npm run <script>
+  ```
+
+Agents are expected to be autonomous and execute all necessary commands without user intervention.
+
 ## Deployment
 
 - **Vercel:** Auto-deploys on push to `main`
@@ -158,4 +195,4 @@ searchCreators(query, platform)    // Search database
 
 ---
 
-*Last updated: 2026-01-31 - Added YouTube API integration*
+*Last updated: 2026-01-31 - Added rankings display + seeding script*

@@ -1,7 +1,7 @@
 // Vercel Serverless Function for Twitch API
 // Keeps client secret secure on server-side
 
-const TWITCH_CLIENT_ID = process.env.VITE_TWITCH_CLIENT_ID;
+const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
 
 let cachedToken = null;
@@ -11,6 +11,10 @@ async function getAccessToken() {
   // Return cached token if still valid
   if (cachedToken && Date.now() < tokenExpiry) {
     return cachedToken;
+  }
+
+  if (!TWITCH_CLIENT_ID || !TWITCH_CLIENT_SECRET) {
+    throw new Error(`Missing credentials: CLIENT_ID=${!!TWITCH_CLIENT_ID}, SECRET=${!!TWITCH_CLIENT_SECRET}`);
   }
 
   const response = await fetch('https://id.twitch.tv/oauth2/token', {
@@ -24,7 +28,8 @@ async function getAccessToken() {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to get Twitch access token');
+    const errorText = await response.text();
+    throw new Error(`Failed to get Twitch access token: ${response.status} - ${errorText}`);
   }
 
   const data = await response.json();

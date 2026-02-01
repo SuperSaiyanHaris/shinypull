@@ -133,3 +133,105 @@ export async function getLatestStats(creatorId) {
   if (error && error.code !== 'PGRST116') throw error;
   return data;
 }
+
+/**
+ * Get ranked creators with latest stats
+ */
+export async function getRankedCreators(platform, rankType = 'subscribers', limit = 50) {
+  const { data, error } = await supabase
+    .from('creators')
+    .select(`
+      id,
+      platform,
+      platform_id,
+      username,
+      display_name,
+      profile_image,
+      creator_stats (
+        recorded_at,
+        subscribers,
+        followers,
+        total_views,
+        total_posts,
+        followers_gained_month,
+        views_gained_month
+      )
+    `)
+    .eq('platform', platform)
+    .order('recorded_at', { foreignTable: 'creator_stats', ascending: false })
+    .limit(1, { foreignTable: 'creator_stats' });
+
+  if (error) throw error;
+
+  const creators = (data || []).map((creator) => ({
+    ...creator,
+    latestStats: creator.creator_stats?.[0] || null,
+  }));
+
+  const withStats = creators.filter((creator) => creator.latestStats);
+
+  let growthByCreatorId = new Map();
+
+  if (rankType === 'growth' && withStats.length > 0) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    const startDateString = startDate.toISOString().split('T')[0];
+
+    const creatorIds = withStats.map((creator) => creator.id);
+
+    const { data: history, error: historyError } = await supabase
+      .from('creator_stats')
+      .select('creator_id, recorded_at, subscribers, followers')
+      .in('creator_id', creatorIds)
+      .gte('recorded_at', startDateString)
+      .order('recorded_at', { ascending: true });
+
+    if (historyError) throw historyError;
+
+    const historyByCreatorId = new Map();
+    (history || []).forEach((row) => {
+      if (!historyByCreatorId.has(row.creator_id)) {
+        historyByCreatorId.set(row.creator_id, []);
+      }
+      historyByCreatorId.get(row.creator_id).push(row);
+    });
+
+    growthByCreatorId = new Map(
+      Array.from(historyByCreatorId.entries()).map(([creatorId, rows]) => {
+        const first = rows[0];
+        const last = rows[rows.length - 1];
+        const firstCount = first?.subscribers ?? first?.followers ?? 0;
+        const lastCount = last?.subscribers ?? last?.followers ?? 0;
+        return [creatorId, lastCount - firstCount];
+      })
+    );
+  }
+
+  const ranked = withStats
+    .map((creator) => {
+      const stats = creator.latestStats;
+      const subscribers = stats?.subscribers ?? stats?.followers ?? 0;
+      const views = stats?.total_views ?? 0;
+      const growth =
+        rankType === 'growth'
+          ? growthByCreatorId.get(creator.id) ?? stats?.followers_gained_month ?? 0
+          : stats?.followers_gained_month ?? 0;
+
+      let sortValue = subscribers;
+      if (rankType === 'views') sortValue = views;
+      if (rankType === 'growth') sortValue = growth;
+
+      return {
+        ...creator,
+        latestStats: stats,
+        subscribers,
+        totalViews: views,
+        growth30d: growth,
+        sortValue,
+      };
+    })
+    .sort((a, b) => b.sortValue - a.sortValue)
+    .slice(0, limit);
+
+  return ranked;
+}
