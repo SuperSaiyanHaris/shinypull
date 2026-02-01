@@ -16,24 +16,26 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 
 // Generate realistic growth patterns with minimal daily changes
 function generateHistoricalStats(baseStats, daysAgo) {
-  // Most big channels have very small daily growth rates
-  // For realism: 0.01% - 0.1% daily subscriber growth, views slightly higher
-  const dailySubGrowthRate = 0.0001 + (Math.random() * 0.0009); // 0.01% - 0.1%
-  const dailyViewGrowthRate = 0.001 + (Math.random() * 0.002); // 0.1% - 0.3%
+  // Most big channels have consistent positive growth
+  // For realism: 0.02% - 0.06% daily subscriber growth (very small and steady)
+  const dailySubGrowthRate = 0.0002 + (Math.random() * 0.0004); // 0.02% - 0.06%
+  const dailyViewGrowthRate = 0.0015 + (Math.random() * 0.0015); // 0.15% - 0.3%
   
   // Calculate what the stats would have been X days ago (working backwards)
-  const subsFactor = Math.pow(1 - dailySubGrowthRate, daysAgo);
-  const viewsFactor = Math.pow(1 - dailyViewGrowthRate, daysAgo);
+  // Use compound growth: stats_past = stats_current / (1 + growth_rate)^days
+  const subsFactor = Math.pow(1 + dailySubGrowthRate, -daysAgo);
+  const viewsFactor = Math.pow(1 + dailyViewGrowthRate, -daysAgo);
   
-  // Add very small random variance (±0.5%) to make it look natural
-  const subsVariance = 1 + (Math.random() - 0.5) * 0.005;
-  const viewsVariance = 1 + (Math.random() - 0.5) * 0.01;
+  // Add tiny variance (±0.1%) but keep it positive overall
+  // This ensures smooth growth with minor fluctuations
+  const subsVariance = 1 + (Math.random() - 0.3) * 0.001; // Slightly positive bias
+  const viewsVariance = 1 + (Math.random() - 0.2) * 0.002; // Slightly positive bias
   
   return {
     subscribers: Math.floor(baseStats.subscribers * subsFactor * subsVariance),
     total_views: Math.floor(baseStats.total_views * viewsFactor * viewsVariance),
-    // Videos: maybe 1-2 new videos per week for big channels
-    total_posts: Math.max(0, baseStats.total_posts - Math.floor(daysAgo / 7 * (Math.random() < 0.5 ? 1 : 2))),
+    // Videos: 0-2 new videos per week for big channels
+    total_posts: Math.max(0, baseStats.total_posts - Math.floor(daysAgo / 4 * Math.random())),
   };
 }
 
