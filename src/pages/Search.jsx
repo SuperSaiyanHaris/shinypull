@@ -39,7 +39,14 @@ export default function Search() {
       setQuery(q);
       performSearch(q);
     }
-  }, [searchParams]);
+  }, [searchParams, selectedPlatform]);
+
+  // Clear results when switching platforms
+  const handlePlatformChange = (platformId) => {
+    setSelectedPlatform(platformId);
+    setResults([]);
+    setSearched(false);
+  };
 
   const performSearch = async (searchQuery) => {
     if (!searchQuery.trim()) return;
@@ -83,7 +90,7 @@ export default function Search() {
           return (
             <button
               key={platform.id}
-              onClick={() => platform.available && setSelectedPlatform(platform.id)}
+              onClick={() => platform.available && handlePlatformChange(platform.id)}
               disabled={!platform.available}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                 selectedPlatform === platform.id
