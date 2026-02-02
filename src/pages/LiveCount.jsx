@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Youtube, Twitch, Users, TrendingUp, TrendingDown, Minus, ExternalLink, RefreshCw, Share2 } from 'lucide-react';
-import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
+import { Youtube, Twitch, TrendingUp, TrendingDown, ExternalLink, RefreshCw, Share2, Radio } from 'lucide-react';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import SEO from '../components/SEO';
 
@@ -11,16 +10,38 @@ const platformConfig = {
     color: 'text-red-600',
     bg: 'bg-red-600',
     gradient: 'from-red-500 to-red-600',
-    label: 'subscribers'
+    label: 'subscribers',
+    refreshInterval: 5000, // 5 seconds for real-time feel
   },
   twitch: {
     icon: Twitch,
     color: 'text-purple-600',
     bg: 'bg-purple-600',
     gradient: 'from-purple-500 to-purple-600',
-    label: 'followers'
+    label: 'followers',
+    refreshInterval: 10000, // 10 seconds for Twitch
   },
 };
+
+// Fetch real-time YouTube count via scraping endpoint
+async function getYouTubeLiveCount(username) {
+  const response = await fetch(`/api/live-count?platform=youtube&username=${encodeURIComponent(username)}`);
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Failed to fetch live count');
+  }
+
+  const data = await response.json();
+  return {
+    platform: 'youtube',
+    platformId: data.channelId,
+    username: data.username || username,
+    displayName: data.displayName,
+    profileImage: data.profileImage,
+    subscribers: data.subscribers,
+  };
+}
 
 export default function LiveCount() {
   const { platform, username } = useParams();
@@ -32,6 +53,7 @@ export default function LiveCount() {
   const [lastUpdate, setLastUpdate] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [history, setHistory] = useState([]);
+  const [isLive, setIsLive] = useState(false);
   const intervalRef = useRef(null);
 
   const config = platformConfig[platform] || platformConfig.youtube;
@@ -43,7 +65,8 @@ export default function LiveCount() {
     try {
       let data = null;
       if (platform === 'youtube') {
-        data = await getYouTubeChannel(username);
+        // Use our real-time scraping endpoint
+        data = await getYouTubeLiveCount(username);
       } else if (platform === 'twitch') {
         data = await getTwitchChannel(username);
       }
@@ -54,6 +77,7 @@ export default function LiveCount() {
         if (isInitial) {
           setCreator(data);
           setCount(newCount);
+          setIsLive(true);
         } else {
           setPreviousCount(count);
           setCount(newCount);
@@ -61,7 +85,7 @@ export default function LiveCount() {
           // Track history
           setHistory(prev => {
             const newHistory = [...prev, { count: newCount, time: new Date() }];
-            return newHistory.slice(-20); // Keep last 20 data points
+            return newHistory.slice(-50); // Keep last 50 data points
           });
         }
 
@@ -69,6 +93,7 @@ export default function LiveCount() {
         setError(null);
       }
     } catch (err) {
+      console.error('Fetch error:', err);
       if (isInitial) {
         setError(err.message || 'Failed to load creator');
       }
@@ -81,10 +106,10 @@ export default function LiveCount() {
   useEffect(() => {
     fetchCount(true);
 
-    // Poll every 30 seconds
+    // Poll at the platform-specific interval
     intervalRef.current = setInterval(() => {
       fetchCount(false);
-    }, 30000);
+    }, config.refreshInterval);
 
     return () => {
       if (intervalRef.current) {
@@ -105,7 +130,7 @@ export default function LiveCount() {
 
   const handleShare = async () => {
     const url = window.location.href;
-    const text = `${creator?.displayName}'s live ${config.label} count: ${formatNumber(count)}`;
+    const text = `${creator?.displayName}'s live ${config.label} count: ${count?.toLocaleString()}`;
 
     if (navigator.share) {
       try {
@@ -161,6 +186,15 @@ export default function LiveCount() {
         {/* Main Counter */}
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center max-w-4xl w-full">
+            {/* Live Indicator */}
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+              </span>
+              <span className="text-red-500 font-bold text-sm uppercase tracking-wider">Live</span>
+            </div>
+
             {/* Creator Info */}
             <div className="flex items-center justify-center gap-4 mb-8">
               <img
@@ -180,7 +214,7 @@ export default function LiveCount() {
 
             {/* The Big Number */}
             <div className="relative mb-8">
-              <div className={`text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tabular-nums tracking-tight bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}>
+              <div className={`text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tabular-nums tracking-tight bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent transition-all duration-300`}>
                 {count?.toLocaleString()}
               </div>
               <p className="text-xl md:text-2xl text-gray-400 mt-4 font-medium">
@@ -190,7 +224,7 @@ export default function LiveCount() {
 
             {/* Change Indicator */}
             {change !== 0 && (
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-lg font-semibold mb-8 ${
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-lg font-semibold mb-8 animate-pulse ${
                 change > 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
               }`}>
                 {change > 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
@@ -244,7 +278,10 @@ export default function LiveCount() {
         {/* Footer Info */}
         <div className="p-4 text-center text-gray-500 text-sm border-t border-gray-800">
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <span>Auto-updates every 30 seconds</span>
+            <span className="flex items-center gap-1">
+              <Radio className="w-3 h-3 text-red-500" />
+              Auto-updates every {config.refreshInterval / 1000}s
+            </span>
             {lastUpdate && (
               <>
                 <span>•</span>
@@ -256,12 +293,4 @@ export default function LiveCount() {
       </div>
     </>
   );
-}
-
-function formatNumber(num) {
-  if (num === null || num === undefined) return '-';
-  if (Math.abs(num) >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
-  if (Math.abs(num) >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-  if (Math.abs(num) >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return num.toLocaleString();
 }
