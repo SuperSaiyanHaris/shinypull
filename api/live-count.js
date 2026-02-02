@@ -1,5 +1,5 @@
 // Vercel Serverless Function for Real-Time YouTube Subscriber Count
-// Scrapes YouTube's public page for live subscriber data
+// Uses multiple methods to try to get exact subscriber counts
 
 export default async function handler(req, res) {
   // CORS headers
@@ -38,7 +38,12 @@ export default async function handler(req, res) {
 }
 
 async function getYouTubeLiveCount(username, channelId) {
-  // Build the URL
+  // First, get the channel ID if we only have username
+  let resolvedChannelId = channelId;
+  let channelName = null;
+  let channelImage = null;
+
+  // Build the URL to fetch channel page
   let url;
   if (channelId) {
     url = `https://www.youtube.com/channel/${channelId}`;
@@ -62,38 +67,124 @@ async function getYouTubeLiveCount(username, channelId) {
   }
 
   const html = await response.text();
-
-  // Extract ytInitialData JSON from the page
   const ytInitialData = extractYtInitialData(html);
 
   if (!ytInitialData) {
     throw new Error('Could not find ytInitialData in page');
   }
 
-  // Parse the data
-  const subscriberCount = findSubscriberCount(ytInitialData);
-  const channelName = findChannelName(ytInitialData, html);
-  const channelImage = findChannelImage(ytInitialData, html);
-  const extractedChannelId = findChannelId(ytInitialData, html);
+  // Get channel info
+  channelName = findChannelName(ytInitialData, html);
+  channelImage = findChannelImage(ytInitialData, html);
+  resolvedChannelId = resolvedChannelId || findChannelId(ytInitialData, html);
+
+  // Try to get exact subscriber count from multiple sources
+  let subscriberCount = null;
+  let isExact = false;
+
+  // Method 1: Try to get exact count from third-party API (socialcounts.org style)
+  if (resolvedChannelId) {
+    try {
+      const exactCount = await fetchExactCount(resolvedChannelId);
+      if (exactCount && exactCount > 0) {
+        subscriberCount = exactCount;
+        isExact = true;
+      }
+    } catch (e) {
+      console.log('Exact count fetch failed, falling back to scraping');
+    }
+  }
+
+  // Method 2: Fall back to scraping if exact count not available
+  if (!subscriberCount) {
+    subscriberCount = findSubscriberCount(ytInitialData);
+    isExact = false;
+  }
 
   if (subscriberCount === null) {
-    throw new Error('Could not extract subscriber count from ytInitialData');
+    throw new Error('Could not extract subscriber count');
   }
 
   return {
     platform: 'youtube',
     username: username,
-    channelId: extractedChannelId || channelId,
+    channelId: resolvedChannelId || channelId,
     displayName: channelName,
     profileImage: channelImage,
     subscribers: subscriberCount,
+    isExact: isExact,
     timestamp: new Date().toISOString(),
-    source: 'live-scrape',
+    source: isExact ? 'api' : 'scrape',
   };
 }
 
+// Try to fetch exact count from YouTube's internal API
+async function fetchExactCount(channelId) {
+  try {
+    // Try YouTube's internal browse endpoint
+    const response = await fetch('https://www.youtube.com/youtubei/v1/browse?prettyPrint=false', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'X-Youtube-Client-Name': '1',
+        'X-Youtube-Client-Version': '2.20240101.00.00',
+      },
+      body: JSON.stringify({
+        context: {
+          client: {
+            clientName: 'WEB',
+            clientVersion: '2.20240101.00.00',
+            hl: 'en',
+            gl: 'US',
+          },
+        },
+        browseId: channelId,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      // Search for subscriberCount in the response
+      const exactCounts = deepSearch(data, 'subscriberCount');
+      for (const count of exactCounts) {
+        if (typeof count === 'number' && count > 0) {
+          return count;
+        }
+        if (typeof count === 'string') {
+          const num = parseInt(count, 10);
+          if (!isNaN(num) && num > 0) {
+            return num;
+          }
+        }
+      }
+
+      // Also try to find exact count in subscriberCountText
+      const texts = deepSearch(data, 'subscriberCountText');
+      for (const text of texts) {
+        // Check for exact numbers first (no abbreviations)
+        const content = text?.simpleText || text?.content || '';
+        if (content) {
+          // Look for exact count patterns like "465,523,243 subscribers"
+          const exactMatch = content.match(/^([\d,]+)\s*subscriber/i);
+          if (exactMatch) {
+            const num = parseInt(exactMatch[1].replace(/,/g, ''), 10);
+            if (!isNaN(num) && num > 1000) {
+              return num;
+            }
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Internal API fetch failed:', e.message);
+  }
+
+  return null;
+}
+
 function extractYtInitialData(html) {
-  // Find ytInitialData in the page - it's in a script tag
   const patterns = [
     /var\s+ytInitialData\s*=\s*(\{.+?\});(?:\s*<\/script>|;\s*var)/s,
     /ytInitialData\s*=\s*(\{.+?\});/s,
@@ -104,14 +195,10 @@ function extractYtInitialData(html) {
     const match = html.match(pattern);
     if (match && match[1]) {
       try {
-        // Clean up the JSON string - remove any trailing content
         let jsonStr = match[1];
-
-        // Try to parse, handling potential issues
         const parsed = JSON.parse(jsonStr);
         return parsed;
       } catch (e) {
-        // Try to find the end of the JSON object by counting braces
         try {
           let jsonStr = match[1];
           let braceCount = 0;
@@ -141,16 +228,24 @@ function extractYtInitialData(html) {
 }
 
 function findSubscriberCount(data) {
-  // Recursively search for subscriberCountText in the data
+  // First, look for exact counts (no abbreviations)
+  const subscriberCounts = deepSearch(data, 'subscriberCount');
+  for (const item of subscriberCounts) {
+    if (typeof item === 'number' && item > 0) return item;
+    if (typeof item === 'string') {
+      const num = parseInt(item, 10);
+      if (!isNaN(num) && num > 0) return num;
+    }
+  }
+
+  // Search for subscriberCountText and parse it
   const searchPaths = [
-    // Common paths where subscriber count is found
     'header.c4TabbedHeaderRenderer.subscriberCountText.simpleText',
     'header.c4TabbedHeaderRenderer.subscriberCountText.accessibility.accessibilityData.label',
     'header.pageHeaderRenderer.content.pageHeaderViewModel.metadata.contentMetadataViewModel.metadataRows',
     'metadata.channelMetadataRenderer.subscriberCountText',
   ];
 
-  // Try direct paths first
   for (const path of searchPaths) {
     const value = getNestedValue(data, path);
     if (value) {
@@ -158,7 +253,6 @@ function findSubscriberCount(data) {
         const count = parseSubscriberString(value);
         if (count !== null && count > 0) return count;
       } else if (Array.isArray(value)) {
-        // Handle metadataRows array
         for (const row of value) {
           const parts = row?.metadataParts || [];
           for (const part of parts) {
@@ -183,16 +277,6 @@ function findSubscriberCount(data) {
     if (item.accessibility?.accessibilityData?.label) {
       const count = parseSubscriberString(item.accessibility.accessibilityData.label);
       if (count !== null && count > 0) return count;
-    }
-  }
-
-  // Look for subscriberCount as a number
-  const subscriberCounts = deepSearch(data, 'subscriberCount');
-  for (const item of subscriberCounts) {
-    if (typeof item === 'number' && item > 0) return item;
-    if (typeof item === 'string') {
-      const num = parseInt(item, 10);
-      if (!isNaN(num) && num > 0) return num;
     }
   }
 
@@ -230,16 +314,14 @@ function getNestedValue(obj, path) {
 function parseSubscriberString(str) {
   if (!str || typeof str !== 'string') return null;
 
-  // Extract the number part - handle various formats
-  // "278M subscribers" -> 278000000
-  // "278 million subscribers" -> 278000000
-  // "1.23M subscribers" -> 1230000
-  // "309M subscribers" -> 309000000
-
   let cleaned = str.toLowerCase().trim();
-
-  // Remove "subscribers" and similar text
   cleaned = cleaned.replace(/subscriber[s]?/gi, '').trim();
+
+  // Check for exact number first (with commas)
+  const exactMatch = cleaned.match(/^([\d,]+)$/);
+  if (exactMatch) {
+    return parseInt(exactMatch[1].replace(/,/g, ''), 10);
+  }
 
   // Handle "million", "billion", "thousand" words
   if (cleaned.includes('million')) {
@@ -268,24 +350,23 @@ function parseSubscriberString(str) {
     return Math.round(num);
   }
 
-  // Handle plain numbers with commas: 309,000,000
+  // Handle plain numbers with commas
   const plainNumber = cleaned.replace(/[,\s]/g, '').match(/^(\d+)$/);
   if (plainNumber) {
     return parseInt(plainNumber[1], 10);
   }
 
-  // Last resort - extract any number
+  // Last resort
   const anyNumber = cleaned.match(/([\d,]+)/);
   if (anyNumber) {
     const num = parseInt(anyNumber[1].replace(/,/g, ''), 10);
-    if (!isNaN(num) && num > 1000) return num; // Only return if it looks like a real count
+    if (!isNaN(num) && num > 1000) return num;
   }
 
   return null;
 }
 
 function findChannelName(data, html) {
-  // Try ytInitialData first
   const names = deepSearch(data, 'title');
   for (const name of names) {
     if (typeof name === 'string' && name.length > 0 && name.length < 100) {
@@ -293,7 +374,6 @@ function findChannelName(data, html) {
     }
   }
 
-  // Fallback to HTML meta tags
   const ogTitle = html.match(/<meta\s+property="og:title"\s+content="([^"]+)"/);
   if (ogTitle && ogTitle[1]) {
     return ogTitle[1].replace(/ - YouTube$/, '').trim();
@@ -308,7 +388,6 @@ function findChannelName(data, html) {
 }
 
 function findChannelImage(data, html) {
-  // Try ytInitialData
   const avatars = deepSearch(data, 'avatar');
   for (const avatar of avatars) {
     if (avatar?.thumbnails?.[0]?.url) {
@@ -316,7 +395,6 @@ function findChannelImage(data, html) {
     }
   }
 
-  // Fallback to HTML
   const ogImage = html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/);
   if (ogImage && ogImage[1]) {
     return ogImage[1];
@@ -326,7 +404,6 @@ function findChannelImage(data, html) {
 }
 
 function findChannelId(data, html) {
-  // Try ytInitialData
   const channelIds = deepSearch(data, 'channelId');
   for (const id of channelIds) {
     if (typeof id === 'string' && id.startsWith('UC') && id.length === 24) {
@@ -341,7 +418,6 @@ function findChannelId(data, html) {
     }
   }
 
-  // Fallback to HTML
   const channelMatch = html.match(/channel\/([UC][a-zA-Z0-9_-]{22})/);
   if (channelMatch) {
     return channelMatch[1];

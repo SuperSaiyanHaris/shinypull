@@ -1,29 +1,47 @@
 import { useState, useEffect, useRef } from 'react';
 
-// Individual animated digit with rolling effect
-function RollingDigit({ digit, previousDigit }) {
-  const [animationClass, setAnimationClass] = useState('');
+// True odometer digit - shows old value rolling out while new value rolls in
+function OdometerDigit({ digit, previousDigit }) {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [direction, setDirection] = useState('up');
+  const [oldDigit, setOldDigit] = useState(digit);
+  const [newDigit, setNewDigit] = useState(digit);
 
   useEffect(() => {
     if (previousDigit !== undefined && previousDigit !== null && previousDigit !== digit) {
       const prev = parseInt(previousDigit, 10);
       const curr = parseInt(digit, 10);
 
+      setOldDigit(previousDigit);
+      setNewDigit(digit);
+
       if (!isNaN(prev) && !isNaN(curr)) {
-        setAnimationClass(curr > prev ? 'animate-roll-up' : 'animate-roll-down');
+        setDirection(curr > prev ? 'up' : 'down');
       } else {
-        setAnimationClass('animate-roll-up');
+        setDirection('up');
       }
 
-      const timer = setTimeout(() => setAnimationClass(''), 300);
+      setIsAnimating(true);
+
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+        setOldDigit(digit);
+      }, 400);
+
       return () => clearTimeout(timer);
+    } else {
+      setOldDigit(digit);
+      setNewDigit(digit);
     }
   }, [digit, previousDigit]);
 
   // Handle separators (comma, period)
   if (digit === ',' || digit === '.') {
     return (
-      <span className="inline-block w-[0.3em] text-center opacity-70">
+      <span
+        className="inline-block text-center opacity-60"
+        style={{ width: '0.35em' }}
+      >
         {digit}
       </span>
     );
@@ -32,40 +50,77 @@ function RollingDigit({ digit, previousDigit }) {
   return (
     <span
       className="inline-block relative overflow-hidden"
-      style={{ width: '0.65em', height: '1.15em', lineHeight: '1.15em' }}
+      style={{
+        width: '0.62em',
+        height: '1.1em',
+      }}
     >
-      <span className={`block ${animationClass}`}>
-        {digit}
+      {/* Old digit - rolls out */}
+      <span
+        className="absolute inset-0 flex items-center justify-center transition-transform duration-400 ease-out"
+        style={{
+          transform: isAnimating
+            ? direction === 'up'
+              ? 'translateY(-100%)'
+              : 'translateY(100%)'
+            : 'translateY(0)',
+          opacity: isAnimating ? 0 : 1,
+          transitionDuration: '400ms',
+        }}
+      >
+        {oldDigit}
       </span>
+
+      {/* New digit - rolls in */}
+      {isAnimating && (
+        <span
+          className="absolute inset-0 flex items-center justify-center transition-transform duration-400 ease-out"
+          style={{
+            transform: isAnimating
+              ? 'translateY(0)'
+              : direction === 'up'
+                ? 'translateY(100%)'
+                : 'translateY(-100%)',
+            transitionDuration: '400ms',
+          }}
+        >
+          {newDigit}
+        </span>
+      )}
     </span>
   );
 }
 
 export default function AnimatedCounter({ value, className = '' }) {
   const [displayValue, setDisplayValue] = useState(value);
-  const prevValueRef = useRef(null);
+  const [prevDisplayValue, setPrevDisplayValue] = useState(null);
+  const isFirstRender = useRef(true);
 
-  // Format the value
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      setDisplayValue(value);
+      return;
+    }
+
+    if (value !== displayValue) {
+      setPrevDisplayValue(displayValue);
+      setDisplayValue(value);
+    }
+  }, [value]);
+
+  // Format the values
   const formattedValue = (() => {
     if (displayValue === null || displayValue === undefined) return '0';
     return typeof displayValue === 'number' ? displayValue.toLocaleString() : String(displayValue);
   })();
 
-  // Get previous formatted value
   const prevFormattedValue = (() => {
-    if (prevValueRef.current === null || prevValueRef.current === undefined) return null;
-    return typeof prevValueRef.current === 'number'
-      ? prevValueRef.current.toLocaleString()
-      : String(prevValueRef.current);
+    if (prevDisplayValue === null || prevDisplayValue === undefined) return null;
+    return typeof prevDisplayValue === 'number'
+      ? prevDisplayValue.toLocaleString()
+      : String(prevDisplayValue);
   })();
-
-  // Update when value changes
-  useEffect(() => {
-    if (value !== displayValue) {
-      prevValueRef.current = displayValue;
-      setDisplayValue(value);
-    }
-  }, [value]);
 
   // Create digit arrays
   const digits = formattedValue.split('');
@@ -76,13 +131,13 @@ export default function AnimatedCounter({ value, className = '' }) {
   const paddedPrev = [...Array(maxLen - prevDigits.length).fill(null), ...prevDigits];
 
   return (
-    <span className={`inline-flex items-baseline ${className}`}>
+    <span className={`inline-flex items-center justify-center ${className}`}>
       {digits.map((digit, index) => {
         const prevIndex = index + (paddedPrev.length - digits.length);
         const prevDigit = prevIndex >= 0 ? paddedPrev[prevIndex] : null;
 
         return (
-          <RollingDigit
+          <OdometerDigit
             key={`${index}-${digits.length}`}
             digit={digit}
             previousDigit={prevDigit}
