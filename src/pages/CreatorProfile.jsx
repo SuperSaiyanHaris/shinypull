@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle, Calendar } from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
@@ -399,6 +399,32 @@ export default function CreatorProfile() {
               </div>
             )}
 
+            {/* Live Counter Link */}
+            <Link
+              to={`/live/${platform}/${creator.username}`}
+              className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-5 mb-6 text-white hover:from-indigo-700 hover:to-purple-700 transition-all group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Radio className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-semibold">Live {platform === 'twitch' ? 'Follower' : 'Subscriber'} Count</p>
+                  <p className="text-sm text-indigo-200">Watch the count update in real-time</p>
+                </div>
+              </div>
+              <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+
+            {/* Milestone Predictions */}
+            {metrics && (creator.subscribers || creator.followers) && (
+              <MilestonePredictions
+                currentCount={creator.subscribers || creator.followers}
+                dailyGrowth={metrics.dailyAverage.subs}
+                platform={platform}
+              />
+            )}
+
             {/* Growth Chart */}
             {statsHistory.length >= 2 && (
               <GrowthChart
@@ -614,6 +640,112 @@ function formatEarnings(low, high) {
     return `$${Math.round(num)}`;
   };
   return `${formatCurrency(low)} - ${formatCurrency(high)}`;
+}
+
+function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
+  const milestones = [
+    100000, 250000, 500000, 750000,
+    1000000, 2000000, 5000000, 10000000,
+    25000000, 50000000, 75000000, 100000000,
+    150000000, 200000000, 250000000, 300000000
+  ];
+
+  // Find next milestones (up to 3)
+  const nextMilestones = milestones
+    .filter(m => m > currentCount)
+    .slice(0, 3);
+
+  if (nextMilestones.length === 0 || dailyGrowth <= 0) {
+    return null;
+  }
+
+  const predictions = nextMilestones.map(milestone => {
+    const needed = milestone - currentCount;
+    const daysNeeded = Math.ceil(needed / dailyGrowth);
+    const estimatedDate = new Date();
+    estimatedDate.setDate(estimatedDate.getDate() + daysNeeded);
+
+    return {
+      milestone,
+      needed,
+      daysNeeded,
+      estimatedDate,
+    };
+  });
+
+  const formatMilestone = (num) => {
+    if (num >= 1000000000) return (num / 1000000000).toFixed(0) + 'B';
+    if (num >= 1000000) return (num / 1000000).toFixed(0) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+    return num.toLocaleString();
+  };
+
+  const formatDays = (days) => {
+    if (days > 365) {
+      const years = Math.floor(days / 365);
+      const months = Math.floor((days % 365) / 30);
+      return `~${years}y ${months}m`;
+    }
+    if (days > 30) {
+      const months = Math.floor(days / 30);
+      const remainingDays = days % 30;
+      return `~${months}mo ${remainingDays}d`;
+    }
+    return `~${days} days`;
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Target className="w-5 h-5 text-indigo-600" />
+        <h3 className="text-lg font-semibold text-gray-900">Milestone Predictions</h3>
+      </div>
+      <p className="text-sm text-gray-500 mb-4">
+        Based on current growth rate of <span className="font-semibold text-indigo-600">+{formatNumber(dailyGrowth)}/day</span>
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {predictions.map((pred, index) => (
+          <div
+            key={pred.milestone}
+            className={`rounded-xl p-4 ${
+              index === 0
+                ? 'bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100'
+                : 'bg-gray-50'
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                index === 0 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'
+              }`}>
+                <Target className="w-4 h-4" />
+              </div>
+              <span className={`text-2xl font-bold ${
+                index === 0 ? 'text-indigo-600' : 'text-gray-900'
+              }`}>
+                {formatMilestone(pred.milestone)}
+              </span>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-600 flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
+                {formatDays(pred.daysNeeded)}
+              </p>
+              <p className="text-xs text-gray-500">
+                Est. {pred.estimatedDate.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: pred.estimatedDate.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+                })}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-gray-400 mt-4">
+        * Predictions assume consistent growth. Actual results may vary based on content, algorithm changes, and other factors.
+      </p>
+    </div>
+  );
 }
 
 function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platform }) {

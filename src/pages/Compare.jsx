@@ -1,0 +1,378 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight } from 'lucide-react';
+import { searchChannels as searchYouTube } from '../services/youtubeService';
+import { searchChannels as searchTwitch } from '../services/twitchService';
+import SEO from '../components/SEO';
+
+const platformConfig = {
+  youtube: { icon: Youtube, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
+  twitch: { icon: Twitch, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
+};
+
+export default function Compare() {
+  const [creators, setCreators] = useState([null, null]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchPlatform, setSearchPlatform] = useState('youtube');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [activeSlot, setActiveSlot] = useState(null);
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    setSearching(true);
+    try {
+      let results = [];
+      if (searchPlatform === 'youtube') {
+        results = await searchYouTube(searchQuery, 5);
+      } else if (searchPlatform === 'twitch') {
+        results = await searchTwitch(searchQuery);
+        results = results.slice(0, 5);
+      }
+      setSearchResults(results);
+    } catch (err) {
+      console.error('Search error:', err);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const selectCreator = (creator) => {
+    if (activeSlot !== null) {
+      const newCreators = [...creators];
+      newCreators[activeSlot] = creator;
+      setCreators(newCreators);
+      setActiveSlot(null);
+      setSearchResults([]);
+      setSearchQuery('');
+    }
+  };
+
+  const removeCreator = (index) => {
+    const newCreators = [...creators];
+    newCreators[index] = null;
+    setCreators(newCreators);
+  };
+
+  const addSlot = () => {
+    if (creators.length < 3) {
+      setCreators([...creators, null]);
+    }
+  };
+
+  const filledCreators = creators.filter(Boolean);
+
+  return (
+    <>
+      <SEO
+        title="Compare Creators"
+        description="Compare YouTube and Twitch creators side-by-side. See subscriber counts, views, and growth metrics."
+      />
+
+      <div className="min-h-screen bg-gray-50">
+        {/* Hero */}
+        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white py-12">
+          <div className="max-w-6xl mx-auto px-4 text-center">
+            <h1 className="text-4xl font-bold mb-4">Compare Creators</h1>
+            <p className="text-xl text-indigo-100">
+              Side-by-side comparison of YouTube and Twitch channels
+            </p>
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          {/* Creator Slots */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {creators.map((creator, index) => (
+              <div key={index}>
+                {creator ? (
+                  <CreatorCard
+                    creator={creator}
+                    onRemove={() => removeCreator(index)}
+                  />
+                ) : (
+                  <EmptySlot
+                    onClick={() => setActiveSlot(index)}
+                    isActive={activeSlot === index}
+                  />
+                )}
+              </div>
+            ))}
+            {creators.length < 3 && (
+              <button
+                onClick={addSlot}
+                className="h-48 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors"
+              >
+                <Plus className="w-8 h-8" />
+              </button>
+            )}
+          </div>
+
+          {/* Search Panel */}
+          {activeSlot !== null && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Select Creator for Slot {activeSlot + 1}
+                </h3>
+                <button
+                  onClick={() => setActiveSlot(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSearch} className="flex gap-2 mb-4">
+                <select
+                  value={searchPlatform}
+                  onChange={(e) => setSearchPlatform(e.target.value)}
+                  className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="youtube">YouTube</option>
+                  <option value="twitch">Twitch</option>
+                </select>
+                <div className="flex-1 relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search for a creator..."
+                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={searching}
+                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold rounded-xl transition-colors"
+                >
+                  {searching ? 'Searching...' : 'Search'}
+                </button>
+              </form>
+
+              {searchResults.length > 0 && (
+                <div className="space-y-2">
+                  {searchResults.map((result) => (
+                    <button
+                      key={result.platformId}
+                      onClick={() => selectCreator(result)}
+                      className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-left"
+                    >
+                      <img
+                        src={result.profileImage}
+                        alt={result.displayName}
+                        className="w-12 h-12 rounded-xl object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 truncate">{result.displayName}</p>
+                        <p className="text-sm text-gray-500">@{result.username}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-gray-900">
+                          {formatNumber(result.subscribers || result.followers)}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {result.platform === 'twitch' ? 'followers' : 'subscribers'}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Comparison Table */}
+          {filledCreators.length >= 2 && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-900">Comparison</h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-100 bg-gray-50">
+                      <th className="px-6 py-4 text-left font-semibold text-gray-600">Metric</th>
+                      {filledCreators.map((creator) => (
+                        <th key={creator.platformId} className="px-6 py-4 text-center font-semibold text-gray-900">
+                          <div className="flex items-center justify-center gap-2">
+                            <img src={creator.profileImage} alt="" className="w-6 h-6 rounded-lg" />
+                            <span className="truncate max-w-[120px]">{creator.displayName}</span>
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <ComparisonRow
+                      label="Platform"
+                      values={filledCreators.map(c => (
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm ${platformConfig[c.platform]?.bg} ${platformConfig[c.platform]?.color}`}>
+                          {c.platform === 'youtube' ? <Youtube className="w-4 h-4" /> : <Twitch className="w-4 h-4" />}
+                          {c.platform}
+                        </span>
+                      ))}
+                    />
+                    <ComparisonRow
+                      label="Subscribers / Followers"
+                      icon={Users}
+                      values={filledCreators.map(c => formatNumber(c.subscribers || c.followers))}
+                      highlight={getWinner(filledCreators.map(c => c.subscribers || c.followers))}
+                    />
+                    <ComparisonRow
+                      label="Total Views"
+                      icon={Eye}
+                      values={filledCreators.map(c => formatNumber(c.totalViews))}
+                      highlight={getWinner(filledCreators.map(c => c.totalViews))}
+                    />
+                    <ComparisonRow
+                      label="Videos / Content"
+                      icon={Video}
+                      values={filledCreators.map(c => c.platform === 'twitch' ? (c.category || '-') : formatNumber(c.totalPosts))}
+                      highlight={filledCreators.every(c => c.platform !== 'twitch') ? getWinner(filledCreators.map(c => c.totalPosts)) : null}
+                    />
+                    <ComparisonRow
+                      label="Avg Views per Video"
+                      icon={TrendingUp}
+                      values={filledCreators.map(c =>
+                        c.platform === 'twitch' ? '-' :
+                        c.totalPosts > 0 ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '-'
+                      )}
+                      highlight={filledCreators.every(c => c.platform !== 'twitch') ?
+                        getWinner(filledCreators.map(c => c.totalPosts > 0 ? c.totalViews / c.totalPosts : 0)) : null}
+                    />
+                  </tbody>
+                </table>
+              </div>
+
+              {/* View Full Profiles */}
+              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                <div className="flex flex-wrap gap-4 justify-center">
+                  {filledCreators.map((creator) => (
+                    <Link
+                      key={creator.platformId}
+                      to={`/${creator.platform}/${creator.username}`}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                    >
+                      View {creator.displayName}'s profile
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {filledCreators.length < 2 && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+              <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-indigo-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Select at least 2 creators</h3>
+              <p className="text-gray-500">Click on the empty slots above to search and add creators to compare</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function CreatorCard({ creator, onRemove }) {
+  const config = platformConfig[creator.platform] || platformConfig.youtube;
+  const Icon = config.icon;
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 relative group">
+      <button
+        onClick={onRemove}
+        className="absolute top-3 right-3 p-1.5 bg-gray-100 hover:bg-red-100 rounded-lg text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+      >
+        <X className="w-4 h-4" />
+      </button>
+      <div className="flex items-center gap-4 mb-4">
+        <img
+          src={creator.profileImage}
+          alt={creator.displayName}
+          className="w-16 h-16 rounded-xl object-cover"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-gray-900 truncate">{creator.displayName}</p>
+          <p className="text-sm text-gray-500 truncate">@{creator.username}</p>
+          <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md text-xs ${config.bg} ${config.color}`}>
+            <Icon className="w-3 h-3" />
+            {creator.platform}
+          </span>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-gray-50 rounded-xl p-3">
+          <p className="text-xs text-gray-500 mb-1">{creator.platform === 'twitch' ? 'Followers' : 'Subs'}</p>
+          <p className="font-bold text-gray-900">{formatNumber(creator.subscribers || creator.followers)}</p>
+        </div>
+        <div className="bg-gray-50 rounded-xl p-3">
+          <p className="text-xs text-gray-500 mb-1">Views</p>
+          <p className="font-bold text-gray-900">{formatNumber(creator.totalViews)}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptySlot({ onClick, isActive }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`h-48 w-full border-2 border-dashed rounded-2xl flex flex-col items-center justify-center transition-colors ${
+        isActive
+          ? 'border-indigo-400 bg-indigo-50 text-indigo-600'
+          : 'border-gray-200 hover:border-gray-300 text-gray-400 hover:text-gray-600'
+      }`}
+    >
+      <Search className="w-8 h-8 mb-2" />
+      <span className="font-medium">Click to add creator</span>
+    </button>
+  );
+}
+
+function ComparisonRow({ label, icon: Icon, values, highlight }) {
+  return (
+    <tr className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+      <td className="px-6 py-4 text-gray-600 font-medium">
+        <div className="flex items-center gap-2">
+          {Icon && <Icon className="w-4 h-4 text-gray-400" />}
+          {label}
+        </div>
+      </td>
+      {values.map((value, index) => (
+        <td
+          key={index}
+          className={`px-6 py-4 text-center font-semibold ${
+            highlight === index ? 'text-emerald-600 bg-emerald-50' : 'text-gray-900'
+          }`}
+        >
+          {value}
+        </td>
+      ))}
+    </tr>
+  );
+}
+
+function getWinner(values) {
+  const max = Math.max(...values.filter(v => v != null && !isNaN(v)));
+  const winnerIndex = values.findIndex(v => v === max);
+  // Only highlight if there's a clear winner (not a tie)
+  const winners = values.filter(v => v === max);
+  return winners.length === 1 ? winnerIndex : null;
+}
+
+function formatNumber(num) {
+  if (num === null || num === undefined) return '-';
+  if (Math.abs(num) >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
+  if (Math.abs(num) >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (Math.abs(num) >= 1000) return (num / 1000).toFixed(1) + 'K';
+  return num.toLocaleString();
+}

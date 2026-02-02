@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, Search, Trophy, Menu, X } from 'lucide-react';
+import { BarChart3, Search, Trophy, Menu, X, Scale } from 'lucide-react';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -16,6 +16,7 @@ export default function Header() {
   const navLinks = [
     { path: '/search', label: 'Search', icon: Search },
     { path: '/rankings', label: 'Rankings', icon: Trophy },
+    { path: '/compare', label: 'Compare', icon: Scale },
   ];
 
   return (

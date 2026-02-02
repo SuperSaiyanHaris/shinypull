@@ -5,6 +5,8 @@ import Home from './pages/Home';
 import CreatorProfile from './pages/CreatorProfile';
 import Search from './pages/Search';
 import Rankings from './pages/Rankings';
+import Compare from './pages/Compare';
+import LiveCount from './pages/LiveCount';
 import Auth from './pages/Auth';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -21,6 +23,8 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/rankings" element={<Rankings />} />
           <Route path="/rankings/:platform" element={<Rankings />} />
+          <Route path="/compare" element={<Compare />} />
+          <Route path="/live/:platform/:username" element={<LiveCount />} />
           <Route path="/:platform/:username" element={<CreatorProfile />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/signin" element={<Auth />} />
