@@ -110,12 +110,12 @@ export default function Search() {
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white border-b border-gray-100">
-          <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex items-center gap-3 mb-2">
-              <SearchIcon className="w-8 h-8 text-indigo-600" />
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Search Creators</h1>
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
+              <SearchIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Search Creators</h1>
             </div>
-            <p className="text-gray-500">Find any creator and view their detailed statistics</p>
+            <p className="text-sm sm:text-base text-gray-500">Find any creator and view their detailed statistics</p>
           </div>
         </div>
 
@@ -153,18 +153,18 @@ export default function Search() {
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-10 group-focus-within:opacity-20 blur transition duration-300"></div>
               <div className="relative flex items-center bg-white rounded-2xl shadow-sm border border-gray-100">
-                <SearchIcon className="absolute left-5 w-5 h-5 text-gray-400" />
+                <SearchIcon className="absolute left-3 sm:left-5 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={`Search ${currentPlatform?.name || ''} creators...`}
-                  className="w-full pl-14 pr-36 py-4 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl"
+                  className="w-full pl-10 sm:pl-14 pr-24 sm:pr-36 py-3 sm:py-4 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-base sm:text-lg rounded-2xl"
                 />
                 <button
                   type="submit"
                   disabled={loading}
-                  className="absolute right-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25"
+                  className="absolute right-2 px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25"
                 >
                   {loading ? 'Searching...' : 'Search'}
                 </button>
@@ -217,19 +217,19 @@ export default function Search() {
                     <Link
                       key={creator.platformId}
                       to={`/${creator.platform}/${creator.username}`}
-                      className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl hover:shadow-lg hover:border-gray-200 transition-all duration-200 group"
+                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-100 rounded-2xl hover:shadow-lg hover:border-gray-200 transition-all duration-200 group"
                     >
                       <img
                         src={creator.profileImage || '/placeholder-avatar.svg'}
                         alt={creator.displayName}
-                        className="w-16 h-16 rounded-xl object-cover bg-gray-100"
+                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0"
                         onError={(e) => {
                           e.target.src = '/placeholder-avatar.svg';
                         }}
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <h3 className="font-semibold text-lg text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+                          <h3 className="font-semibold text-base sm:text-lg text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
                             {creator.displayName}
                           </h3>
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium ${colors.bg} text-white`}>
@@ -237,13 +237,13 @@ export default function Search() {
                             {creator.platform}
                           </span>
                         </div>
-                        <p className="text-gray-500 truncate">@{creator.username}</p>
+                        <p className="text-sm sm:text-base text-gray-500 truncate">@{creator.username}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="font-bold text-gray-900 text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
-                        <p className="text-sm text-gray-500">{creator.platform === 'twitch' ? 'followers' : 'subscribers'}</p>
+                        <p className="font-bold text-gray-900 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
+                        <p className="text-xs sm:text-sm text-gray-500">{creator.platform === 'twitch' ? 'followers' : 'subscribers'}</p>
                       </div>
-                      <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="hidden sm:block w-5 h-5 text-gray-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
                     </Link>
                   );
                 })}

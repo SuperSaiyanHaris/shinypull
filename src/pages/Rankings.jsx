@@ -70,12 +70,12 @@ export default function Rankings() {
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white border-b border-gray-100">
-          <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex items-center gap-3 mb-2">
-              <Trophy className="w-8 h-8 text-indigo-600" />
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Creator Rankings</h1>
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
+              <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Creator Rankings</h1>
             </div>
-            <p className="text-gray-500">Discover top creators across platforms</p>
+            <p className="text-sm sm:text-base text-gray-500">Discover top creators across platforms</p>
           </div>
         </div>
 

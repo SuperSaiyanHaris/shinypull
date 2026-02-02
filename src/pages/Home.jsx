@@ -63,41 +63,41 @@ export default function Home() {
             <div className="absolute top-20 -left-40 w-80 h-80 bg-purple-100 rounded-full opacity-50 blur-3xl"></div>
           </div>
 
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-16 pb-24">
+          <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-16 sm:pb-24">
             <div className="text-center max-w-4xl mx-auto">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-sm font-medium text-indigo-600 mb-8">
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-indigo-50 rounded-full text-xs sm:text-sm font-medium text-indigo-600 mb-6 sm:mb-8">
                 <span className="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></span>
                 Real-time creator analytics
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4 sm:mb-6 tracking-tight px-2">
                 Social Media{' '}
                 <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                   Statistics
                 </span>
               </h1>
 
-              <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-4">
                 Track followers, views, and growth for your favorite YouTube and Twitch creators. Get detailed analytics and insights.
               </p>
 
               {/* Search Bar */}
-              <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-16">
+              <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12 sm:mb-16 px-4">
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-20 group-hover:opacity-30 blur transition duration-300"></div>
                   <div className="relative flex items-center bg-white rounded-2xl shadow-xl shadow-gray-200/50">
-                    <Search className="absolute left-5 w-5 h-5 text-gray-400" />
+                    <Search className="absolute left-3 sm:left-5 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search for a creator (e.g., MrBeast, Ninja)"
-                      className="w-full pl-14 pr-36 py-5 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl"
+                      className="w-full pl-10 sm:pl-14 pr-20 sm:pr-36 py-3.5 sm:py-5 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-base sm:text-lg rounded-2xl"
                     />
                     <button
                       type="submit"
-                      className="absolute right-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30"
+                      className="absolute right-2 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30"
                     >
                       Search
                     </button>

@@ -54,7 +54,29 @@ export default function Terms() {
                 </p>
               </Section>
 
-              <Section title="5. Acceptable Use">
+              <Section title="5. Live Counter Estimates">
+                <p className="mb-4">
+                  Our "Live Counter" feature displays <strong>estimated</strong> real-time subscriber and follower
+                  counts. These numbers are simulations based on:
+                </p>
+                <ul className="list-disc list-inside text-gray-600 space-y-1 mb-4">
+                  <li>The most recent publicly available count from the platform's official API</li>
+                  <li>Typical growth patterns for channels of similar size</li>
+                  <li>Statistical modeling to simulate realistic fluctuations</li>
+                </ul>
+                <p className="mb-4">
+                  <strong>Important:</strong> The live counter does NOT display the actual real-time count from
+                  YouTube or Twitch. Platform APIs only provide rounded/cached subscriber counts (e.g., "465M"
+                  instead of "465,523,243"). The additional digits shown are algorithmic estimates for
+                  entertainment purposes.
+                </p>
+                <p>
+                  For the most accurate counts, please refer to the official platform (YouTube Studio, Twitch Dashboard).
+                  ShinyPull is not responsible for any decisions made based on these estimated figures.
+                </p>
+              </Section>
+
+              <Section title="6. Acceptable Use">
                 <p className="mb-2">You agree NOT to:</p>
                 <ul className="list-disc list-inside text-gray-600 space-y-1">
                   <li>Use automated tools to scrape or download data</li>
@@ -66,7 +88,7 @@ export default function Terms() {
                 </ul>
               </Section>
 
-              <Section title="6. Intellectual Property">
+              <Section title="7. Intellectual Property">
                 <p>
                   All content, features, and functionality of ShinyPull are owned by us and protected by
                   international copyright, trademark, and other intellectual property laws. Creator statistics
@@ -74,14 +96,14 @@ export default function Terms() {
                 </p>
               </Section>
 
-              <Section title="7. Third-Party Platforms">
+              <Section title="8. Third-Party Platforms">
                 <p>
                   Our service relies on third-party platform APIs (YouTube, Twitch, etc.). We are not
                   affiliated with these platforms. Changes to their APIs or terms may affect our service.
                 </p>
               </Section>
 
-              <Section title="8. Limitation of Liability">
+              <Section title="9. Limitation of Liability">
                 <p>
                   ShinyPull is provided "as is" without warranties of any kind. We shall not be liable
                   for any indirect, incidental, special, consequential, or punitive damages resulting from
@@ -89,21 +111,21 @@ export default function Terms() {
                 </p>
               </Section>
 
-              <Section title="9. Service Modifications">
+              <Section title="10. Service Modifications">
                 <p>
                   We reserve the right to modify, suspend, or discontinue any part of our service at any
                   time without notice. We may also update these Terms of Service periodically.
                 </p>
               </Section>
 
-              <Section title="10. Termination">
+              <Section title="11. Termination">
                 <p>
                   We may terminate or suspend your account and access to the service at our sole discretion,
                   without notice, for conduct that violates these Terms or is harmful to other users.
                 </p>
               </Section>
 
-              <Section title="11. Contact Information">
+              <Section title="12. Contact Information">
                 <p>
                   For questions about these Terms, please contact us at{' '}
                   <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-700">

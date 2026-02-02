@@ -221,38 +221,39 @@ export default function CreatorProfile() {
         <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-6xl mx-auto">
             {/* Profile Header */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8 mb-6 -mt-16 relative">
-              <div className="flex flex-col md:flex-row items-start gap-6">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 mb-6 -mt-16 relative">
+              <div className="flex flex-col md:flex-row items-start gap-4 sm:gap-6">
                 <img
                   src={creator.profileImage}
                   alt={creator.displayName}
-                  className="w-24 h-24 md:w-28 md:h-28 rounded-2xl object-cover bg-gray-100 border-4 border-white shadow-lg"
+                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl object-cover bg-gray-100 border-4 border-white shadow-lg"
                 />
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{creator.displayName}</h1>
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${colors.bg} text-white`}>
-                      {Icon && <Icon className="w-4 h-4" />}
+                <div className="flex-1 w-full">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{creator.displayName}</h1>
+                    <span className={`inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm ${colors.bg} text-white`}>
+                      {Icon && <Icon className="w-3 h-3 sm:w-4 sm:h-4" />}
                       {platform}
                     </span>
                     {creator.country && (
-                      <span className="px-2.5 py-1 bg-gray-100 rounded-lg text-sm text-gray-600 font-medium">
+                      <span className="px-2 sm:px-2.5 py-1 bg-gray-100 rounded-lg text-xs sm:text-sm text-gray-600 font-medium">
                         {creator.country}
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-500 mb-3">@{creator.username}</p>
+                  <p className="text-sm sm:text-base text-gray-500 mb-3">@{creator.username}</p>
                   
                   {/* Social Links */}
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <a
                       href={platformUrls[platform]?.(creator.username)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium text-sm"
+                      className="inline-flex items-center gap-1.5 sm:gap-2 text-indigo-600 hover:text-indigo-700 font-medium text-xs sm:text-sm"
                     >
-                      <ExternalLink className="w-4 h-4" />
-                      View on {platform}
+                      <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden xs:inline">View on {platform}</span>
+                      <span className="xs:hidden">View</span>
                     </a>
                     
                     {/* Additional social links for YouTube channels */}
@@ -402,18 +403,18 @@ export default function CreatorProfile() {
             {/* Live Counter Link */}
             <Link
               to={`/live/${platform}/${creator.username}`}
-              className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-5 mb-6 text-white hover:from-indigo-700 hover:to-purple-700 transition-all group"
+              className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:from-indigo-700 hover:to-purple-700 transition-all group\"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                  <Radio className="w-5 h-5" />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Radio className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <div>
-                  <p className="font-semibold">Live {platform === 'twitch' ? 'Follower' : 'Subscriber'} Count</p>
-                  <p className="text-sm text-indigo-200">Watch the count update in real-time</p>
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm sm:text-base truncate">Live {platform === 'twitch' ? 'Follower' : 'Subscriber'} Count</p>
+                  <p className="text-xs sm:text-sm text-indigo-200 truncate">Watch the count update in real-time</p>
                 </div>
               </div>
-              <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform flex-shrink-0" />
             </Link>
 
             {/* Milestone Predictions */}
@@ -595,13 +596,13 @@ export default function CreatorProfile() {
 
 function StatCard({ icon: Icon, label, value, sublabel }) {
   return (
-    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center gap-2 mb-2">
-        {Icon && <Icon className="w-4 h-4 text-gray-400" />}
-        <p className="text-sm text-gray-500 font-medium">{label}</p>
+        {Icon && <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />}
+        <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">{label}</p>
       </div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-      {sublabel && <p className="text-xs text-gray-400 mt-1">{sublabel}</p>}
+      <p className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{value}</p>
+      {sublabel && <p className="text-xs text-gray-400 mt-1 truncate">{sublabel}</p>}
     </div>
   );
 }
@@ -611,12 +612,12 @@ function SummaryCard({ label, sublabel, value, change }) {
   const isNegative = change !== undefined && change < 0;
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-5 border border-indigo-100">
-      <p className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{value}</p>
-      <p className="text-sm font-medium text-gray-700">{label}</p>
-      {sublabel && <p className="text-xs text-gray-500 mt-1">{sublabel}</p>}
+    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 sm:p-5 border border-indigo-100">
+      <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 truncate">{value}</p>
+      <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">{label}</p>
+      {sublabel && <p className="text-xs text-gray-500 mt-1 truncate">{sublabel}</p>}
       {change !== undefined && change !== null && (
-        <p className={`text-xs mt-2 font-medium ${isPositive ? 'text-emerald-600' : isNegative ? 'text-red-500' : 'text-gray-400'}`}>
+        <p className={`text-xs mt-2 font-medium truncate ${isPositive ? 'text-emerald-600' : isNegative ? 'text-red-500' : 'text-gray-400'}`}>
           {isPositive ? '+' : ''}{formatNumber(change)}
         </p>
       )}
