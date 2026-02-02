@@ -114,6 +114,33 @@ async function fetchTwitchFollowers(broadcasterId) {
 }
 
 /**
+ * Fetch total view count from VODs for a Twitch user
+ * Since Twitch deprecated the view_count field, we sum up views from recent VODs
+ */
+async function fetchTwitchVODViews(broadcasterId) {
+  const token = await getTwitchAccessToken();
+
+  try {
+    const response = await fetch(
+      `https://api.twitch.tv/helix/videos?user_id=${broadcasterId}&first=100&type=archive`,
+      {
+        headers: {
+          'Client-ID': TWITCH_CLIENT_ID,
+          'Authorization': `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+    const totalViews = (data.data || []).reduce((sum, video) => sum + (video.view_count || 0), 0);
+    return totalViews;
+  } catch (err) {
+    console.warn(`Failed to fetch VOD views: ${err.message}`);
+    return 0;
+  }
+}
+
+/**
  * Process array in chunks
  */
 function chunk(array, size) {
@@ -245,12 +272,15 @@ async function collectDailyStats() {
           }
 
           try {
-            const followers = await fetchTwitchFollowers(userData.id);
+            const [followers, vodViews] = await Promise.all([
+              fetchTwitchFollowers(userData.id),
+              fetchTwitchVODViews(userData.id),
+            ]);
             return {
               creator,
               stats: {
                 followers,
-                total_views: userData.view_count,
+                total_views: vodViews,
               },
             };
           } catch (err) {
