@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Youtube, Twitch, TrendingUp, TrendingDown, ExternalLink, RefreshCw, Share2, Radio } from 'lucide-react';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import SEO from '../components/SEO';
+import AnimatedCounter from '../components/AnimatedCounter';
 
 const platformConfig = {
   youtube: {
@@ -215,7 +216,7 @@ export default function LiveCount() {
             {/* The Big Number */}
             <div className="relative mb-8">
               <div className={`text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tabular-nums tracking-tight bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent transition-all duration-300`}>
-                {count?.toLocaleString()}
+                <AnimatedCounter value={count || 0} />
               </div>
               <p className="text-xl md:text-2xl text-gray-400 mt-4 font-medium">
                 {config.label}
