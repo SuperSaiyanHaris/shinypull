@@ -34,6 +34,7 @@ export default function CreatorProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [chartRange, setChartRange] = useState(30);
+  const [chartMetric, setChartMetric] = useState('subscribers'); // subscribers, views, videos
 
   useEffect(() => {
     loadCreator();
@@ -241,15 +242,85 @@ export default function CreatorProfile() {
                     )}
                   </div>
                   <p className="text-gray-500 mb-3">@{creator.username}</p>
-                  <a
-                    href={platformUrls[platform]?.(creator.username)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium text-sm"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    View on {platform}
-                  </a>
+                  
+                  {/* Social Links */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <a
+                      href={platformUrls[platform]?.(creator.username)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium text-sm"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      View on {platform}
+                    </a>
+                    
+                    {/* Additional social links for YouTube channels */}
+                    {platform === 'youtube' && creator.platformId && (
+                      <>
+                        <span className="text-gray-300">•</span>
+                        <a
+                          href={`https://www.youtube.com/channel/${creator.platformId}/about`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-600 hover:text-gray-900 text-sm"
+                        >
+                          About
+                        </a>
+                        <span className="text-gray-300">•</span>
+                        <a
+                          href={`https://www.youtube.com/channel/${creator.platformId}/videos`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-600 hover:text-gray-900 text-sm"
+                        >
+                          Videos
+                        </a>
+                        <span className="text-gray-300">•</span>
+                        <a
+                          href={`https://www.youtube.com/channel/${creator.platformId}/community`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-600 hover:text-gray-900 text-sm"
+                        >
+                          Community
+                        </a>
+                      </>
+                    )}
+                    
+                    {/* Twitch-specific links */}
+                    {platform === 'twitch' && (
+                      <>
+                        <span className="text-gray-300">•</span>
+                        <a
+                          href={`https://twitch.tv/${creator.username}/videos`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-600 hover:text-gray-900 text-sm"
+                        >
+                          Videos
+                        </a>
+                        <span className="text-gray-300">•</span>
+                        <a
+                          href={`https://twitch.tv/${creator.username}/schedule`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-600 hover:text-gray-900 text-sm"
+                        >
+                          Schedule
+                        </a>
+                        <span className="text-gray-300">•</span>
+                        <a
+                          href={`https://twitch.tv/${creator.username}/about`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-600 hover:text-gray-900 text-sm"
+                        >
+                          About
+                        </a>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -334,6 +405,8 @@ export default function CreatorProfile() {
                 data={statsHistory}
                 range={chartRange}
                 onRangeChange={setChartRange}
+                metric={chartMetric}
+                onMetricChange={setChartMetric}
                 platform={platform}
               />
             )}
@@ -543,13 +616,40 @@ function formatEarnings(low, high) {
   return `${formatCurrency(low)} - ${formatCurrency(high)}`;
 }
 
-function GrowthChart({ data, range, onRangeChange, platform }) {
+function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platform }) {
   const ranges = [
     { label: '30D', value: 30 },
     { label: '60D', value: 60 },
     { label: '90D', value: 90 },
     { label: 'All', value: 9999 },
   ];
+
+  const metrics = [
+    { 
+      value: 'subscribers', 
+      label: platform === 'twitch' ? 'Follower Growth' : 'Subscriber Growth',
+      dataKey: 'subscribers',
+      color: '#6366f1'
+    },
+    { 
+      value: 'views', 
+      label: 'View Growth',
+      dataKey: 'views',
+      color: '#10b981'
+    },
+  ];
+
+  // Add video count metric for non-Twitch platforms
+  if (platform !== 'twitch') {
+    metrics.push({
+      value: 'videos',
+      label: 'Video Count',
+      dataKey: 'videos',
+      color: '#f59e0b'
+    });
+  }
+
+  const currentMetric = metrics.find(m => m.value === metric) || metrics[0];
 
   const filteredData = data
     .filter((stat) => {
@@ -563,6 +663,7 @@ function GrowthChart({ data, range, onRangeChange, platform }) {
       date: stat.recorded_at,
       subscribers: stat.subscribers || stat.followers || 0,
       views: stat.total_views || 0,
+      videos: stat.total_posts || 0,
       label: new Date(stat.recorded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     }));
 
@@ -570,11 +671,12 @@ function GrowthChart({ data, range, onRangeChange, platform }) {
     return null;
   }
 
-  const minSubs = Math.min(...filteredData.map(d => d.subscribers));
-  const maxSubs = Math.max(...filteredData.map(d => d.subscribers));
-  const padding = Math.max((maxSubs - minSubs) * 0.1, 100);
+  const values = filteredData.map(d => d[currentMetric.dataKey]);
+  const minValue = Math.min(...values);
+  const maxValue = Math.max(...values);
+  const padding = Math.max((maxValue - minValue) * 0.1, metric === 'views' ? 1000 : 100);
 
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-3">
@@ -587,8 +689,10 @@ function GrowthChart({ data, range, onRangeChange, platform }) {
             })}
           </p>
           <p className="text-sm text-gray-600">
-            <span className="font-semibold text-indigo-600">{formatNumber(payload[0].value)}</span>
-            {' '}{platform === 'twitch' ? 'followers' : 'subscribers'}
+            <span className="font-semibold" style={{ color: currentMetric.color }}>
+              {formatNumber(payload[0].value)}
+            </span>
+            {' '}{currentMetric.label.toLowerCase().replace(' growth', '').replace(' count', '')}
           </p>
         </div>
       );
@@ -598,10 +702,21 @@ function GrowthChart({ data, range, onRangeChange, platform }) {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {platform === 'twitch' ? 'Follower' : 'Subscriber'} Growth
-        </h3>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-semibold text-gray-900">Growth Analytics</h3>
+          <select
+            value={metric}
+            onChange={(e) => onMetricChange(e.target.value)}
+            className="px-3 py-1.5 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+          >
+            {metrics.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
           {ranges.map((r) => (
             <button
@@ -622,9 +737,9 @@ function GrowthChart({ data, range, onRangeChange, platform }) {
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={filteredData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
             <defs>
-              <linearGradient id="subsGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+              <linearGradient id={`${metric}Gradient`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={currentMetric.color} stopOpacity={0.2} />
+                <stop offset="95%" stopColor={currentMetric.color} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
@@ -636,7 +751,7 @@ function GrowthChart({ data, range, onRangeChange, platform }) {
               minTickGap={50}
             />
             <YAxis
-              domain={[minSubs - padding, maxSubs + padding]}
+              domain={[minValue - padding, maxValue + padding]}
               axisLine={false}
               tickLine={false}
               tick={{ fill: '#9ca3af', fontSize: 12 }}
@@ -646,12 +761,12 @@ function GrowthChart({ data, range, onRangeChange, platform }) {
             <Tooltip content={<CustomTooltip />} />
             <Area
               type="monotone"
-              dataKey="subscribers"
-              stroke="#6366f1"
+              dataKey={currentMetric.dataKey}
+              stroke={currentMetric.color}
               strokeWidth={2}
-              fill="url(#subsGradient)"
+              fill={`url(#${metric}Gradient)`}
               dot={false}
-              activeDot={{ r: 6, fill: '#6366f1', stroke: '#fff', strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: currentMetric.color, stroke: '#fff', strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -660,7 +775,7 @@ function GrowthChart({ data, range, onRangeChange, platform }) {
         <span>{filteredData.length} data points</span>
         <span className="w-1 h-1 rounded-full bg-gray-300"></span>
         <span>
-          {formatNumber(filteredData[filteredData.length - 1]?.subscribers - filteredData[0]?.subscribers)} net growth
+          {formatNumber(filteredData[filteredData.length - 1]?.[currentMetric.dataKey] - filteredData[0]?.[currentMetric.dataKey])} net growth
         </span>
       </div>
     </div>
