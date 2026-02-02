@@ -703,19 +703,20 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold text-gray-900">Growth Analytics</h3>
-          <select
-            value={metric}
-            onChange={(e) => onMetricChange(e.target.value)}
-            className="px-3 py-1.5 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
-          >
-            {metrics.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-lg">
+          {metrics.map((m) => (
+            <button
+              key={m.value}
+              onClick={() => onMetricChange(m.value)}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                metric === m.value
+                  ? 'bg-white text-indigo-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {m.label}
+            </button>
+          ))}
         </div>
         <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
           {ranges.map((r) => (
