@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Search as SearchIcon, Youtube, Twitch, Instagram, User, AlertCircle } from 'lucide-react';
+import { Search as SearchIcon, Youtube, Twitch, Instagram, User, AlertCircle, ArrowRight } from 'lucide-react';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats } from '../services/creatorService';
@@ -13,10 +13,10 @@ const platformIcons = {
 };
 
 const platformColors = {
-  youtube: 'bg-red-600',
-  twitch: 'bg-purple-600',
-  instagram: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500',
-  tiktok: 'bg-pink-500',
+  youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600' },
+  twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
+  instagram: { bg: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', light: 'bg-purple-50', text: 'text-purple-600' },
+  tiktok: { bg: 'bg-pink-500', light: 'bg-pink-50', text: 'text-pink-500' },
 };
 
 const platforms = [
@@ -43,7 +43,6 @@ export default function Search() {
     }
   }, [searchParams, selectedPlatform]);
 
-  // Clear results when switching platforms
   const handlePlatformChange = (platformId) => {
     setSelectedPlatform(platformId);
     setResults([]);
@@ -99,125 +98,161 @@ export default function Search() {
     }
   };
 
+  const currentPlatform = platforms.find(p => p.id === selectedPlatform);
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Search Creators</h1>
+    <>
+      <SEO
+        title="Search Creators"
+        description="Search for YouTube, Twitch, and other social media creators to view their statistics and analytics."
+      />
 
-      {/* Platform Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {platforms.map((platform) => {
-          const Icon = platform.icon;
-          return (
-            <button
-              key={platform.id}
-              onClick={() => platform.available && handlePlatformChange(platform.id)}
-              disabled={!platform.available}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedPlatform === platform.id
-                  ? platformColors[platform.id] + ' text-white'
-                  : platform.available
-                  ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                  : 'bg-gray-800/50 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              {Icon && <Icon className="w-5 h-5" />}
-              {platform.name}
-              {!platform.available && <span className="text-xs">(Soon)</span>}
-            </button>
-          );
-        })}
-      </div>
-
-      <form onSubmit={handleSubmit} className="mb-8">
-        <div className="relative">
-          <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search ${selectedPlatform} creators...`}
-            className="w-full pl-12 pr-32 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 rounded-lg font-medium transition-colors"
-          >
-            {loading ? 'Searching...' : 'Search'}
-          </button>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-100">
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex items-center gap-3 mb-2">
+              <SearchIcon className="w-8 h-8 text-indigo-600" />
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Search Creators</h1>
+            </div>
+            <p className="text-gray-500">Find any creator and view their detailed statistics</p>
+          </div>
         </div>
-      </form>
 
-      {/* Error State */}
-      {error && (
-        <div className="flex items-center gap-3 p-4 mb-6 bg-red-900/30 border border-red-700 rounded-lg text-red-400">
-          <AlertCircle className="w-5 h-5 flex-shrink-0" />
-          <p>{error}</p>
-        </div>
-      )}
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+          {/* Platform Tabs */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {platforms.map((platform) => {
+              const Icon = platform.icon;
+              const isSelected = selectedPlatform === platform.id;
+              const colors = platformColors[platform.id];
 
-      {/* Loading State */}
-      {loading && (
-        <div className="text-center py-12">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">Searching {selectedPlatform}...</p>
-        </div>
-      )}
+              return (
+                <button
+                  key={platform.id}
+                  onClick={() => platform.available && handlePlatformChange(platform.id)}
+                  disabled={!platform.available}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
+                    isSelected
+                      ? `${colors.bg} text-white shadow-lg`
+                      : platform.available
+                      ? 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:shadow-md'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  {Icon && <Icon className="w-5 h-5" />}
+                  {platform.name}
+                  {!platform.available && <span className="text-xs opacity-75">(Soon)</span>}
+                </button>
+              );
+            })}
+          </div>
 
-      {/* No Results */}
-      {!loading && searched && !error && results.length === 0 && (
-        <div className="text-center py-12 bg-gray-800 rounded-lg border border-gray-700">
-          <User className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No creators found</h3>
-          <p className="text-gray-400 mb-4">
-            We couldn't find any {selectedPlatform} creators matching "{query}"
-          </p>
-          <p className="text-sm text-gray-500">
-            Try searching for a different name or check the spelling
-          </p>
-        </div>
-      )}
-
-      {/* Results */}
-      {results.length > 0 && (
-        <div className="space-y-4">
-          <p className="text-gray-400 mb-4">{results.length} creators found</p>
-          {results.map((creator) => {
-            const Icon = platformIcons[creator.platform] || User;
-            return (
-              <Link
-                key={creator.platformId}
-                to={`/${creator.platform}/${creator.username}`}
-                className="flex items-center gap-4 p-4 bg-gray-800 border border-gray-700 rounded-lg hover:border-gray-600 transition-colors"
-              >
-                <img
-                  src={creator.profileImage || '/placeholder-avatar.svg'}
-                  alt={creator.displayName}
-                  className="w-16 h-16 rounded-full object-cover bg-gray-700"
-                  onError={(e) => {
-                    e.target.src = '/placeholder-avatar.svg';
-                  }}
+          {/* Search Form */}
+          <form onSubmit={handleSubmit} className="mb-8">
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-10 group-focus-within:opacity-20 blur transition duration-300"></div>
+              <div className="relative flex items-center bg-white rounded-2xl shadow-sm border border-gray-100">
+                <SearchIcon className="absolute left-5 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={`Search ${currentPlatform?.name || ''} creators...`}
+                  className="w-full pl-14 pr-36 py-4 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl"
                 />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-semibold text-lg truncate">{creator.displayName}</h3>
-                    <span className={`px-2 py-0.5 rounded text-xs ${platformColors[creator.platform]} text-white flex-shrink-0`}>
-                      <Icon className="w-3 h-3 inline mr-1" />
-                      {creator.platform}
-                    </span>
-                  </div>
-                  <p className="text-gray-400 truncate">@{creator.username}</p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="font-semibold">{formatNumber(creator.subscribers || creator.followers)}</p>
-                  <p className="text-sm text-gray-400">{creator.platform === 'twitch' ? 'followers' : 'subscribers'}</p>
-                </div>
-              </Link>
-            );
-          })}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="absolute right-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25"
+                >
+                  {loading ? 'Searching...' : 'Search'}
+                </button>
+              </div>
+            </div>
+          </form>
+
+          {/* Error State */}
+          {error && (
+            <div className="flex items-center gap-3 p-4 mb-6 bg-red-50 border border-red-100 rounded-xl text-red-600">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <p>{error}</p>
+            </div>
+          )}
+
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-16">
+              <div className="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-500">Searching {currentPlatform?.name}...</p>
+            </div>
+          )}
+
+          {/* No Results */}
+          {!loading && searched && !error && results.length === 0 && (
+            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No creators found</h3>
+              <p className="text-gray-500 mb-4">
+                We couldn't find any {currentPlatform?.name} creators matching "{query}"
+              </p>
+              <p className="text-sm text-gray-400">
+                Try searching for a different name or check the spelling
+              </p>
+            </div>
+          )}
+
+          {/* Results */}
+          {results.length > 0 && (
+            <div>
+              <p className="text-gray-500 mb-4">{results.length} creators found</p>
+              <div className="space-y-3">
+                {results.map((creator) => {
+                  const Icon = platformIcons[creator.platform] || User;
+                  const colors = platformColors[creator.platform];
+
+                  return (
+                    <Link
+                      key={creator.platformId}
+                      to={`/${creator.platform}/${creator.username}`}
+                      className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl hover:shadow-lg hover:border-gray-200 transition-all duration-200 group"
+                    >
+                      <img
+                        src={creator.profileImage || '/placeholder-avatar.svg'}
+                        alt={creator.displayName}
+                        className="w-16 h-16 rounded-xl object-cover bg-gray-100"
+                        onError={(e) => {
+                          e.target.src = '/placeholder-avatar.svg';
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <h3 className="font-semibold text-lg text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+                            {creator.displayName}
+                          </h3>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium ${colors.bg} text-white`}>
+                            <Icon className="w-3 h-3" />
+                            {creator.platform}
+                          </span>
+                        </div>
+                        <p className="text-gray-500 truncate">@{creator.username}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-bold text-gray-900 text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
+                        <p className="text-sm text-gray-500">{creator.platform === 'twitch' ? 'followers' : 'subscribers'}</p>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }
 

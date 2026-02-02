@@ -1,14 +1,38 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, Instagram } from 'lucide-react';
+import { Search, Youtube, Twitch, Instagram, TrendingUp, BarChart3, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 
 const platforms = [
-  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', stats: '72M+ channels', available: true },
-  { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', stats: '7M+ channels', available: true },
-  { id: 'tiktok', name: 'TikTok', icon: null, color: 'bg-pink-500', stats: 'Coming Soon', available: false },
-  { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', stats: 'Coming Soon', available: false },
+  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-600', stats: '72M+ channels', available: true },
+  { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50', textColor: 'text-purple-600', stats: '7M+ channels', available: true },
+  { id: 'tiktok', name: 'TikTok', icon: null, color: 'from-pink-500 to-pink-600', bgColor: 'bg-pink-50', textColor: 'text-pink-600', stats: 'Coming Soon', available: false },
+  { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'from-purple-500 to-orange-500', bgColor: 'bg-gradient-to-br from-purple-50 to-orange-50', textColor: 'text-purple-600', stats: 'Coming Soon', available: false },
+];
+
+const features = [
+  {
+    icon: Search,
+    title: 'Search Creators',
+    description: 'Find any creator across YouTube and Twitch with real-time data.',
+    color: 'from-blue-500 to-indigo-600',
+    bgColor: 'bg-blue-50',
+  },
+  {
+    icon: TrendingUp,
+    title: 'Track Growth',
+    description: 'See daily, weekly, and monthly follower and view growth statistics.',
+    color: 'from-emerald-500 to-teal-600',
+    bgColor: 'bg-emerald-50',
+  },
+  {
+    icon: BarChart3,
+    title: 'Compare & Rank',
+    description: 'Compare creators and see how they rank against others.',
+    color: 'from-purple-500 to-violet-600',
+    bgColor: 'bg-purple-50',
+  },
 ];
 
 export default function Home() {
@@ -24,124 +48,165 @@ export default function Home() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Home"
         description="Track YouTube, Twitch, TikTok, Instagram & Twitter statistics. View subscriber counts, earnings estimates, rankings and growth analytics for your favorite creators."
         keywords="youtube statistics, twitch statistics, subscriber count, social blade alternative, creator analytics, earnings calculator"
       />
-      <div className="min-h-[calc(100vh-73px)]">
+
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* Hero Section */}
-        <section className="py-20 px-4 text-center bg-gradient-to-b from-gray-800 to-gray-900">
-        <h1 className="text-5xl font-bold mb-4">
-          Social Media <span className="text-blue-500">Statistics</span>
-        </h1>
-        <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-          Track followers, views, and growth for YouTube, Twitch, TikTok, and Instagram creators.
-        </p>
-
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for a creator (e.g., MrBeast, Ninja, PewDiePie)"
-              className="w-full pl-12 pr-4 py-4 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-lg"
-            />
-            <button
-              type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
-            >
-              Search
-            </button>
+        <section className="relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-100 rounded-full opacity-50 blur-3xl"></div>
+            <div className="absolute top-20 -left-40 w-80 h-80 bg-purple-100 rounded-full opacity-50 blur-3xl"></div>
           </div>
-        </form>
 
-        {/* Platform Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-          {platforms.map((platform) => {
-            const content = (
-              <>
-                <div className={`w-12 h-12 ${platform.color} rounded-lg flex items-center justify-center mx-auto mb-3 ${!platform.available ? 'opacity-50' : ''}`}>
-                  {platform.icon ? (
-                    <platform.icon className="w-6 h-6 text-white" />
-                  ) : (
-                    <span className="text-white font-bold text-sm">{platform.name.slice(0, 2)}</span>
-                  )}
+          <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-16 pb-24">
+            <div className="text-center max-w-4xl mx-auto">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-sm font-medium text-indigo-600 mb-8">
+                <span className="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></span>
+                Real-time creator analytics
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight">
+                Social Media{' '}
+                <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  Statistics
+                </span>
+              </h1>
+
+              <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Track followers, views, and growth for your favorite YouTube and Twitch creators. Get detailed analytics and insights.
+              </p>
+
+              {/* Search Bar */}
+              <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-16">
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-20 group-hover:opacity-30 blur transition duration-300"></div>
+                  <div className="relative flex items-center bg-white rounded-2xl shadow-xl shadow-gray-200/50">
+                    <Search className="absolute left-5 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search for a creator (e.g., MrBeast, Ninja)"
+                      className="w-full pl-14 pr-36 py-5 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl"
+                    />
+                    <button
+                      type="submit"
+                      className="absolute right-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30"
+                    >
+                      Search
+                    </button>
+                  </div>
                 </div>
-                <h3 className={`font-semibold mb-1 ${platform.available ? 'group-hover:text-blue-400' : ''} transition-colors`}>
-                  {platform.name}
-                </h3>
-                <p className="text-sm text-gray-500">{platform.stats}</p>
-              </>
-            );
+              </form>
 
-            if (platform.available) {
-              return (
-                <Link
-                  key={platform.id}
-                  to={`/rankings/${platform.id}`}
-                  className="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:border-gray-600 transition-colors group"
-                >
-                  {content}
-                </Link>
-              );
-            }
+              {/* Platform Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                {platforms.map((platform) => {
+                  const Icon = platform.icon;
 
-            return (
-              <div
-                key={platform.id}
-                className="bg-gray-800/50 border border-gray-700/50 rounded-lg p-6 cursor-not-allowed opacity-60"
-              >
-                {content}
-              </div>
-            );
-          })}
-        </div>
-      </section>
+                  if (platform.available) {
+                    return (
+                      <Link
+                        key={platform.id}
+                        to={`/rankings/${platform.id}`}
+                        className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-gray-200 transition-all duration-300 hover:-translate-y-1"
+                      >
+                        <div className={`w-14 h-14 ${platform.bgColor} rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                          {Icon ? (
+                            <Icon className={`w-7 h-7 ${platform.textColor}`} />
+                          ) : (
+                            <span className={`${platform.textColor} font-bold text-lg`}>{platform.name.slice(0, 2)}</span>
+                          )}
+                        </div>
+                        <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
+                          {platform.name}
+                        </h3>
+                        <p className="text-sm text-gray-500">{platform.stats}</p>
+                      </Link>
+                    );
+                  }
 
-      {/* Features Section */}
-      <section className="py-16 px-4 bg-gray-900">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Track Creator Growth</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-blue-500" />
+                  return (
+                    <div
+                      key={platform.id}
+                      className="relative bg-gray-50/50 rounded-2xl p-6 border border-gray-100 opacity-60 cursor-not-allowed"
+                    >
+                      <div className={`w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                        {Icon ? (
+                          <Icon className="w-7 h-7 text-gray-400" />
+                        ) : (
+                          <span className="text-gray-400 font-bold text-lg">{platform.name.slice(0, 2)}</span>
+                        )}
+                      </div>
+                      <h3 className="font-semibold text-gray-400 mb-1">{platform.name}</h3>
+                      <p className="text-sm text-gray-400">{platform.stats}</p>
+                    </div>
+                  );
+                })}
               </div>
-              <h3 className="text-xl font-semibold mb-2">Search Creators</h3>
-              <p className="text-gray-400">
-                Find any creator across YouTube, Twitch, TikTok, and Instagram.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Track Growth</h3>
-              <p className="text-gray-400">
-                See daily, weekly, and monthly follower and view growth statistics.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Compare & Rank</h3>
-              <p className="text-gray-400">
-                Compare creators and see how they rank against others in their category.
-              </p>
             </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-24 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                Track Creator Growth
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Everything you need to analyze and track social media creators
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300"
+                >
+                  <div className={`w-14 h-14 ${feature.bgColor} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <feature.icon className={`w-7 h-7 bg-gradient-to-r ${feature.color} bg-clip-text`} style={{ color: feature.color.includes('emerald') ? '#10b981' : feature.color.includes('blue') ? '#6366f1' : '#8b5cf6' }} />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-24">
+          <div className="max-w-4xl mx-auto">
+            <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-8 sm:p-12 text-center">
+              <div className="absolute inset-0 bg-grid-white/10"></div>
+              <div className="relative">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                  Start tracking your favorite creators
+                </h2>
+                <p className="text-indigo-100 mb-8 max-w-xl mx-auto">
+                  Search for any YouTube or Twitch creator and get detailed analytics instantly.
+                </p>
+                <Link
+                  to="/search"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors shadow-lg"
+                >
+                  Get Started
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </>
   );
 }
