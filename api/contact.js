@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'ShinyPull Contact <onboarding@resend.dev>',
+        from: 'ShinyPull <contact@shinypull.com>',
         to: CONTACT_EMAIL,
         reply_to: email,
         subject: `Contact Form: ${name}`,
