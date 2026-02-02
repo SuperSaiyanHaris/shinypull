@@ -2,8 +2,8 @@ name: Daily Stats Collection
 
 on:
   schedule:
-    # Run every day at 00:00 UTC (can adjust timing)
-    - cron: '0 0 * * *'
+    # Run every day at 8 AM CST (14:00 UTC)
+    - cron: '0 14 * * *'
   workflow_dispatch: # Allow manual trigger from GitHub UI
 
 jobs:

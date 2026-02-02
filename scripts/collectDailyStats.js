@@ -116,28 +116,30 @@ async function collectDailyStats() {
       if (creator.platform === 'youtube') {
         stats = await fetchYouTubeStats(creator.platform_id);
         
-        // Save to database
-        await supabase.from('creator_stats').insert({
+        // Save to database (upsert to handle re-runs)
+        const today = new Date().toISOString().split('T')[0];
+        await supabase.from('creator_stats').upsert({
           creator_id: creator.id,
-          recorded_at: new Date().toISOString().split('T')[0],
+          recorded_at: today,
           subscribers: stats.subscribers,
           followers: stats.subscribers,
           total_views: stats.total_views,
           total_posts: stats.total_posts,
-        });
+        }, { onConflict: 'creator_id,recorded_at' });
         
         console.log(`✅ ${creator.display_name}: ${(stats.subscribers / 1000000).toFixed(1)}M subs, ${(stats.total_views / 1000000000).toFixed(2)}B views`);
       } else if (creator.platform === 'twitch') {
         stats = await fetchTwitchStats(creator.username);
         
-        await supabase.from('creator_stats').insert({
+        const twitchToday = new Date().toISOString().split('T')[0];
+        await supabase.from('creator_stats').upsert({
           creator_id: creator.id,
-          recorded_at: new Date().toISOString().split('T')[0],
+          recorded_at: twitchToday,
           subscribers: stats.followers,
           followers: stats.followers,
           total_views: stats.total_views,
           total_posts: stats.total_posts,
-        });
+        }, { onConflict: 'creator_id,recorded_at' });
         
         console.log(`✅ ${creator.display_name}: ${(stats.followers / 1000000).toFixed(1)}M followers, ${(stats.total_views / 1000000).toFixed(1)}M views`);
       }
