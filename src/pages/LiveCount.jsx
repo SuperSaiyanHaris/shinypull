@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Youtube, Twitch, ExternalLink, Share2, AlertCircle, TrendingUp, TrendingDown, Info } from 'lucide-react';
+import { Youtube, Twitch, ExternalLink, Share2, AlertCircle } from 'lucide-react';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import Odometer from '../components/Odometer';
@@ -32,9 +32,6 @@ export default function LiveCount() {
   const [estimatedCount, setEstimatedCount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [sessionChange, setSessionChange] = useState(0);
-  const [lastChange, setLastChange] = useState(0);
-  const [updateCount, setUpdateCount] = useState(0);
 
   const config = platformConfig[platform] || platformConfig.youtube;
   const Icon = config.icon;
@@ -99,12 +96,6 @@ export default function LiveCount() {
           const direction = Math.random() > 0.15 ? 1 : -1;
           const magnitude = Math.random() * baseGrowthPerSecond * (interval / 1000) * 2;
           const change = Math.round(direction * magnitude);
-
-          if (change !== 0) {
-            setLastChange(change);
-            setSessionChange(s => s + change);
-            setUpdateCount(c => c + 1);
-          }
 
           return Math.max(0, prev + change);
         });
@@ -206,7 +197,7 @@ export default function LiveCount() {
             </div>
 
             {/* The Big Counter */}
-            <div className="mb-6 sm:mb-8">
+            <div className="mb-8 sm:mb-12">
               <div className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black ${config.color} tracking-tight`}>
                 {estimatedCount !== null && (
                   <Odometer value={estimatedCount} duration={300} />
@@ -217,42 +208,14 @@ export default function LiveCount() {
               </p>
             </div>
 
-            {/* Change Indicator */}
-            {lastChange !== 0 && (
-              <div className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-base sm:text-lg font-semibold mb-6 sm:mb-8 ${
-                lastChange > 0
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                  : 'bg-red-500/20 text-red-400 border border-red-500/30'
-              }`}>
-                {lastChange > 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
-                {lastChange > 0 ? '+' : ''}{lastChange.toLocaleString()}
-              </div>
-            )}
-
-            {/* Session Stats */}
-            {updateCount > 5 && (
-              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-8 sm:mb-10 text-sm sm:text-base">
-                <div className="bg-gray-800/50 rounded-xl px-4 py-2 border border-gray-700/50">
-                  <span className="text-gray-400">Session: </span>
-                  <span className={`font-bold ${sessionChange >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {sessionChange >= 0 ? '+' : ''}{sessionChange.toLocaleString()}
-                  </span>
-                </div>
-                <div className="bg-gray-800/50 rounded-xl px-4 py-2 border border-gray-700/50">
-                  <span className="text-gray-400">Updates: </span>
-                  <span className="font-bold text-white">{updateCount.toLocaleString()}</span>
-                </div>
-              </div>
-            )}
-
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-8">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <button
                 onClick={handleShare}
                 className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-xl transition-colors border border-gray-700"
               >
                 <Share2 className="w-5 h-5" />
-                <span className="hidden sm:inline">Share</span>
+                Share
               </button>
               <Link
                 to={`/${platform}/${username}`}
@@ -261,15 +224,6 @@ export default function LiveCount() {
                 <ExternalLink className="w-5 h-5" />
                 Full Profile
               </Link>
-            </div>
-
-            {/* Estimate Disclaimer */}
-            <div className="flex items-start sm:items-center justify-center gap-2 text-gray-500 text-xs sm:text-sm max-w-lg mx-auto">
-              <Info className="w-4 h-4 flex-shrink-0 mt-0.5 sm:mt-0" />
-              <p className="text-left sm:text-center">
-                This is an <span className="text-gray-400">estimated</span> count based on the channel's {config.label} and typical growth patterns.
-                <Link to="/terms" className="text-indigo-400 hover:text-indigo-300 ml-1">Learn more</Link>
-              </p>
             </div>
           </div>
         </div>
