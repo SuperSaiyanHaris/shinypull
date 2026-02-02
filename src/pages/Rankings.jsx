@@ -11,12 +11,6 @@ const platforms = [
   { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', lightBg: 'bg-purple-50', textColor: 'text-purple-500', available: false },
 ];
 
-const rankTypes = [
-  { id: 'subscribers', name: 'Top Subscribers', icon: Users },
-  { id: 'views', name: 'Most Views', icon: Eye },
-  { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
-];
-
 export default function Rankings() {
   const { platform: urlPlatform } = useParams();
   const navigate = useNavigate();
@@ -25,6 +19,12 @@ export default function Rankings() {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const rankTypes = [
+    { id: 'subscribers', name: selectedPlatform === 'twitch' ? 'Top Followers' : 'Top Subscribers', icon: Users },
+    { id: 'views', name: 'Most Views', icon: Eye },
+    { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
+  ];
 
   useEffect(() => {
     if (urlPlatform && urlPlatform !== selectedPlatform) {
