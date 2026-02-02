@@ -31,9 +31,18 @@ async function getTwitchAccessToken() {
 }
 
 async function fetchYouTubeStats(channelId) {
+  if (!YOUTUBE_API_KEY) {
+    throw new Error('YouTube API key not configured');
+  }
+
   const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=${channelId}&key=${YOUTUBE_API_KEY}`;
   const response = await fetch(url);
   const data = await response.json();
+
+  // Check for API errors first
+  if (data.error) {
+    throw new Error(`YouTube API error: ${data.error.message || data.error.code}`);
+  }
 
   if (!data.items || data.items.length === 0) {
     throw new Error(`YouTube channel not found: ${channelId}`);
@@ -93,6 +102,13 @@ async function fetchTwitchStats(username) {
 async function collectDailyStats() {
   console.log('📊 Starting daily stats collection...');
   console.log(`   Date: ${new Date().toISOString().split('T')[0]}\n`);
+
+  // Check credentials
+  console.log('🔑 Checking credentials...');
+  console.log(`   YouTube API Key: ${YOUTUBE_API_KEY ? '✅ Set' : '❌ Missing'}`);
+  console.log(`   Twitch Client ID: ${TWITCH_CLIENT_ID ? '✅ Set' : '❌ Missing'}`);
+  console.log(`   Twitch Client Secret: ${TWITCH_CLIENT_SECRET ? '✅ Set' : '❌ Missing'}`);
+  console.log('');
 
   // Get all creators from database
   const { data: creators, error: fetchError } = await supabase
