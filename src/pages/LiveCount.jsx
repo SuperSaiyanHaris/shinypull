@@ -215,7 +215,7 @@ export default function LiveCount() {
 
             {/* The Big Number */}
             <div className="relative mb-8">
-              <div className={`text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tabular-nums tracking-tight bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent transition-all duration-300`}>
+              <div className={`text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tabular-nums tracking-tight ${platform === 'youtube' ? 'text-red-500' : 'text-purple-500'} transition-all duration-300`}>
                 <AnimatedCounter value={count || 0} />
               </div>
               <p className="text-xl md:text-2xl text-gray-400 mt-4 font-medium">
