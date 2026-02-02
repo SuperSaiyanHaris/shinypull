@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle, Calendar } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
@@ -32,6 +33,7 @@ export default function CreatorProfile() {
   const [statsHistory, setStatsHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [chartRange, setChartRange] = useState(30);
 
   useEffect(() => {
     loadCreator();
@@ -68,7 +70,7 @@ export default function CreatorProfile() {
             totalPosts: channelData.totalPosts,
           });
 
-          const history = await getCreatorStats(dbCreator.id, 30);
+          const history = await getCreatorStats(dbCreator.id, 90);
           setStatsHistory(history || []);
         } catch (dbErr) {
           console.warn('Failed to save to database:', dbErr);
@@ -326,6 +328,16 @@ export default function CreatorProfile() {
               </div>
             )}
 
+            {/* Growth Chart */}
+            {statsHistory.length >= 2 && (
+              <GrowthChart
+                data={statsHistory}
+                range={chartRange}
+                onRangeChange={setChartRange}
+                platform={platform}
+              />
+            )}
+
             {/* Daily Metrics Table */}
             {metrics ? (
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -529,4 +541,128 @@ function formatEarnings(low, high) {
     return `$${Math.round(num)}`;
   };
   return `${formatCurrency(low)} - ${formatCurrency(high)}`;
+}
+
+function GrowthChart({ data, range, onRangeChange, platform }) {
+  const ranges = [
+    { label: '30D', value: 30 },
+    { label: '60D', value: 60 },
+    { label: '90D', value: 90 },
+    { label: 'All', value: 9999 },
+  ];
+
+  const filteredData = data
+    .filter((stat) => {
+      if (range === 9999) return true;
+      const statDate = new Date(stat.recorded_at);
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - range);
+      return statDate >= cutoffDate;
+    })
+    .map((stat) => ({
+      date: stat.recorded_at,
+      subscribers: stat.subscribers || stat.followers || 0,
+      views: stat.total_views || 0,
+      label: new Date(stat.recorded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    }));
+
+  if (filteredData.length < 2) {
+    return null;
+  }
+
+  const minSubs = Math.min(...filteredData.map(d => d.subscribers));
+  const maxSubs = Math.max(...filteredData.map(d => d.subscribers));
+  const padding = Math.max((maxSubs - minSubs) * 0.1, 100);
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-3">
+          <p className="text-sm font-medium text-gray-900 mb-1">
+            {new Date(payload[0].payload.date).toLocaleDateString('en-US', {
+              weekday: 'short',
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric'
+            })}
+          </p>
+          <p className="text-sm text-gray-600">
+            <span className="font-semibold text-indigo-600">{formatNumber(payload[0].value)}</span>
+            {' '}{platform === 'twitch' ? 'followers' : 'subscribers'}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-gray-900">
+          {platform === 'twitch' ? 'Follower' : 'Subscriber'} Growth
+        </h3>
+        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+          {ranges.map((r) => (
+            <button
+              key={r.value}
+              onClick={() => onRangeChange(r.value)}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                range === r.value
+                  ? 'bg-white text-indigo-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={filteredData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+            <defs>
+              <linearGradient id="subsGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="label"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#9ca3af', fontSize: 12 }}
+              interval="preserveStartEnd"
+              minTickGap={50}
+            />
+            <YAxis
+              domain={[minSubs - padding, maxSubs + padding]}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#9ca3af', fontSize: 12 }}
+              tickFormatter={(value) => formatNumber(value)}
+              width={60}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="subscribers"
+              stroke="#6366f1"
+              strokeWidth={2}
+              fill="url(#subsGradient)"
+              dot={false}
+              activeDot={{ r: 6, fill: '#6366f1', stroke: '#fff', strokeWidth: 2 }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="flex items-center justify-center gap-4 mt-4 text-sm text-gray-500">
+        <span>{filteredData.length} data points</span>
+        <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+        <span>
+          {formatNumber(filteredData[filteredData.length - 1]?.subscribers - filteredData[0]?.subscribers)} net growth
+        </span>
+      </div>
+    </div>
+  );
 }
