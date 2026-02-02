@@ -432,7 +432,7 @@ export default function CreatorProfile() {
                       {metrics.dailyStats.map((stat) => (
                         <tr key={stat.recorded_at} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                           <td className="px-6 py-4 text-gray-900">
-                            {new Date(stat.recorded_at).toLocaleDateString('en-US', {
+                            {new Date(stat.recorded_at + 'T12:00:00').toLocaleDateString('en-US', {
                               weekday: 'short',
                               month: 'short',
                               day: 'numeric'
@@ -664,7 +664,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       subscribers: stat.subscribers || stat.followers || 0,
       views: stat.total_views || 0,
       videos: stat.total_posts || 0,
-      label: new Date(stat.recorded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      label: new Date(stat.recorded_at + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     }));
 
   if (filteredData.length < 2) {
@@ -681,7 +681,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-3">
           <p className="text-sm font-medium text-gray-900 mb-1">
-            {new Date(payload[0].payload.date).toLocaleDateString('en-US', {
+            {new Date(payload[0].payload.date + 'T12:00:00').toLocaleDateString('en-US', {
               weekday: 'short',
               month: 'short',
               day: 'numeric',
