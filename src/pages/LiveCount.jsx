@@ -55,7 +55,48 @@ export default function LiveCount() {
           setCreator(data);
           const count = data.subscribers || data.followers || 0;
           setBaseCount(count);
-          setEstimatedCount(count);
+          
+          // Check localStorage for previous count to make refresh more realistic
+          const storageKey = `livecount_${platform}_${username}`;
+          const stored = localStorage.getItem(storageKey);
+          
+          if (stored) {
+            try {
+              const { count: lastCount, timestamp } = JSON.parse(stored);
+              const now = Date.now();
+              const hoursSince = (now - timestamp) / (1000 * 60 * 60);
+              
+              // If data is less than 24 hours old, calculate estimated growth
+              if (hoursSince < 24) {
+                // Calculate growth multiplier based on subscriber count
+                let growthMultiplier = 1;
+                if (count > 100000000) growthMultiplier = 3;
+                else if (count > 50000000) growthMultiplier = 2.5;
+                else if (count > 10000000) growthMultiplier = 2;
+                else if (count > 1000000) growthMultiplier = 1.5;
+                else if (count > 100000) growthMultiplier = 1;
+                else growthMultiplier = 0.5;
+                
+                const baseGrowthPerSecond = config.avgGrowthPerSecond * growthMultiplier;
+                const secondsSince = hoursSince * 3600;
+                const estimatedGrowth = Math.round(baseGrowthPerSecond * secondsSince);
+                
+                // Start from last known count plus estimated growth, but don't exceed API count + reasonable buffer
+                const estimatedStart = Math.min(
+                  lastCount + estimatedGrowth,
+                  count + (baseGrowthPerSecond * 3600) // Max 1 hour ahead of API
+                );
+                
+                setEstimatedCount(Math.max(count, estimatedStart));
+              } else {
+                setEstimatedCount(count);
+              }
+            } catch (e) {
+              setEstimatedCount(count);
+            }
+          } else {
+            setEstimatedCount(count);
+          }
         } else {
           setError('Creator not found');
         }
@@ -68,7 +109,7 @@ export default function LiveCount() {
     };
 
     fetchCreator();
-  }, [platform, username]);
+  }, [platform, username, config.avgGrowthPerSecond]);
 
   // Simulate live count changes
   useEffect(() => {
@@ -96,8 +137,17 @@ export default function LiveCount() {
           const direction = Math.random() > 0.15 ? 1 : -1;
           const magnitude = Math.random() * baseGrowthPerSecond * (interval / 1000) * 2;
           const change = Math.round(direction * magnitude);
+          
+          const newCount = Math.max(0, prev + change);
+          
+          // Save to localStorage on each update
+          const storageKey = `livecount_${platform}_${username}`;
+          localStorage.setItem(storageKey, JSON.stringify({
+            count: newCount,
+            timestamp: Date.now()
+          }));
 
-          return Math.max(0, prev + change);
+          return newCount;
         });
 
         updateInterval();
