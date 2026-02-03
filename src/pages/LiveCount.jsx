@@ -25,6 +25,22 @@ const platformConfig = {
   },
 };
 
+// Helper function to generate realistic random offset based on channel size
+const getRandomOffset = (count) => {
+  let maxOffset = 0;
+  
+  if (count > 100000000) maxOffset = 50000;      // 100M+: ±50k
+  else if (count > 50000000) maxOffset = 25000;  // 50M-100M: ±25k
+  else if (count > 10000000) maxOffset = 10000;  // 10M-50M: ±10k
+  else if (count > 1000000) maxOffset = 5000;    // 1M-10M: ±5k
+  else if (count > 100000) maxOffset = 1000;     // 100k-1M: ±1k
+  else if (count > 10000) maxOffset = 500;       // 10k-100k: ±500
+  else maxOffset = 100;                          // <10k: ±100
+  
+  // Return random offset between -maxOffset and +maxOffset
+  return Math.floor(Math.random() * (maxOffset * 2 + 1)) - maxOffset;
+};
+
 export default function LiveCount() {
   const { platform, username } = useParams();
   const [creator, setCreator] = useState(null);
@@ -89,13 +105,18 @@ export default function LiveCount() {
                 
                 setEstimatedCount(Math.max(count, estimatedStart));
               } else {
-                setEstimatedCount(count);
+                // Add random offset for fresh start
+                const randomOffset = getRandomOffset(count);
+                setEstimatedCount(count + randomOffset);
               }
             } catch (e) {
-              setEstimatedCount(count);
+              const randomOffset = getRandomOffset(count);
+              setEstimatedCount(count + randomOffset);
             }
           } else {
-            setEstimatedCount(count);
+            // Add random offset for first-time load
+            const randomOffset = getRandomOffset(count);
+            setEstimatedCount(count + randomOffset);
           }
         } else {
           setError('Creator not found');
@@ -135,7 +156,9 @@ export default function LiveCount() {
         setEstimatedCount(prev => {
           // Random change: mostly positive, occasionally negative
           const direction = Math.random() > 0.15 ? 1 : -1;
-          const magnitude = Math.random() * baseGrowthPerSecond * (interval / 1000) * 2;
+          // Increase multiplier for larger, more realistic changes
+          const magnitudeMultiplier = subscribers > 10000000 ? 100 : subscribers > 1000000 ? 50 : 10;
+          const magnitude = Math.random() * baseGrowthPerSecond * (interval / 1000) * magnitudeMultiplier;
           const change = Math.round(direction * magnitude);
           
           const newCount = Math.max(0, prev + change);
