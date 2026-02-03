@@ -5,6 +5,7 @@ import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeSe
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import Odometer from '../components/Odometer';
 import SEO from '../components/SEO';
+import { analytics } from '../lib/analytics';
 
 const platformConfig = {
   youtube: {
@@ -71,6 +72,9 @@ export default function LiveCount() {
           setCreator(data);
           const count = data.subscribers || data.followers || 0;
           setBaseCount(count);
+          
+          // Track live count view
+          analytics.viewLiveCount(platform, username, data.displayName, count);
           
           // Check localStorage for previous count to make refresh more realistic
           const storageKey = `livecount_${platform}_${username}`;
@@ -193,11 +197,13 @@ export default function LiveCount() {
     if (navigator.share) {
       try {
         await navigator.share({ title: text, url });
+        analytics.share(platform, username, creator?.displayName, 'native');
       } catch (e) {
         // User cancelled
       }
     } else {
       navigator.clipboard.writeText(url);
+      analytics.share(platform, username, creator?.displayName, 'copy_link');
       alert('Link copied to clipboard!');
     }
   };

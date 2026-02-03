@@ -4,6 +4,7 @@ import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowR
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import SEO from '../components/SEO';
+import { analytics } from '../lib/analytics';
 
 const platformConfig = {
   youtube: { icon: Youtube, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
@@ -47,6 +48,16 @@ export default function Compare() {
       setActiveSlot(null);
       setSearchResults([]);
       setSearchQuery('');
+      
+      // Track comparison when both slots are filled
+      if (newCreators[0] && newCreators[1]) {
+        analytics.compare(
+          newCreators[0].platform,
+          newCreators[0].username,
+          newCreators[1].platform,
+          newCreators[1].username
+        );
+      }
     }
   };
 

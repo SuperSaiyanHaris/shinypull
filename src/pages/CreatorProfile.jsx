@@ -6,6 +6,7 @@ import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeSe
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
 import SEO from '../components/SEO';
+import { analytics } from '../lib/analytics';
 
 const platformIcons = {
   youtube: Youtube,
@@ -62,6 +63,9 @@ export default function CreatorProfile() {
 
       if (channelData) {
         setCreator(channelData);
+        
+        // Track profile view
+        analytics.viewProfile(platform, username, channelData.displayName);
 
         try {
           const dbCreator = await upsertCreator(channelData);
@@ -433,7 +437,10 @@ export default function CreatorProfile() {
                 range={chartRange}
                 onRangeChange={setChartRange}
                 metric={chartMetric}
-                onMetricChange={setChartMetric}
+                onMetricChange={(metric) => {
+                  setChartMetric(metric);
+                  analytics.changeChartMetric(metric);
+                }}
                 platform={platform}
               />
             )}

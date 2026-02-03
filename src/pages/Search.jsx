@@ -5,6 +5,7 @@ import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats } from '../services/creatorService';
 import SEO from '../components/SEO';
+import { analytics } from '../lib/analytics';
 
 const platformIcons = {
   youtube: Youtube,
@@ -51,6 +52,9 @@ export default function Search() {
 
   const performSearch = async (searchQuery) => {
     if (!searchQuery.trim()) return;
+
+    // Track search
+    analytics.search(searchQuery);
 
     setLoading(true);
     setError(null);

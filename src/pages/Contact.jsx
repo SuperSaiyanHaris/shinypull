@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import SEO from '../components/SEO';
 import { Mail, MessageSquare, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { analytics } from '../lib/analytics';
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -31,9 +32,11 @@ export default function Contact() {
 
       setStatus('success');
       setFormData({ name: '', email: '', message: '' });
+      analytics.contactSubmit(true);
     } catch (error) {
       setStatus('error');
       setErrorMessage(error.message || 'Something went wrong. Please try again.');
+      analytics.contactSubmit(false);
     }
   };
 

@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Youtube, Twitch, Instagram, TrendingUp, Users, Eye, Trophy } from 'lucide-react';
 import { getRankedCreators } from '../services/creatorService';
 import SEO from '../components/SEO';
+import { analytics } from '../lib/analytics';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', hoverColor: 'hover:bg-red-700', lightBg: 'bg-red-50', textColor: 'text-red-600', available: true },
@@ -55,6 +56,7 @@ export default function Rankings() {
     if (!platformId) return;
     setSelectedPlatform(platformId);
     navigate(`/rankings/${platformId}`);
+    analytics.switchPlatform('rankings', platformId);
   };
 
   const followerLabel = selectedPlatform === 'twitch' ? 'Followers' : 'Subscribers';
