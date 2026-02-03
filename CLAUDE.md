@@ -52,25 +52,31 @@ src/
 ```sql
 -- Core tables
 creators (id, platform, platform_id, username, display_name, profile_image, description, country, category, created_at, updated_at)
-creator_stats (id, creator_id, recorded_at, followers, following, total_views, total_posts, subscribers, avg_views_per_post, engagement_rate, estimated_earnings_low/high, followers_gained_day/week/month, views_gained_day/week/month)
+creator_stats (id, creator_id, recorded_at, followers, following, total_views, total_posts, subscribers, avg_views_per_post, engagement_rate, estimated_earnings_low/high, followers_gained_day/week/month, views_gained_day/week/month, hours_watched_day/week/month, peak_viewers_day, avg_viewers_day, streams_count_day)
 users (id, email, display_name, avatar_url, created_at, updated_at)  -- References auth.users
 user_saved_creators (id, user_id, creator_id, created_at)
 rankings (id, platform, category, rank_type, rank_position, creator_id, recorded_at)
+
+-- Twitch stream tracking (for Hours Watched calculation)
+stream_sessions (id, creator_id, stream_id, started_at, ended_at, peak_viewers, avg_viewers, hours_watched, game_name, title)
+viewer_samples (id, session_id, recorded_at, viewer_count, game_name)
 
 -- Platforms: 'youtube', 'twitch', 'tiktok', 'instagram', 'twitter'
 -- Rank types: 'subscribers', 'views', 'growth'
 ```
 
-All tables have RLS enabled. `creators`, `creator_stats`, and `rankings` have public read access.
+All tables have RLS enabled. `creators`, `creator_stats`, `rankings`, `stream_sessions`, and `viewer_samples` have public read access.
 
 ## Commands
 
 ```bash
-npm run dev      # Start dev server on port 3000
-npm run build    # Production build to dist/
-npm run preview  # Preview production build
-npm run seed:top-creators  # Seed top YouTube/Twitch creators
-npm run backfill:stats     # Generate 30 days of historical data
+npm run dev                    # Start dev server on port 3000
+npm run build                  # Production build to dist/
+npm run preview                # Preview production build
+npm run seed:top-creators      # Seed top YouTube/Twitch creators
+npm run collect:daily          # Collect daily stats for all creators
+npm run monitor:twitch         # Monitor live Twitch streams (for Hours Watched)
+npm run aggregate:hours-watched # Aggregate Hours Watched metrics
 ```
 
 ## Supabase CLI
@@ -109,44 +115,67 @@ VITE_YOUTUBE_API_KEY=<youtube-api-key>
 - [x] Tailwind styling with platform colors
 - [x] Vercel deployment pipeline
 - [x] **YouTube API integration** - search channels, fetch stats
-- [x] **Creator profiles** - display YouTube channel stats with banner/avatar
+- [x] **Twitch API integration** - search streamers, fetch stats, Hours Watched tracking
+- [x] **Creator profiles** - display YouTube/Twitch stats with banner/avatar
 - [x] **Database persistence** - creators and stats saved to Supabase on view
 - [x] **Rankings display** - Rankings page pulls top creators from Supabase
 - [x] **Seed script** - Seed top 50+ YouTube/Twitch creators into database
 - [x] **Search persistence** - YouTube search results auto-save to database
+- [x] **Automated daily stats collection** - GitHub Actions runs 3x daily
+- [x] **Twitch Hours Watched tracking** - Stream monitoring every 5 minutes
+- [x] **Charts with recharts** - Historical data visualization
 
 ## What Needs Implementation
 
-- [ ] **Automated daily stats collection:** GitHub Actions cron or Vercel Cron to run collectDailyStats.js
-- [ ] **Charts:** Use recharts for historical data visualization
-- [ ] **Growth calculations:** Calculate daily/weekly/monthly growth from stats history (partially done)
 - [ ] **User auth:** Allow users to save/track creators
-- [ ] **Background jobs:** Scheduled stats collection for tracked creators
-- [ ] **Estimated earnings:** Calculate based on views/engagement
+- [ ] **TikTok integration:** Limited API access
+- [ ] **Instagram integration:** Requires Facebook app approval
 
 ## Data Collection Strategy
 
 ### Current Approach (REAL DATA ONLY):
 1. **On-Demand Collection:** When a user searches/views a profile, we fetch current stats from API
-2. **Daily Snapshots:** Run `collectDailyStats.js` once per day to capture all tracked creators
-3. **Historical Build-Up:** Data accumulates naturally over time from daily snapshots
-4. **No Backfilling:** We do NOT generate fake historical data - only real API responses
+2. **Daily Snapshots:** Run `collectDailyStats.js` 3x per day (6 AM, 2 PM, 10 PM UTC) via GitHub Actions
+3. **Twitch Stream Monitoring:** Run `monitorTwitchStreams.js` every 5 minutes to track live viewer counts
+4. **Hours Watched Aggregation:** Calculate hours watched from stream session data
+5. **Historical Build-Up:** Data accumulates naturally over time from daily snapshots
+6. **No Backfilling:** We do NOT generate fake historical data - only real API responses
 
 ### Scripts:
 - `scripts/seedTopCreators.js` - Initial seed of top 50 creators (one-time)
-- `scripts/collectDailyStats.js` - **Daily collection of REAL stats from APIs**
+- `scripts/collectDailyStats.js` - **Collection of REAL stats from APIs (runs 3x daily)**
+- `scripts/monitorTwitchStreams.js` - **Twitch stream monitoring (runs every 5 minutes)**
+- `scripts/aggregateHoursWatched.js` - **Aggregate Hours Watched metrics for Twitch**
 - `scripts/deleteFakeData.js` - Emergency cleanup (deletes any non-today data)
 - `scripts/validateData.js` - QA tool to check data integrity
+
+### GitHub Actions Workflows:
+- `.github/workflows/daily-stats-collection.yml` - Runs 3x daily at 6 AM, 2 PM, 10 PM UTC
+- `.github/workflows/twitch-stream-monitor.yml` - Runs every 5 minutes for live stream tracking
 
 ## Platform API Status
 
 | Platform | Status | Notes |
 |----------|--------|-------|
-| YouTube | Working | Data API v3 with API key |
-| Twitch | Working | Serverless API + OAuth, search/profile/seeding |
+| YouTube | Working | Data API v3 with API key. Note: Subscriber counts are rounded to 3 significant figures by YouTube's policy. |
+| Twitch | Working | Helix API + OAuth. Follower counts accurate. Total views deprecated - we use Hours Watched instead. |
 | TikTok | Not started | Limited API access |
 | Instagram | Not started | Requires Facebook app |
 | Twitter/X | Skipped | Paid API ($100+/month) |
+
+### Platform-Specific Notes
+
+**YouTube:**
+- Subscriber counts are rounded by YouTube (e.g., 465,123,456 shows as 465,000,000)
+- This is a YouTube policy since September 2019, not a bug
+- View counts are more accurate and update more frequently
+
+**Twitch:**
+- `view_count` was deprecated by Twitch in April 2022
+- We track **Hours Watched** instead (industry standard metric)
+- Calculated as: `average_viewers × stream_duration`
+- Stream monitoring runs every 5 minutes to sample viewer counts
+- Follower counts remain accurate
 
 ## YouTube Service (`src/services/youtubeService.js`)
 
@@ -207,30 +236,32 @@ This script ([scripts/backfillHistoricalStats.js](scripts/backfillHistoricalStat
 - Creates data points for all seeded creators
 - Makes the daily metrics table look professional and accurate
 
-## Automated Data Collection (TODO)
+## Automated Data Collection
 
-**Current Status:** Manual collection only. Need to implement:
+**Status:** ✅ Fully automated via GitHub Actions
 
-1. **Daily Stats Cron Job** - Run once per day:
-   - Fetch latest stats for all tracked creators
-   - Insert new daily snapshot into `creator_stats` table
-   - Options:
-     - Vercel Cron Jobs (requires Pro plan)
-     - GitHub Actions with scheduled workflows (free)
-     - External cron service (cron-job.org, etc.) hitting an API endpoint
+### Daily Stats Collection (3x daily)
+- **Schedule:** 6 AM, 2 PM, 10 PM UTC
+- **Workflow:** `.github/workflows/daily-stats-collection.yml`
+- **What it does:**
+  - Fetches latest stats for all YouTube creators (batch API calls)
+  - Fetches latest follower counts for all Twitch creators
+  - Aggregates Hours Watched metrics from stream sessions
+  - Upserts data into `creator_stats` table
 
-2. **On-Demand Updates** - When users view a profile:
-   - Check if today's stats exist
-   - If not, fetch and save latest stats
-   - Currently implemented in CreatorProfile.jsx when loading
+### Twitch Stream Monitoring (every 5 minutes)
+- **Schedule:** Every 5 minutes
+- **Workflow:** `.github/workflows/twitch-stream-monitor.yml`
+- **What it does:**
+  - Polls Twitch API for live streams of tracked creators
+  - Records viewer count samples in `viewer_samples` table
+  - Tracks stream sessions in `stream_sessions` table
+  - Calculates Hours Watched when streams end
 
-3. **Recommended Approach:**
-   - GitHub Actions workflow that runs daily at midnight UTC
-   - Calls a Vercel API endpoint (e.g., `/api/update-stats`)
-   - Endpoint iterates through creators and fetches/saves latest stats
-   - Respects API rate limits (YouTube: 10,000 units/day)
-
-**Manual Update:** For now, visiting a creator profile automatically updates their stats for today.
+### On-Demand Updates
+- When users view a profile, stats are fetched live from API
+- Data is saved to database for that day
+- Works as a fallback if scheduled jobs miss any creators
 
 ## Agent Instructions
 
@@ -255,4 +286,4 @@ Agents are expected to be autonomous and execute all necessary commands without 
 
 ---
 
-*Last updated: 2026-01-31 - Added rankings display + seeding script*
+*Last updated: 2026-02-03 - Added Twitch Hours Watched tracking, 3x daily collection, stream monitoring*

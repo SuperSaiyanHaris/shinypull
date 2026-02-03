@@ -100,6 +100,22 @@ export async function getCreatorStats(creatorId, days = 30) {
 }
 
 /**
+ * Get hours watched stats for a Twitch creator
+ */
+export async function getHoursWatched(creatorId) {
+  const { data, error } = await supabase
+    .from('creator_stats')
+    .select('hours_watched_day, hours_watched_week, hours_watched_month, peak_viewers_day, avg_viewers_day, streams_count_day')
+    .eq('creator_id', creatorId)
+    .order('recorded_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}
+
+/**
  * Search creators in database
  */
 export async function searchCreators(query, platform = null) {

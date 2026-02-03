@@ -2,14 +2,19 @@ name: Daily Stats Collection
 
 on:
   schedule:
-    # Run every day at 8 AM CST (14:00 UTC)
+    # Run 3x daily for fresher YouTube data
+    # 6 AM UTC (12 AM CST)
+    - cron: '0 6 * * *'
+    # 14:00 UTC (8 AM CST)
     - cron: '0 14 * * *'
+    # 22:00 UTC (4 PM CST)
+    - cron: '0 22 * * *'
   workflow_dispatch: # Allow manual trigger from GitHub UI
 
 jobs:
   collect-stats:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,6 +36,12 @@ jobs:
           VITE_TWITCH_CLIENT_ID: ${{ secrets.VITE_TWITCH_CLIENT_ID }}
           VITE_TWITCH_CLIENT_SECRET: ${{ secrets.VITE_TWITCH_CLIENT_SECRET }}
         run: node scripts/collectDailyStats.js
+
+      - name: Aggregate hours watched (Twitch)
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/aggregateHoursWatched.js
 
       - name: Report completion
         if: success()

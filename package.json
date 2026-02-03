@@ -10,6 +10,8 @@
     "seed:top-creators": "node scripts/seedTopCreators.js",
     "seed:expanded": "node scripts/seedTopCreatorsExpanded.js",
     "collect:daily": "node scripts/collectDailyStats.js",
+    "monitor:twitch": "node scripts/monitorTwitchStreams.js",
+    "aggregate:hours-watched": "node scripts/aggregateHoursWatched.js",
     "delete:fake-data": "node scripts/deleteFakeData.js",
     "validate:data": "node scripts/validateData.js"
   },

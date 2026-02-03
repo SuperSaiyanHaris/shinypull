@@ -4,7 +4,7 @@ import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
-import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
+import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 
@@ -62,8 +62,6 @@ export default function CreatorProfile() {
       }
 
       if (channelData) {
-        setCreator(channelData);
-        
         // Track profile view
         analytics.viewProfile(platform, username, channelData.displayName);
 
@@ -77,9 +75,23 @@ export default function CreatorProfile() {
 
           const history = await getCreatorStats(dbCreator.id, 90);
           setStatsHistory(history || []);
+
+          // For Twitch, fetch hours watched data
+          if (platform === 'twitch') {
+            const hoursWatchedData = await getHoursWatched(dbCreator.id);
+            if (hoursWatchedData) {
+              channelData.hoursWatchedDay = hoursWatchedData.hours_watched_day;
+              channelData.hoursWatchedWeek = hoursWatchedData.hours_watched_week;
+              channelData.hoursWatchedMonth = hoursWatchedData.hours_watched_month;
+              channelData.peakViewersDay = hoursWatchedData.peak_viewers_day;
+              channelData.avgViewersDay = hoursWatchedData.avg_viewers_day;
+            }
+          }
         } catch (dbErr) {
           console.warn('Failed to save to database:', dbErr);
         }
+
+        setCreator(channelData);
       }
     } catch (err) {
       console.error('Error loading creator:', err);
@@ -344,11 +356,20 @@ export default function CreatorProfile() {
                 value={formatNumber(creator.subscribers || creator.followers)}
                 sublabel={creator.hiddenSubscribers ? '(hidden)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
               />
-              <StatCard
-                icon={Eye}
-                label="Total Views"
-                value={formatNumber(creator.totalViews)}
-              />
+              {platform === 'twitch' ? (
+                <StatCard
+                  icon={Eye}
+                  label="Hours Watched"
+                  value={creator.hoursWatchedMonth ? formatHoursWatched(creator.hoursWatchedMonth) : 'Tracking...'}
+                  sublabel="Last 30 days"
+                />
+              ) : (
+                <StatCard
+                  icon={Eye}
+                  label="Total Views"
+                  value={formatNumber(creator.totalViews)}
+                />
+              )}
               {platform !== 'twitch' && (
                 <StatCard
                   icon={Video}
@@ -381,12 +402,20 @@ export default function CreatorProfile() {
                   value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
                   change={metrics?.last30Days.subs}
                 />
-                <SummaryCard
-                  label="Views"
-                  sublabel="Last 30 days"
-                  value={metrics ? formatNumber(metrics.last30Days.views) : '--'}
-                  change={metrics?.last30Days.views}
-                />
+                {platform === 'twitch' ? (
+                  <SummaryCard
+                    label="Hours Watched"
+                    sublabel="Last 30 days"
+                    value={creator.hoursWatchedMonth ? formatHoursWatched(creator.hoursWatchedMonth) : 'Tracking...'}
+                  />
+                ) : (
+                  <SummaryCard
+                    label="Views"
+                    sublabel="Last 30 days"
+                    value={metrics ? formatNumber(metrics.last30Days.views) : '--'}
+                    change={metrics?.last30Days.views}
+                  />
+                )}
                 {platform !== 'twitch' && (
                   <>
                     <SummaryCard
@@ -457,7 +486,7 @@ export default function CreatorProfile() {
                       <tr className="border-b border-gray-100 bg-gray-50 text-left">
                         <th className="px-6 py-4 font-semibold text-gray-600">Date</th>
                         <th className="px-6 py-4 font-semibold text-gray-600 text-right">{platform === 'twitch' ? 'Followers' : 'Subscribers'}</th>
-                        <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>
+                        {platform !== 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
                         {platform !== 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
                         {platform !== 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Est. Earnings</th>}
                       </tr>
@@ -482,16 +511,18 @@ export default function CreatorProfile() {
                               )}
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className="flex flex-col items-end">
-                              <span className="font-medium text-gray-900">{formatNumber(stat.total_views)}</span>
-                              {stat.viewsChange !== 0 && (
-                                <span className={`text-xs ${stat.viewsChange > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
-                                  {stat.viewsChange > 0 ? '+' : ''}{formatNumber(stat.viewsChange)}
-                                </span>
-                              )}
-                            </div>
-                          </td>
+                          {platform !== 'twitch' && (
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex flex-col items-end">
+                                <span className="font-medium text-gray-900">{formatNumber(stat.total_views)}</span>
+                                {stat.viewsChange !== 0 && (
+                                  <span className={`text-xs ${stat.viewsChange > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
+                                    {stat.viewsChange > 0 ? '+' : ''}{formatNumber(stat.viewsChange)}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                          )}
                           {platform !== 'twitch' && (
                             <>
                               <td className="px-6 py-4 text-right">
@@ -518,9 +549,9 @@ export default function CreatorProfile() {
                             {metrics.dailyAverage.subs >= 0 ? '+' : ''}{formatNumber(metrics.dailyAverage.subs)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.dailyAverage.views)}</td>
                         {platform !== 'twitch' && (
                           <>
+                            <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.dailyAverage.views)}</td>
                             <td className="px-6 py-4 text-right"></td>
                             <td className="px-6 py-4 text-right text-indigo-900">
                               {formatEarnings(metrics.dailyAverage.views / 1000 * 2, metrics.dailyAverage.views / 1000 * 7)}
@@ -536,9 +567,9 @@ export default function CreatorProfile() {
                             {metrics.weeklyAverage.subs >= 0 ? '+' : ''}{formatNumber(metrics.weeklyAverage.subs)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.weeklyAverage.views)}</td>
                         {platform !== 'twitch' && (
                           <>
+                            <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.weeklyAverage.views)}</td>
                             <td className="px-6 py-4 text-right"></td>
                             <td className="px-6 py-4 text-right text-indigo-900">
                               {formatEarnings(metrics.weeklyAverage.views / 1000 * 2, metrics.weeklyAverage.views / 1000 * 7)}
@@ -554,9 +585,9 @@ export default function CreatorProfile() {
                             {metrics.last30Days.subs >= 0 ? '+' : ''}{formatNumber(metrics.last30Days.subs)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.last30Days.views)}</td>
                         {platform !== 'twitch' && (
                           <>
+                            <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.last30Days.views)}</td>
                             <td className="px-6 py-4 text-right text-emerald-600">+{metrics.last30Days.videos}</td>
                             <td className="px-6 py-4 text-right text-indigo-900">
                               {formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)}
@@ -648,6 +679,13 @@ function formatEarnings(low, high) {
     return `$${Math.round(num)}`;
   };
   return `${formatCurrency(low)} - ${formatCurrency(high)}`;
+}
+
+function formatHoursWatched(hours) {
+  if (!hours || hours === 0) return '0';
+  if (hours >= 1000000) return `${(hours / 1000000).toFixed(1)}M`;
+  if (hours >= 1000) return `${(hours / 1000).toFixed(1)}K`;
+  return Math.round(hours).toLocaleString();
 }
 
 function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
@@ -765,19 +803,23 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
   ];
 
   const metrics = [
-    { 
-      value: 'subscribers', 
+    {
+      value: 'subscribers',
       label: platform === 'twitch' ? 'Follower Growth' : 'Subscriber Growth',
       dataKey: 'subscribers',
       color: '#6366f1'
     },
-    { 
-      value: 'views', 
+  ];
+
+  // Add view growth for non-Twitch platforms (Twitch views are unreliable)
+  if (platform !== 'twitch') {
+    metrics.push({
+      value: 'views',
       label: 'View Growth',
       dataKey: 'views',
       color: '#10b981'
-    },
-  ];
+    });
+  }
 
   // Add video count metric for non-Twitch platforms
   if (platform !== 'twitch') {
@@ -814,7 +856,13 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
   const values = filteredData.map(d => d[currentMetric.dataKey]);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
-  const padding = Math.max((maxValue - minValue) * 0.1, metric === 'views' ? 1000 : 100);
+
+  // Calculate padding - ensure minimum 1% range for zero-variance data
+  const valueRange = maxValue - minValue;
+  const minPaddingRange = maxValue * 0.01 || 1000; // At least 1% of max value or 1000
+  const padding = valueRange > 0
+    ? Math.max(valueRange * 0.1, metric === 'views' ? 1000 : 100)
+    : minPaddingRange;
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
