@@ -1,8 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, ArrowLeft, Twitter, Facebook } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Twitter, Facebook, Loader2 } from 'lucide-react';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
-import { getPostBySlug, getAllPosts } from '../data/blogPosts';
+import { getPostBySlug, getRelatedPosts } from '../services/blogService';
 import { getProduct } from '../data/products';
 
 /**
@@ -45,6 +46,8 @@ function parseMarkdown(content) {
  * Use {{product:slug}} in content to embed a product card
  */
 function BlogContent({ content }) {
+  if (!content) return null;
+
   // Split content by product embeds: {{product:slug}}
   const parts = content.split(/(\{\{product:[^}]+\}\})/g);
 
@@ -79,8 +82,33 @@ function BlogContent({ content }) {
 export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const post = getPostBySlug(slug);
-  const allPosts = getAllPosts();
+  const [post, setPost] = useState(null);
+  const [relatedPosts, setRelatedPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const postData = await getPostBySlug(slug);
+      setPost(postData);
+
+      if (postData?.category) {
+        const related = await getRelatedPosts(postData.category, slug);
+        setRelatedPosts(related);
+      }
+
+      setLoading(false);
+    }
+    fetchData();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+      </div>
+    );
+  }
 
   if (!post) {
     return (
@@ -94,11 +122,6 @@ export default function BlogPost() {
       </div>
     );
   }
-
-  // Get related posts (same category, excluding current)
-  const relatedPosts = allPosts
-    .filter(p => p.category === post.category && p.slug !== post.slug)
-    .slice(0, 2);
 
   // Share URLs
   const shareUrl = encodeURIComponent(window.location.href);
@@ -150,7 +173,7 @@ export default function BlogPost() {
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-8 pb-8 border-b border-gray-100">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                  {new Date(post.published_at).toLocaleDateString('en-US', {
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric'
@@ -158,7 +181,7 @@ export default function BlogPost() {
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  {post.readTime}
+                  {post.read_time}
                 </span>
                 <span>By {post.author}</span>
 
@@ -212,7 +235,7 @@ export default function BlogPost() {
                         <h3 className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors mb-2">
                           {related.title}
                         </h3>
-                        <p className="text-sm text-gray-500">{related.readTime}</p>
+                        <p className="text-sm text-gray-500">{related.read_time}</p>
                       </div>
                     </article>
                   </Link>

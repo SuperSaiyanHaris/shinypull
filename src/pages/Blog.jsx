@@ -1,11 +1,34 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, ChevronRight, Loader2 } from 'lucide-react';
 import SEO from '../components/SEO';
-import { getAllPosts, getAllCategories } from '../data/blogPosts';
+import { getAllPosts, getAllCategories } from '../services/blogService';
 
 export default function Blog() {
-  const posts = getAllPosts();
-  const categories = getAllCategories();
+  const [posts, setPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      const [postsData, categoriesData] = await Promise.all([
+        getAllPosts(),
+        getAllCategories()
+      ]);
+      setPosts(postsData);
+      setCategories(categoriesData);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -41,6 +64,13 @@ export default function Blog() {
             ))}
           </div>
 
+          {/* No posts message */}
+          {posts.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No blog posts yet. Check back soon!</p>
+            </div>
+          )}
+
           {/* Featured Post */}
           {posts.length > 0 && (
             <Link
@@ -69,7 +99,7 @@ export default function Blog() {
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        {new Date(posts[0].publishedAt).toLocaleDateString('en-US', {
+                        {new Date(posts[0].published_at).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric'
@@ -77,7 +107,7 @@ export default function Blog() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
-                        {posts[0].readTime}
+                        {posts[0].read_time}
                       </span>
                     </div>
                   </div>
@@ -113,7 +143,7 @@ export default function Blog() {
                     <div className="flex items-center justify-between text-sm text-gray-500">
                       <span className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
-                        {post.readTime}
+                        {post.read_time}
                       </span>
                       <span className="text-indigo-600 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
                         Read more <ChevronRight className="w-4 h-4" />

@@ -1,25 +1,34 @@
 /**
- * Blog Posts Data
+ * Seed Blog Posts
  *
- * Add new posts to this array. They will automatically appear on the blog listing
- * and have their own dedicated page at /blog/{slug}
- *
- * For Amazon affiliate links, use your affiliate tag in the URL:
- * https://www.amazon.com/dp/PRODUCT_ID?tag=YOUR_AFFILIATE_TAG
+ * Run this script to populate the blog_posts table with initial content.
+ * Usage: npm run seed:blog
  */
 
-export const blogPosts = [
+import { createClient } from '@supabase/supabase-js';
+import { config } from 'dotenv';
+
+config();
+
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: false },
+});
+
+const blogPosts = [
   {
     slug: 'best-streaming-setup-2026',
     title: 'Best Streaming Setup for Beginners in 2026',
     description: 'Everything you need to start streaming on Twitch or YouTube - from cameras to microphones to lighting.',
     category: 'Streaming Gear',
     author: 'ShinyPull Team',
-    publishedAt: '2026-02-03',
-    readTime: '8 min read',
+    published_at: '2026-02-03',
+    read_time: '8 min read',
     image: 'https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=800',
-    content: `
-# Best Streaming Setup for Beginners in 2026
+    is_published: true,
+    content: `# Best Streaming Setup for Beginners in 2026
 
 Starting your streaming journey doesn't have to break the bank. Here's our curated guide to the essential gear that top creators recommend.
 
@@ -108,8 +117,7 @@ Remember, content is king. The best gear in the world won't save a boring stream
 
 ---
 
-*Links in this article may be affiliate links. As an Amazon Associate, we earn from qualifying purchases.*
-    `,
+*Links in this article may be affiliate links. As an Amazon Associate, we earn from qualifying purchases.*`,
   },
   {
     slug: 'grow-youtube-channel-2026',
@@ -117,11 +125,11 @@ Remember, content is king. The best gear in the world won't save a boring stream
     description: 'Analyzing the strategies that helped creators like MrBeast, MKBHD, and others build massive audiences.',
     category: 'Growth Tips',
     author: 'ShinyPull Team',
-    publishedAt: '2026-02-01',
-    readTime: '12 min read',
+    published_at: '2026-02-01',
+    read_time: '12 min read',
     image: 'https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=800',
-    content: `
-# How Top YouTubers Grew to 1 Million Subscribers
+    is_published: true,
+    content: `# How Top YouTubers Grew to 1 Million Subscribers
 
 We analyzed the growth patterns of over 50 successful YouTube channels to identify the strategies that actually work.
 
@@ -223,8 +231,7 @@ Track your own growth and compare to top creators using ShinyPull's analytics to
 
 ---
 
-*This article contains our analysis of public YouTube data and creator interviews.*
-    `,
+*This article contains our analysis of public YouTube data and creator interviews.*`,
   },
   {
     slug: 'twitch-streaming-equipment',
@@ -232,11 +239,11 @@ Track your own growth and compare to top creators using ShinyPull's analytics to
     description: 'From webcams to green screens - everything you need for a professional Twitch stream.',
     category: 'Streaming Gear',
     author: 'ShinyPull Team',
-    publishedAt: '2026-01-28',
-    readTime: '10 min read',
+    published_at: '2026-01-28',
+    read_time: '10 min read',
     image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
-    content: `
-# Essential Twitch Streaming Equipment Guide
+    is_published: true,
+    content: `# Essential Twitch Streaming Equipment Guide
 
 Professional streamers make it look effortless, but there's serious gear behind those polished broadcasts. Here's what you actually need.
 
@@ -383,8 +390,7 @@ Track your stream's growth with ShinyPull's Twitch analytics - including Hours W
 
 ---
 
-*Some links in this article may be affiliate links. As an Amazon Associate, we earn from qualifying purchases.*
-    `,
+*Some links in this article may be affiliate links. As an Amazon Associate, we earn from qualifying purchases.*`,
   },
   {
     slug: 'creator-economy-statistics-2026',
@@ -392,11 +398,11 @@ Track your stream's growth with ShinyPull's Twitch analytics - including Hours W
     description: 'The latest data on how much creators earn, platform growth, and industry trends.',
     category: 'Industry Insights',
     author: 'ShinyPull Team',
-    publishedAt: '2026-01-25',
-    readTime: '6 min read',
+    published_at: '2026-01-25',
+    read_time: '6 min read',
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
-    content: `
-# Creator Economy Statistics & Trends for 2026
+    is_published: true,
+    content: `# Creator Economy Statistics & Trends for 2026
 
 The creator economy continues to explode. Here's what the data tells us about where things are headed.
 
@@ -476,37 +482,26 @@ Track real creator statistics and growth trends at ShinyPull.com!
 
 ---
 
-*Statistics compiled from industry reports, platform announcements, and ShinyPull data analysis.*
-    `,
+*Statistics compiled from industry reports, platform announcements, and ShinyPull data analysis.*`,
   },
 ];
 
-/**
- * Get all published blog posts, sorted by date (newest first)
- */
-export function getAllPosts() {
-  return [...blogPosts].sort((a, b) =>
-    new Date(b.publishedAt) - new Date(a.publishedAt)
-  );
+async function seedBlogPosts() {
+  console.log('📝 Seeding blog posts...\n');
+
+  for (const post of blogPosts) {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .upsert(post, { onConflict: 'slug' });
+
+    if (error) {
+      console.log(`   ❌ ${post.slug}: ${error.message}`);
+    } else {
+      console.log(`   ✅ ${post.slug}`);
+    }
+  }
+
+  console.log('\n✨ Blog posts seeded successfully!');
 }
 
-/**
- * Get a single post by its slug
- */
-export function getPostBySlug(slug) {
-  return blogPosts.find(post => post.slug === slug);
-}
-
-/**
- * Get posts by category
- */
-export function getPostsByCategory(category) {
-  return blogPosts.filter(post => post.category === category);
-}
-
-/**
- * Get all unique categories
- */
-export function getAllCategories() {
-  return [...new Set(blogPosts.map(post => post.category))];
-}
+seedBlogPosts().catch(console.error);
