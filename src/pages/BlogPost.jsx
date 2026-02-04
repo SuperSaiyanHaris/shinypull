@@ -30,12 +30,16 @@ function parseMarkdown(content) {
     .replace(/^---$/gm, '<hr class="my-8 border-gray-200" />')
     // Paragraphs
     .split('\n\n')
-    .map(block => {
+    .map((block, index) => {
       const trimmed = block.trim();
       if (!trimmed) return '';
       if (trimmed.startsWith('<')) return trimmed;
       if (trimmed.includes('<li')) {
         return `<ul class="my-4">${trimmed}</ul>`;
+      }
+      // First paragraph is the intro/lead - style it specially with background and separator
+      if (index === 0) {
+        return `<div class="mb-12"><p class="text-xl text-gray-700 leading-relaxed font-medium p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">${trimmed}</p></div>`;
       }
       return `<p class="text-gray-600 leading-relaxed mb-4">${trimmed}</p>`;
     })
