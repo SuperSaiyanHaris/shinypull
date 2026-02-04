@@ -280,7 +280,7 @@ export default function BlogAdmin() {
                       value={formData.title}
                       onChange={handleInputChange}
                       placeholder="Best Streaming Setup for 2026"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white"
                     />
                   </div>
                   <div>
@@ -293,7 +293,7 @@ export default function BlogAdmin() {
                       value={formData.slug}
                       onChange={handleInputChange}
                       placeholder="best-streaming-setup-2026"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-900 bg-white placeholder-gray-400"
                     />
                   </div>
                 </div>
@@ -309,7 +309,7 @@ export default function BlogAdmin() {
                     value={formData.description}
                     onChange={handleInputChange}
                     placeholder="A brief description for SEO and previews"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white"
                   />
                 </div>
 
@@ -323,7 +323,7 @@ export default function BlogAdmin() {
                       name="category"
                       value={formData.category}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white"
                     >
                       {CATEGORIES.map(cat => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -339,7 +339,7 @@ export default function BlogAdmin() {
                       name="author"
                       value={formData.author}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white"
                     />
                   </div>
                   <div>
@@ -352,7 +352,7 @@ export default function BlogAdmin() {
                       value={formData.read_time}
                       onChange={handleInputChange}
                       placeholder="5 min read"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white"
                     />
                   </div>
                 </div>
@@ -369,7 +369,7 @@ export default function BlogAdmin() {
                       value={formData.image}
                       onChange={handleInputChange}
                       placeholder="https://images.unsplash.com/..."
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white placeholder-gray-400"
                     />
                     {formData.image && (
                       <a
@@ -421,7 +421,7 @@ Regular paragraph text with **bold** and *italic* formatting.
 {{product:fifine-k669b}}
 
 More content..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-900 bg-white placeholder-gray-400"
                   />
                 </div>
 
