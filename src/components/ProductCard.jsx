@@ -6,10 +6,13 @@ import { ExternalLink } from 'lucide-react';
  * Usage in blog posts:
  * {{product:fifine-k669b}}
  *
- * Products are defined in src/data/products.js
+ * Products are fetched from Supabase
  */
 export default function ProductCard({ product }) {
   if (!product) return null;
+
+  // Handle both camelCase (legacy) and snake_case (Supabase) naming
+  const affiliateLink = product.affiliate_link || product.affiliateLink;
 
   return (
     <div className="my-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
@@ -61,7 +64,7 @@ export default function ProductCard({ product }) {
 
           {/* CTA Button */}
           <a
-            href={product.affiliateLink}
+            href={affiliateLink}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors w-full sm:w-auto"

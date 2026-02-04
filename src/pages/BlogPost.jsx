@@ -4,7 +4,7 @@ import { Calendar, Clock, ArrowLeft, Twitter, Facebook, Loader2 } from 'lucide-r
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
 import { getPostBySlug, getRelatedPosts } from '../services/blogService';
-import { getProduct } from '../data/products';
+import { getProduct } from '../services/productsService';
 
 /**
  * Simple markdown to HTML converter for blog content
@@ -42,6 +42,34 @@ function parseMarkdown(content) {
 }
 
 /**
+ * Component that loads and displays a product card
+ */
+function ProductEmbed({ slug }) {
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProduct() {
+      setLoading(true);
+      const productData = await getProduct(slug);
+      setProduct(productData);
+      setLoading(false);
+    }
+    loadProduct();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="my-6 p-6 bg-gray-50 rounded-lg flex items-center justify-center">
+        <Loader2 className="w-6 h-6 text-indigo-600 animate-spin" />
+      </div>
+    );
+  }
+
+  return <ProductCard product={product} />;
+}
+
+/**
  * Renders blog content with support for embedded product cards
  * Use {{product:slug}} in content to embed a product card
  */
@@ -59,8 +87,7 @@ function BlogContent({ content }) {
 
         if (productMatch) {
           const productSlug = productMatch[1];
-          const product = getProduct(productSlug);
-          return <ProductCard key={index} product={product} />;
+          return <ProductEmbed key={index} slug={productSlug} />;
         }
 
         // Regular markdown content
