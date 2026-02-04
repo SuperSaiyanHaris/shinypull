@@ -14,6 +14,7 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
+import BlogAdmin from './pages/BlogAdmin';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/admin" element={<BlogAdmin />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
         </Routes>
       </main>
