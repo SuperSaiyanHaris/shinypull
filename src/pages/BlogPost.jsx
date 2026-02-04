@@ -8,9 +8,8 @@ import { getPostBySlug, getAllPosts } from '../data/blogPosts';
  */
 function parseMarkdown(content) {
   let html = content
-    // Escape HTML first
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+    // Links (before HTML escaping) - [text](url)
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-700 underline">$1</a>')
     // Headers
     .replace(/^### (.+)$/gm, '<h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">$1</h3>')
     .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">$1</h2>')

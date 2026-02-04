@@ -31,7 +31,7 @@ Every successful streamer needs three core components: **good audio**, **decent 
 
 Audio quality is arguably more important than video. Viewers will tolerate average video, but poor audio drives them away instantly.
 
-### Budget Pick: Fifine K669B (~$30)
+### Budget Pick: [Fifine K669B](https://amzn.to/4ryPDUb) (~$30)
 Perfect for beginners, this USB condenser mic delivers surprisingly good quality for its price point. Plug-and-play setup means you're streaming in minutes.
 
 ### Mid-Range: Blue Yeti (~$100)
@@ -85,7 +85,7 @@ Physical buttons for scene switching, sound effects, and more. Dramatically impr
 
 For those just starting out, here's a complete setup under $250:
 
-1. **Fifine K669B Microphone** - $30
+1. **[Fifine K669B Microphone](https://amzn.to/4ryPDUb)** - $30
 2. **Logitech C920 Webcam** - $70
 3. **Ring Light with Stand** - $40
 4. **Boom Arm for Microphone** - $25
@@ -252,7 +252,7 @@ USB microphones are convenient but limited. XLR microphones with an audio interf
 
 **Our Recommendations:**
 
-1. **Budget USB**: Fifine K669B ($30) - Great starter mic
+1. **Budget USB**: [Fifine K669B](https://amzn.to/4ryPDUb) ($30) - Great starter mic
 2. **Premium USB**: Blue Yeti X ($170) - Professional USB option
 3. **Budget XLR**: Audio-Technica AT2020 ($100) + interface
 4. **Pro XLR**: Shure SM7B ($400) - Industry standard
@@ -334,7 +334,7 @@ Remove your background entirely:
 ## The Complete Setup Tiers
 
 ### Starter (~$300)
-- Fifine K669B microphone
+- [Fifine K669B](https://amzn.to/4ryPDUb) microphone
 - Logitech C920 webcam
 - Ring light
 - Basic boom arm
