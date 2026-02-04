@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, Search, Trophy, Menu, X, Scale } from 'lucide-react';
+import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen } from 'lucide-react';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -10,6 +10,9 @@ export default function Header() {
     if (path === '/rankings') {
       return location.pathname.startsWith('/rankings');
     }
+    if (path === '/blog') {
+      return location.pathname.startsWith('/blog');
+    }
     return location.pathname === path;
   };
 
@@ -17,6 +20,7 @@ export default function Header() {
     { path: '/search', label: 'Search', icon: Search },
     { path: '/rankings', label: 'Rankings', icon: Trophy },
     { path: '/compare', label: 'Compare', icon: Scale },
+    { path: '/blog', label: 'Blog', icon: BookOpen },
   ];
 
   return (
