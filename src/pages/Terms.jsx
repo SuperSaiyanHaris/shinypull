@@ -125,7 +125,23 @@ export default function Terms() {
                 </p>
               </Section>
 
-              <Section title="12. Contact Information">
+              <Section title="12. Amazon Associates Disclosure">
+                <p className="mb-4">
+                  ShinyPull is a participant in the Amazon Services LLC Associates Program, an affiliate
+                  advertising program designed to provide a means for sites to earn advertising fees by
+                  advertising and linking to Amazon.com.
+                </p>
+                <p className="mb-4">
+                  <strong>As an Amazon Associate I earn from qualifying purchases.</strong>
+                </p>
+                <p>
+                  When you click on product links in our blog posts and make a purchase, we may earn a
+                  commission at no additional cost to you. This helps support our platform and allows us
+                  to continue providing free analytics and content to streamers and content creators.
+                </p>
+              </Section>
+
+              <Section title="13. Contact Information">
                 <p>
                   For questions about these Terms, please contact us at{' '}
                   <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-700">
