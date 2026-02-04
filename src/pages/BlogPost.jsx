@@ -1,14 +1,16 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, ArrowLeft, Share2, Twitter, Facebook } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Twitter, Facebook } from 'lucide-react';
 import SEO from '../components/SEO';
+import ProductCard from '../components/ProductCard';
 import { getPostBySlug, getAllPosts } from '../data/blogPosts';
+import { getProduct } from '../data/products';
 
 /**
  * Simple markdown to HTML converter for blog content
  */
 function parseMarkdown(content) {
   let html = content
-    // Links (before HTML escaping) - [text](url)
+    // Links - [text](url)
     .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-700 underline">$1</a>')
     // Headers
     .replace(/^### (.+)$/gm, '<h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">$1</h3>')
@@ -22,7 +24,7 @@ function parseMarkdown(content) {
     .replace(/^- (.+)$/gm, '<li class="ml-6 mb-2 list-disc">$1</li>')
     // Horizontal rule
     .replace(/^---$/gm, '<hr class="my-8 border-gray-200" />')
-    // Paragraphs (lines that aren't already tags)
+    // Paragraphs
     .split('\n\n')
     .map(block => {
       const trimmed = block.trim();
@@ -36,6 +38,42 @@ function parseMarkdown(content) {
     .join('\n');
 
   return html;
+}
+
+/**
+ * Renders blog content with support for embedded product cards
+ * Use {{product:slug}} in content to embed a product card
+ */
+function BlogContent({ content }) {
+  // Split content by product embeds: {{product:slug}}
+  const parts = content.split(/(\{\{product:[^}]+\}\})/g);
+
+  return (
+    <div className="prose prose-lg max-w-none">
+      {parts.map((part, index) => {
+        // Check if this part is a product embed
+        const productMatch = part.match(/\{\{product:([^}]+)\}\}/);
+
+        if (productMatch) {
+          const productSlug = productMatch[1];
+          const product = getProduct(productSlug);
+          return <ProductCard key={index} product={product} />;
+        }
+
+        // Regular markdown content
+        if (part.trim()) {
+          return (
+            <div
+              key={index}
+              dangerouslySetInnerHTML={{ __html: parseMarkdown(part) }}
+            />
+          );
+        }
+
+        return null;
+      })}
+    </div>
+  );
 }
 
 export default function BlogPost() {
@@ -148,11 +186,8 @@ export default function BlogPost() {
                 </div>
               </div>
 
-              {/* Content */}
-              <div
-                className="prose prose-lg max-w-none"
-                dangerouslySetInnerHTML={{ __html: parseMarkdown(post.content) }}
-              />
+              {/* Content with Product Cards */}
+              <BlogContent content={post.content} />
             </div>
           </article>
 
