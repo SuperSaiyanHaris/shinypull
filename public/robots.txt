@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /blog/admin
+
+Sitemap: https://shinypull.com/sitemap.xml

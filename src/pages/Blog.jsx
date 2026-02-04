@@ -7,6 +7,7 @@ import { getAllPosts, getAllCategories } from '../services/blogService';
 export default function Blog() {
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,6 +22,11 @@ export default function Blog() {
     }
     fetchData();
   }, []);
+
+  // Filter posts by selected category
+  const filteredPosts = selectedCategory === 'all' 
+    ? posts 
+    : posts.filter(post => post.category === selectedCategory);
 
   if (loading) {
     return (
@@ -51,55 +57,67 @@ export default function Blog() {
         <div className="max-w-6xl mx-auto px-4 py-12">
           {/* Categories */}
           <div className="flex flex-wrap gap-2 mb-8">
-            <span className="px-4 py-2 bg-indigo-600 text-white rounded-full text-sm font-medium">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedCategory === 'all'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+              }`}
+            >
               All Posts
-            </span>
+            </button>
             {categories.map(category => (
-              <span
+              <button
                 key={category}
-                className="px-4 py-2 bg-white text-gray-600 rounded-full text-sm font-medium border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedCategory === category
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                }`}
               >
                 {category}
-              </span>
+              </button>
             ))}
           </div>
 
           {/* No posts message */}
-          {posts.length === 0 && (
+          {filteredPosts.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500">No blog posts yet. Check back soon!</p>
+              <p className="text-gray-500">No blog posts in this category yet.</p>
             </div>
           )}
 
           {/* Featured Post */}
-          {posts.length > 0 && (
+          {filteredPosts.length > 0 && (
             <Link
-              to={`/blog/${posts[0].slug}`}
+              to={`/blog/${filteredPosts[0].slug}`}
               className="block mb-12 group"
             >
               <article className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="md:flex">
                   <div className="md:w-1/2">
                     <img
-                      src={posts[0].image}
-                      alt={posts[0].title}
+                      src={filteredPosts[0].image}
+                      alt={filteredPosts[0].title}
                       className="w-full h-64 md:h-full object-cover"
                     />
                   </div>
                   <div className="md:w-1/2 p-8 flex flex-col justify-center">
                     <span className="text-indigo-600 font-medium text-sm mb-2">
-                      {posts[0].category}
+                      {filteredPosts[0].category}
                     </span>
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">
-                      {posts[0].title}
+                      {filteredPosts[0].title}
                     </h2>
                     <p className="text-gray-600 mb-4 line-clamp-2">
-                      {posts[0].description}
+                      {filteredPosts[0].description}
                     </p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        {new Date(posts[0].published_at).toLocaleDateString('en-US', {
+                        {new Date(filteredPosts[0].published_at).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric'
@@ -107,7 +125,7 @@ export default function Blog() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
-                        {posts[0].read_time}
+                        {filteredPosts[0].read_time}
                       </span>
                     </div>
                   </div>
@@ -118,7 +136,7 @@ export default function Blog() {
 
           {/* Post Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.slice(1).map(post => (
+            {filteredPosts.slice(1).map(post => (
               <Link
                 key={post.slug}
                 to={`/blog/${post.slug}`}

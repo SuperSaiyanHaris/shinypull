@@ -6,7 +6,8 @@ export default function SEO({
   description, 
   keywords,
   image = 'https://www.shinypull.com/og-image.png',
-  type = 'website'
+  type = 'website',
+  article = null, // { publishedTime, modifiedTime, author, section }
 }) {
   const location = useLocation();
   const url = `https://www.shinypull.com${location.pathname}`;
@@ -51,6 +52,20 @@ export default function SEO({
     updateMetaTag('twitter:description', metaDescription);
     updateMetaTag('twitter:image', image);
     
+    // Article-specific tags (for blog posts)
+    if (article) {
+      updateMetaTag('article:published_time', article.publishedTime, true);
+      if (article.modifiedTime) {
+        updateMetaTag('article:modified_time', article.modifiedTime, true);
+      }
+      if (article.author) {
+        updateMetaTag('article:author', article.author, true);
+      }
+      if (article.section) {
+        updateMetaTag('article:section', article.section, true);
+      }
+    }
+    
     // Additional SEO tags
     updateMetaTag('robots', 'index, follow');
     updateMetaTag('author', 'Shiny Pull');
@@ -64,7 +79,7 @@ export default function SEO({
     }
     canonical.setAttribute('href', url);
     
-  }, [fullTitle, metaDescription, keywords, url, image, type]);
+  }, [fullTitle, metaDescription, keywords, url, image, type, article]);
   
   return null;
 }

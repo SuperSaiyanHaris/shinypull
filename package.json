@@ -15,7 +15,8 @@
     "seed:blog": "node scripts/seedBlogPosts.js",
     "seed:products": "node scripts/seedProducts.js",
     "delete:fake-data": "node scripts/deleteFakeData.js",
-    "validate:data": "node scripts/validateData.js"
+    "validate:data": "node scripts/validateData.js",
+    "generate:sitemap": "node scripts/generateSitemap.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",

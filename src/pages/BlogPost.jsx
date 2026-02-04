@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, ArrowLeft, Twitter, Facebook, Loader2 } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Loader2 } from 'lucide-react';
 import SEO from '../components/SEO';
+import StructuredData, { createBlogPostingSchema, createBreadcrumbSchema } from '../components/StructuredData';
+import Breadcrumbs from '../components/Breadcrumbs';
+import ShareButtons from '../components/ShareButtons';
 import ProductCard from '../components/ProductCard';
 import { getPostBySlug, getRelatedPosts } from '../services/blogService';
 import { getProduct } from '../services/productsService';
@@ -153,6 +156,25 @@ export default function BlogPost() {
   // Share URLs
   const shareUrl = encodeURIComponent(window.location.href);
   const shareTitle = encodeURIComponent(post.title);
+  const postUrl = `https://shinypull.com/blog/${post.slug}`;
+
+  // Create structured data schemas
+  const blogPostSchema = createBlogPostingSchema({
+    title: post.title,
+    description: post.description,
+    image: post.image,
+    datePublished: post.published_at,
+    dateModified: post.updated_at,
+    author: post.author,
+    category: post.category,
+    url: postUrl
+  });
+
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: 'Home', url: 'https://shinypull.com' },
+    { name: 'Blog', url: 'https://shinypull.com/blog' },
+    { name: post.title, url: postUrl }
+  ]);
 
   return (
     <>
@@ -160,7 +182,17 @@ export default function BlogPost() {
         title={post.title}
         description={post.description}
         image={post.image}
+        type="article"
+        article={{
+          publishedTime: post.published_at,
+          modifiedTime: post.updated_at,
+          author: post.author || 'Shiny Pull',
+          section: post.category
+        }}
       />
+      
+      <StructuredData schema={blogPostSchema} />
+      <StructuredData schema={breadcrumbSchema} />
 
       <div className="min-h-screen bg-gray-50">
         {/* Hero Image */}
@@ -186,6 +218,15 @@ export default function BlogPost() {
           {/* Article Header */}
           <article className="bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
             <div className="p-8 md:p-12">
+              {/* Breadcrumbs */}
+              <Breadcrumbs 
+                items={[
+                  { label: 'Home', path: '/' },
+                  { label: 'Blog', path: '/blog' },
+                  { label: post.title, path: `/blog/${post.slug}` }
+                ]}
+              />
+
               {/* Category */}
               <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-sm font-medium mb-4">
                 {post.category}
@@ -213,26 +254,12 @@ export default function BlogPost() {
                 <span>By {post.author}</span>
 
                 {/* Share Buttons */}
-                <div className="flex items-center gap-2 ml-auto">
-                  <span className="text-gray-400">Share:</span>
-                  <a
-                    href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    aria-label="Share on Twitter"
-                  >
-                    <Twitter className="w-4 h-4 text-gray-500" />
-                  </a>
-                  <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    aria-label="Share on Facebook"
-                  >
-                    <Facebook className="w-4 h-4 text-gray-500" />
-                  </a>
+                <div className="ml-auto">
+                  <ShareButtons 
+                    url={postUrl} 
+                    title={post.title} 
+                    description={post.description} 
+                  />
                 </div>
               </div>
 
