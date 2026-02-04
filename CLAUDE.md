@@ -52,6 +52,9 @@ src/
 │   ├── CreatorProfile.jsx # Individual creator stats
 │   ├── LiveCount.jsx     # Real-time subscriber counter
 │   ├── Compare.jsx       # Compare creators
+│   ├── Blog.jsx          # Blog listing page
+│   ├── BlogPost.jsx      # Individual blog post viewer
+│   ├── BlogAdmin.jsx     # Blog & products admin panel
 │   ├── Auth.jsx          # Sign in/up
 │   ├── About.jsx         # About page
 │   ├── Contact.jsx       # Contact page
@@ -60,7 +63,10 @@ src/
 ├── services/
 │   ├── youtubeService.js # YouTube Data API integration
 │   ├── twitchService.js  # Twitch Helix API integration
-│   └── creatorService.js # Supabase CRUD operations
+│   ├── creatorService.js # Supabase CRUD operations
+│   ├── blogService.js    # Blog posts CRUD
+│   ├── blogAdminService.js # Blog admin operations
+│   └── productsService.js # Affiliate products CRUD
 ├── lib/
 │   ├── supabase.js       # Supabase client
 │   └── analytics.js      # Google Analytics
@@ -73,7 +79,10 @@ scripts/
 ├── monitorTwitchStreams.js   # Twitch stream monitoring (every 5 min)
 ├── aggregateHoursWatched.js  # Calculate Twitch hours watched
 ├── seedTopCreators.js        # Seed top 50 creators
-└── seedTopCreatorsExpanded.js # Seed 200+ creators
+├── seedTopCreatorsExpanded.js # Seed 200+ creators
+├── seedBlogPosts.js          # Seed initial blog posts
+├── seedProducts.js           # Seed affiliate products
+└── updateBlogPost.js         # Update blog post content from temp files
 ```
 
 ## Routes
@@ -87,6 +96,9 @@ scripts/
 | `/compare` | Compare | Compare multiple creators |
 | `/live/:platform/:username` | LiveCount | Real-time counter |
 | `/:platform/:username` | CreatorProfile | Creator stats page |
+| `/blog` | Blog | Blog listing page |
+| `/blog/:slug` | BlogPost | Individual blog post |
+| `/blog/admin` | BlogAdmin | Blog & products admin panel |
 | `/auth`, `/signin`, `/signup` | Auth | Authentication |
 | `/about`, `/contact`, `/privacy`, `/terms` | Static | Info pages |
 
@@ -97,6 +109,8 @@ creators (id, platform, platform_id, username, display_name, profile_image, desc
 creator_stats (id, creator_id, recorded_at, subscribers, followers, total_views, total_posts, hours_watched_*, peak_viewers_*, avg_viewers_*, streams_count_*)
 stream_sessions (id, creator_id, stream_id, started_at, ended_at, peak_viewers, avg_viewers, hours_watched, game_name, title)
 viewer_samples (id, session_id, recorded_at, viewer_count, game_name)
+blog_posts (id, slug, title, description, content, category, author, image, read_time, published_at, is_published, created_at, updated_at)
+products (id, slug, name, price, badge, description, features[], image, affiliate_link, is_active, created_at, updated_at)
 ```
 
 ## Platform API Notes
@@ -117,6 +131,8 @@ viewer_samples (id, session_id, recorded_at, viewer_count, game_name)
 npm run dev                    # Dev server on port 3000
 npm run build                  # Production build
 npm run seed:top-creators      # Seed top creators
+npm run seed:blog              # Seed blog posts
+npm run seed:products          # Seed affiliate products
 npm run collect:daily          # Collect daily stats
 npm run monitor:twitch         # Monitor Twitch streams
 npm run aggregate:hours-watched # Aggregate hours watched
@@ -146,6 +162,42 @@ Scripts use `dotenv` to load `.env` automatically.
 - Numbers: Format with K/M/B suffixes via `formatNumber()`
 - Dates: Use `getTodayLocal()` for America/New_York timezone
 - Usernames: Store without @ prefix
+
+## Blog & Products System
+
+**Blog Admin Panel (`/blog/admin`):**
+- Full CRUD interface for blog posts and affiliate products
+- Two tabs: Posts and Products
+- Markdown content editor with product embed support
+- Publish/unpublish toggle for posts
+- Active/inactive toggle for products
+- Copy embed codes to clipboard
+
+**Product Embeds:**
+- Use `{{product:slug}}` syntax in blog post content
+- BlogPost component parses and replaces with ProductCard components
+- Products are fetched asynchronously from Supabase
+- ProductCard supports both snake_case (DB) and camelCase (legacy) fields
+
+**Updating Blog Content:**
+When you need to update a blog post with large content changes:
+1. Create the new content in a temp file (e.g., `temp_blog_updated.txt`)
+2. Use `scripts/updateBlogPost.js` as a template
+3. Modify the script to read your temp file and target the correct slug
+4. Run: `node scripts/updateBlogPost.js`
+5. Content is updated in Supabase (no need to git commit temp files)
+
+**Adding Products:**
+1. Visit `/blog/admin` → Products tab
+2. Click "New Product"
+3. Fill in: name, slug, price, badge, description, features, image URL, affiliate link
+4. Copy the embed code: `{{product:slug}}`
+5. Paste into any blog post content
+6. Product card automatically renders with image, features, and buy button
+
+**Product Images:**
+- Use Amazon product images: Right-click product image → "Open image in new tab" → Copy URL
+- Format: `https://m.media-amazon.com/images/I/[IMAGE_ID]._AC_SL1500_.jpg`
 
 ## Agent Instructions
 
