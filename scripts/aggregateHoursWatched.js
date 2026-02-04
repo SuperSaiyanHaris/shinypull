@@ -8,6 +8,9 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { config } from 'dotenv';
+
+config();
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
@@ -83,21 +86,26 @@ async function aggregateHoursWatched() {
     const weekStats = aggregateSessions(weekSessions || []);
     const monthStats = aggregateSessions(monthSessions || []);
 
-    // Update today's stats record
+    // Upsert hours watched data (update if exists, insert if not)
     const { error } = await supabase
       .from('creator_stats')
-      .update({
+      .upsert({
+        creator_id: creator.id,
+        recorded_at: todayStr,
         hours_watched_day: dayStats.hoursWatched,
         hours_watched_week: weekStats.hoursWatched,
         hours_watched_month: monthStats.hoursWatched,
         peak_viewers_day: dayStats.peakViewers,
         avg_viewers_day: dayStats.avgViewers,
         streams_count_day: dayStats.streamCount,
-      })
-      .eq('creator_id', creator.id)
-      .eq('recorded_at', todayStr);
+      }, {
+        onConflict: 'creator_id,recorded_at',
+        ignoreDuplicates: false
+      });
 
-    if (!error && monthStats.hoursWatched > 0) {
+    if (error) {
+      console.log(`   ❌ ${creator.display_name}: ${error.message}`);
+    } else if (monthStats.hoursWatched > 0) {
       console.log(`   ✅ ${creator.display_name}: ${monthStats.hoursWatched.toFixed(0)} hours watched (30d)`);
       updatedCount++;
     }

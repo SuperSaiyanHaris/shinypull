@@ -430,11 +430,6 @@ export default function CreatorProfile() {
                       value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
                       change={metrics?.last30Days.subs}
                     />
-                    <SummaryCard
-                      label="Hours Watched"
-                      sublabel="Last 30 days"
-                      value={creator.hoursWatchedMonth ? formatHoursWatched(creator.hoursWatchedMonth) : 'Tracking...'}
-                    />
                   </>
                 ) : (
                   <>
