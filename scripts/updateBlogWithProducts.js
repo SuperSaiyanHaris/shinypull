@@ -7,7 +7,7 @@ const supabase = createClient(
   process.env.VITE_SUPABASE_ANON_KEY
 );
 
-const content = readFileSync('temp_blog_with_products.txt', 'utf-8');
+const content = readFileSync('temp_blog_natural.txt', 'utf-8');
 
 const { data, error } = await supabase
   .from('blog_posts')
