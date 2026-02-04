@@ -1,6 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
+import BackToTop from './components/BackToTop';
 import Home from './pages/Home';
 import CreatorProfile from './pages/CreatorProfile';
 import Search from './pages/Search';
@@ -19,6 +21,8 @@ import BlogAdmin from './pages/BlogAdmin';
 function App() {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+      <ScrollToTop />
+      <BackToTop />
       <Header />
       <main className="flex-1">
         <Routes>
