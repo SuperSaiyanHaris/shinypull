@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio } from 'lucide-react';
+import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Info } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
@@ -35,7 +35,8 @@ export default function CreatorProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [chartRange, setChartRange] = useState(30);
-  const [chartMetric, setChartMetric] = useState('subscribers'); // subscribers, views, videos
+  // Default to views for YouTube (subscriber counts are rounded by YouTube API)
+  const [chartMetric, setChartMetric] = useState(platform === 'youtube' ? 'views' : 'subscribers');
 
   useEffect(() => {
     loadCreator();
@@ -354,7 +355,7 @@ export default function CreatorProfile() {
                 icon={Users}
                 label={platform === 'twitch' ? 'Followers' : 'Subscribers'}
                 value={formatNumber(creator.subscribers || creator.followers)}
-                sublabel={creator.hiddenSubscribers ? '(hidden)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
+                sublabel={creator.hiddenSubscribers ? '(hidden)' : platform === 'youtube' ? '(rounded by YouTube)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
               />
               {platform === 'twitch' ? (
                 <StatCard
@@ -393,31 +394,37 @@ export default function CreatorProfile() {
               )}
             </div>
 
+            {/* YouTube API Limitation Note */}
+            {platform === 'youtube' && (creator.subscribers || 0) >= 1000000 && (
+              <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl mb-6 text-sm">
+                <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-amber-800 font-medium">YouTube rounds subscriber counts</p>
+                  <p className="text-amber-700 mt-1">
+                    Since September 2019, YouTube displays abbreviated subscriber counts (e.g., 465M instead of exact numbers).
+                    Daily subscriber changes may appear as zero even when the channel is growing. View counts are accurate.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Growth Summary */}
             {(creator.subscribers || creator.followers) && (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <SummaryCard
-                  label={platform === 'twitch' ? 'Followers' : 'Subscribers'}
-                  sublabel="Last 30 days"
-                  value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
-                  change={metrics?.last30Days.subs}
-                />
-                {platform === 'twitch' ? (
-                  <SummaryCard
-                    label="Hours Watched"
-                    sublabel="Last 30 days"
-                    value={creator.hoursWatchedMonth ? formatHoursWatched(creator.hoursWatchedMonth) : 'Tracking...'}
-                  />
-                ) : (
-                  <SummaryCard
-                    label="Views"
-                    sublabel="Last 30 days"
-                    value={metrics ? formatNumber(metrics.last30Days.views) : '--'}
-                    change={metrics?.last30Days.views}
-                  />
-                )}
-                {platform !== 'twitch' && (
+                {platform === 'youtube' ? (
                   <>
+                    {/* For YouTube, lead with Views (accurate) instead of Subscribers (rounded) */}
+                    <SummaryCard
+                      label="Views"
+                      sublabel="Last 30 days"
+                      value={metrics ? formatNumber(metrics.last30Days.views) : '--'}
+                      change={metrics?.last30Days.views}
+                    />
+                    <SummaryCard
+                      label="Videos"
+                      sublabel="Last 30 days"
+                      value={metrics ? `+${metrics.last30Days.videos}` : '--'}
+                    />
                     <SummaryCard
                       label="Monthly Est."
                       sublabel="Based on avg CPM"
@@ -427,6 +434,35 @@ export default function CreatorProfile() {
                       label="Yearly Est."
                       sublabel="Based on avg CPM"
                       value={metrics ? formatEarnings(metrics.last30Days.views / 1000 * 2 * 12, metrics.last30Days.views / 1000 * 7 * 12) : '--'}
+                    />
+                  </>
+                ) : platform === 'twitch' ? (
+                  <>
+                    <SummaryCard
+                      label="Followers"
+                      sublabel="Last 30 days"
+                      value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
+                      change={metrics?.last30Days.subs}
+                    />
+                    <SummaryCard
+                      label="Hours Watched"
+                      sublabel="Last 30 days"
+                      value={creator.hoursWatchedMonth ? formatHoursWatched(creator.hoursWatchedMonth) : 'Tracking...'}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <SummaryCard
+                      label="Subscribers"
+                      sublabel="Last 30 days"
+                      value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
+                      change={metrics?.last30Days.subs}
+                    />
+                    <SummaryCard
+                      label="Views"
+                      sublabel="Last 30 days"
+                      value={metrics ? formatNumber(metrics.last30Days.views) : '--'}
+                      change={metrics?.last30Days.views}
                     />
                   </>
                 )}
@@ -504,7 +540,8 @@ export default function CreatorProfile() {
                           <td className="px-6 py-4 text-right">
                             <div className="flex flex-col items-end">
                               <span className="font-medium text-gray-900">{formatNumber(stat.subscribers || stat.followers)}</span>
-                              {stat.subsChange !== 0 && (
+                              {/* Only show subscriber changes for Twitch (YouTube rounds counts making changes unreliable) */}
+                              {platform === 'twitch' && stat.subsChange !== 0 && (
                                 <span className={`text-xs ${stat.subsChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                                   {stat.subsChange > 0 ? '+' : ''}{formatNumber(stat.subsChange)}
                                 </span>
@@ -545,9 +582,14 @@ export default function CreatorProfile() {
                       <tr className="bg-indigo-50 font-semibold">
                         <td className="px-6 py-4 text-indigo-900">Daily Average</td>
                         <td className="px-6 py-4 text-right">
-                          <span className={metrics.dailyAverage.subs >= 0 ? 'text-emerald-600' : 'text-red-500'}>
-                            {metrics.dailyAverage.subs >= 0 ? '+' : ''}{formatNumber(metrics.dailyAverage.subs)}
-                          </span>
+                          {/* For YouTube, show dash since subscriber counts are rounded */}
+                          {platform === 'youtube' ? (
+                            <span className="text-gray-400">—</span>
+                          ) : (
+                            <span className={metrics.dailyAverage.subs >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                              {metrics.dailyAverage.subs >= 0 ? '+' : ''}{formatNumber(metrics.dailyAverage.subs)}
+                            </span>
+                          )}
                         </td>
                         {platform !== 'twitch' && (
                           <>
@@ -563,9 +605,13 @@ export default function CreatorProfile() {
                       <tr className="bg-indigo-50 font-semibold">
                         <td className="px-6 py-4 text-indigo-900">Weekly Average</td>
                         <td className="px-6 py-4 text-right">
-                          <span className={metrics.weeklyAverage.subs >= 0 ? 'text-emerald-600' : 'text-red-500'}>
-                            {metrics.weeklyAverage.subs >= 0 ? '+' : ''}{formatNumber(metrics.weeklyAverage.subs)}
-                          </span>
+                          {platform === 'youtube' ? (
+                            <span className="text-gray-400">—</span>
+                          ) : (
+                            <span className={metrics.weeklyAverage.subs >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                              {metrics.weeklyAverage.subs >= 0 ? '+' : ''}{formatNumber(metrics.weeklyAverage.subs)}
+                            </span>
+                          )}
                         </td>
                         {platform !== 'twitch' && (
                           <>
@@ -581,9 +627,13 @@ export default function CreatorProfile() {
                       <tr className="bg-indigo-50 font-semibold">
                         <td className="px-6 py-4 text-indigo-900">Last 30 Days</td>
                         <td className="px-6 py-4 text-right">
-                          <span className={metrics.last30Days.subs >= 0 ? 'text-emerald-600' : 'text-red-500'}>
-                            {metrics.last30Days.subs >= 0 ? '+' : ''}{formatNumber(metrics.last30Days.subs)}
-                          </span>
+                          {platform === 'youtube' ? (
+                            <span className="text-gray-400">—</span>
+                          ) : (
+                            <span className={metrics.last30Days.subs >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                              {metrics.last30Days.subs >= 0 ? '+' : ''}{formatNumber(metrics.last30Days.subs)}
+                            </span>
+                          )}
                         </td>
                         {platform !== 'twitch' && (
                           <>
@@ -802,27 +852,54 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
     { label: 'All', value: 9999 },
   ];
 
-  const metrics = [
-    {
-      value: 'subscribers',
-      label: platform === 'twitch' ? 'Follower Growth' : 'Subscriber Growth',
-      dataKey: 'subscribers',
-      color: '#6366f1'
-    },
-  ];
+  // Build metrics array based on platform
+  // For YouTube: Views first (accurate), then Subscribers (rounded), then Videos
+  // For Twitch: Followers only (views deprecated)
+  const metrics = [];
 
-  // Add view growth for non-Twitch platforms (Twitch views are unreliable)
-  if (platform !== 'twitch') {
+  if (platform === 'youtube') {
+    // Views are accurate for YouTube, show first
     metrics.push({
       value: 'views',
       label: 'View Growth',
       dataKey: 'views',
       color: '#10b981'
     });
-  }
-
-  // Add video count metric for non-Twitch platforms
-  if (platform !== 'twitch') {
+    metrics.push({
+      value: 'subscribers',
+      label: 'Subscriber Growth',
+      dataKey: 'subscribers',
+      color: '#6366f1',
+      note: '(rounded by YouTube)'
+    });
+    metrics.push({
+      value: 'videos',
+      label: 'Video Count',
+      dataKey: 'videos',
+      color: '#f59e0b'
+    });
+  } else if (platform === 'twitch') {
+    // Twitch: only follower growth (views deprecated)
+    metrics.push({
+      value: 'subscribers',
+      label: 'Follower Growth',
+      dataKey: 'subscribers',
+      color: '#6366f1'
+    });
+  } else {
+    // Other platforms
+    metrics.push({
+      value: 'subscribers',
+      label: 'Subscriber Growth',
+      dataKey: 'subscribers',
+      color: '#6366f1'
+    });
+    metrics.push({
+      value: 'views',
+      label: 'View Growth',
+      dataKey: 'views',
+      color: '#10b981'
+    });
     metrics.push({
       value: 'videos',
       label: 'Video Count',
