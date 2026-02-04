@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Info } from 'lucide-react';
+import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
@@ -393,20 +393,6 @@ export default function CreatorProfile() {
                 />
               )}
             </div>
-
-            {/* YouTube API Limitation Note */}
-            {platform === 'youtube' && (creator.subscribers || 0) >= 1000000 && (
-              <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl mb-6 text-sm">
-                <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-amber-800 font-medium">YouTube rounds subscriber counts</p>
-                  <p className="text-amber-700 mt-1">
-                    Since September 2019, YouTube displays abbreviated subscriber counts (e.g., 465M instead of exact numbers).
-                    Daily subscriber changes may appear as zero even when the channel is growing. View counts are accurate.
-                  </p>
-                </div>
-              </div>
-            )}
 
             {/* Growth Summary */}
             {(creator.subscribers || creator.followers) && (

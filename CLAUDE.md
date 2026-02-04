@@ -205,6 +205,16 @@ getRankedCreators(platform, rankType, limit) // Get top creators by subs/views/g
 - All times stored as TIMESTAMPTZ, dates as DATE
 - YouTube usernames stored without @ prefix
 
+## UI/UX Guidelines
+
+**IMPORTANT - NO DISCLAIMERS OR NOTES ON USER-FACING PAGES:**
+- NEVER add warning banners, info boxes, disclaimers, or explanatory notes to user-facing pages
+- Do not add notes explaining API limitations, data accuracy issues, or technical caveats
+- The only exception is the Terms of Service page - legal disclaimers belong there only
+- If data has limitations (e.g., YouTube rounds subscriber counts), handle it gracefully in the UI without explaining why
+- Show dashes, hide metrics, or adjust the UI silently - don't educate users about technical details
+- Keep the UI clean and professional like SocialBlade - they don't explain API quirks to users
+
 ## Seeding Top Creators
 
 The database can be seeded with top YouTube and Twitch creators using:
