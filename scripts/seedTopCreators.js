@@ -21,6 +21,18 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
 
+/**
+ * Get today's date in America/New_York timezone (YYYY-MM-DD format)
+ */
+function getTodayLocal() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
+
 const YOUTUBE_QUERIES = [
   'MrBeast',
   'T-Series',
@@ -105,7 +117,7 @@ async function upsertCreator(creatorData) {
 }
 
 async function saveCreatorStats(creatorId, stats) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayLocal();
 
   const { data, error } = await supabase
     .from('creator_stats')

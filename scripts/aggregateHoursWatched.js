@@ -16,12 +16,24 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
 
+/**
+ * Get today's date in America/New_York timezone (YYYY-MM-DD format)
+ */
+function getTodayLocal() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
+
 async function aggregateHoursWatched() {
   console.log('📊 Aggregating hours watched metrics...');
   console.log(`   Time: ${new Date().toISOString()}\n`);
 
   const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = getTodayLocal();
 
   // Calculate date ranges
   const dayAgo = new Date(today);

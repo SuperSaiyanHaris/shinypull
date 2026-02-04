@@ -27,10 +27,23 @@ export async function upsertCreator(creatorData) {
 }
 
 /**
+ * Get today's date in America/New_York timezone (YYYY-MM-DD format)
+ * This ensures consistent date handling regardless of UTC offset
+ */
+function getTodayLocal() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
+
+/**
  * Save creator stats snapshot
  */
 export async function saveCreatorStats(creatorId, stats) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayLocal();
 
   const { data, error } = await supabase
     .from('creator_stats')

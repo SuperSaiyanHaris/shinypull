@@ -14,6 +14,18 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
 
+/**
+ * Get today's date in America/New_York timezone (YYYY-MM-DD format)
+ */
+function getTodayLocal() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
+
 // Top 200+ YouTube Channel IDs (by subscriber count, as of 2024-2025)
 // Using IDs is 100x more efficient than search queries
 const YOUTUBE_CHANNEL_IDS = [
@@ -249,7 +261,7 @@ async function upsertCreator(creatorData) {
 }
 
 async function saveCreatorStats(creatorId, stats) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayLocal();
   const { error } = await supabase
     .from('creator_stats')
     .upsert({

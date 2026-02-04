@@ -141,6 +141,19 @@ async function fetchTwitchVODViews(broadcasterId) {
 }
 
 /**
+ * Get today's date in America/New_York timezone (YYYY-MM-DD format)
+ * This ensures consistent date handling regardless of UTC offset
+ */
+function getTodayLocal() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
+
+/**
  * Process array in chunks
  */
 function chunk(array, size) {
@@ -175,8 +188,9 @@ async function parallelLimit(tasks, limit) {
 }
 
 async function collectDailyStats() {
+  const today = getTodayLocal();
   console.log('📊 Starting daily stats collection (batch mode)...');
-  console.log(`   Date: ${new Date().toISOString().split('T')[0]}\n`);
+  console.log(`   Date: ${today} (America/New_York)\n`);
 
   // Check credentials
   console.log('🔑 Checking credentials...');
@@ -202,7 +216,6 @@ async function collectDailyStats() {
   console.log(`   YouTube: ${youtubeCreators.length}`);
   console.log(`   Twitch: ${twitchCreators.length}\n`);
 
-  const today = new Date().toISOString().split('T')[0];
   let successCount = 0;
   let errorCount = 0;
   const statsToUpsert = [];
