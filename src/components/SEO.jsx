@@ -5,12 +5,12 @@ export default function SEO({
   title, 
   description, 
   keywords,
-  image = 'https://www.shinypull.com/og-image.png',
+  image = 'https://shinypull.com/og-image.png',
   type = 'website',
   article = null, // { publishedTime, modifiedTime, author, section }
 }) {
   const location = useLocation();
-  const url = `https://www.shinypull.com${location.pathname}`;
+  const url = `https://shinypull.com${location.pathname}`;
   
   const fullTitle = title ? `${title} | Shiny Pull` : 'Shiny Pull - Social Media Analytics & Statistics';
   const defaultDescription = 'Track YouTube, Twitch, TikTok, Instagram & Twitter statistics. View subscriber counts, earnings estimates, rankings and growth analytics for your favorite creators.';
