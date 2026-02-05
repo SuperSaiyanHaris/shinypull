@@ -468,10 +468,14 @@ export default function CreatorProfile() {
             </Link>
 
             {/* Milestone Predictions */}
-            {metrics && (creator.subscribers || creator.followers) && (
+            {metrics && (
+              platform === 'youtube'
+                ? creator.totalViews && metrics.dailyAverage.views > 0
+                : creator.subscribers || creator.followers
+            ) && (
               <MilestonePredictions
-                currentCount={creator.subscribers || creator.followers}
-                dailyGrowth={metrics.dailyAverage.subs}
+                currentCount={platform === 'youtube' ? creator.totalViews : (creator.subscribers || creator.followers)}
+                dailyGrowth={platform === 'youtube' ? metrics.dailyAverage.views : metrics.dailyAverage.subs}
                 platform={platform}
               />
             )}
@@ -720,12 +724,22 @@ function formatHoursWatched(hours) {
 }
 
 function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
-  const milestones = [
+  const followerMilestones = [
     100000, 250000, 500000, 750000,
     1000000, 2000000, 5000000, 10000000,
     25000000, 50000000, 75000000, 100000000,
     150000000, 200000000, 250000000, 300000000
   ];
+
+  const viewMilestones = [
+    1000000, 5000000, 10000000, 25000000,
+    50000000, 100000000, 250000000, 500000000,
+    1000000000, 2500000000, 5000000000, 10000000000,
+    25000000000, 50000000000
+  ];
+
+  const milestones = platform === 'youtube' ? viewMilestones : followerMilestones;
+  const metricLabel = platform === 'youtube' ? 'views' : 'followers';
 
   // Find next milestones (up to 3)
   const nextMilestones = milestones
@@ -778,7 +792,7 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
         <h3 className="text-lg font-semibold text-gray-900">Milestone Predictions</h3>
       </div>
       <p className="text-sm text-gray-500 mb-4">
-        Based on current growth rate of <span className="font-semibold text-indigo-600">+{formatNumber(dailyGrowth)}/day</span>
+        Based on current {metricLabel} growth of <span className="font-semibold text-indigo-600">+{formatNumber(dailyGrowth)}/day</span>
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {predictions.map((pred, index) => (
