@@ -21,6 +21,8 @@ const staticPages = [
   { url: '/', changefreq: 'daily', priority: 1.0 },
   { url: '/blog', changefreq: 'daily', priority: 0.9 },
   { url: '/rankings', changefreq: 'daily', priority: 0.9 },
+  { url: '/rankings/youtube', changefreq: 'daily', priority: 0.85 },
+  { url: '/rankings/twitch', changefreq: 'daily', priority: 0.85 },
   { url: '/compare', changefreq: 'weekly', priority: 0.8 },
   { url: '/search', changefreq: 'weekly', priority: 0.7 },
   { url: '/about', changefreq: 'monthly', priority: 0.6 },
@@ -106,6 +108,12 @@ async function generateSitemap() {
         lastmod: creator.updated_at,
         changefreq: 'daily',
         priority: 0.7,
+      });
+      urls.push({
+        url: `/live/${creator.platform}/${creator.username}`,
+        lastmod: creator.updated_at,
+        changefreq: 'daily',
+        priority: 0.6,
       });
     });
   }

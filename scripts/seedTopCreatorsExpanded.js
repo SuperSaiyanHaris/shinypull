@@ -1,3 +1,5 @@
+import { config } from 'dotenv';
+config();
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -187,8 +189,21 @@ const YOUTUBE_CHANNEL_IDS = [
   'UCcdwLMPsaU2ezNSJU1nFoBQ', // MrBeast Gaming
   'UCjgpFI5dU-D1-kh9H1muoxQ', // Shane Dawson
   'UCq-Fj5jknLsUf-MWSy4_brA', // T-Series
-  'UCo_IB5145EVNcf8hw1Kku7w', // Nas Daily
-  'UC4USoIAL9qcsx5nCZV_QRnA', // Tom Scott
+  'UCo_IB5145EVNcf8hw1Kku7w', // The Game Theorists
+  'UC4USoIAL9qcsx5nCZV_QRnA', // iDubbbzTV
+  // Education & Explainer
+  'UCy0tKL1T7wFoYcxCe0xjN6Q', // Technology Connections
+  'UCUHW94eEFW7hkUMVaZz4eDg', // minutephysics
+  'UC2C_jShtL725hvbm1arSV9w', // CGP Grey
+  'UCZYTClx2T1of7BRZ86-8fow', // SciShow
+  'UCJkMlOu7faDgqh4PfzbpLdg', // Nerdwriter1
+  'UC9RM-iSvTu1uPJb8X5yp3EQ', // Wendover Productions
+  'UCRFIPG2u1DxKLNuE3y2SjHA', // SciShow Kids
+  // Sub-channels & extras
+  'UCdBK94H6oZT2Q7l0-b0xmMg', // ShortCircuit (LMG)
+  'UCFLFc8Lpbwt4jPtY1_Ai5yA', // LMG Clips
+  'UCYJPby9DRCteedh5tfxVbrw', // Smosh Pit
+  'UCJ2ZDzMRgSrxmwphstrm8Ww', // Smosh Games
 ];
 
 // Top 200 Twitch streamers by followers
@@ -235,7 +250,11 @@ const TWITCH_USERNAMES = [
   'calebhart42', 'simply', 'smallant', 'wirtual', 'pointcrow', 'linkus7',
   'atrioc', 'stanz', 'connoreatspants', 'slimecicle', 'jschlatt', 'quig',
   'smajor', 'philza', 'wilbursoot', 'tommyinnit', 'tubbo', 'ranboo',
-  'georgenotfound', 'sapnap', 'punz', 'antfrost', 'badboyhalo', 'skeppy'
+  'georgenotfound', 'sapnap', 'punz', 'antfrost', 'badboyhalo', 'skeppy',
+  // VTubers & 2024-2025 wave
+  'ironmouse', 'lilypichu', 'caseoh',
+  // Esports legends who stream
+  'faker', 'cdew', 'steel',
 ];
 
 // Utility functions
