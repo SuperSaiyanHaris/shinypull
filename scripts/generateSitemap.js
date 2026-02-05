@@ -87,18 +87,22 @@ async function generateSitemap() {
   console.log('👤 Fetching creator profiles...');
   const { data: creators, error: creatorsError } = await supabase
     .from('creators')
-    .select('username, updated_at')
+    .select('platform, username, updated_at')
     .not('username', 'is', null)
     .order('updated_at', { ascending: false })
-    .limit(500); // Top 500 creators
+    .limit(500);
 
   if (creatorsError) {
     console.error('❌ Error fetching creators:', creatorsError);
   } else {
     console.log(`   Found ${creators.length} creator profiles`);
+    const seen = new Set();
     creators.forEach(creator => {
+      const key = `${creator.platform}/${creator.username.toLowerCase()}`;
+      if (seen.has(key)) return;
+      seen.add(key);
       urls.push({
-        url: `/creator/${creator.username}`,
+        url: `/${creator.platform}/${creator.username}`,
         lastmod: creator.updated_at,
         changefreq: 'daily',
         priority: 0.7,
