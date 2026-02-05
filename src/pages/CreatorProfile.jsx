@@ -735,7 +735,8 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
     1000000, 5000000, 10000000, 25000000,
     50000000, 100000000, 250000000, 500000000,
     1000000000, 2500000000, 5000000000, 10000000000,
-    25000000000, 50000000000
+    25000000000, 50000000000, 100000000000, 250000000000,
+    500000000000, 1000000000000
   ];
 
   const milestones = platform === 'youtube' ? viewMilestones : followerMilestones;
@@ -765,6 +766,7 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
   });
 
   const formatMilestone = (num) => {
+    if (num >= 1000000000000) return (num / 1000000000000).toFixed(0) + 'T';
     if (num >= 1000000000) return (num / 1000000000).toFixed(0) + 'B';
     if (num >= 1000000) return (num / 1000000).toFixed(0) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
