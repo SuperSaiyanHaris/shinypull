@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, Instagram, TrendingUp, BarChart3, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { Search, Youtube, Twitch, Instagram, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
+import { getAllPosts } from '../services/blogService';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-600', stats: '72M+ channels', available: true },
@@ -37,7 +38,12 @@ const features = [
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [latestPosts, setLatestPosts] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getAllPosts().then(posts => setLatestPosts(posts.slice(0, 3)));
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -182,6 +188,75 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Latest Blog Posts */}
+        {latestPosts.length > 0 && (
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-24 bg-gray-50">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex items-center justify-between mb-12">
+                <div>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                    Latest from the Blog
+                  </h2>
+                  <p className="text-lg text-gray-600">
+                    Tips, guides, and insights for creators
+                  </p>
+                </div>
+                <Link
+                  to="/blog"
+                  className="hidden sm:flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+                >
+                  View all posts <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                {latestPosts.map(post => (
+                  <Link
+                    key={post.slug}
+                    to={`/blog/${post.slug}`}
+                    className="group"
+                  >
+                    <article className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="p-6 flex flex-col flex-1">
+                        <span className="text-indigo-600 font-medium text-sm mb-2">
+                          {post.category}
+                        </span>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                          {post.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-1">
+                          {post.description}
+                        </p>
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            {post.read_time}
+                          </span>
+                          <span className="text-indigo-600 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                            Read more <ChevronRight className="w-4 h-4" />
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+
+              <Link
+                to="/blog"
+                className="mt-8 flex sm:hidden items-center justify-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+              >
+                View all posts <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* CTA Section */}
         <section className="w-full px-4 sm:px-6 lg:px-8 py-24">
