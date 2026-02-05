@@ -1,0 +1,39 @@
+name: YouTube Creator Discovery
+
+on:
+  schedule:
+    # Run daily at 5 AM UTC (12 AM EST / 11 PM CST)
+    - cron: '0 5 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  discover-creators:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Discover YouTube creators
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          VITE_YOUTUBE_API_KEY: ${{ secrets.VITE_YOUTUBE_API_KEY }}
+        run: node scripts/discoverYouTubeCreators.js
+
+      - name: Report completion
+        if: success()
+        run: echo "✅ YouTube creator discovery completed successfully"
+
+      - name: Report failure
+        if: failure()
+        run: echo "❌ YouTube creator discovery failed"

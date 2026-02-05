@@ -23,9 +23,9 @@ function parseMarkdown(content) {
     // Bold and italic
     .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Lists
-    .replace(/^\d+\. (.+)$/gm, '<li class="ml-6 mb-2 list-decimal">$1</li>')
-    .replace(/^- (.+)$/gm, '<li class="ml-6 mb-2 list-disc">$1</li>')
+    // Lists - tighter spacing on mobile
+    .replace(/^\d+\. (.+)$/gm, '<li class="ml-4 md:ml-6 mb-1 md:mb-2 list-decimal">$1</li>')
+    .replace(/^- (.+)$/gm, '<li class="ml-4 md:ml-6 mb-1 md:mb-2 list-disc">$1</li>')
     // Horizontal rule
     .replace(/^---$/gm, '<hr class="my-8 border-gray-200" />')
     // Paragraphs
