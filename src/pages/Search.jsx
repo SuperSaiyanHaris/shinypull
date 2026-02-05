@@ -6,6 +6,7 @@ import { searchChannels as searchTwitch } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
+import { formatNumber } from '../lib/utils';
 
 const platformIcons = {
   youtube: Youtube,
@@ -260,10 +261,3 @@ export default function Search() {
   );
 }
 
-function formatNumber(num) {
-  if (!num) return '0';
-  if (num >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
-  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return num.toLocaleString();
-}

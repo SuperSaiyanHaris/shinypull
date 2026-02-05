@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, TrendingDown, Minus, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio } from 'lucide-react';
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
+import { formatNumber } from '../lib/utils';
 
 const platformIcons = {
   youtube: Youtube,
@@ -696,14 +697,6 @@ function SummaryCard({ label, sublabel, value, change }) {
       )}
     </div>
   );
-}
-
-function formatNumber(num) {
-  if (num === null || num === undefined) return '-';
-  if (Math.abs(num) >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
-  if (Math.abs(num) >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-  if (Math.abs(num) >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return num.toLocaleString();
 }
 
 function formatEarnings(low, high) {

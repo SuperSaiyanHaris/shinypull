@@ -4,6 +4,7 @@ import { Youtube, Twitch, Instagram, TrendingUp, Users, Eye, Trophy } from 'luci
 import { getRankedCreators } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
+import { formatNumber } from '../lib/utils';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', hoverColor: 'hover:bg-red-700', lightBg: 'bg-red-50', textColor: 'text-red-600', available: true },
@@ -238,10 +239,3 @@ export default function Rankings() {
   );
 }
 
-function formatNumber(num) {
-  if (num === null || num === undefined) return '-';
-  if (Math.abs(num) >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
-  if (Math.abs(num) >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-  if (Math.abs(num) >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return num.toLocaleString();
-}

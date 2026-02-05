@@ -5,6 +5,7 @@ import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
+import { formatNumber } from '../lib/utils';
 
 const platformConfig = {
   youtube: { icon: Youtube, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
@@ -380,10 +381,3 @@ function getWinner(values) {
   return winners.length === 1 ? winnerIndex : null;
 }
 
-function formatNumber(num) {
-  if (num === null || num === undefined) return '-';
-  if (Math.abs(num) >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
-  if (Math.abs(num) >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-  if (Math.abs(num) >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return num.toLocaleString();
-}
