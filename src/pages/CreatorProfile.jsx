@@ -642,7 +642,7 @@ export default function CreatorProfile() {
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Collecting Historical Data</h3>
                 <p className="text-gray-500 text-sm mb-2">
-                  We're tracking this creator's stats. Check back tomorrow to see daily growth metrics!
+                  We've added this creator to our tracking system. Check back tomorrow to see daily growth metrics!
                 </p>
                 <p className="text-xs text-gray-400">
                   {statsHistory.length} data point(s) collected so far
