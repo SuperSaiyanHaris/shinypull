@@ -44,7 +44,9 @@ src/
 │   ├── Header.jsx        # Navigation header
 │   ├── Footer.jsx        # Site footer
 │   ├── SEO.jsx           # Meta tags for pages
-│   └── Odometer.jsx      # Animated number counter
+│   ├── Odometer.jsx      # Animated number counter
+│   ├── ProductCard.jsx   # Full-size affiliate product card
+│   └── MiniProductCard.jsx # Compact product card + grid
 ├── pages/
 │   ├── Home.jsx          # Landing page with search
 │   ├── Search.jsx        # Creator search
@@ -174,10 +176,12 @@ Scripts use `dotenv` to load `.env` automatically.
 - Copy embed codes to clipboard
 
 **Product Embeds:**
-- Use `{{product:slug}}` syntax in blog post content
-- BlogPost component parses and replaces with ProductCard components
+- Use `{{product:slug}}` for full-size product cards in blog content
+- Use `{{product-mini:slug}}` for compact vertical cards (image, name, price, buy button)
+- Use `{{product-grid}}...{{/product-grid}}` to wrap mini cards in a responsive grid
+- BlogPost component parses and replaces with ProductCard/MiniProductCard components
 - Products are fetched asynchronously from Supabase
-- ProductCard supports both snake_case (DB) and camelCase (legacy) fields
+- Both components support snake_case (DB) and camelCase (legacy) fields
 
 **Updating Blog Content:**
 When you need to update a blog post with large content changes:
@@ -215,4 +219,4 @@ When you need to update a blog post with large content changes:
 
 ---
 
-*Last updated: 2026-02-03*
+*Last updated: 2026-02-06*

@@ -68,6 +68,30 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://shinypull.com/blog/twitch-streaming-equipment</loc>
+    <lastmod>2026-02-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/blog/budget-streaming-setup</loc>
+    <lastmod>2026-02-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/blog/intermediate-streaming-setup</loc>
+    <lastmod>2026-02-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/blog/professional-streaming-setup</loc>
+    <lastmod>2026-02-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://shinypull.com/twitch/liminha</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>daily</changefreq>
