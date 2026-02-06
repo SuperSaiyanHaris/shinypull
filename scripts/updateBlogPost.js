@@ -12,7 +12,7 @@ const content = readFileSync('temp_blog_updated.txt', 'utf-8');
 const { data, error } = await supabase
   .from('blog_posts')
   .update({ content })
-  .eq('slug', 'best-streaming-setup-2026');
+  .eq('slug', 'grow-youtube-channel-2026');
 
 if (error) {
   console.error('Error:', error);
