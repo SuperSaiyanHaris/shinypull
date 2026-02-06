@@ -39,10 +39,10 @@ export default function MiniProductCard({ product }) {
 
         {/* Product Info */}
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold text-gray-900 truncate">
+          <h4 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight">
             {product.name}
           </h4>
-          <p className="text-lg font-bold text-indigo-600">
+          <p className="text-base font-bold text-indigo-600 mt-1">
             {product.price}
           </p>
         </div>
@@ -73,7 +73,7 @@ export default function MiniProductCard({ product }) {
  */
 export function MiniProductGrid({ children }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 my-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 my-6">
       {children}
     </div>
   );
