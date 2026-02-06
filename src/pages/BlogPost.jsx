@@ -6,6 +6,7 @@ import StructuredData, { createBlogPostingSchema, createBreadcrumbSchema } from 
 import Breadcrumbs from '../components/Breadcrumbs';
 import ShareButtons from '../components/ShareButtons';
 import ProductCard from '../components/ProductCard';
+import MiniProductCard, { MiniProductGrid } from '../components/MiniProductCard';
 import { getPostBySlug, getRelatedPosts } from '../services/blogService';
 import { getProduct } from '../services/productsService';
 
@@ -81,7 +82,7 @@ function parseMarkdown(content) {
 /**
  * Component that loads and displays a product card
  */
-function ProductEmbed({ slug }) {
+function ProductEmbed({ slug, mini = false }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -97,48 +98,88 @@ function ProductEmbed({ slug }) {
 
   if (loading) {
     return (
-      <div className="my-6 p-6 bg-gray-50 rounded-lg flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-indigo-600 animate-spin" />
+      <div className={`${mini ? 'p-4' : 'my-6 p-6'} bg-gray-50 rounded-lg flex items-center justify-center`}>
+        <Loader2 className="w-5 h-5 text-indigo-600 animate-spin" />
       </div>
     );
   }
 
-  return <ProductCard product={product} />;
+  return mini ? <MiniProductCard product={product} /> : <ProductCard product={product} />;
 }
 
 /**
  * Renders blog content with support for embedded product cards
- * Use {{product:slug}} in content to embed a product card
+ * Use {{product:slug}} for full card, {{product-mini:slug}} for compact card
+ * Use {{product-grid}}...{{/product-grid}} to wrap mini cards in a grid
  */
 function BlogContent({ content }) {
   if (!content) return null;
 
-  // Split content by product embeds: {{product:slug}}
-  const parts = content.split(/(\{\{product:[^}]+\}\})/g);
+  // Split content by all product embeds and grid markers
+  const parts = content.split(/(\{\{product(?:-mini)?:[^}]+\}\}|\{\{product-grid\}\}|\{\{\/product-grid\}\})/g);
+
+  let inGrid = false;
+  let gridItems = [];
+
+  const elements = [];
+
+  parts.forEach((part, index) => {
+    // Check for grid start
+    if (part === '{{product-grid}}') {
+      inGrid = true;
+      gridItems = [];
+      return;
+    }
+
+    // Check for grid end
+    if (part === '{{/product-grid}}') {
+      if (gridItems.length > 0) {
+        elements.push(
+          <MiniProductGrid key={`grid-${index}`}>
+            {gridItems}
+          </MiniProductGrid>
+        );
+      }
+      inGrid = false;
+      gridItems = [];
+      return;
+    }
+
+    // Check for mini product embed
+    const miniMatch = part.match(/\{\{product-mini:([^}]+)\}\}/);
+    if (miniMatch) {
+      const productSlug = miniMatch[1];
+      const embed = <ProductEmbed key={`mini-${index}`} slug={productSlug} mini={true} />;
+      if (inGrid) {
+        gridItems.push(embed);
+      } else {
+        elements.push(embed);
+      }
+      return;
+    }
+
+    // Check for full product embed
+    const productMatch = part.match(/\{\{product:([^}]+)\}\}/);
+    if (productMatch) {
+      const productSlug = productMatch[1];
+      elements.push(<ProductEmbed key={`product-${index}`} slug={productSlug} />);
+      return;
+    }
+
+    // Regular markdown content
+    if (part.trim()) {
+      elements.push(
+        <div
+          key={`content-${index}`}
+          dangerouslySetInnerHTML={{ __html: parseMarkdown(part) }}
+        />
+      );
+    }
+  });
 
   return (
     <div className="prose prose-lg max-w-none">
-      {parts.map((part, index) => {
-        // Check if this part is a product embed
-        const productMatch = part.match(/\{\{product:([^}]+)\}\}/);
-
-        if (productMatch) {
-          const productSlug = productMatch[1];
-          return <ProductEmbed key={index} slug={productSlug} />;
-        }
-
-        // Regular markdown content
-        if (part.trim()) {
-          return (
-            <div
-              key={index}
-              dangerouslySetInnerHTML={{ __html: parseMarkdown(part) }}
-            />
-          );
-        }
-
-        return null;
-      })}
+      {elements}
     </div>
   );
 }
