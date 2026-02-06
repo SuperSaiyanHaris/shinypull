@@ -552,7 +552,9 @@ export default function CreatorProfile() {
                                 <div className="flex flex-col items-end">
                                   <span className="font-medium text-gray-900">{formatNumber(stat.total_posts || 0)}</span>
                                   {stat.videosChange !== 0 && (
-                                    <span className="text-xs text-emerald-600">+{stat.videosChange}</span>
+                                    <span className={`text-xs ${stat.videosChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                      {stat.videosChange > 0 ? '+' : ''}{stat.videosChange}
+                                    </span>
                                   )}
                                 </div>
                               </td>
@@ -624,7 +626,9 @@ export default function CreatorProfile() {
                         {platform !== 'twitch' && (
                           <>
                             <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.last30Days.views)}</td>
-                            <td className="px-6 py-4 text-right text-emerald-600">+{metrics.last30Days.videos}</td>
+                            <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                              {metrics.last30Days.videos >= 0 ? '+' : ''}{metrics.last30Days.videos}
+                            </td>
                             <td className="px-6 py-4 text-right text-indigo-900">
                               {formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)}
                             </td>

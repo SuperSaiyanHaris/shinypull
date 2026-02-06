@@ -91,6 +91,13 @@ export default function BlogAdmin() {
     fetchData();
   }, []);
 
+  // Scroll to top when entering edit mode
+  useEffect(() => {
+    if (isEditingPost || isEditingProduct) {
+      window.scrollTo(0, 0);
+    }
+  }, [isEditingPost, isEditingProduct]);
+
   async function fetchData() {
     try {
       setLoading(true);
