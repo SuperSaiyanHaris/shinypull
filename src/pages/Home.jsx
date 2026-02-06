@@ -61,38 +61,42 @@ export default function Home() {
       />
 
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-100 rounded-full opacity-50 blur-3xl"></div>
-            <div className="absolute top-20 -left-40 w-80 h-80 bg-purple-100 rounded-full opacity-50 blur-3xl"></div>
+        {/* Hero Section - Dark Gradient with Mesh */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+          {/* Animated mesh gradient background */}
+          <div className="absolute inset-0">
+            {/* Grid pattern */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+            {/* Gradient orbs */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
           </div>
 
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-16 sm:pb-24">
+          <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 pb-20 sm:pb-32">
             <div className="text-center max-w-4xl mx-auto">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-indigo-50 rounded-full text-xs sm:text-sm font-medium text-indigo-600 mb-6 sm:mb-8">
-                <span className="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></span>
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-xs sm:text-sm font-medium text-indigo-300 mb-6 sm:mb-8">
+                <span className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
                 Real-time creator analytics
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4 sm:mb-6 tracking-tight px-2">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-6 tracking-tight px-2">
                 Social Media{' '}
-                <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                   Statistics
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-4">
+              <p className="text-base sm:text-lg lg:text-xl text-slate-300 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-4">
                 Track followers, views, and growth for your favorite YouTube and Twitch creators. Get detailed analytics and insights.
               </p>
 
-              {/* Search Bar */}
+              {/* Search Bar - Glassmorphism */}
               <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12 sm:mb-16 px-4">
                 <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-20 group-hover:opacity-30 blur transition duration-300"></div>
-                  <div className="relative flex items-center bg-white rounded-2xl shadow-xl shadow-gray-200/50">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-50 group-hover:opacity-70 blur transition duration-300"></div>
+                  <div className="relative flex items-center bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl">
                     <Search className="absolute left-3 sm:left-5 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                     <input
                       type="text"
@@ -111,8 +115,8 @@ export default function Home() {
                 </div>
               </form>
 
-              {/* Platform Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+              {/* Platform Cards - Glass style */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto px-4">
                 {platforms.map((platform) => {
                   const Icon = platform.icon;
 
@@ -121,7 +125,7 @@ export default function Home() {
                       <Link
                         key={platform.id}
                         to={`/rankings/${platform.id}`}
-                        className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-gray-200 transition-all duration-300 hover:-translate-y-1"
+                        className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/20 hover:border-white/20 transition-all duration-300 hover:-translate-y-1"
                       >
                         <div className={`w-14 h-14 ${platform.bgColor} rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
                           {Icon ? (
@@ -130,10 +134,10 @@ export default function Home() {
                             <span className={`${platform.textColor} font-bold text-lg`}>{platform.name.slice(0, 2)}</span>
                           )}
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
+                        <h3 className="font-semibold text-white mb-1 group-hover:text-indigo-300 transition-colors">
                           {platform.name}
                         </h3>
-                        <p className="text-sm text-gray-500">{platform.stats}</p>
+                        <p className="text-sm text-slate-400">{platform.stats}</p>
                       </Link>
                     );
                   }
@@ -141,23 +145,26 @@ export default function Home() {
                   return (
                     <div
                       key={platform.id}
-                      className="relative bg-gray-50/50 rounded-2xl p-6 border border-gray-100 opacity-60 cursor-not-allowed"
+                      className="relative bg-white/5 rounded-2xl p-6 border border-white/5 opacity-50 cursor-not-allowed"
                     >
-                      <div className={`w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                      <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center mx-auto mb-4">
                         {Icon ? (
-                          <Icon className="w-7 h-7 text-gray-400" />
+                          <Icon className="w-7 h-7 text-slate-500" />
                         ) : (
-                          <span className="text-gray-400 font-bold text-lg">{platform.name.slice(0, 2)}</span>
+                          <span className="text-slate-500 font-bold text-lg">{platform.name.slice(0, 2)}</span>
                         )}
                       </div>
-                      <h3 className="font-semibold text-gray-400 mb-1">{platform.name}</h3>
-                      <p className="text-sm text-gray-400">{platform.stats}</p>
+                      <h3 className="font-semibold text-slate-500 mb-1">{platform.name}</h3>
+                      <p className="text-sm text-slate-600">{platform.stats}</p>
                     </div>
                   );
                 })}
               </div>
             </div>
           </div>
+
+          {/* Bottom fade to white */}
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
         </section>
 
         {/* Features Section */}
@@ -258,26 +265,33 @@ export default function Home() {
           </section>
         )}
 
-        {/* CTA Section */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-24">
-          <div className="max-w-4xl mx-auto">
-            <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-8 sm:p-12 text-center">
-              <div className="absolute inset-0 bg-grid-white/10"></div>
-              <div className="relative">
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-                  Start tracking your favorite creators
-                </h2>
-                <p className="text-indigo-100 mb-8 max-w-xl mx-auto">
-                  Search for any YouTube or Twitch creator and get detailed analytics instantly.
-                </p>
-                <Link
-                  to="/search"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors shadow-lg"
-                >
-                  Get Started
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </div>
+        {/* CTA Section - Dark Footer */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+          {/* Background effects */}
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+            <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+          </div>
+
+          {/* Top fade from white */}
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white to-transparent"></div>
+
+          <div className="relative w-full px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
+                Start tracking your favorite creators
+              </h2>
+              <p className="text-slate-300 mb-8 max-w-xl mx-auto text-lg">
+                Search for any YouTube or Twitch creator and get detailed analytics instantly.
+              </p>
+              <Link
+                to="/search"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors shadow-lg shadow-indigo-500/20"
+              >
+                Get Started
+                <ArrowRight className="w-5 h-5" />
+              </Link>
             </div>
           </div>
         </section>

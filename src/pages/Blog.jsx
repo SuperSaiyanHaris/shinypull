@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, ChevronRight, Loader2 } from 'lucide-react';
+import { Calendar, Clock, ChevronRight, Loader2, BookOpen } from 'lucide-react';
 import SEO from '../components/SEO';
 import { getAllPosts, getAllCategories } from '../services/blogService';
 
@@ -44,13 +44,23 @@ export default function Blog() {
       />
 
       <div className="min-h-screen bg-gray-50">
-        {/* Hero */}
-        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white py-16">
-          <div className="max-w-6xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-bold mb-4">Creator Resources</h1>
-            <p className="text-xl text-indigo-100 max-w-2xl mx-auto">
-              Expert guides on streaming gear, growth strategies, and industry insights to help you succeed as a creator
-            </p>
+        {/* Header - Dark */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+            <div className="absolute top-0 right-1/4 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
+          </div>
+          <div className="relative w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+            <div className="max-w-6xl mx-auto text-center">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3">
+                <BookOpen className="w-7 h-7 sm:w-9 sm:h-9 text-indigo-400" />
+                <h1 className="text-3xl sm:text-4xl font-bold text-white">Creator Resources</h1>
+              </div>
+              <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto">
+                Expert guides on streaming gear, growth strategies, and industry insights to help you succeed as a creator
+              </p>
+            </div>
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight } from 'lucide-react';
+import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale } from 'lucide-react';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import SEO from '../components/SEO';
@@ -84,13 +84,23 @@ export default function Compare() {
       />
 
       <div className="min-h-screen bg-gray-50">
-        {/* Hero */}
-        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white py-8 sm:py-12">
-          <div className="max-w-6xl mx-auto px-4 text-center">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">Compare Creators</h1>
-            <p className="text-base sm:text-lg lg:text-xl text-indigo-100">
-              Side-by-side comparison of YouTube and Twitch channels
-            </p>
+        {/* Header - Dark */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+            <div className="absolute top-0 left-1/3 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-1/3 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
+          </div>
+          <div className="relative w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div className="max-w-6xl mx-auto text-center">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2">
+                <Scale className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-400" />
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Compare Creators</h1>
+              </div>
+              <p className="text-base sm:text-lg text-slate-400">
+                Side-by-side comparison of YouTube and Twitch channels
+              </p>
+            </div>
           </div>
         </div>
 
