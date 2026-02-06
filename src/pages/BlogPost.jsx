@@ -14,8 +14,12 @@ import { getProduct } from '../services/productsService';
  */
 function parseMarkdown(content) {
   let html = content
-    // Links - [text](url)
+    // External links - [text](https://...)
     .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-700 underline">$1</a>')
+    // Internal links - [text](/path) - styled as buttons for CTAs
+    .replace(/\*\*\[([^\]]+)\]\((\/[^)]+)\)\*\*/g, '<a href="$2" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-500/25 my-4">$1 →</a>')
+    // Regular internal links - [text](/path)
+    .replace(/\[([^\]]+)\]\((\/[^)]+)\)/g, '<a href="$2" class="text-indigo-600 hover:text-indigo-700 underline font-medium">$1</a>')
     // Headers with fancy styling
     .replace(/^### (.+)$/gm, '<h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">$1</h3>')
     .replace(/^## (.+)$/gm, '<div class="relative mt-16 mb-8 first:mt-0"><div class="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full"></div><h2 class="text-3xl font-bold text-gray-900 pl-16">$1</h2></div>')
@@ -27,9 +31,34 @@ function parseMarkdown(content) {
     .replace(/^\d+\. (.+)$/gm, '<li class="ml-4 md:ml-6 mb-1 md:mb-2 list-decimal">$1</li>')
     .replace(/^- (.+)$/gm, '<li class="ml-4 md:ml-6 mb-1 md:mb-2 list-disc">$1</li>')
     // Horizontal rule
-    .replace(/^---$/gm, '<hr class="my-8 border-gray-200" />')
-    // Paragraphs
-    .split('\n\n')
+    .replace(/^---$/gm, '<hr class="my-8 border-gray-200" />');
+
+  // Handle markdown tables
+  html = html.replace(/\|(.+)\|\n\|[-| ]+\|\n((?:\|.+\|\n?)+)/g, (match, headerRow, bodyRows) => {
+    const headers = headerRow.split('|').filter(h => h.trim());
+    const rows = bodyRows.trim().split('\n').map(row =>
+      row.split('|').filter(c => c.trim())
+    );
+
+    let table = '<div class="overflow-x-auto my-8"><table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">';
+    table += '<thead class="bg-gray-50"><tr>';
+    headers.forEach(h => {
+      table += `<th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${h.trim()}</th>`;
+    });
+    table += '</tr></thead><tbody class="bg-white divide-y divide-gray-200">';
+    rows.forEach((row, i) => {
+      table += `<tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">`;
+      row.forEach(cell => {
+        table += `<td class="px-4 py-3 text-sm text-gray-700">${cell.trim()}</td>`;
+      });
+      table += '</tr>';
+    });
+    table += '</tbody></table></div>';
+    return table;
+  });
+
+  // Paragraphs
+  html = html.split('\n\n')
     .map((block, index) => {
       const trimmed = block.trim();
       if (!trimmed) return '';
