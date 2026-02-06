@@ -410,7 +410,7 @@ export default function CreatorProfile() {
                     <SummaryCard
                       label="Videos"
                       sublabel="Last 30 days"
-                      value={metrics ? `+${metrics.last30Days.videos}` : '--'}
+                      value={metrics ? `${metrics.last30Days.videos >= 0 ? '+' : ''}${metrics.last30Days.videos}` : '--'}
                     />
                     <SummaryCard
                       label="Monthly Est."
