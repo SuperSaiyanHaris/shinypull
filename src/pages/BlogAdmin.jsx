@@ -553,17 +553,17 @@ export default function BlogAdmin() {
                 </div>
               ) : (
                 posts.map(post => (
-                  <div key={post.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                  <div key={post.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow overflow-hidden">
                     <div className="flex gap-4">
                       {post.image && (
                         <div className="hidden sm:block w-32 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                           <img src={post.image} alt="" className="w-full h-full object-cover" />
                         </div>
                       )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2 mb-1">
                               {post.is_published ? (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full"><Eye className="w-3 h-3" />Published</span>
                               ) : (
