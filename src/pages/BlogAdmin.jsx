@@ -626,17 +626,17 @@ export default function BlogAdmin() {
                 </div>
               ) : (
                 products.map(product => (
-                  <div key={product.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                  <div key={product.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow overflow-hidden">
                     <div className="flex gap-4">
                       {product.image && (
                         <div className="w-20 h-20 rounded-lg overflow-hidden bg-white border border-gray-100 flex-shrink-0 flex items-center justify-center p-1">
                           <img src={product.image} alt="" className="max-h-full max-w-full object-contain" />
                         </div>
                       )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2 mb-1">
                               {product.is_active ? (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full"><Eye className="w-3 h-3" />Active</span>
                               ) : (
@@ -645,7 +645,7 @@ export default function BlogAdmin() {
                               {product.badge && <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-full">{product.badge}</span>}
                               {product.price && <span className="text-sm font-semibold text-gray-900">{product.price}</span>}
                             </div>
-                            <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                            <h3 className="font-semibold text-gray-900 truncate">{product.name}</h3>
                             <p className="text-sm text-gray-500 truncate">{product.description}</p>
                           </div>
                           <div className="flex items-center gap-1 flex-shrink-0">
