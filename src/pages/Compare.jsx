@@ -6,6 +6,7 @@ import { searchChannels as searchTwitch } from '../services/twitchService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
+import logger from '../lib/logger';
 
 const platformConfig = {
   youtube: { icon: Youtube, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
@@ -35,7 +36,7 @@ export default function Compare() {
       }
       setSearchResults(results);
     } catch (err) {
-      console.error('Search error:', err);
+      logger.error('Search error:', err);
     } finally {
       setSearching(false);
     }

@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import logger from '../lib/logger';
 
 /**
  * Get all blog posts (including unpublished) for admin
@@ -10,7 +11,7 @@ export async function getAllPostsAdmin() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching blog posts:', error);
+    logger.error('Error fetching blog posts:', error);
     throw error;
   }
 
@@ -28,7 +29,7 @@ export async function getPostById(id) {
     .single();
 
   if (error) {
-    console.error('Error fetching blog post:', error);
+    logger.error('Error fetching blog post:', error);
     throw error;
   }
 
@@ -46,7 +47,7 @@ export async function createPost(post) {
     .single();
 
   if (error) {
-    console.error('Error creating blog post:', error);
+    logger.error('Error creating blog post:', error);
     throw error;
   }
 
@@ -65,7 +66,7 @@ export async function updatePost(id, updates) {
     .single();
 
   if (error) {
-    console.error('Error updating blog post:', error);
+    logger.error('Error updating blog post:', error);
     throw error;
   }
 
@@ -82,7 +83,7 @@ export async function deletePost(id) {
     .eq('id', id);
 
   if (error) {
-    console.error('Error deleting blog post:', error);
+    logger.error('Error deleting blog post:', error);
     throw error;
   }
 

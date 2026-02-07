@@ -1,30 +1,29 @@
 import { Twitter, Facebook, Linkedin, Link2, Check } from 'lucide-react';
 import { useState } from 'react';
+import logger from '../lib/logger';
+import { SOCIAL_SHARE_URLS } from '../lib/config';
+import { TIMEOUTS } from '../lib/constants';
 
 /**
  * Social sharing buttons component
  * Allows users to share content on social media
  */
-export default function ShareButtons({ url, title, description }) {
+export default function ShareButtons({ url, title }) {
   const [copied, setCopied] = useState(false);
 
-  const encodedUrl = encodeURIComponent(url);
-  const encodedTitle = encodeURIComponent(title);
-  const encodedDescription = encodeURIComponent(description || '');
-
   const shareLinks = {
-    twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`
+    twitter: SOCIAL_SHARE_URLS.twitter(url, title),
+    facebook: SOCIAL_SHARE_URLS.facebook(url),
+    linkedin: SOCIAL_SHARE_URLS.linkedin(url),
   };
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), TIMEOUTS.COPY_FEEDBACK);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      logger.error('Failed to copy:', err);
     }
   };
 

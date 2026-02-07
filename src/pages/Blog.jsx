@@ -156,6 +156,7 @@ export default function Blog() {
                   <img
                     src={post.image}
                     alt={post.title}
+                    loading="lazy"
                     className="w-full h-48 object-cover"
                   />
                   <div className="p-6 flex flex-col flex-1">

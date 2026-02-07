@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import logger from '../lib/logger';
 
 /**
  * Get a product by slug (for rendering in blog posts)
@@ -12,7 +13,7 @@ export async function getProduct(slug) {
     .single();
 
   if (error) {
-    console.error('Error fetching product:', error);
+    logger.error('Error fetching product:', error);
     return null;
   }
 
@@ -29,7 +30,7 @@ export async function getAllProducts() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching products:', error);
+    logger.error('Error fetching products:', error);
     throw error;
   }
 
@@ -47,7 +48,7 @@ export async function createProduct(product) {
     .single();
 
   if (error) {
-    console.error('Error creating product:', error);
+    logger.error('Error creating product:', error);
     throw error;
   }
 
@@ -66,7 +67,7 @@ export async function updateProduct(id, updates) {
     .single();
 
   if (error) {
-    console.error('Error updating product:', error);
+    logger.error('Error updating product:', error);
     throw error;
   }
 
@@ -83,7 +84,7 @@ export async function deleteProduct(id) {
     .eq('id', id);
 
   if (error) {
-    console.error('Error deleting product:', error);
+    logger.error('Error deleting product:', error);
     throw error;
   }
 

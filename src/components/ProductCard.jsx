@@ -22,6 +22,7 @@ export default function ProductCard({ product }) {
           <img
             src={product.image}
             alt={product.name}
+            loading="lazy"
             className="max-h-40 max-w-full object-contain"
           />
         </div>

@@ -7,6 +7,7 @@ import { upsertCreator, saveCreatorStats } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
+import logger from '../lib/logger';
 
 const platformIcons = {
   youtube: Youtube,
@@ -73,7 +74,7 @@ export default function Search() {
       }
       setResults(channels);
     } catch (err) {
-      console.error('Search error:', err);
+      logger.error('Search error:', err);
       setError(err.message || 'Failed to search. Please try again.');
       setResults([]);
     } finally {
@@ -98,7 +99,7 @@ export default function Search() {
           totalPosts: channel.totalPosts,
         });
       } catch (dbErr) {
-        console.warn('Failed to persist creator:', dbErr);
+        logger.warn('Failed to persist creator:', dbErr);
       }
     }
   };
@@ -232,6 +233,7 @@ export default function Search() {
                       <img
                         src={creator.profileImage || '/placeholder-avatar.svg'}
                         alt={creator.displayName}
+                        loading="lazy"
                         className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0"
                         onError={(e) => {
                           e.target.src = '/placeholder-avatar.svg';

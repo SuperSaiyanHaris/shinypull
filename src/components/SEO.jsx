@@ -1,16 +1,17 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { DEFAULT_OG_IMAGE, getSiteUrl } from '../lib/config';
 
-export default function SEO({ 
-  title, 
-  description, 
+export default function SEO({
+  title,
+  description,
   keywords,
-  image = 'https://shinypull.com/og-image.png',
+  image = DEFAULT_OG_IMAGE,
   type = 'website',
   article = null, // { publishedTime, modifiedTime, author, section }
 }) {
   const location = useLocation();
-  const url = `https://shinypull.com${location.pathname}`;
+  const url = getSiteUrl(location.pathname);
   
   const fullTitle = title ? `${title} | Shiny Pull` : 'Shiny Pull - Social Media Analytics & Statistics';
   const defaultDescription = 'Track YouTube, Twitch, TikTok, Instagram & Twitter statistics. View subscriber counts, earnings estimates, rankings and growth analytics for your favorite creators.';

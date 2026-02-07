@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, ArrowLeft, Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import SEO from '../components/SEO';
 import StructuredData, { createBlogPostingSchema, createBreadcrumbSchema } from '../components/StructuredData';
 import Breadcrumbs from '../components/Breadcrumbs';
@@ -9,75 +11,6 @@ import ProductCard from '../components/ProductCard';
 import MiniProductCard, { MiniProductGrid } from '../components/MiniProductCard';
 import { getPostBySlug, getRelatedPosts } from '../services/blogService';
 import { getProduct } from '../services/productsService';
-
-/**
- * Simple markdown to HTML converter for blog content
- */
-function parseMarkdown(content) {
-  let html = content
-    // External links - [text](https://...)
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-700 underline">$1</a>')
-    // Internal links - [text](/path) - styled as buttons for CTAs
-    .replace(/\*\*\[([^\]]+)\]\((\/[^)]+)\)\*\*/g, '<a href="$2" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-500/25 my-4">$1 →</a>')
-    // Regular internal links - [text](/path)
-    .replace(/\[([^\]]+)\]\((\/[^)]+)\)/g, '<a href="$2" class="text-indigo-600 hover:text-indigo-700 underline font-medium">$1</a>')
-    // Headers with fancy styling
-    .replace(/^### (.+)$/gm, '<h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">$1</h3>')
-    .replace(/^## (.+)$/gm, '<div class="relative mt-16 mb-8 first:mt-0"><div class="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full"></div><h2 class="text-3xl font-bold text-gray-900 pl-16">$1</h2></div>')
-    .replace(/^# (.+)$/gm, '<h1 class="text-3xl font-bold text-gray-900 mt-8 mb-6">$1</h1>')
-    // Bold and italic
-    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Lists - tighter spacing on mobile
-    .replace(/^\d+\. (.+)$/gm, '<li class="ml-4 md:ml-6 mb-1 md:mb-2 list-decimal text-gray-700">$1</li>')
-    .replace(/^- (.+)$/gm, '<li class="ml-4 md:ml-6 mb-1 md:mb-2 list-disc text-gray-700">$1</li>')
-    // Horizontal rule
-    .replace(/^---$/gm, '<hr class="my-8 border-gray-200" />');
-
-  // Handle markdown tables
-  html = html.replace(/\|(.+)\|\n\|[-| ]+\|\n((?:\|.+\|\n?)+)/g, (match, headerRow, bodyRows) => {
-    const headers = headerRow.split('|').filter(h => h.trim());
-    const rows = bodyRows.trim().split('\n').map(row =>
-      row.split('|').filter(c => c.trim())
-    );
-
-    let table = '<div class="overflow-x-auto my-8"><table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">';
-    table += '<thead class="bg-gray-50"><tr>';
-    headers.forEach(h => {
-      table += `<th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${h.trim()}</th>`;
-    });
-    table += '</tr></thead><tbody class="bg-white divide-y divide-gray-200">';
-    rows.forEach((row, i) => {
-      table += `<tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">`;
-      row.forEach(cell => {
-        table += `<td class="px-4 py-3 text-sm text-gray-700">${cell.trim()}</td>`;
-      });
-      table += '</tr>';
-    });
-    table += '</tbody></table></div>';
-    return table;
-  });
-
-  // Paragraphs
-  html = html.split('\n\n')
-    .map((block, index) => {
-      const trimmed = block.trim();
-      if (!trimmed) return '';
-      if (trimmed.includes('<li')) {
-        const tag = trimmed.includes('list-decimal') ? 'ol' : 'ul';
-        return `<${tag} class="my-4 text-gray-700">${trimmed}</${tag}>`;
-      }
-      if (trimmed.startsWith('<')) return trimmed;
-      // First paragraph is the intro/lead - style it specially with background and separator
-      if (index === 0) {
-        return `<div class="mb-12"><p class="text-xl text-gray-700 leading-relaxed font-medium p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">${trimmed}</p></div>`;
-      }
-      return `<p class="text-gray-600 leading-relaxed mb-4">${trimmed}</p>`;
-    })
-    .join('\n');
-
-  return html;
-}
 
 /**
  * Component that loads and displays a product card
@@ -106,6 +39,116 @@ function ProductEmbed({ slug, mini = false }) {
 
   return mini ? <MiniProductCard product={product} /> : <ProductCard product={product} />;
 }
+
+/**
+ * Custom markdown components with ShinyPull styling
+ */
+const markdownComponents = {
+  // Headers with fancy styling
+  h1: ({ children }) => (
+    <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-6">{children}</h1>
+  ),
+  h2: ({ children }) => (
+    <div className="relative mt-16 mb-8 first:mt-0">
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" />
+      <h2 className="text-3xl font-bold text-gray-900 pl-16">{children}</h2>
+    </div>
+  ),
+  h3: ({ children }) => (
+    <h3 className="text-xl font-bold text-gray-900 mt-8 mb-3">{children}</h3>
+  ),
+  // Paragraphs
+  p: ({ children, node }) => {
+    // Check if this is the first paragraph (intro/lead)
+    const parent = node?.position?.start?.line === 1;
+    if (parent) {
+      return (
+        <div className="mb-12">
+          <p className="text-xl text-gray-700 leading-relaxed font-medium p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
+            {children}
+          </p>
+        </div>
+      );
+    }
+    return <p className="text-gray-600 leading-relaxed mb-4">{children}</p>;
+  },
+  // Links - external vs internal
+  a: ({ href, children }) => {
+    const isExternal = href?.startsWith('http');
+    if (isExternal) {
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-indigo-600 hover:text-indigo-700 underline"
+        >
+          {children}
+        </a>
+      );
+    }
+    return (
+      <Link to={href} className="text-indigo-600 hover:text-indigo-700 underline font-medium">
+        {children}
+      </Link>
+    );
+  },
+  // Bold and italic
+  strong: ({ children }) => (
+    <strong className="font-semibold text-gray-900">{children}</strong>
+  ),
+  em: ({ children }) => <em>{children}</em>,
+  // Lists
+  ul: ({ children }) => (
+    <ul className="my-4 text-gray-700 list-disc ml-4 md:ml-6">{children}</ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="my-4 text-gray-700 list-decimal ml-4 md:ml-6">{children}</ol>
+  ),
+  li: ({ children }) => (
+    <li className="mb-1 md:mb-2 text-gray-700">{children}</li>
+  ),
+  // Horizontal rule
+  hr: () => <hr className="my-8 border-gray-200" />,
+  // Tables with GFM support
+  table: ({ children }) => (
+    <div className="overflow-x-auto my-8">
+      <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+        {children}
+      </table>
+    </div>
+  ),
+  thead: ({ children }) => <thead className="bg-gray-50">{children}</thead>,
+  tbody: ({ children }) => <tbody className="bg-white divide-y divide-gray-200">{children}</tbody>,
+  tr: ({ children, isHeader }) => (
+    <tr className={isHeader ? '' : 'even:bg-gray-50'}>{children}</tr>
+  ),
+  th: ({ children }) => (
+    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+      {children}
+    </th>
+  ),
+  td: ({ children }) => (
+    <td className="px-4 py-3 text-sm text-gray-700">{children}</td>
+  ),
+  // Code blocks
+  code: ({ inline, children }) => {
+    if (inline) {
+      return <code className="px-1.5 py-0.5 bg-gray-100 rounded text-sm font-mono text-indigo-600">{children}</code>;
+    }
+    return (
+      <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto my-4">
+        <code className="text-sm font-mono">{children}</code>
+      </pre>
+    );
+  },
+  // Blockquotes
+  blockquote: ({ children }) => (
+    <blockquote className="border-l-4 border-indigo-500 pl-4 my-4 italic text-gray-600">
+      {children}
+    </blockquote>
+  ),
+};
 
 /**
  * Renders blog content with support for embedded product cards
@@ -166,13 +209,16 @@ function BlogContent({ content }) {
       return;
     }
 
-    // Regular markdown content
+    // Regular markdown content - use react-markdown
     if (part.trim()) {
       elements.push(
-        <div
+        <ReactMarkdown
           key={`content-${index}`}
-          dangerouslySetInnerHTML={{ __html: parseMarkdown(part) }}
-        />
+          remarkPlugins={[remarkGfm]}
+          components={markdownComponents}
+        >
+          {part}
+        </ReactMarkdown>
       );
     }
   });
@@ -358,6 +404,7 @@ export default function BlogPost() {
                       <img
                         src={related.image}
                         alt={related.title}
+                        loading="lazy"
                         className="w-full h-40 object-cover"
                       />
                       <div className="p-6">

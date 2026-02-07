@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio } from 'lucide-react';
+import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star } from 'lucide-react';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
+import { followCreator, unfollowCreator, isFollowing as checkIsFollowing } from '../services/followService';
+import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
+import logger from '../lib/logger';
 
 const platformIcons = {
   youtube: Youtube,
@@ -31,6 +34,7 @@ const platformUrls = {
 
 export default function CreatorProfile() {
   const { platform, username } = useParams();
+  const { user, isAuthenticated } = useAuth();
   const [creator, setCreator] = useState(null);
   const [statsHistory, setStatsHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +42,8 @@ export default function CreatorProfile() {
   const [chartRange, setChartRange] = useState(30);
   // Default to views for YouTube (subscriber counts are rounded by YouTube API)
   const [chartMetric, setChartMetric] = useState(platform === 'youtube' ? 'views' : 'subscribers');
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   useEffect(() => {
     loadCreator();
@@ -90,16 +96,52 @@ export default function CreatorProfile() {
             }
           }
         } catch (dbErr) {
-          console.warn('Failed to save to database:', dbErr);
+          logger.warn('Failed to save to database:', dbErr);
         }
 
         setCreator(channelData);
       }
     } catch (err) {
-      console.error('Error loading creator:', err);
+      logger.error('Error loading creator:', err);
       setError(err.message || 'Failed to load creator');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Check follow status when user and creator are available
+  useEffect(() => {
+    async function checkFollowStatus() {
+      if (isAuthenticated && user && creator?.id) {
+        const following = await checkIsFollowing(user.id, creator.id);
+        setIsFollowing(following);
+      }
+    }
+    checkFollowStatus();
+  }, [isAuthenticated, user, creator?.id]);
+
+  const handleFollowToggle = async () => {
+    if (!isAuthenticated) {
+      // Redirect to auth page
+      window.location.href = '/auth';
+      return;
+    }
+
+    if (!creator?.id) return;
+
+    setFollowLoading(true);
+    try {
+      if (isFollowing) {
+        await unfollowCreator(user.id, creator.id);
+        setIsFollowing(false);
+      } else {
+        await followCreator(user.id, creator.id);
+        setIsFollowing(true);
+      }
+    } catch (err) {
+      logger.error('Failed to toggle follow:', err);
+    } finally {
+      setFollowLoading(false);
     }
   };
 
@@ -339,6 +381,22 @@ export default function CreatorProfile() {
                         </a>
                       </>
                     )}
+                  </div>
+                  
+                  {/* Follow Button */}
+                  <div className="mt-4">
+                    <button
+                      onClick={handleFollowToggle}
+                      disabled={followLoading}
+                      className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                        isFollowing
+                          ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg shadow-indigo-500/30'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      <Star className={`w-4 h-4 ${isFollowing ? 'fill-current' : ''}`} />
+                      {followLoading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
+                    </button>
                   </div>
                 </div>
               </div>

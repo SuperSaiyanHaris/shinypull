@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen } from 'lucide-react';
+import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut, isAuthenticated } = useAuth();
 
   const isActive = (path) => {
     if (path === '/rankings') {
@@ -53,6 +56,56 @@ export default function Header() {
                 <span>{link.label}</span>
               </Link>
             ))}
+
+            {/* Auth Section */}
+            <div className="ml-4 pl-4 border-l border-gray-200">
+              {isAuthenticated ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-indigo-600" />
+                    </div>
+                  </button>
+
+                  {userMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50"
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          My Dashboard
+                        </Link>
+                        <button
+                          onClick={() => {
+                            signOut();
+                            setUserMenuOpen(false);
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50 w-full"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Sign Out
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+                >
+                  <User className="w-4 h-4" />
+                  Sign In
+                </Link>
+              )}
+            </div>
           </nav>
 
           {/* Mobile menu button */}
@@ -83,6 +136,41 @@ export default function Header() {
                   <span>{link.label}</span>
                 </Link>
               ))}
+
+              {/* Mobile Auth Section */}
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50"
+                    >
+                      <LayoutDashboard className="w-5 h-5" />
+                      My Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        signOut();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50 w-full"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/auth"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 mx-4 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors"
+                  >
+                    <User className="w-5 h-5" />
+                    Sign In
+                  </Link>
+                )}
+              </div>
             </div>
           </nav>
         )}

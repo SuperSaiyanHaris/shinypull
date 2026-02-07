@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import logger from '../lib/logger';
 
 /**
  * Get all published blog posts, sorted by date (newest first)
@@ -11,7 +12,7 @@ export async function getAllPosts() {
     .order('published_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching blog posts:', error);
+    logger.error('Error fetching blog posts:', error);
     return [];
   }
 
@@ -30,7 +31,7 @@ export async function getPostBySlug(slug) {
     .single();
 
   if (error) {
-    console.error('Error fetching blog post:', error);
+    logger.error('Error fetching blog post:', error);
     return null;
   }
 
@@ -49,7 +50,7 @@ export async function getPostsByCategory(category) {
     .order('published_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching blog posts by category:', error);
+    logger.error('Error fetching blog posts by category:', error);
     return [];
   }
 
@@ -66,7 +67,7 @@ export async function getAllCategories() {
     .eq('is_published', true);
 
   if (error) {
-    console.error('Error fetching categories:', error);
+    logger.error('Error fetching categories:', error);
     return [];
   }
 
@@ -89,7 +90,7 @@ export async function getRelatedPosts(category, excludeSlug, limit = 2) {
     .limit(limit);
 
   if (error) {
-    console.error('Error fetching related posts:', error);
+    logger.error('Error fetching related posts:', error);
     return [];
   }
 

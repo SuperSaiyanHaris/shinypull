@@ -21,6 +21,7 @@ import {
   Copy,
 } from 'lucide-react';
 import SEO from '../components/SEO';
+import { TIMEOUTS, BLOG_CATEGORIES } from '../lib/constants';
 import {
   getAllPostsAdmin,
   createPost,
@@ -38,7 +39,7 @@ import {
   generateProductSlug,
 } from '../services/productsService';
 
-const CATEGORIES = ['Streaming Gear', 'Growth Tips', 'Industry Insights', 'Tutorials'];
+// Use BLOG_CATEGORIES from constants
 
 const emptyPost = {
   title: '',
@@ -87,6 +88,10 @@ export default function BlogAdmin() {
   // Delete confirmation
   const [deleteConfirm, setDeleteConfirm] = useState({ type: null, id: null });
 
+  // Form validation errors
+  const [postErrors, setPostErrors] = useState({});
+  const [productErrors, setProductErrors] = useState({});
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -116,12 +121,12 @@ export default function BlogAdmin() {
 
   function showSuccess(message) {
     setSuccess(message);
-    setTimeout(() => setSuccess(null), 3000);
+    setTimeout(() => setSuccess(null), TIMEOUTS.SUCCESS_MESSAGE);
   }
 
   function showError(message) {
     setError(message);
-    setTimeout(() => setError(null), 5000);
+    setTimeout(() => setError(null), TIMEOUTS.ERROR_MESSAGE);
   }
 
   function copyToClipboard(text) {
@@ -156,6 +161,18 @@ export default function BlogAdmin() {
     setIsEditingPost(false);
     setCurrentPost(null);
     setPostFormData(emptyPost);
+    setPostErrors({});
+  }
+
+  function validatePost(data) {
+    const errors = {};
+    if (!data.title?.trim()) errors.title = 'Title is required';
+    if (!data.slug?.trim()) errors.slug = 'Slug is required';
+    else if (!/^[a-z0-9-]+$/.test(data.slug)) errors.slug = 'Slug must be lowercase with hyphens only';
+    if (!data.content?.trim()) errors.content = 'Content is required';
+    if (!data.description?.trim()) errors.description = 'Description is required for SEO';
+    if (data.image && !data.image.startsWith('http')) errors.image = 'Image must be a valid URL';
+    return errors;
   }
 
   function handlePostInputChange(e) {
@@ -170,8 +187,10 @@ export default function BlogAdmin() {
   }
 
   async function handleSavePost() {
-    if (!postFormData.title || !postFormData.slug || !postFormData.content) {
-      showError('Title, slug, and content are required');
+    const errors = validatePost(postFormData);
+    setPostErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      showError('Please fix the validation errors');
       return;
     }
     try {
@@ -243,6 +262,18 @@ export default function BlogAdmin() {
     setCurrentProduct(null);
     setProductFormData(emptyProduct);
     setFeaturesInput('');
+    setProductErrors({});
+  }
+
+  function validateProduct(data) {
+    const errors = {};
+    if (!data.name?.trim()) errors.name = 'Product name is required';
+    if (!data.slug?.trim()) errors.slug = 'Slug is required';
+    else if (!/^[a-z0-9-]+$/.test(data.slug)) errors.slug = 'Slug must be lowercase with hyphens only';
+    if (!data.affiliate_link?.trim()) errors.affiliate_link = 'Affiliate link is required';
+    else if (!data.affiliate_link.startsWith('http')) errors.affiliate_link = 'Must be a valid URL';
+    if (data.image && !data.image.startsWith('http')) errors.image = 'Image must be a valid URL';
+    return errors;
   }
 
   function handleProductInputChange(e) {
@@ -263,8 +294,10 @@ export default function BlogAdmin() {
   }
 
   async function handleSaveProduct() {
-    if (!productFormData.name || !productFormData.slug || !productFormData.affiliate_link) {
-      showError('Name, slug, and affiliate link are required');
+    const errors = validateProduct(productFormData);
+    setProductErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      showError('Please fix the validation errors');
       return;
     }
     try {
@@ -419,22 +452,25 @@ export default function BlogAdmin() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                    <input type="text" name="title" value={postFormData.title} onChange={handlePostInputChange} placeholder="Best Streaming Setup for 2026" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white" />
+                    <input type="text" name="title" value={postFormData.title} onChange={handlePostInputChange} placeholder="Best Streaming Setup for 2026" className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white ${postErrors.title ? 'border-red-500' : 'border-gray-300'}`} />
+                    {postErrors.title && <p className="mt-1 text-sm text-red-600">{postErrors.title}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
-                    <input type="text" name="slug" value={postFormData.slug} onChange={handlePostInputChange} placeholder="best-streaming-setup-2026" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-900 bg-white" />
+                    <input type="text" name="slug" value={postFormData.slug} onChange={handlePostInputChange} placeholder="best-streaming-setup-2026" className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-900 bg-white ${postErrors.slug ? 'border-red-500' : 'border-gray-300'}`} />
+                    {postErrors.slug && <p className="mt-1 text-sm text-red-600">{postErrors.slug}</p>}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <input type="text" name="description" value={postFormData.description} onChange={handlePostInputChange} placeholder="A brief description for SEO" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                  <input type="text" name="description" value={postFormData.description} onChange={handlePostInputChange} placeholder="A brief description for SEO" className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white ${postErrors.description ? 'border-red-500' : 'border-gray-300'}`} />
+                  {postErrors.description && <p className="mt-1 text-sm text-red-600">{postErrors.description}</p>}
                 </div>
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                     <select name="category" value={postFormData.category} onChange={handlePostInputChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white">
-                      {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                      {BLOG_CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                     </select>
                   </div>
                   <div>
@@ -448,13 +484,15 @@ export default function BlogAdmin() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image URL</label>
-                  <input type="text" name="image" value={postFormData.image} onChange={handlePostInputChange} placeholder="https://images.unsplash.com/..." className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white" />
+                  <input type="text" name="image" value={postFormData.image} onChange={handlePostInputChange} placeholder="https://images.unsplash.com/..." className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white ${postErrors.image ? 'border-red-500' : 'border-gray-300'}`} />
+                  {postErrors.image && <p className="mt-1 text-sm text-red-600">{postErrors.image}</p>}
                   {postFormData.image && <img src={postFormData.image} alt="Preview" className="mt-2 w-full max-w-md h-32 object-cover rounded-lg border border-gray-200" onError={(e) => e.target.style.display = 'none'} />}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Content (Markdown) *</label>
                   <p className="text-xs text-gray-500 mb-2">Use {"{{product:slug}}"} to embed product cards</p>
-                  <textarea name="content" value={postFormData.content} onChange={handlePostInputChange} rows={16} placeholder="# Your Article Title..." className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-900 bg-white" />
+                  <textarea name="content" value={postFormData.content} onChange={handlePostInputChange} rows={16} placeholder="# Your Article Title..." className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-900 bg-white ${postErrors.content ? 'border-red-500' : 'border-gray-300'}`} />
+                  {postErrors.content && <p className="mt-1 text-sm text-red-600">{postErrors.content}</p>}
                 </div>
                 <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
                   <input type="checkbox" id="is_published" name="is_published" checked={postFormData.is_published} onChange={handlePostInputChange} className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
@@ -490,26 +528,30 @@ export default function BlogAdmin() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
-                    <input type="text" name="name" value={productFormData.name} onChange={handleProductInputChange} placeholder="Fifine K669B USB Microphone" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white" />
+                    <input type="text" name="name" value={productFormData.name} onChange={handleProductInputChange} placeholder="Fifine K669B USB Microphone" className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white ${productErrors.name ? 'border-red-500' : 'border-gray-300'}`} />
+                    {productErrors.name && <p className="mt-1 text-sm text-red-600">{productErrors.name}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
                     <div className="flex gap-2">
-                      <input type="text" name="slug" value={productFormData.slug} onChange={handleProductInputChange} placeholder="fifine-k669b" className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-900 bg-white" />
+                      <input type="text" name="slug" value={productFormData.slug} onChange={handleProductInputChange} placeholder="fifine-k669b" className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-900 bg-white ${productErrors.slug ? 'border-red-500' : 'border-gray-300'}`} />
                       <button onClick={() => copyToClipboard(`{{product:${productFormData.slug}}}`)} className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors" title="Copy embed code">
                         <Copy className="w-4 h-4 text-gray-600" />
                       </button>
                     </div>
+                    {productErrors.slug && <p className="mt-1 text-sm text-red-600">{productErrors.slug}</p>}
                     <p className="text-xs text-gray-500 mt-1">Use in posts: {"{{product:" + (productFormData.slug || 'slug') + "}}"}</p>
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Amazon Affiliate Link *</label>
-                  <input type="text" name="affiliate_link" value={productFormData.affiliate_link} onChange={handleProductInputChange} placeholder="https://amzn.to/..." className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white" />
+                  <input type="text" name="affiliate_link" value={productFormData.affiliate_link} onChange={handleProductInputChange} placeholder="https://amzn.to/..." className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white ${productErrors.affiliate_link ? 'border-red-500' : 'border-gray-300'}`} />
+                  {productErrors.affiliate_link && <p className="mt-1 text-sm text-red-600">{productErrors.affiliate_link}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Amazon Image URL</label>
-                  <input type="text" name="image" value={productFormData.image} onChange={handleProductInputChange} placeholder="https://m.media-amazon.com/images/I/..." className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white" />
+                  <input type="text" name="image" value={productFormData.image} onChange={handleProductInputChange} placeholder="https://m.media-amazon.com/images/I/..." className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 bg-white ${productErrors.image ? 'border-red-500' : 'border-gray-300'}`} />
+                  {productErrors.image && <p className="mt-1 text-sm text-red-600">{productErrors.image}</p>}
                   <p className="text-xs text-gray-500 mt-1">Right-click product image on Amazon → "Open image in new tab" → Copy URL</p>
                   {productFormData.image && (
                     <div className="mt-2 w-32 h-32 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-2">

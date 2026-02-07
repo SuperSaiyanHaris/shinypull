@@ -6,6 +6,7 @@ import { getChannelByUsername as getTwitchChannel } from '../services/twitchServ
 import Odometer from '../components/Odometer';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
+import logger from '../lib/logger';
 
 const platformConfig = {
   youtube: {
@@ -126,7 +127,7 @@ export default function LiveCount() {
           setError('Creator not found');
         }
       } catch (err) {
-        console.error('Fetch error:', err);
+        logger.error('Fetch error:', err);
         setError(err.message || 'Failed to load creator');
       } finally {
         setLoading(false);

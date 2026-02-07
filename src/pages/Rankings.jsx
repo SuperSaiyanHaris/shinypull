@@ -5,6 +5,7 @@ import { getRankedCreators } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
+import logger from '../lib/logger';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', hoverColor: 'hover:bg-red-700', lightBg: 'bg-red-50', textColor: 'text-red-600', available: true },
@@ -45,7 +46,7 @@ export default function Rankings() {
       const data = await getRankedCreators(selectedPlatform, selectedRankType, 50);
       setRankings(data);
     } catch (err) {
-      console.error('Failed to load rankings:', err);
+      logger.error('Failed to load rankings:', err);
       setError(err.message || 'Failed to load rankings');
       setRankings([]);
     } finally {
@@ -200,6 +201,7 @@ export default function Rankings() {
                   <img
                     src={creator.profile_image || '/placeholder-avatar.svg'}
                     alt={creator.display_name}
+                    loading="lazy"
                     className="w-12 h-12 rounded-xl object-cover bg-gray-100 flex-shrink-0"
                     onError={(e) => {
                       e.target.src = '/placeholder-avatar.svg';
