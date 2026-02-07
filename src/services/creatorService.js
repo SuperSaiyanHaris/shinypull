@@ -230,9 +230,59 @@ export const getRankedCreators = withErrorHandling(
 
     const withStats = creators.filter((creator) => creator.latestStats);
 
-    // For growth rankings, we'll use the pre-calculated growth fields
-    // YouTube: views_gained_month (since subscribers are rounded)
-    // Twitch: followers_gained_month
+    let growthByCreatorId = new Map();
+
+    if (rankType === 'growth' && withStats.length > 0) {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 30);
+      const startDateString = startDate.toISOString().split('T')[0];
+
+      const creatorIds = withStats.map((creator) => creator.id);
+
+      // For YouTube, calculate growth based on views (subscribers are rounded)
+      // For Twitch, calculate growth based on followers (exact numbers)
+      const selectFields = platform === 'youtube'
+        ? 'creator_id, recorded_at, total_views'
+        : 'creator_id, recorded_at, followers';
+
+      // Query historical stats for growth calculation
+      const { data: history, error: historyError } = await supabase
+        .from('creator_stats')
+        .select(selectFields)
+        .in('creator_id', creatorIds)
+        .gte('recorded_at', startDateString)
+        .order('recorded_at');
+
+      if (!historyError && history) {
+        const historyByCreatorId = new Map();
+        (history || []).forEach((row) => {
+          if (!historyByCreatorId.has(row.creator_id)) {
+            historyByCreatorId.set(row.creator_id, []);
+          }
+          historyByCreatorId.get(row.creator_id).push(row);
+        });
+
+        growthByCreatorId = new Map(
+          Array.from(historyByCreatorId.entries()).map(([creatorId, rows]) => {
+            if (rows.length < 2) return [creatorId, 0];
+            
+            const first = rows[0];
+            const last = rows[rows.length - 1];
+            
+            // For YouTube, use total_views for growth
+            // For Twitch, use followers for growth
+            const firstCount = platform === 'youtube'
+              ? (first?.total_views ?? 0)
+              : (first?.followers ?? 0);
+            const lastCount = platform === 'youtube'
+              ? (last?.total_views ?? 0)
+              : (last?.followers ?? 0);
+            
+            return [creatorId, lastCount - firstCount];
+          })
+        );
+      }
+    }
 
     const ranked = withStats
       .map((creator) => {
@@ -240,13 +290,13 @@ export const getRankedCreators = withErrorHandling(
         const subscribers = stats?.subscribers ?? stats?.followers ?? 0;
         const views = stats?.total_views ?? 0;
         
-        // For YouTube growth, use views_gained_month
-        // For Twitch/others, use followers_gained_month
-        const growthMetric = platform === 'youtube' 
+        // Get calculated growth or fall back to pre-calculated field
+        const calculatedGrowth = growthByCreatorId.get(creator.id);
+        const fallbackGrowth = platform === 'youtube'
           ? (stats?.views_gained_month ?? 0)
           : (stats?.followers_gained_month ?? 0);
         
-        const growth = rankType === 'growth' ? growthMetric : growthMetric;
+        const growth = calculatedGrowth !== undefined ? calculatedGrowth : fallbackGrowth;
 
         let sortValue = subscribers;
         if (rankType === 'views') sortValue = views;
