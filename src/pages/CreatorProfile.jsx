@@ -605,7 +605,7 @@ export default function CreatorProfile() {
                             <td className="px-6 py-4 text-right">
                               <div className="flex flex-col items-end">
                                 <span className="font-medium text-gray-900">
-                                  {stat.hours_watched_day ? `${Math.round(stat.hours_watched_day)}K` : '-'}
+                                  {stat.hours_watched_day ? `${Math.round(stat.hours_watched_day / 1000)}K` : '-'}
                                 </span>
                               </div>
                             </td>
