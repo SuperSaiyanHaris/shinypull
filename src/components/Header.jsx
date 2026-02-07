@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +10,13 @@ export default function Header() {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const location = useLocation();
   const { user, signOut, isAuthenticated } = useAuth();
+
+  // Listen for custom event to open auth panel
+  useEffect(() => {
+    const handleOpenAuthPanel = () => setAuthPanelOpen(true);
+    window.addEventListener('openAuthPanel', handleOpenAuthPanel);
+    return () => window.removeEventListener('openAuthPanel', handleOpenAuthPanel);
+  }, []);
 
   const isActive = (path) => {
     if (path === '/rankings') {
@@ -182,7 +189,7 @@ export default function Header() {
                       setAuthPanelOpen(true);
                       setMobileMenuOpen(false);
                     }}
-                    className="flex items-center justify-center gap-2 mx-4 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors"
+                    className="flex items-center justify-center gap-2 py-3 px-6 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors w-full"
                   >
                     <User className="w-5 h-5" />
                     Sign In

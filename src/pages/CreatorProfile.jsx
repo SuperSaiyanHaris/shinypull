@@ -125,8 +125,8 @@ export default function CreatorProfile() {
 
   const handleFollowToggle = async () => {
     if (!isAuthenticated) {
-      // Redirect to auth page
-      window.location.href = '/auth';
+      // Trigger auth panel by dispatching custom event
+      window.dispatchEvent(new CustomEvent('openAuthPanel'));
       return;
     }
 
