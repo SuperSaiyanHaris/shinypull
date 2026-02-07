@@ -44,6 +44,7 @@ export default function CreatorProfile() {
   const [chartMetric, setChartMetric] = useState(platform === 'youtube' ? 'views' : 'subscribers');
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [dbCreatorId, setDbCreatorId] = useState(null); // Store database UUID
 
   useEffect(() => {
     loadCreator();
@@ -75,6 +76,8 @@ export default function CreatorProfile() {
 
         try {
           const dbCreator = await upsertCreator(channelData);
+          setDbCreatorId(dbCreator.id); // Store the database UUID
+          
           await saveCreatorStats(dbCreator.id, {
             subscribers: channelData.subscribers || channelData.followers,
             totalViews: channelData.totalViews,
@@ -112,13 +115,13 @@ export default function CreatorProfile() {
   // Check follow status when user and creator are available
   useEffect(() => {
     async function checkFollowStatus() {
-      if (isAuthenticated && user && creator?.id) {
-        const following = await checkIsFollowing(user.id, creator.id);
+      if (isAuthenticated && user && dbCreatorId) {
+        const following = await checkIsFollowing(user.id, dbCreatorId);
         setIsFollowing(following);
       }
     }
     checkFollowStatus();
-  }, [isAuthenticated, user, creator?.id]);
+  }, [isAuthenticated, user, dbCreatorId]);
 
   const handleFollowToggle = async () => {
     if (!isAuthenticated) {
@@ -127,15 +130,18 @@ export default function CreatorProfile() {
       return;
     }
 
-    if (!creator?.id) return;
+    if (!dbCreatorId) {
+      logger.error('Creator not found in database');
+      return;
+    }
 
     setFollowLoading(true);
     try {
       if (isFollowing) {
-        await unfollowCreator(user.id, creator.id);
+        await unfollowCreator(user.id, dbCreatorId);
         setIsFollowing(false);
       } else {
-        await followCreator(user.id, creator.id);
+        await followCreator(user.id, dbCreatorId);
         setIsFollowing(true);
       }
     } catch (err) {
@@ -282,6 +288,22 @@ export default function CreatorProfile() {
           <div className="max-w-6xl mx-auto">
             {/* Profile Header */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 mb-6 -mt-16 relative">
+              {/* Follow Button - Top Right */}
+              <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+                <button
+                  onClick={handleFollowToggle}
+                  disabled={followLoading}
+                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base ${
+                    isFollowing
+                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg shadow-indigo-500/30'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <Star className={`w-4 h-4 ${isFollowing ? 'fill-current' : ''}`} />
+                  <span className="hidden xs:inline">{followLoading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}</span>
+                </button>
+              </div>
+
               <div className="flex flex-col md:flex-row items-start gap-4 sm:gap-6">
                 <img
                   src={creator.profileImage}
@@ -381,22 +403,6 @@ export default function CreatorProfile() {
                         </a>
                       </>
                     )}
-                  </div>
-                  
-                  {/* Follow Button */}
-                  <div className="mt-4">
-                    <button
-                      onClick={handleFollowToggle}
-                      disabled={followLoading}
-                      className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
-                        isFollowing
-                          ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg shadow-indigo-500/30'
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                      <Star className={`w-4 h-4 ${isFollowing ? 'fill-current' : ''}`} />
-                      {followLoading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
-                    </button>
                   </div>
                 </div>
               </div>
