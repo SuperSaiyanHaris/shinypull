@@ -28,9 +28,7 @@ const blogPosts = [
     read_time: '8 min read',
     image: 'https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=800',
     is_published: true,
-    content: `# Best Streaming Setup for Beginners in 2026
-
-Starting your streaming journey doesn't have to break the bank. Here's our curated guide to the essential gear that top creators recommend.
+    content: `Starting your streaming journey doesn't have to break the bank. Here's our curated guide to the essential gear that top creators recommend.
 
 ## The Essentials
 
@@ -129,9 +127,7 @@ Remember, content is king. The best gear in the world won't save a boring stream
     read_time: '12 min read',
     image: 'https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=800',
     is_published: true,
-    content: `# How Top YouTubers Grew to 1 Million Subscribers
-
-We analyzed the growth patterns of over 50 successful YouTube channels to identify the strategies that actually work.
+    content: `We analyzed the growth patterns of over 50 successful YouTube channels to identify the strategies that actually work.
 
 ## The Data Behind Success
 
@@ -243,9 +239,7 @@ Track your own growth and compare to top creators using ShinyPull's analytics to
     read_time: '10 min read',
     image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
     is_published: true,
-    content: `# Essential Twitch Streaming Equipment Guide
-
-Professional streamers make it look effortless, but there's serious gear behind those polished broadcasts. Here's what you actually need.
+    content: `Professional streamers make it look effortless, but there's serious gear behind those polished broadcasts. Here's what you actually need.
 
 ## Audio Setup
 
@@ -402,9 +396,7 @@ Track your stream's growth with ShinyPull's Twitch analytics - including Hours W
     read_time: '6 min read',
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
     is_published: true,
-    content: `# Creator Economy Statistics & Trends for 2026
-
-The creator economy continues to explode. Here's what the data tells us about where things are headed.
+    content: `The creator economy continues to explode. Here's what the data tells us about where things are headed.
 
 ## Market Size
 

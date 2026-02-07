@@ -212,65 +212,41 @@ export const getRankedCreators = withErrorHandling(
           views_gained_month
         )
       `)
-      .eq('platform', platform)
-      .order('recorded_at', { foreignTable: 'creator_stats', ascending: false })
-      .limit(1, { foreignTable: 'creator_stats' });
+      .eq('platform', platform);
 
     if (error) throw error;
 
-    const creators = (data || []).map((creator) => ({
-      ...creator,
-      latestStats: creator.creator_stats?.[0] || null,
-    }));
+    // Map creators and get their latest stats
+    const creators = (data || []).map((creator) => {
+      // Sort creator_stats by recorded_at descending and get the latest
+      const sortedStats = (creator.creator_stats || []).sort(
+        (a, b) => new Date(b.recorded_at) - new Date(a.recorded_at)
+      );
+      return {
+        ...creator,
+        latestStats: sortedStats[0] || null,
+      };
+    });
 
     const withStats = creators.filter((creator) => creator.latestStats);
 
-    let growthByCreatorId = new Map();
-
-    if (rankType === 'growth' && withStats.length > 0) {
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - 30);
-      const startDateString = startDate.toISOString().split('T')[0];
-
-      const creatorIds = withStats.map((creator) => creator.id);
-
-      const { data: history, error: historyError } = await supabase
-        .from('creator_stats')
-        .select('creator_id, recorded_at, subscribers, followers')
-        .in('creator_id', creatorIds)
-        .gte('recorded_at', startDateString)
-        .order('recorded_at', { ascending: true });
-
-      if (historyError) throw historyError;
-
-      const historyByCreatorId = new Map();
-      (history || []).forEach((row) => {
-        if (!historyByCreatorId.has(row.creator_id)) {
-          historyByCreatorId.set(row.creator_id, []);
-        }
-        historyByCreatorId.get(row.creator_id).push(row);
-      });
-
-      growthByCreatorId = new Map(
-        Array.from(historyByCreatorId.entries()).map(([creatorId, rows]) => {
-          const first = rows[0];
-          const last = rows[rows.length - 1];
-          const firstCount = first?.subscribers ?? first?.followers ?? 0;
-          const lastCount = last?.subscribers ?? last?.followers ?? 0;
-          return [creatorId, lastCount - firstCount];
-        })
-      );
-    }
+    // For growth rankings, we'll use the pre-calculated growth fields
+    // YouTube: views_gained_month (since subscribers are rounded)
+    // Twitch: followers_gained_month
 
     const ranked = withStats
       .map((creator) => {
         const stats = creator.latestStats;
         const subscribers = stats?.subscribers ?? stats?.followers ?? 0;
         const views = stats?.total_views ?? 0;
-        const growth =
-          rankType === 'growth'
-            ? growthByCreatorId.get(creator.id) ?? stats?.followers_gained_month ?? 0
-            : stats?.followers_gained_month ?? 0;
+        
+        // For YouTube growth, use views_gained_month
+        // For Twitch/others, use followers_gained_month
+        const growthMetric = platform === 'youtube' 
+          ? (stats?.views_gained_month ?? 0)
+          : (stats?.followers_gained_month ?? 0);
+        
+        const growth = rankType === 'growth' ? growthMetric : growthMetric;
 
         let sortValue = subscribers;
         if (rankType === 'views') sortValue = views;

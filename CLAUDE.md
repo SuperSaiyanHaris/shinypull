@@ -165,6 +165,72 @@ Scripts use `dotenv` to load `.env` automatically.
 - Dates: Use `getTodayLocal()` for America/New_York timezone
 - Usernames: Store without @ prefix
 
+## Authentication & Follow System
+
+**AuthPanel Component:**
+- Slide-out panel from the right side (not a separate page)
+- Controlled by custom events: `openAuthPanel` and `closeAuthPanel`
+- Supports contextual messages (e.g., "Sign in to follow creators")
+- Smooth animations: `translate-x-full` → `translate-x-0` with transition
+- Input fields have visible text (text-gray-900) and placeholders
+- Integrated into Header component with event listeners
+
+**Follow Button Integration:**
+- Follow/unfollow buttons dispatch `openAuthPanel` event when user not authenticated
+- Opens auth panel with message: "Sign in to follow creators"
+- `ensureUserExists()` helper creates public.users entry if auth.users exists but public.users doesn't
+
+**Dashboard Link:**
+- Desktop: Shows in main header navigation (right side)
+- Mobile: Appears in hamburger menu dropdown
+- Only visible when user is authenticated
+
+## Search Bar Pattern
+
+All search interfaces (Home, Search, Compare) follow this pattern:
+- Centered layout with `max-w-2xl mx-auto`
+- Search input and button stacked vertically (`space-y-3`)
+- Button appears **below** the input (not inline)
+- Responsive button width: `w-full sm:w-auto sm:min-w-[200px]`
+- Full width on mobile, auto-sized on desktop (min 200px)
+
+## Twitch-Specific Features
+
+**Hours Watched Tracking:**
+- Primary metric for Twitch (view_count deprecated in 2022)
+- Tracked via `stream_sessions` table with start/end times
+- `viewer_samples` table stores viewer count every 5 minutes
+- Aggregated daily/weekly/monthly via `aggregateHoursWatched.js`
+- **Aggregation approach:** Calendar day snapshots, NOT rolling 24-hour windows
+  - Daily: streams that ENDED today (todayStart to todayEnd)
+  - Weekly: last 7 calendar days
+  - Monthly: last 30 calendar days
+- Displayed as "XK Hours" (divide by 1000, add K suffix)
+
+**Daily Channel Metrics Table:**
+- Shows Watch Hours column for Twitch creators
+- Queries `hours_watched_day` field from `creator_stats`
+- Formats large numbers: 58365 → "58K Hours"
+- Falls back to "Building Historical Data" when no data yet
+
+## Blog Post Format
+
+**Content Structure:**
+- Blog post content starts with intro paragraph (NO H1 title in content)
+- Title is rendered from `title` field in header, not from markdown
+- First paragraph automatically styled as intro box:
+  - Larger text (text-xl)
+  - Gradient background (indigo-50 to purple-50)
+  - Rounded border with padding
+  - Detected by checking `node?.position?.start?.line === 1`
+- All blog posts follow this pattern for consistency
+
+**Blog Post Creation:**
+1. Title goes in `title` field (used in header)
+2. Content starts with intro paragraph (no H1)
+3. First heading in content should be H2 (##)
+4. Intro paragraph gets automatic gradient box styling
+
 ## Blog & Products System
 
 **Blog Admin Panel (`/blog/admin`):**
@@ -219,4 +285,4 @@ When you need to update a blog post with large content changes:
 
 ---
 
-*Last updated: 2026-02-06*
+*Last updated: 2026-02-07*
