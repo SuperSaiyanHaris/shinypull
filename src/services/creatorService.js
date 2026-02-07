@@ -264,7 +264,16 @@ export const getRankedCreators = withErrorHandling(
 
         growthByCreatorId = new Map(
           Array.from(historyByCreatorId.entries()).map(([creatorId, rows]) => {
-            if (rows.length < 2) return [creatorId, 0];
+            // Need at least 2 data points to calculate growth
+            if (rows.length < 2) {
+              // If no historical data, try to use current stats for estimate
+              const creator = withStats.find(c => c.id === creatorId);
+              const stats = creator?.latestStats;
+              if (platform === 'youtube') {
+                return [creatorId, stats?.views_gained_month ?? 0];
+              }
+              return [creatorId, stats?.followers_gained_month ?? 0];
+            }
             
             const first = rows[0];
             const last = rows[rows.length - 1];
