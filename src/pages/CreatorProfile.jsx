@@ -127,7 +127,7 @@ export default function CreatorProfile() {
     if (!isAuthenticated) {
       // Trigger auth panel with a helpful message
       window.dispatchEvent(new CustomEvent('openAuthPanel', {
-        detail: { message: 'Sign in to follow creators and get notified about their latest stats!' }
+        detail: { message: 'Sign in to follow creators and see their latest stats quicker!' }
       }));
       return;
     }
