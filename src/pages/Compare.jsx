@@ -173,7 +173,7 @@ export default function Compare() {
                   <button
                     type="submit"
                     disabled={searching}
-                    className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:hover:translate-y-0"
+                    className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:hover:translate-y-0"
                   >
                     {searching ? 'Searching...' : 'Search'}
                   </button>
