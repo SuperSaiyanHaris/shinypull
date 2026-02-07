@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, Star, Users, Loader2, LogOut } from 'lucide-react';
+import { Youtube, Twitch, Star, Users, Loader2 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { getFollowedCreators } from '../services/followService';
@@ -19,11 +19,12 @@ const platformColors = {
 };
 
 export default function Dashboard() {
-  const { user, signOut, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [followedCreators, setFollowedCreators] = useState([]);
   const [creatorStats, setCreatorStats] = useState({});
   const [loading, setLoading] = useState(true);
+  const [platformFilter, setPlatformFilter] = useState(null); // null = all, 'youtube', 'twitch'
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -59,11 +60,6 @@ export default function Dashboard() {
     }
   }
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
-
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -89,30 +85,24 @@ export default function Dashboard() {
         {/* Header */}
         <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
           <div className="max-w-6xl mx-auto px-4 py-12">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-white mb-2">
-                  Welcome back, {displayName}!
-                </h1>
-                <p className="text-slate-400">
-                  Track your favorite creators and see their latest updates.
-                </p>
-              </div>
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </button>
-            </div>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Welcome back, {displayName}!
+            </h1>
+            <p className="text-slate-400">
+              Track your favorite creators and see their latest updates.
+            </p>
           </div>
         </div>
 
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Stats Summary */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <button
+              onClick={() => setPlatformFilter(null)}
+              className={`bg-white rounded-xl border p-6 text-left transition-all ${
+                platformFilter === null ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-indigo-100 rounded-lg">
                   <Star className="w-6 h-6 text-indigo-600" />
@@ -122,8 +112,13 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-500">Following</p>
                 </div>
               </div>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            </button>
+            <button
+              onClick={() => setPlatformFilter(platformFilter === 'youtube' ? null : 'youtube')}
+              className={`bg-white rounded-xl border p-6 text-left transition-all ${
+                platformFilter === 'youtube' ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-red-100 rounded-lg">
                   <Youtube className="w-6 h-6 text-red-600" />
@@ -135,8 +130,13 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-500">YouTube Creators</p>
                 </div>
               </div>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            </button>
+            <button
+              onClick={() => setPlatformFilter(platformFilter === 'twitch' ? null : 'twitch')}
+              className={`bg-white rounded-xl border p-6 text-left transition-all ${
+                platformFilter === 'twitch' ? 'border-purple-500 ring-2 ring-purple-200' : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-purple-100 rounded-lg">
                   <Twitch className="w-6 h-6 text-purple-600" />
@@ -148,7 +148,7 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-500">Twitch Streamers</p>
                 </div>
               </div>
-            </div>
+            </button>
           </div>
 
           {/* Following List */}
@@ -156,7 +156,9 @@ export default function Dashboard() {
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <Star className="w-5 h-5 text-yellow-500" />
-                Creators You Follow
+                {platformFilter === 'youtube' ? 'YouTube Creators You Follow' :
+                 platformFilter === 'twitch' ? 'Twitch Streamers You Follow' :
+                 'Creators You Follow'}
               </h2>
             </div>
 
@@ -164,12 +166,18 @@ export default function Dashboard() {
               <div className="flex items-center justify-center p-12">
                 <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
               </div>
-            ) : followedCreators.length === 0 ? (
+            ) : followedCreators.length === 0 || (platformFilter && followedCreators.filter(c => c.platform === platformFilter).length === 0) ? (
               <div className="text-center p-12">
                 <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No creators followed yet</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {platformFilter ? `No ${platformFilter === 'youtube' ? 'YouTube creators' : 'Twitch streamers'} followed yet` : 'No creators followed yet'}
+                </h3>
                 <p className="text-gray-500 mb-6">
-                  Start following creators to track their statistics here.
+                  {platformFilter ? (
+                    <>Click the "Following" card to see all creators, or search to find {platformFilter === 'youtube' ? 'YouTube creators' : 'Twitch streamers'}.</>
+                  ) : (
+                    'Start following creators to track their statistics here.'
+                  )}
                 </p>
                 <Link
                   to="/search"
@@ -180,7 +188,9 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="divide-y divide-gray-100">
-                {followedCreators.map(creator => {
+                {followedCreators
+                  .filter(creator => !platformFilter || creator.platform === platformFilter)
+                  .map(creator => {
                   const PlatformIcon = platformIcons[creator.platform] || Users;
                   const colors = platformColors[creator.platform] || { bg: 'bg-gray-600', light: 'bg-gray-50', text: 'text-gray-600' };
                   const stats = creatorStats[creator.id];
