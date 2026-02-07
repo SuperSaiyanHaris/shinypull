@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthPanel from './AuthPanel';
 
@@ -36,6 +36,7 @@ export default function Header() {
     { path: '/search', label: 'Search', icon: Search },
     { path: '/rankings', label: 'Rankings', icon: Trophy },
     { path: '/compare', label: 'Compare', icon: Scale },
+    { path: '/youtube/money-calculator', label: 'Calculator', icon: Calculator },
     { path: '/blog', label: 'Blog', icon: BookOpen },
   ];
 
