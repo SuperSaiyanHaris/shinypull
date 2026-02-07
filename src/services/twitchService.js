@@ -6,8 +6,8 @@ const API_BASE = '/api/twitch';
  * Search for Twitch channels
  */
 export const searchChannels = withErrorHandling(
-  async (query) => {
-    const response = await fetch(`${API_BASE}?action=search&query=${encodeURIComponent(query)}`);
+  async (query, maxResults = 25) => {
+    const response = await fetch(`${API_BASE}?action=search&query=${encodeURIComponent(query)}&maxResults=${maxResults}`);
 
     if (!response.ok) {
       const error = await response.json();

@@ -40,11 +40,14 @@ async function getAccessToken() {
   return cachedToken;
 }
 
-async function searchChannels(query) {
+async function searchChannels(query, maxResults = 25) {
   const token = await getAccessToken();
 
+  // Clamp maxResults between 1 and 100 (Twitch API limit)
+  const limit = Math.max(1, Math.min(100, maxResults));
+
   const response = await fetch(
-    `https://api.twitch.tv/helix/search/channels?query=${encodeURIComponent(query)}&first=10`,
+    `https://api.twitch.tv/helix/search/channels?query=${encodeURIComponent(query)}&first=${limit}`,
     {
       headers: {
         'Client-ID': TWITCH_CLIENT_ID,
@@ -163,11 +166,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { action, query, username } = req.query;
+  const { action, query, username, maxResults } = req.query;
 
   try {
     if (action === 'search' && query) {
-      const results = await searchChannels(query);
+      const results = await searchChannels(query, maxResults ? parseInt(maxResults, 10) : 25);
       return res.status(200).json({ data: results });
     }
 

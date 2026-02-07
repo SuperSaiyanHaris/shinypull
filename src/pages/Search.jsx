@@ -65,12 +65,12 @@ export default function Search() {
     try {
       let channels = [];
       if (selectedPlatform === 'youtube') {
-        channels = await searchYouTube(searchQuery, 10);
+        channels = await searchYouTube(searchQuery, 25);
         if (channels.length > 0) {
           void persistYouTubeResults(channels);
         }
       } else if (selectedPlatform === 'twitch') {
-        channels = await searchTwitch(searchQuery);
+        channels = await searchTwitch(searchQuery, 25);
       }
       setResults(channels);
     } catch (err) {

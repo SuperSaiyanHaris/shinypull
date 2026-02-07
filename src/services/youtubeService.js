@@ -7,9 +7,9 @@ const API_URL = '/api/youtube';
  * Search for YouTube channels by query
  */
 export const searchChannels = withErrorHandling(
-  async (query, maxResults = 10) => {
+  async (query, maxResults = 25) => {
     const response = await fetch(
-      `${API_URL}?action=search&query=${encodeURIComponent(query)}`
+      `${API_URL}?action=search&query=${encodeURIComponent(query)}&maxResults=${maxResults}`
     );
 
     if (!response.ok) {

@@ -6,14 +6,17 @@ const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 /**
  * Search for YouTube channels
  */
-async function searchChannels(query) {
+async function searchChannels(query, maxResults = 25) {
   if (!YOUTUBE_API_KEY) {
     throw new Error('Missing YouTube API key');
   }
 
+  // Clamp maxResults between 1 and 50 (YouTube API limit)
+  const limit = Math.max(1, Math.min(50, maxResults));
+
   const response = await fetch(
     `https://www.googleapis.com/youtube/v3/search?` +
-    `part=snippet&type=channel&q=${encodeURIComponent(query)}&maxResults=10&key=${YOUTUBE_API_KEY}`
+    `part=snippet&type=channel&q=${encodeURIComponent(query)}&maxResults=${limit}&key=${YOUTUBE_API_KEY}`
   );
 
   if (!response.ok) {
@@ -153,7 +156,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { action, id, username, query } = req.query;
+    const { action, id, username, query, maxResults } = req.query;
 
     if (!action) {
       return res.status(400).json({ error: 'Missing action parameter' });
@@ -166,7 +169,7 @@ export default async function handler(req, res) {
         if (!query) {
           return res.status(400).json({ error: 'Missing query parameter' });
         }
-        result = await searchChannels(query);
+        result = await searchChannels(query, maxResults ? parseInt(maxResults, 10) : 25);
         break;
 
       case 'getChannel':
