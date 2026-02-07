@@ -287,20 +287,20 @@ export default function CreatorProfile() {
         <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-6xl mx-auto">
             {/* Profile Header */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 mb-6 -mt-16 relative">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 mb-6 -mt-16 relative z-10">
               {/* Follow Button - Top Right */}
-              <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+              <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
                 <button
                   onClick={handleFollowToggle}
                   disabled={followLoading}
-                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base ${
+                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base shadow-lg ${
                     isFollowing
-                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg shadow-indigo-500/30'
+                      ? 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                      : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-indigo-500/30'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <Star className={`w-4 h-4 ${isFollowing ? 'fill-current' : ''}`} />
-                  <span className="hidden xs:inline">{followLoading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}</span>
+                  {followLoading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
                 </button>
               </div>
 

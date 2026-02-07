@@ -3,6 +3,38 @@ import logger from '../lib/logger';
 import { withErrorHandling, AuthenticationError } from '../lib/errorHandler';
 
 /**
+ * Ensure user exists in users table
+ * @param {string} userId - The user's ID
+ */
+async function ensureUserExists(userId) {
+  // Check if user exists
+  const { data: existingUser } = await supabase
+    .from('users')
+    .select('id')
+    .eq('id', userId)
+    .single();
+
+  if (existingUser) return;
+
+  // Get user data from auth
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) return;
+
+  // Create user record
+  await supabase
+    .from('users')
+    .insert({
+      id: userId,
+      email: user.email,
+      display_name: user.user_metadata?.display_name || user.email,
+      avatar_url: user.user_metadata?.avatar_url,
+    })
+    .select()
+    .single();
+}
+
+/**
  * Follow a creator
  * @param {string} userId - The user's ID
  * @param {string} creatorId - The creator's ID
@@ -12,6 +44,9 @@ export const followCreator = withErrorHandling(
     if (!userId) {
       throw new AuthenticationError('User must be logged in to follow creators');
     }
+
+    // Ensure user exists in users table
+    await ensureUserExists(userId);
 
     const { error } = await supabase
       .from('user_saved_creators')
