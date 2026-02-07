@@ -4,7 +4,7 @@
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
 /**
- * Search for YouTube channels
+ * Search for YouTube channels (includes statistics)
  */
 async function searchChannels(query, maxResults = 25) {
   if (!YOUTUBE_API_KEY) {
@@ -14,27 +14,73 @@ async function searchChannels(query, maxResults = 25) {
   // Clamp maxResults between 1 and 50 (YouTube API limit)
   const limit = Math.max(1, Math.min(50, maxResults));
 
-  const response = await fetch(
+  // Step 1: Search for channels
+  const searchResponse = await fetch(
     `https://www.googleapis.com/youtube/v3/search?` +
     `part=snippet&type=channel&q=${encodeURIComponent(query)}&maxResults=${limit}&key=${YOUTUBE_API_KEY}`
   );
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`YouTube API error: ${response.status} - ${errorText}`);
+  if (!searchResponse.ok) {
+    const errorText = await searchResponse.text();
+    throw new Error(`YouTube API error: ${searchResponse.status} - ${errorText}`);
   }
 
-  const data = await response.json();
+  const searchData = await searchResponse.json();
 
-  return data.items.map(item => ({
-    platform: 'youtube',
-    platformId: item.snippet.channelId,
-    id: item.snippet.channelId,
-    username: item.snippet.channelTitle,
-    displayName: item.snippet.channelTitle,
-    profileImage: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
-    description: item.snippet.description,
-  }));
+  if (!searchData.items || searchData.items.length === 0) {
+    return [];
+  }
+
+  // Step 2: Get channel IDs and fetch statistics in batch
+  const channelIds = searchData.items.map(item => item.snippet.channelId).join(',');
+
+  const statsResponse = await fetch(
+    `https://www.googleapis.com/youtube/v3/channels?` +
+    `part=snippet,statistics&id=${channelIds}&key=${YOUTUBE_API_KEY}`
+  );
+
+  if (!statsResponse.ok) {
+    // If stats fetch fails, return basic results without stats
+    return searchData.items.map(item => ({
+      platform: 'youtube',
+      platformId: item.snippet.channelId,
+      id: item.snippet.channelId,
+      username: item.snippet.channelTitle,
+      displayName: item.snippet.channelTitle,
+      profileImage: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
+      description: item.snippet.description,
+    }));
+  }
+
+  const statsData = await statsResponse.json();
+
+  // Create a map of channel stats by ID
+  const statsMap = new Map();
+  (statsData.items || []).forEach(channel => {
+    statsMap.set(channel.id, {
+      subscribers: parseInt(channel.statistics?.subscriberCount || 0),
+      totalViews: parseInt(channel.statistics?.viewCount || 0),
+      totalPosts: parseInt(channel.statistics?.videoCount || 0),
+      customUrl: channel.snippet?.customUrl,
+    });
+  });
+
+  // Merge search results with statistics
+  return searchData.items.map(item => {
+    const stats = statsMap.get(item.snippet.channelId) || {};
+    return {
+      platform: 'youtube',
+      platformId: item.snippet.channelId,
+      id: item.snippet.channelId,
+      username: stats.customUrl?.replace('@', '') || item.snippet.channelTitle.toLowerCase().replace(/\s+/g, ''),
+      displayName: item.snippet.channelTitle,
+      profileImage: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
+      description: item.snippet.description,
+      subscribers: stats.subscribers || 0,
+      totalViews: stats.totalViews || 0,
+      totalPosts: stats.totalPosts || 0,
+    };
+  });
 }
 
 /**

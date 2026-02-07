@@ -61,7 +61,47 @@ async function searchChannels(query, maxResults = 25) {
   }
 
   const data = await response.json();
-  return data.data.map(transformChannel);
+  const channels = data.data || [];
+
+  if (channels.length === 0) {
+    return [];
+  }
+
+  // Fetch follower counts in parallel for all channels
+  const followerPromises = channels.map(async (channel) => {
+    try {
+      const followersResponse = await fetch(
+        `https://api.twitch.tv/helix/channels/followers?broadcaster_id=${channel.id}&first=1`,
+        {
+          headers: {
+            'Client-ID': TWITCH_CLIENT_ID,
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+      if (followersResponse.ok) {
+        const followersData = await followersResponse.json();
+        return { id: channel.id, followers: followersData.total || 0 };
+      }
+    } catch (e) {
+      // Ignore individual failures
+    }
+    return { id: channel.id, followers: 0 };
+  });
+
+  const followerResults = await Promise.all(followerPromises);
+  const followerMap = new Map(followerResults.map(r => [r.id, r.followers]));
+
+  return channels.map(channel => ({
+    platform: 'twitch',
+    platformId: channel.id,
+    username: channel.broadcaster_login,
+    displayName: channel.display_name,
+    profileImage: channel.thumbnail_url,
+    isLive: channel.is_live,
+    category: channel.game_name,
+    followers: followerMap.get(channel.id) || 0,
+  }));
 }
 
 async function getChannelByUsername(username) {
