@@ -20,6 +20,7 @@ import Terms from './pages/Terms';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import BlogAdmin from './pages/BlogAdmin';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
             <Route path="/live/:platform/:username" element={<LiveCount />} />
             <Route path="/:platform/:username" element={<CreatorProfile />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/reset" element={<ResetPassword />} />
             <Route path="/signin" element={<Auth />} />
             <Route path="/signup" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
