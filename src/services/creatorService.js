@@ -225,13 +225,16 @@ export const getRankedCreators = withErrorHandling(
       const latestStats = allStats[0] || null;
       
       // Calculate 30-day growth from historical data
-      // Only calculate if we have at least 2 days of data
+      // YouTube: require at least 7 days of data for accurate growth
+      // Twitch: require at least 2 days (follower counts are exact)
       let calculatedGrowth = 0;
-      if (allStats.length >= 2) {
+      const minDataPoints = platform === 'youtube' ? 7 : 2;
+      
+      if (allStats.length >= minDataPoints) {
         const oldestStat = allStats[allStats.length - 1];
         const newestStat = allStats[0];
         
-        // Check if data spans at least 2 different days
+        // Check if data spans at least the minimum required days
         const oldestDate = new Date(oldestStat.recorded_at).toDateString();
         const newestDate = new Date(newestStat.recorded_at).toDateString();
         
