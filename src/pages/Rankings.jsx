@@ -148,8 +148,8 @@ export default function Rankings() {
                   <Info className="w-3.5 h-3.5 text-gray-400 cursor-help" />
                   <div className="absolute right-0 top-6 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none">
                     {selectedPlatform === 'youtube' 
-                      ? 'Based on view growth over available data (min. 7 days)' 
-                      : 'Based on follower growth over available data'}
+                      ? 'YouTube growth based on total views' 
+                      : 'Twitch growth based on followers'}
                   </div>
                 </div>
               </div>
