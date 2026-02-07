@@ -735,12 +735,12 @@ export default function CreatorProfile() {
                 <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="w-8 h-8 text-indigo-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Collecting Historical Data</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Building Historical Data</h3>
                 <p className="text-gray-500 text-sm mb-2">
-                  We've added this creator to our tracking system. Check back tomorrow to see daily growth metrics!
+                  This creator is being tracked! We collect daily snapshots to show growth trends and metrics.
                 </p>
                 <p className="text-xs text-gray-400">
-                  {statsHistory.length} data point(s) collected so far
+                  {statsHistory.length} day(s) of data collected • Check back soon for trends!
                 </p>
               </div>
             )}
