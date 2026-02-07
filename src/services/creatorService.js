@@ -209,7 +209,10 @@ export const getRankedCreators = withErrorHandling(
           total_views,
           total_posts,
           followers_gained_month,
-          views_gained_month
+          views_gained_month,
+          hours_watched_day,
+          hours_watched_week,
+          hours_watched_month
         )
       `)
       .eq('platform', platform);
@@ -243,8 +246,13 @@ export const getRankedCreators = withErrorHandling(
             // For YouTube, use view growth
             calculatedGrowth = (newestStat?.total_views || 0) - (oldestStat?.total_views || 0);
           } else {
-            // For Twitch, use follower growth
-            calculatedGrowth = (newestStat?.followers || 0) - (oldestStat?.followers || 0);
+            // For Twitch, use watch hours growth (primary metric)
+            const hoursGrowth = (newestStat?.hours_watched_month || 0) - (oldestStat?.hours_watched_month || 0);
+            // Also track follower growth
+            const followerGrowth = (newestStat?.followers || 0) - (oldestStat?.followers || 0);
+            // Combine both metrics: prioritize watch hours but add follower growth as bonus
+            // Convert hours to views equivalent (1 hour = ~3600 "value units") and add follower growth
+            calculatedGrowth = (hoursGrowth * 3600) + followerGrowth;
           }
         }
       }
