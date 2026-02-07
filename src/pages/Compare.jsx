@@ -110,85 +110,140 @@ export default function Compare() {
             )}
           </div>
 
-          {/* Comparison Table */}
+          {/* Comparison Section */}
           {filledCreators.length >= 2 && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900">Comparison</h3>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-100 bg-gray-50">
-                      <th className="px-6 py-4 text-left font-semibold text-gray-600">Metric</th>
-                      {filledCreators.map((creator) => (
-                        <th key={creator.platformId} className="px-6 py-4 text-center font-semibold text-gray-900">
-                          <div className="flex items-center justify-center gap-2">
-                            <img src={creator.profileImage} alt="" className="w-6 h-6 rounded-lg" />
-                            <span className="truncate max-w-[120px]">{creator.displayName}</span>
-                          </div>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <ComparisonRow
-                      label="Platform"
-                      values={filledCreators.map(c => (
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm ${platformConfig[c.platform]?.bg} ${platformConfig[c.platform]?.color}`}>
-                          {c.platform === 'youtube' ? <Youtube className="w-4 h-4" /> : <Twitch className="w-4 h-4" />}
-                          {c.platform}
-                        </span>
-                      ))}
-                    />
-                    <ComparisonRow
-                      label="Subscribers / Followers"
-                      icon={Users}
-                      values={filledCreators.map(c => formatNumber(c.subscribers || c.followers))}
-                      highlight={getWinner(filledCreators.map(c => c.subscribers || c.followers))}
-                    />
-                    <ComparisonRow
-                      label="Total Views"
-                      icon={Eye}
-                      values={filledCreators.map(c => formatNumber(c.totalViews))}
-                      highlight={getWinner(filledCreators.map(c => c.totalViews))}
-                    />
-                    <ComparisonRow
-                      label="Videos / Content"
-                      icon={Video}
-                      values={filledCreators.map(c => c.platform === 'twitch' ? (c.category || '-') : formatNumber(c.totalPosts))}
-                      highlight={filledCreators.every(c => c.platform !== 'twitch') ? getWinner(filledCreators.map(c => c.totalPosts)) : null}
-                    />
-                    <ComparisonRow
-                      label="Avg Views per Video"
-                      icon={TrendingUp}
-                      values={filledCreators.map(c =>
-                        c.platform === 'twitch' ? '-' :
-                        c.totalPosts > 0 ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '-'
-                      )}
-                      highlight={filledCreators.every(c => c.platform !== 'twitch') ?
-                        getWinner(filledCreators.map(c => c.totalPosts > 0 ? c.totalViews / c.totalPosts : 0)) : null}
-                    />
-                  </tbody>
-                </table>
-              </div>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-100">
+                  <h3 className="text-lg font-semibold text-gray-900">Comparison</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-100 bg-gray-50">
+                        <th className="px-6 py-4 text-left font-semibold text-gray-600">Metric</th>
+                        {filledCreators.map((creator) => (
+                          <th key={creator.platformId} className="px-6 py-4 text-center font-semibold text-gray-900">
+                            <div className="flex items-center justify-center gap-2">
+                              <img src={creator.profileImage} alt="" className="w-6 h-6 rounded-lg" />
+                              <span className="truncate max-w-[120px]">{creator.displayName}</span>
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ComparisonRow
+                        label="Platform"
+                        values={filledCreators.map(c => (
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm ${platformConfig[c.platform]?.bg} ${platformConfig[c.platform]?.color}`}>
+                            {c.platform === 'youtube' ? <Youtube className="w-4 h-4" /> : <Twitch className="w-4 h-4" />}
+                            {c.platform}
+                          </span>
+                        ))}
+                      />
+                      <ComparisonRow
+                        label="Subscribers / Followers"
+                        icon={Users}
+                        values={filledCreators.map(c => formatNumber(c.subscribers || c.followers))}
+                        highlight={getWinner(filledCreators.map(c => c.subscribers || c.followers))}
+                      />
+                      <ComparisonRow
+                        label="Total Views"
+                        icon={Eye}
+                        values={filledCreators.map(c => formatNumber(c.totalViews))}
+                        highlight={getWinner(filledCreators.map(c => c.totalViews))}
+                      />
+                      <ComparisonRow
+                        label="Videos / Content"
+                        icon={Video}
+                        values={filledCreators.map(c => c.platform === 'twitch' ? (c.category || '-') : formatNumber(c.totalPosts))}
+                        highlight={filledCreators.every(c => c.platform !== 'twitch') ? getWinner(filledCreators.map(c => c.totalPosts)) : null}
+                      />
+                      <ComparisonRow
+                        label="Avg Views per Video"
+                        icon={TrendingUp}
+                        values={filledCreators.map(c =>
+                          c.platform === 'twitch' ? '-' :
+                          c.totalPosts > 0 ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '-'
+                        )}
+                        highlight={filledCreators.every(c => c.platform !== 'twitch') ?
+                          getWinner(filledCreators.map(c => c.totalPosts > 0 ? c.totalViews / c.totalPosts : 0)) : null}
+                      />
+                    </tbody>
+                  </table>
+                </div>
 
-              {/* View Full Profiles */}
-              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
-                <div className="flex flex-wrap gap-4 justify-center">
-                  {filledCreators.map((creator) => (
-                    <Link
-                      key={creator.platformId}
-                      to={`/${creator.platform}/${creator.username}`}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 hover:text-indigo-600 hover:border-indigo-200 transition-colors"
-                    >
-                      View {creator.displayName}'s profile
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  ))}
+                {/* View Full Profiles - Desktop */}
+                <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                  <div className="flex flex-wrap gap-4 justify-center">
+                    {filledCreators.map((creator) => (
+                      <Link
+                        key={creator.platformId}
+                        to={`/${creator.platform}/${creator.username}`}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                      >
+                        View {creator.displayName}'s profile
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+
+              {/* Mobile Stat-by-Stat View */}
+              <div className="md:hidden space-y-3">
+                <MobileComparisonCard
+                  label="Subscribers / Followers"
+                  icon={Users}
+                  creators={filledCreators}
+                  getValue={(c) => c.subscribers || c.followers}
+                  formatValue={(v) => formatNumber(v)}
+                />
+                <MobileComparisonCard
+                  label="Total Views"
+                  icon={Eye}
+                  creators={filledCreators}
+                  getValue={(c) => c.totalViews}
+                  formatValue={(v) => formatNumber(v)}
+                />
+                <MobileComparisonCard
+                  label="Videos"
+                  icon={Video}
+                  creators={filledCreators.filter(c => c.platform !== 'twitch')}
+                  getValue={(c) => c.totalPosts}
+                  formatValue={(v) => formatNumber(v)}
+                  hideIfEmpty
+                />
+                <MobileComparisonCard
+                  label="Avg Views per Video"
+                  icon={TrendingUp}
+                  creators={filledCreators.filter(c => c.platform !== 'twitch')}
+                  getValue={(c) => c.totalPosts > 0 ? c.totalViews / c.totalPosts : 0}
+                  formatValue={(v) => formatNumber(Math.round(v))}
+                  hideIfEmpty
+                />
+
+                {/* View Full Profiles - Mobile */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+                  <p className="text-sm font-medium text-gray-500 mb-3">View Profiles</p>
+                  <div className="space-y-2">
+                    {filledCreators.map((creator) => (
+                      <Link
+                        key={creator.platformId}
+                        to={`/${creator.platform}/${creator.username}`}
+                        className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                      >
+                        <img src={creator.profileImage} alt="" className="w-8 h-8 rounded-lg" />
+                        <span className="flex-1 font-medium text-gray-900 truncate">{creator.displayName}</span>
+                        <ArrowRight className="w-4 h-4 text-gray-400" />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
           )}
 
           {filledCreators.length < 2 && (
@@ -388,6 +443,53 @@ function ComparisonRow({ label, icon: Icon, values, highlight }) {
         </td>
       ))}
     </tr>
+  );
+}
+
+function MobileComparisonCard({ label, icon: Icon, creators, getValue, formatValue, hideIfEmpty }) {
+  if (hideIfEmpty && creators.length === 0) return null;
+
+  const values = creators.map(getValue);
+  const winner = getWinner(values);
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div className="flex items-center gap-2 mb-3">
+        {Icon && <Icon className="w-4 h-4 text-gray-400" />}
+        <span className="text-sm font-medium text-gray-500">{label}</span>
+      </div>
+      <div className="space-y-2">
+        {creators.map((creator, index) => {
+          const isWinner = winner === index;
+          const value = getValue(creator);
+          return (
+            <div
+              key={creator.platformId}
+              className={`flex items-center gap-3 p-3 rounded-xl ${
+                isWinner ? 'bg-emerald-50 ring-1 ring-emerald-200' : 'bg-gray-50'
+              }`}
+            >
+              <img
+                src={creator.profileImage}
+                alt={creator.displayName}
+                className="w-8 h-8 rounded-lg object-cover"
+              />
+              <span className="flex-1 font-medium text-gray-900 truncate text-sm">
+                {creator.displayName}
+              </span>
+              <span className={`font-bold ${isWinner ? 'text-emerald-600' : 'text-gray-900'}`}>
+                {formatValue(value)}
+              </span>
+              {isWinner && (
+                <span className="text-xs font-medium text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  ✓
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
