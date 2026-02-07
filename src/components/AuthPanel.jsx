@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { Mail, Lock, User, X } from 'lucide-react';
 
-export default function AuthPanel({ isOpen, onClose }) {
+export default function AuthPanel({ isOpen, onClose, message: contextMessage }) {
   const { isAuthenticated } = useAuth();
   const [mode, setMode] = useState('signin'); // signin or signup
   const [email, setEmail] = useState('');
@@ -135,6 +135,19 @@ export default function AuthPanel({ isOpen, onClose }) {
 
         {/* Content */}
         <div className="px-6 py-8">
+          {contextMessage && (
+            <div className="mb-6 bg-indigo-50 border border-indigo-200 rounded-lg p-4 flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-indigo-800 font-medium">{contextMessage}</p>
+              </div>
+            </div>
+          )}
+          
           <p className="text-gray-600 mb-8">
             {mode === 'signup' 
               ? 'Sign up to start tracking your favorite creators' 

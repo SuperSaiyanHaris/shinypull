@@ -8,12 +8,16 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
+  const [authPanelMessage, setAuthPanelMessage] = useState('');
   const location = useLocation();
   const { user, signOut, isAuthenticated } = useAuth();
 
   // Listen for custom event to open auth panel
   useEffect(() => {
-    const handleOpenAuthPanel = () => setAuthPanelOpen(true);
+    const handleOpenAuthPanel = (e) => {
+      setAuthPanelMessage(e.detail?.message || '');
+      setAuthPanelOpen(true);
+    };
     window.addEventListener('openAuthPanel', handleOpenAuthPanel);
     return () => window.removeEventListener('openAuthPanel', handleOpenAuthPanel);
   }, []);
@@ -202,7 +206,14 @@ export default function Header() {
       </div>
 
       {/* Auth Panel */}
-      <AuthPanel isOpen={authPanelOpen} onClose={() => setAuthPanelOpen(false)} />
+      <AuthPanel 
+        isOpen={authPanelOpen} 
+        onClose={() => {
+          setAuthPanelOpen(false);
+          setAuthPanelMessage('');
+        }} 
+        message={authPanelMessage}
+      />
     </header>
   );
 }

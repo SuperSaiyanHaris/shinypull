@@ -125,8 +125,10 @@ export default function CreatorProfile() {
 
   const handleFollowToggle = async () => {
     if (!isAuthenticated) {
-      // Trigger auth panel by dispatching custom event
-      window.dispatchEvent(new CustomEvent('openAuthPanel'));
+      // Trigger auth panel with a helpful message
+      window.dispatchEvent(new CustomEvent('openAuthPanel', {
+        detail: { message: 'Sign in to follow creators and get notified about their latest stats!' }
+      }));
       return;
     }
 
