@@ -173,7 +173,7 @@ export default function AuthPanel({ isOpen, onClose }) {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-white border border-gray-300 rounded-lg py-3 px-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full bg-white border border-gray-300 rounded-lg py-3 px-10 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="Your name"
                     required
                   />
@@ -189,7 +189,7 @@ export default function AuthPanel({ isOpen, onClose }) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white border border-gray-300 rounded-lg py-3 px-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full bg-white border border-gray-300 rounded-lg py-3 px-10 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="you@example.com"
                   required
                 />
@@ -204,7 +204,7 @@ export default function AuthPanel({ isOpen, onClose }) {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white border border-gray-300 rounded-lg py-3 px-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full bg-white border border-gray-300 rounded-lg py-3 px-10 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="••••••••"
                   required
                   minLength={6}
