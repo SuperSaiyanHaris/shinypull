@@ -246,13 +246,11 @@ export const getRankedCreators = withErrorHandling(
             // For YouTube, use view growth
             calculatedGrowth = (newestStat?.total_views || 0) - (oldestStat?.total_views || 0);
           } else {
-            // For Twitch, use watch hours growth (primary metric)
+            // For Twitch, combine watch hours growth and follower growth
             const hoursGrowth = (newestStat?.hours_watched_month || 0) - (oldestStat?.hours_watched_month || 0);
-            // Also track follower growth
             const followerGrowth = (newestStat?.followers || 0) - (oldestStat?.followers || 0);
-            // Combine both metrics: prioritize watch hours but add follower growth as bonus
-            // Convert hours to views equivalent (1 hour = ~3600 "value units") and add follower growth
-            calculatedGrowth = (hoursGrowth * 3600) + followerGrowth;
+            // Add both metrics together (hours + followers)
+            calculatedGrowth = hoursGrowth + followerGrowth;
           }
         }
       }
