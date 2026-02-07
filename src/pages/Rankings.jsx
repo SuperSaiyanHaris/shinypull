@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, TrendingUp, Users, Eye, Trophy } from 'lucide-react';
+import { Youtube, Twitch, Instagram, TrendingUp, Users, Eye, Trophy, Info } from 'lucide-react';
 import { getRankedCreators } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
@@ -142,7 +142,17 @@ export default function Rankings() {
               <div className="col-span-5">Creator</div>
               <div className="col-span-2 text-right">{followerLabel}</div>
               <div className="col-span-2 text-right">Views</div>
-              <div className="col-span-2 text-right">30-Day Growth</div>
+              <div className="col-span-2 text-right flex items-center justify-end gap-1 group">
+                <span>30-Day Growth</span>
+                <div className="relative">
+                  <Info className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  <div className="absolute right-0 top-6 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none">
+                    {selectedPlatform === 'youtube' 
+                      ? 'Based on view growth over available data (min. 7 days)' 
+                      : 'Based on follower growth over available data'}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Loading State */}
