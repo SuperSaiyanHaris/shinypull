@@ -225,17 +225,24 @@ export const getRankedCreators = withErrorHandling(
       const latestStats = allStats[0] || null;
       
       // Calculate 30-day growth from historical data
+      // Only calculate if we have at least 2 days of data
       let calculatedGrowth = 0;
-      if (allStats.length >= 2 && rankType === 'growth') {
+      if (allStats.length >= 2) {
         const oldestStat = allStats[allStats.length - 1];
         const newestStat = allStats[0];
         
-        if (platform === 'youtube') {
-          // For YouTube, use view growth
-          calculatedGrowth = (newestStat?.total_views || 0) - (oldestStat?.total_views || 0);
-        } else {
-          // For Twitch, use follower growth
-          calculatedGrowth = (newestStat?.followers || 0) - (oldestStat?.followers || 0);
+        // Check if data spans at least 2 different days
+        const oldestDate = new Date(oldestStat.recorded_at).toDateString();
+        const newestDate = new Date(newestStat.recorded_at).toDateString();
+        
+        if (oldestDate !== newestDate) {
+          if (platform === 'youtube') {
+            // For YouTube, use view growth
+            calculatedGrowth = (newestStat?.total_views || 0) - (oldestStat?.total_views || 0);
+          } else {
+            // For Twitch, use follower growth
+            calculatedGrowth = (newestStat?.followers || 0) - (oldestStat?.followers || 0);
+          }
         }
       }
       
