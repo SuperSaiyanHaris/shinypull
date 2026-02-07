@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import AuthPanel from './AuthPanel';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const location = useLocation();
   const { user, signOut, isAuthenticated } = useAuth();
 
@@ -25,6 +27,13 @@ export default function Header() {
     { path: '/compare', label: 'Compare', icon: Scale },
     { path: '/blog', label: 'Blog', icon: BookOpen },
   ];
+
+  // Close auth panel when user logs in
+  const handleAuthStateChange = () => {
+    if (isAuthenticated) {
+      setAuthPanelOpen(false);
+    }
+  };
 
   return (
     <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
@@ -57,6 +66,21 @@ export default function Header() {
               </Link>
             ))}
 
+            {/* Dashboard Link (Desktop Only, When Authenticated) */}
+            {isAuthenticated && (
+              <Link
+                to="/dashboard"
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  isActive('/dashboard')
+                    ? 'bg-indigo-50 text-indigo-600'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Dashboard</span>
+              </Link>
+            )}
+
             {/* Auth Section */}
             <div className="ml-4 pl-4 border-l border-gray-200">
               {isAuthenticated ? (
@@ -74,14 +98,6 @@ export default function Header() {
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                        <Link
-                          to="/dashboard"
-                          onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50"
-                        >
-                          <LayoutDashboard className="w-4 h-4" />
-                          My Dashboard
-                        </Link>
                         <button
                           onClick={() => {
                             signOut();
@@ -97,13 +113,13 @@ export default function Header() {
                   )}
                 </div>
               ) : (
-                <Link
-                  to="/auth"
+                <button
+                  onClick={() => setAuthPanelOpen(true)}
                   className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
                 >
                   <User className="w-4 h-4" />
                   Sign In
-                </Link>
+                </button>
               )}
             </div>
           </nav>
@@ -161,20 +177,25 @@ export default function Header() {
                     </button>
                   </>
                 ) : (
-                  <Link
-                    to="/auth"
-                    onClick={() => setMobileMenuOpen(false)}
+                  <button
+                    onClick={() => {
+                      setAuthPanelOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
                     className="flex items-center justify-center gap-2 mx-4 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors"
                   >
                     <User className="w-5 h-5" />
                     Sign In
-                  </Link>
+                  </button>
                 )}
               </div>
             </div>
           </nav>
         )}
       </div>
+
+      {/* Auth Panel */}
+      <AuthPanel isOpen={authPanelOpen} onClose={() => setAuthPanelOpen(false)} />
     </header>
   );
 }
