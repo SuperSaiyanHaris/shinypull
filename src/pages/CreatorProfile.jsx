@@ -574,6 +574,7 @@ export default function CreatorProfile() {
                       <tr className="border-b border-gray-100 bg-gray-50 text-left">
                         <th className="px-6 py-4 font-semibold text-gray-600">Date</th>
                         <th className="px-6 py-4 font-semibold text-gray-600 text-right">{platform === 'twitch' ? 'Followers' : 'Subscribers'}</th>
+                        {platform === 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Watch Hours</th>}
                         {platform !== 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
                         {platform !== 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
                         {platform !== 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Est. Earnings</th>}
@@ -600,6 +601,15 @@ export default function CreatorProfile() {
                               )}
                             </div>
                           </td>
+                          {platform === 'twitch' && (
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex flex-col items-end">
+                                <span className="font-medium text-gray-900">
+                                  {stat.hours_watched_day ? `${stat.hours_watched_day.toLocaleString('en-US', { maximumFractionDigits: 1 })}K` : '-'}
+                                </span>
+                              </div>
+                            </td>
+                          )}
                           {platform !== 'twitch' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex flex-col items-end">
@@ -645,6 +655,11 @@ export default function CreatorProfile() {
                             </span>
                           )}
                         </td>
+                        {platform === 'twitch' && (
+                          <td className="px-6 py-4 text-right">
+                            <span className="text-gray-400">—</span>
+                          </td>
+                        )}
                         {platform !== 'twitch' && (
                           <>
                             <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.dailyAverage.views)}</td>
@@ -667,6 +682,11 @@ export default function CreatorProfile() {
                             </span>
                           )}
                         </td>
+                        {platform === 'twitch' && (
+                          <td className="px-6 py-4 text-right">
+                            <span className="text-gray-400">—</span>
+                          </td>
+                        )}
                         {platform !== 'twitch' && (
                           <>
                             <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.weeklyAverage.views)}</td>
@@ -689,6 +709,11 @@ export default function CreatorProfile() {
                             </span>
                           )}
                         </td>
+                        {platform === 'twitch' && (
+                          <td className="px-6 py-4 text-right">
+                            <span className="text-gray-400">—</span>
+                          </td>
+                        )}
                         {platform !== 'twitch' && (
                           <>
                             <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.last30Days.views)}</td>
