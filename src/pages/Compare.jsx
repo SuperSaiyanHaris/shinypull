@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale } from 'lucide-react';
+import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2 } from 'lucide-react';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import SEO from '../components/SEO';
@@ -15,62 +15,20 @@ const platformConfig = {
 
 export default function Compare() {
   const [creators, setCreators] = useState([null, null]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchPlatform, setSearchPlatform] = useState('youtube');
-  const [searchResults, setSearchResults] = useState([]);
-  const [searching, setSearching] = useState(false);
-  const [activeSlot, setActiveSlot] = useState(null);
-  const searchPanelRef = useRef(null);
 
-  // Auto-scroll to search panel on mobile when a slot is clicked
-  useEffect(() => {
-    if (activeSlot !== null && searchPanelRef.current) {
-      // Small delay to ensure the panel is rendered
-      setTimeout(() => {
-        searchPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  }, [activeSlot]);
+  const selectCreator = (index, creator) => {
+    const newCreators = [...creators];
+    newCreators[index] = creator;
+    setCreators(newCreators);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-
-    setSearching(true);
-    try {
-      let results = [];
-      if (searchPlatform === 'youtube') {
-        results = await searchYouTube(searchQuery, 5);
-      } else if (searchPlatform === 'twitch') {
-        results = await searchTwitch(searchQuery);
-        results = results.slice(0, 5);
-      }
-      setSearchResults(results);
-    } catch (err) {
-      logger.error('Search error:', err);
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  const selectCreator = (creator) => {
-    if (activeSlot !== null) {
-      const newCreators = [...creators];
-      newCreators[activeSlot] = creator;
-      setCreators(newCreators);
-      setActiveSlot(null);
-      setSearchResults([]);
-      setSearchQuery('');
-      
-      // Track comparison when both slots are filled
-      if (newCreators[0] && newCreators[1]) {
-        analytics.compare(
-          newCreators[0].platform,
-          newCreators[0].username,
-          newCreators[1].platform,
-          newCreators[1].username
-        );
-      }
+    // Track comparison when both slots are filled
+    if (newCreators[0] && newCreators[1]) {
+      analytics.compare(
+        newCreators[0].platform,
+        newCreators[0].username,
+        newCreators[1].platform,
+        newCreators[1].username
+      );
     }
   };
 
@@ -83,6 +41,14 @@ export default function Compare() {
   const addSlot = () => {
     if (creators.length < 3) {
       setCreators([...creators, null]);
+    }
+  };
+
+  const removeSlot = (index) => {
+    if (creators.length > 2) {
+      const newCreators = [...creators];
+      newCreators.splice(index, 1);
+      setCreators(newCreators);
     }
   };
 
@@ -127,9 +93,9 @@ export default function Compare() {
                     onRemove={() => removeCreator(index)}
                   />
                 ) : (
-                  <EmptySlot
-                    onClick={() => setActiveSlot(index)}
-                    isActive={activeSlot === index}
+                  <SearchableSlot
+                    onSelect={(creator) => selectCreator(index, creator)}
+                    onRemove={creators.length > 2 ? () => removeSlot(index) : null}
                   />
                 )}
               </div>
@@ -137,91 +103,12 @@ export default function Compare() {
             {creators.length < 3 && (
               <button
                 onClick={addSlot}
-                className="h-48 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors"
+                className="min-h-[280px] border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors"
               >
                 <Plus className="w-8 h-8" />
               </button>
             )}
           </div>
-
-          {/* Search Panel */}
-          {activeSlot !== null && (
-            <div ref={searchPanelRef} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8 scroll-mt-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Select Creator for Slot {activeSlot + 1}
-                </h3>
-                <button
-                  onClick={() => setActiveSlot(null)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <form onSubmit={handleSearch} className="mb-4">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <select
-                      value={searchPlatform}
-                      onChange={(e) => setSearchPlatform(e.target.value)}
-                      className="px-4 py-3 bg-white border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-semibold shadow-sm hover:border-gray-300 transition-colors"
-                    >
-                      <option value="youtube">YouTube</option>
-                      <option value="twitch">Twitch</option>
-                    </select>
-                    <div className="flex-1 relative group">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search for a creator..."
-                        className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-medium shadow-sm"
-                      />
-                    </div>
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={searching}
-                    className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:hover:translate-y-0"
-                  >
-                    {searching ? 'Searching...' : 'Search'}
-                  </button>
-                </div>
-              </form>
-
-              {searchResults.length > 0 && (
-                <div className="space-y-2">
-                  {searchResults.map((result) => (
-                    <button
-                      key={result.platformId}
-                      onClick={() => selectCreator(result)}
-                      className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-left"
-                    >
-                      <img
-                        src={result.profileImage}
-                        alt={result.displayName}
-                        className="w-12 h-12 rounded-xl object-cover"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 truncate">{result.displayName}</p>
-                        <p className="text-sm text-gray-500">@{result.username}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">
-                          {formatNumber(result.subscribers || result.followers)}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {result.platform === 'twitch' ? 'followers' : 'subscribers'}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Comparison Table */}
           {filledCreators.length >= 2 && (
@@ -310,7 +197,7 @@ export default function Compare() {
                 <Users className="w-8 h-8 text-indigo-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Select at least 2 creators</h3>
-              <p className="text-gray-500">Click on the empty slots above to search and add creators to compare</p>
+              <p className="text-gray-500">Search for creators in the slots above to start comparing</p>
             </div>
           )}
         </div>
@@ -360,19 +247,124 @@ function CreatorCard({ creator, onRemove }) {
   );
 }
 
-function EmptySlot({ onClick, isActive }) {
+function SearchableSlot({ onSelect, onRemove }) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchPlatform, setSearchPlatform] = useState('youtube');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    setSearching(true);
+    try {
+      let results = [];
+      if (searchPlatform === 'youtube') {
+        results = await searchYouTube(searchQuery, 5);
+      } else if (searchPlatform === 'twitch') {
+        results = await searchTwitch(searchQuery, 5);
+      }
+      setSearchResults(results);
+    } catch (err) {
+      logger.error('Search error:', err);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleSelect = (creator) => {
+    onSelect(creator);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
   return (
-    <button
-      onClick={onClick}
-      className={`h-48 w-full border-2 border-dashed rounded-2xl flex flex-col items-center justify-center transition-colors ${
-        isActive
-          ? 'border-indigo-400 bg-indigo-50 text-indigo-600'
-          : 'border-gray-200 hover:border-gray-300 text-gray-400 hover:text-gray-600'
-      }`}
-    >
-      <Search className="w-8 h-8 mb-2" />
-      <span className="font-medium">Click to add creator</span>
-    </button>
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 min-h-[280px] flex flex-col relative">
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className="absolute top-2 right-2 p-1.5 bg-gray-100 hover:bg-red-100 rounded-lg text-gray-400 hover:text-red-500 transition-all z-10"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
+
+      <form onSubmit={handleSearch} className="space-y-3">
+        <div className="flex gap-2">
+          <select
+            value={searchPlatform}
+            onChange={(e) => setSearchPlatform(e.target.value)}
+            className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          >
+            <option value="youtube">YouTube</option>
+            <option value="twitch">Twitch</option>
+          </select>
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search creator..."
+              className="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+        <button
+          type="submit"
+          disabled={searching || !searchQuery.trim()}
+          className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+        >
+          {searching ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Searching...
+            </>
+          ) : (
+            'Search'
+          )}
+        </button>
+      </form>
+
+      <div className="flex-1 mt-3 overflow-y-auto">
+        {searchResults.length > 0 ? (
+          <div className="space-y-2">
+            {searchResults.map((result) => (
+              <button
+                key={result.platformId}
+                onClick={() => handleSelect(result)}
+                className="w-full flex items-center gap-3 p-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-left"
+              >
+                <img
+                  src={result.profileImage}
+                  alt={result.displayName}
+                  className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-gray-900 truncate">{result.displayName}</p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {formatNumber(result.subscribers || result.followers)} {result.platform === 'twitch' ? 'followers' : 'subs'}
+                  </p>
+                </div>
+                <div className={`p-1 rounded ${platformConfig[result.platform]?.bg}`}>
+                  {result.platform === 'youtube' ? (
+                    <Youtube className={`w-4 h-4 ${platformConfig[result.platform]?.color}`} />
+                  ) : (
+                    <Twitch className={`w-4 h-4 ${platformConfig[result.platform]?.color}`} />
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center text-gray-400">
+            <Search className="w-8 h-8 mb-2" />
+            <span className="text-sm font-medium">Search for a creator</span>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
