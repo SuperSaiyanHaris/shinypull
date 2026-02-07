@@ -1,101 +1,107 @@
 import { supabase } from '../lib/supabase';
-import logger from '../lib/logger';
+import { withErrorHandling } from '../lib/errorHandler';
 
 /**
  * Get all blog posts (including unpublished) for admin
  */
-export async function getAllPostsAdmin() {
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .order('created_at', { ascending: false });
+export const getAllPostsAdmin = withErrorHandling(
+  async () => {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    logger.error('Error fetching blog posts:', error);
-    throw error;
-  }
-
-  return data;
-}
+    if (error) throw error;
+    return data;
+  },
+  'blogAdminService.getAllPostsAdmin'
+);
 
 /**
  * Get a single post by ID for editing
  */
-export async function getPostById(id) {
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .eq('id', id)
-    .single();
+export const getPostById = withErrorHandling(
+  async (id) => {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-  if (error) {
-    logger.error('Error fetching blog post:', error);
-    throw error;
-  }
-
-  return data;
-}
+    if (error) throw error;
+    return data;
+  },
+  'blogAdminService.getPostById'
+);
 
 /**
  * Create a new blog post
  */
-export async function createPost(post) {
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .insert(post)
-    .select()
-    .single();
+export const createPost = withErrorHandling(
+  async (post) => {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .insert(post)
+      .select()
+      .single();
 
-  if (error) {
-    logger.error('Error creating blog post:', error);
-    throw error;
-  }
-
-  return data;
-}
+    if (error) throw error;
+    return data;
+  },
+  'blogAdminService.createPost'
+);
 
 /**
  * Update an existing blog post
  */
-export async function updatePost(id, updates) {
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
+export const updatePost = withErrorHandling(
+  async (id, updates) => {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
 
-  if (error) {
-    logger.error('Error updating blog post:', error);
-    throw error;
-  }
-
-  return data;
-}
+    if (error) throw error;
+    return data;
+  },
+  'blogAdminService.updatePost'
+);
 
 /**
  * Delete a blog post
  */
-export async function deletePost(id) {
-  const { error } = await supabase
-    .from('blog_posts')
-    .delete()
-    .eq('id', id);
+export const deletePost = withErrorHandling(
+  async (id) => {
+    const { error } = await supabase
+      .from('blog_posts')
+      .delete()
+      .eq('id', id);
 
-  if (error) {
-    logger.error('Error deleting blog post:', error);
-    throw error;
-  }
-
-  return true;
-}
+    if (error) throw error;
+    return true;
+  },
+  'blogAdminService.deletePost'
+);
 
 /**
  * Toggle publish status
  */
-export async function togglePublish(id, isPublished) {
-  return updatePost(id, { is_published: isPublished });
-}
+export const togglePublish = withErrorHandling(
+  async (id, isPublished) => {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .update({ is_published: isPublished })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+  'blogAdminService.togglePublish'
+);
 
 /**
  * Generate slug from title

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, Star, Users, Loader2, LogOut, Settings } from 'lucide-react';
+import { Youtube, Twitch, Star, Users, Loader2, LogOut } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { getFollowedCreators } from '../services/followService';
 import { getCreatorStats } from '../services/creatorService';
 import { formatNumber } from '../lib/utils';
+import logger from '../lib/logger';
 
 const platformIcons = {
   youtube: Youtube,
@@ -52,7 +53,7 @@ export default function Dashboard() {
       }
       setCreatorStats(stats);
     } catch (error) {
-      console.error('Failed to load followed creators:', error);
+      logger.error('Failed to load followed creators:', error);
     } finally {
       setLoading(false);
     }
