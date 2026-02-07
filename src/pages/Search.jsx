@@ -161,26 +161,28 @@ export default function Search() {
 
           {/* Search Form */}
           <form onSubmit={handleSubmit} className="mb-8 max-w-2xl mx-auto">
-            <div className="relative group mb-4">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-10 group-focus-within:opacity-20 blur transition duration-300"></div>
-              <div className="relative flex items-center bg-white rounded-2xl shadow-md border border-gray-200">
-                <SearchIcon className="absolute left-4 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={`Search ${currentPlatform?.name || ''} creators...`}
-                  className="w-full pl-12 pr-4 py-4 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl"
-                />
+            <div className="space-y-3">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-15 group-focus-within:opacity-25 blur-xl transition duration-300"></div>
+                <div className="relative flex items-center bg-white rounded-2xl shadow-lg border-2 border-gray-100 group-focus-within:border-indigo-200 transition-colors">
+                  <SearchIcon className="absolute left-5 w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={`Search ${currentPlatform?.name || ''} creators...`}
+                    className="w-full pl-14 pr-6 py-4 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl font-medium"
+                  />
+                </div>
               </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full px-8 py-4 text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-2xl transition-all duration-200 shadow-xl shadow-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:hover:translate-y-0"
+              >
+                {loading ? 'Searching...' : 'Search'}
+              </button>
             </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-8 py-3.5 text-base bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30"
-            >
-              {loading ? 'Searching...' : 'Search'}
-            </button>
           </form>
 
           {/* Error State */}

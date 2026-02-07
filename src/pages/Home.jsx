@@ -92,26 +92,28 @@ export default function Home() {
                 Track followers, views, and growth for your favorite YouTube and Twitch creators. Get detailed analytics and insights.
               </p>
 
-              {/* Search Bar - Glassmorphism */}
+              {/* Search Bar - Modern Clean Design */}
               <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12 sm:mb-16 px-4">
-                <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-50 group-hover:opacity-70 blur transition duration-300"></div>
-                  <div className="relative flex items-center bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl">
-                    <Search className="absolute left-3 sm:left-5 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search for a creator (e.g., MrBeast, Ninja)"
-                      className="w-full pl-10 sm:pl-14 pr-20 sm:pr-36 py-3.5 sm:py-5 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-base sm:text-lg rounded-2xl"
-                    />
-                    <button
-                      type="submit"
-                      className="absolute right-2 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30"
-                    >
-                      Search
-                    </button>
+                <div className="space-y-3">
+                  <div className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-20 group-hover:opacity-30 blur-xl transition duration-300"></div>
+                    <div className="relative flex items-center bg-white rounded-2xl shadow-2xl border-2 border-white/50">
+                      <Search className="absolute left-5 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search for a creator (e.g., MrBeast, Ninja)"
+                        className="w-full pl-14 pr-6 py-5 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl font-medium"
+                      />
+                    </div>
                   </div>
+                  <button
+                    type="submit"
+                    className="w-full px-8 py-4 text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-2xl transition-all duration-200 shadow-2xl shadow-indigo-500/40 hover:shadow-indigo-500/60 hover:-translate-y-0.5"
+                  >
+                    Search
+                  </button>
                 </div>
               </form>
 

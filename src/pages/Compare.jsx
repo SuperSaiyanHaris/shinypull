@@ -149,33 +149,35 @@ export default function Compare() {
               </div>
 
               <form onSubmit={handleSearch} className="mb-4">
-                <div className="flex items-center gap-3 mb-4">
-                  <select
-                    value={searchPlatform}
-                    onChange={(e) => setSearchPlatform(e.target.value)}
-                    className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
-                  >
-                    <option value="youtube">YouTube</option>
-                    <option value="twitch">Twitch</option>
-                  </select>
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search for a creator..."
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <select
+                      value={searchPlatform}
+                      onChange={(e) => setSearchPlatform(e.target.value)}
+                      className="px-4 py-3 bg-white border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-semibold shadow-sm hover:border-gray-300 transition-colors"
+                    >
+                      <option value="youtube">YouTube</option>
+                      <option value="twitch">Twitch</option>
+                    </select>
+                    <div className="flex-1 relative group">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search for a creator..."
+                        className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-medium shadow-sm"
+                      />
+                    </div>
                   </div>
+                  <button
+                    type="submit"
+                    disabled={searching}
+                    className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:hover:translate-y-0"
+                  >
+                    {searching ? 'Searching...' : 'Search'}
+                  </button>
                 </div>
-                <button
-                  type="submit"
-                  disabled={searching}
-                  className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-500/25"
-                >
-                  {searching ? 'Searching...' : 'Search'}
-                </button>
               </form>
 
               {searchResults.length > 0 && (
