@@ -24,6 +24,8 @@ async function searchChannels(query) {
   const data = await response.json();
 
   return data.items.map(item => ({
+    platform: 'youtube',
+    platformId: item.snippet.channelId,
     id: item.snippet.channelId,
     username: item.snippet.channelTitle,
     displayName: item.snippet.channelTitle,
@@ -62,6 +64,8 @@ async function getChannel(channelId) {
   const branding = channel.brandingSettings;
 
   return {
+    platform: 'youtube',
+    platformId: channel.id,
     id: channel.id,
     username: snippet.customUrl?.replace('@', '') || snippet.title.toLowerCase().replace(/\s+/g, ''),
     displayName: snippet.title,
@@ -69,10 +73,12 @@ async function getChannel(channelId) {
     bannerImage: branding?.image?.bannerExternalUrl,
     description: snippet.description,
     country: snippet.country,
+    category: null,
     subscribers: parseInt(statistics.subscriberCount || 0),
     totalViews: parseInt(statistics.viewCount || 0),
-    videoCount: parseInt(statistics.videoCount || 0),
-    publishedAt: snippet.publishedAt,
+    totalPosts: parseInt(statistics.videoCount || 0),
+    hiddenSubscribers: statistics.hiddenSubscriberCount || false,
+    createdAt: snippet.publishedAt,
   };
 }
 
@@ -100,6 +106,8 @@ async function getChannelByUsername(username) {
       const branding = channel.brandingSettings;
 
       return {
+        platform: 'youtube',
+        platformId: channel.id,
         id: channel.id,
         username: snippet.customUrl?.replace('@', '') || snippet.title.toLowerCase().replace(/\s+/g, ''),
         displayName: snippet.title,
@@ -107,10 +115,12 @@ async function getChannelByUsername(username) {
         bannerImage: branding?.image?.bannerExternalUrl,
         description: snippet.description,
         country: snippet.country,
+        category: null,
         subscribers: parseInt(statistics.subscriberCount || 0),
         totalViews: parseInt(statistics.viewCount || 0),
-        videoCount: parseInt(statistics.videoCount || 0),
-        publishedAt: snippet.publishedAt,
+        totalPosts: parseInt(statistics.videoCount || 0),
+        hiddenSubscribers: statistics.hiddenSubscriberCount || false,
+        createdAt: snippet.publishedAt,
       };
     }
   }
