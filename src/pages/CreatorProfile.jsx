@@ -287,7 +287,7 @@ export default function CreatorProfile() {
         <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-6xl mx-auto">
             {/* Profile Header */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 mb-6 -mt-16 relative z-10">
+            <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 mb-6 relative z-10 ${creator.bannerImage ? '-mt-16' : ''}`}>
               {/* Follow Button - Top Right */}
               <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
                 <button
