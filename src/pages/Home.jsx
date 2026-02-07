@@ -19,6 +19,7 @@ const features = [
     description: 'Find any creator across YouTube and Twitch with real-time data.',
     color: 'from-blue-500 to-indigo-600',
     bgColor: 'bg-blue-50',
+    link: '/search',
   },
   {
     icon: TrendingUp,
@@ -26,6 +27,7 @@ const features = [
     description: 'See daily, weekly, and monthly follower and view growth statistics.',
     color: 'from-emerald-500 to-teal-600',
     bgColor: 'bg-emerald-50',
+    link: '/rankings/youtube',
   },
   {
     icon: BarChart3,
@@ -33,6 +35,7 @@ const features = [
     description: 'Compare creators and see how they rank against others.',
     color: 'from-purple-500 to-violet-600',
     bgColor: 'bg-purple-50',
+    link: '/compare',
   },
 ];
 
@@ -183,16 +186,17 @@ export default function Home() {
 
             <div className="grid md:grid-cols-3 gap-8">
               {features.map((feature, index) => (
-                <div
+                <Link
                   key={index}
-                  className="group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300"
+                  to={feature.link}
+                  className="group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer"
                 >
                   <div className={`w-14 h-14 ${feature.bgColor} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                     <feature.icon className={`w-7 h-7 bg-gradient-to-r ${feature.color} bg-clip-text`} style={{ color: feature.color.includes('emerald') ? '#10b981' : feature.color.includes('blue') ? '#6366f1' : '#8b5cf6' }} />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
                   <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
