@@ -37,8 +37,12 @@ async function aggregateHoursWatched() {
 
   const today = new Date();
   const todayStr = getTodayLocal();
+  
+  // For daily snapshot: get streams that ended TODAY
+  const todayStart = new Date(todayStr + 'T00:00:00');
+  const todayEnd = new Date(todayStr + 'T23:59:59');
 
-  // Calculate date ranges
+  // Calculate date ranges for rolling windows
   const dayAgo = new Date(today);
   dayAgo.setDate(dayAgo.getDate() - 1);
 
@@ -59,7 +63,16 @@ async function aggregateHoursWatched() {
   let updatedCount = 0;
 
   for (const creator of creators) {
-    // Get completed stream sessions for different time periods
+    // Get streams that ended TODAY (for daily snapshot)
+    const { data: todaySessions } = await supabase
+      .from('stream_sessions')
+      .select('hours_watched, peak_viewers, avg_viewers')
+      .eq('creator_id', creator.id)
+      .gte('ended_at', todayStart.toISOString())
+      .lte('ended_at', todayEnd.toISOString())
+      .not('ended_at', 'is', null);
+
+    // Get completed stream sessions for different time periods (rolling windows)
     const { data: daySessions } = await supabase
       .from('stream_sessions')
       .select('hours_watched, peak_viewers, avg_viewers')
@@ -82,6 +95,7 @@ async function aggregateHoursWatched() {
       .not('ended_at', 'is', null);
 
     // Calculate aggregates
+    const todayStats = aggregateSessions(todaySessions || []);
     const dayStats = aggregateSessions(daySessions || []);
     const weekStats = aggregateSessions(weekSessions || []);
     const monthStats = aggregateSessions(monthSessions || []);
@@ -92,12 +106,12 @@ async function aggregateHoursWatched() {
       .upsert({
         creator_id: creator.id,
         recorded_at: todayStr,
-        hours_watched_day: dayStats.hoursWatched,
+        hours_watched_day: todayStats.hoursWatched, // Hours from streams that ended TODAY
         hours_watched_week: weekStats.hoursWatched,
         hours_watched_month: monthStats.hoursWatched,
-        peak_viewers_day: dayStats.peakViewers,
-        avg_viewers_day: dayStats.avgViewers,
-        streams_count_day: dayStats.streamCount,
+        peak_viewers_day: todayStats.peakViewers,
+        avg_viewers_day: todayStats.avgViewers,
+        streams_count_day: todayStats.streamCount,
       }, {
         onConflict: 'creator_id,recorded_at',
         ignoreDuplicates: false
@@ -106,7 +120,7 @@ async function aggregateHoursWatched() {
     if (error) {
       console.log(`   ❌ ${creator.display_name}: ${error.message}`);
     } else if (monthStats.hoursWatched > 0) {
-      console.log(`   ✅ ${creator.display_name}: ${monthStats.hoursWatched.toFixed(0)} hours watched (30d)`);
+      console.log(`   ✅ ${creator.display_name}: Today: ${todayStats.hoursWatched.toFixed(0)}h, 30d: ${monthStats.hoursWatched.toFixed(0)}h`);
       updatedCount++;
     }
   }
