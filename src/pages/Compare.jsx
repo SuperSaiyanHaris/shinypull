@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale } from 'lucide-react';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
@@ -20,6 +20,17 @@ export default function Compare() {
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [activeSlot, setActiveSlot] = useState(null);
+  const searchPanelRef = useRef(null);
+
+  // Auto-scroll to search panel on mobile when a slot is clicked
+  useEffect(() => {
+    if (activeSlot !== null && searchPanelRef.current) {
+      // Small delay to ensure the panel is rendered
+      setTimeout(() => {
+        searchPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [activeSlot]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -135,7 +146,7 @@ export default function Compare() {
 
           {/* Search Panel */}
           {activeSlot !== null && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8">
+            <div ref={searchPanelRef} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8 scroll-mt-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">
                   Select Creator for Slot {activeSlot + 1}
