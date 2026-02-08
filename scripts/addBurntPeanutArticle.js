@@ -28,7 +28,7 @@ By early 2025, TheBurntPeanut had grown to 30,000 Twitch followers. Not bad, but
 
 Throughout 2025, he streamed consistently, often 6-8 hours per day. More importantly, he started clipping his best moments for TikTok and YouTube Shorts. These short-form videos went viral, introducing TheBurntPeanut to audiences who'd never heard of Escape from Tarkov. By mid-year, he'd crossed 200,000 followers.
 
-[Track TheBurntPeanut's live Twitch stats on ShinyPull →](https://www.shinypull.com/twitch/theburntpeanut_247)
+[Track TheBurntPeanut's live Twitch stats on ShinyPull →](https://www.shinypull.com/twitch/theburntpeanut)
 
 ## The Battlefield 6 Breakthrough
 
@@ -146,7 +146,7 @@ TheBurntPeanut keeps his real identity private and has not publicly shared his r
 
 ### How many Twitch followers does TheBurntPeanut have?
 
-As of February 2026, TheBurntPeanut has over 1.8 million Twitch followers, plus 9.4 million TikTok likes and 1.5 million YouTube subscribers. [Track his live stats here](https://www.shinypull.com/twitch/theburntpeanut_247).
+As of February 2026, TheBurntPeanut has over 1.8 million Twitch followers, plus 9.4 million TikTok likes and 1.5 million YouTube subscribers. [Track his live stats here](https://www.shinypull.com/twitch/theburntpeanut).
 
 ### What games does TheBurntPeanut stream?
 
@@ -164,7 +164,7 @@ His rise shows where streaming is headed in 2026. Short-form content on TikTok d
 
 TheBurntPeanut's stats tell the story: 1.8M+ Twitch followers, 1.5M YouTube subscribers, millions of watch hours, and award nominations at The Game Awards and Streamer Awards. Going from 30K to nearly 2 million followers in just over a year is one of the fastest rises in Twitch history.
 
-Want to track TheBurntPeanut's continued growth? ShinyPull updates his stats in real-time, showing follower count, watch hours, peak viewers, and historical growth charts. [See his full analytics here](https://www.shinypull.com/twitch/theburntpeanut_247).
+Want to track TheBurntPeanut's continued growth? ShinyPull updates his stats in real-time, showing follower count, watch hours, peak viewers, and historical growth charts. [See his full analytics here](https://www.shinypull.com/twitch/theburntpeanut).
 
 You can also [compare his stats to other top streamers](https://www.shinypull.com/compare) or check out our [Twitch rankings](https://www.shinypull.com/rankings/twitch) to see where he ranks against the biggest names on the platform.
 
