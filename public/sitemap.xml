@@ -36,6 +36,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://shinypull.com/youtube/money-calculator</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
     <loc>https://shinypull.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

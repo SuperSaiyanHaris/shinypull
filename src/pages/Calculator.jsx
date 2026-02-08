@@ -97,8 +97,9 @@ export default function Calculator() {
   return (
     <>
       <SEO
-        title="YouTube Money Calculator"
-        description="Estimate YouTube earnings based on daily views and RPM. Calculate how much YouTubers make from ad revenue."
+        title="YouTube Money Calculator - Estimate YouTuber Earnings"
+        description="Estimate YouTube earnings based on daily views and RPM. Calculate how much YouTubers make from ad revenue. Free YouTube income calculator with 16 currencies."
+        keywords="youtube money calculator, youtube earnings calculator, how much do youtubers make, youtube income estimator, youtube revenue calculator, youtuber salary, youtube ad revenue, RPM calculator"
       />
 
       <div className="min-h-screen bg-gray-50">
