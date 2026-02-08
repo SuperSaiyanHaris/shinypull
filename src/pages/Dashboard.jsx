@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight } from 'lucide-react';
+import { Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { getFollowedCreators } from '../services/followService';
@@ -29,6 +29,7 @@ export default function Dashboard() {
   const [platformFilter, setPlatformFilter] = useState(null);
   const [liveStreamers, setLiveStreamers] = useState(new Set());
   const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const [recentlyViewedIndex, setRecentlyViewedIndex] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -102,8 +103,13 @@ export default function Dashboard() {
   }
 
   const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User';
-  const filteredCreators = followedCreators.filter(c => !platformFilter || c.platform === platformFilter);
   const liveCount = followedCreators.filter(c => c.platform === 'twitch' && liveStreamers.has(c.username.toLowerCase())).length;
+  const filteredCreators = followedCreators.filter(c => {
+    if (platformFilter === 'live') {
+      return c.platform === 'twitch' && liveStreamers.has(c.username.toLowerCase());
+    }
+    return !platformFilter || c.platform === platformFilter;
+  });
 
   return (
     <>
@@ -181,7 +187,13 @@ export default function Dashboard() {
               </div>
             </button>
             {/* Live Now Card */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+            <button
+              onClick={() => setPlatformFilter(platformFilter === 'live' ? null : 'live')}
+              disabled={liveCount === 0}
+              className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
+                platformFilter === 'live' ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200 hover:border-gray-300'
+              } ${liveCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
               <div className="flex items-center gap-3">
                 <div className="p-2 sm:p-3 bg-red-100 rounded-lg relative">
                   <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
@@ -194,7 +206,7 @@ export default function Dashboard() {
                   <p className="text-xs sm:text-sm text-gray-500">Live Now</p>
                 </div>
               </div>
-            </div>
+            </button>
           </div>
 
           {/* Quick Actions */}
@@ -213,19 +225,39 @@ export default function Dashboard() {
           {/* Recently Viewed */}
           {recentlyViewed.length > 0 && (
             <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <Clock className="w-5 h-5 text-gray-400" />
-                <h2 className="text-lg font-semibold text-gray-900">Recently Viewed</h2>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-gray-400" />
+                  <h2 className="text-lg font-semibold text-gray-900">Recently Viewed</h2>
+                </div>
+                {recentlyViewed.length > 4 && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setRecentlyViewedIndex(Math.max(0, recentlyViewedIndex - 4))}
+                      disabled={recentlyViewedIndex === 0}
+                      className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setRecentlyViewedIndex(Math.min(recentlyViewed.length - 4, recentlyViewedIndex + 4))}
+                      disabled={recentlyViewedIndex >= recentlyViewed.length - 4}
+                      className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {recentlyViewed.map((creator, idx) => {
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {recentlyViewed.slice(recentlyViewedIndex, recentlyViewedIndex + 4).map((creator, idx) => {
                   const PlatformIcon = platformIcons[creator.platform] || Users;
                   const colors = platformColors[creator.platform] || { light: 'bg-gray-50', text: 'text-gray-600' };
                   return (
                     <Link
                       key={`${creator.platform}-${creator.username}-${idx}`}
                       to={`/${creator.platform}/${creator.username}`}
-                      className="flex-shrink-0 bg-white rounded-xl border border-gray-200 p-3 hover:border-indigo-300 hover:shadow-sm transition-all w-40"
+                      className="bg-white rounded-xl border border-gray-200 p-3 hover:border-indigo-300 hover:shadow-sm transition-all"
                     >
                       <img
                         src={creator.profileImage || '/placeholder-avatar.svg'}
@@ -254,8 +286,9 @@ export default function Dashboard() {
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <Star className="w-5 h-5 text-yellow-500" />
-                {platformFilter === 'youtube' ? 'YouTube Creators' :
+                {platformFilter === 'live' ? <Radio className="w-5 h-5 text-red-500" /> : <Star className="w-5 h-5 text-yellow-500" />}
+                {platformFilter === 'live' ? 'Live Now' :
+                 platformFilter === 'youtube' ? 'YouTube Creators' :
                  platformFilter === 'twitch' ? 'Twitch Streamers' :
                  'Creators You Follow'}
               </h2>
@@ -273,19 +306,28 @@ export default function Dashboard() {
               </div>
             ) : filteredCreators.length === 0 ? (
               <div className="text-center p-12">
-                <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                {platformFilter === 'live' ? (
+                  <Radio className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                ) : (
+                  <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                )}
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {platformFilter ? `No ${platformFilter === 'youtube' ? 'YouTube creators' : 'Twitch streamers'} followed yet` : 'No creators followed yet'}
+                  {platformFilter === 'live' ? 'No one is live right now' :
+                   platformFilter ? `No ${platformFilter === 'youtube' ? 'YouTube creators' : 'Twitch streamers'} followed yet` : 'No creators followed yet'}
                 </h3>
                 <p className="text-gray-500 mb-6">
-                  Start following creators to track their statistics here.
+                  {platformFilter === 'live'
+                    ? 'Check back later to see when your followed Twitch streamers go live.'
+                    : 'Start following creators to track their statistics here.'}
                 </p>
-                <Link
-                  to="/search"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
-                >
-                  Find Creators
-                </Link>
+                {platformFilter !== 'live' && (
+                  <Link
+                    to="/search"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+                  >
+                    Find Creators
+                  </Link>
+                )}
               </div>
             ) : (
               <div className="divide-y divide-gray-100">

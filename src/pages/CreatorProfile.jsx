@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star } from 'lucide-react';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
-import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
+import { getChannelByUsername as getTwitchChannel, getLiveStreams } from '../services/twitchService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import { followCreator, unfollowCreator, isFollowing as checkIsFollowing } from '../services/followService';
 import { useAuth } from '../contexts/AuthContext';
@@ -46,6 +46,8 @@ export default function CreatorProfile() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [dbCreatorId, setDbCreatorId] = useState(null); // Store database UUID
+  const [isLive, setIsLive] = useState(false);
+  const [liveStreamInfo, setLiveStreamInfo] = useState(null);
 
   useEffect(() => {
     loadCreator();
@@ -114,6 +116,22 @@ export default function CreatorProfile() {
           subscribers: channelData.subscribers,
           followers: channelData.followers,
         });
+
+        // Check if Twitch streamer is live
+        if (platform === 'twitch') {
+          try {
+            const liveData = await getLiveStreams([channelData.username || username]);
+            if (liveData && liveData.length > 0) {
+              setIsLive(true);
+              setLiveStreamInfo(liveData[0]);
+            } else {
+              setIsLive(false);
+              setLiveStreamInfo(null);
+            }
+          } catch (liveErr) {
+            logger.warn('Failed to check live status:', liveErr);
+          }
+        }
       }
     } catch (err) {
       logger.error('Error loading creator:', err);
@@ -330,6 +348,12 @@ export default function CreatorProfile() {
                       {Icon && <Icon className="w-3 h-3 sm:w-4 sm:h-4" />}
                       {platform}
                     </span>
+                    {isLive && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm bg-red-500 text-white animate-pulse">
+                        <Radio className="w-3 h-3 sm:w-4 sm:h-4" />
+                        LIVE
+                      </span>
+                    )}
                     {creator.country && (
                       <span className="px-2 sm:px-2.5 py-1 bg-gray-100 rounded-lg text-xs sm:text-sm text-gray-600 font-medium">
                         {creator.country}
@@ -350,7 +374,28 @@ export default function CreatorProfile() {
                       <span className="hidden xs:inline">View on {platform}</span>
                       <span className="xs:hidden">View</span>
                     </a>
-                    
+
+                    {/* Watch Live Button for Twitch */}
+                    {isLive && platform === 'twitch' && (
+                      <>
+                        <span className="text-gray-300">•</span>
+                        <a
+                          href={`https://twitch.tv/${creator.username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-500 hover:bg-red-600 text-white font-medium text-xs sm:text-sm rounded-full transition-colors"
+                        >
+                          <Radio className="w-3 h-3" />
+                          Watch Live
+                          {liveStreamInfo?.viewer_count && (
+                            <span className="ml-1 text-red-200">
+                              ({formatNumber(liveStreamInfo.viewer_count)} viewers)
+                            </span>
+                          )}
+                        </a>
+                      </>
+                    )}
+
                     {/* Additional social links for YouTube channels */}
                     {platform === 'youtube' && creator.platformId && (
                       <>
