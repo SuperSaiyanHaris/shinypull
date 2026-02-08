@@ -28,13 +28,28 @@ export default function Footer() {
             <h3 className="font-semibold mb-4 text-gray-900">Features</h3>
             <ul className="space-y-3 text-sm">
               <li>
+                <Link to="/search" className="text-gray-500 hover:text-indigo-600 transition-colors">
+                  Creator Search
+                </Link>
+              </li>
+              <li>
                 <Link to="/rankings" className="text-gray-500 hover:text-indigo-600 transition-colors">
                   Top Rankings
                 </Link>
               </li>
               <li>
-                <Link to="/search" className="text-gray-500 hover:text-indigo-600 transition-colors">
-                  Creator Search
+                <Link to="/compare" className="text-gray-500 hover:text-indigo-600 transition-colors">
+                  Compare Creators
+                </Link>
+              </li>
+              <li>
+                <Link to="/youtube/money-calculator" className="text-gray-500 hover:text-indigo-600 transition-colors">
+                  Money Calculator
+                </Link>
+              </li>
+              <li>
+                <Link to="/live/youtube/mrbeast" className="text-gray-500 hover:text-indigo-600 transition-colors">
+                  Live Sub Count
                 </Link>
               </li>
             </ul>

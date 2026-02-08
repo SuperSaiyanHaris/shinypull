@@ -11,6 +11,16 @@ const currencies = [
   { code: 'AUD', symbol: 'A$', rate: 1.53 },
   { code: 'CAD', symbol: 'C$', rate: 1.36 },
   { code: 'INR', symbol: '₹', rate: 83.12 },
+  { code: 'JPY', symbol: '¥', rate: 149.50 },
+  { code: 'BRL', symbol: 'R$', rate: 4.97 },
+  { code: 'MXN', symbol: 'MX$', rate: 17.15 },
+  { code: 'KRW', symbol: '₩', rate: 1320.50 },
+  { code: 'PHP', symbol: '₱', rate: 55.80 },
+  { code: 'IDR', symbol: 'Rp', rate: 15650 },
+  { code: 'SGD', symbol: 'S$', rate: 1.34 },
+  { code: 'NZD', symbol: 'NZ$', rate: 1.64 },
+  { code: 'SEK', symbol: 'kr', rate: 10.42 },
+  { code: 'CHF', symbol: 'CHF', rate: 0.88 },
 ];
 
 // Default RPM range used by Social Blade

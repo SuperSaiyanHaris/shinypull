@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, Instagram, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight } from 'lucide-react';
+import { Search, Youtube, Twitch, Instagram, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
@@ -198,6 +198,35 @@ export default function Home() {
                   <p className="text-gray-600 leading-relaxed">{feature.description}</p>
                 </Link>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Calculator Promo Banner */}
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-r from-emerald-500 to-teal-600">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="flex items-center gap-6">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <DollarSign className="w-10 h-10 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                    YouTube Money Calculator
+                  </h3>
+                  <p className="text-emerald-100 text-lg">
+                    Estimate how much YouTubers earn from their videos
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/youtube/money-calculator"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-emerald-600 font-bold rounded-xl hover:bg-emerald-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              >
+                <Calculator className="w-5 h-5" />
+                Try Calculator
+                <ArrowRight className="w-5 h-5" />
+              </Link>
             </div>
           </div>
         </section>
