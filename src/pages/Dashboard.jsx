@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft, Check, X } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { getFollowedCreators } from '../services/followService';
@@ -30,6 +30,8 @@ export default function Dashboard() {
   const [liveStreamers, setLiveStreamers] = useState(new Set());
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const [recentlyViewedIndex, setRecentlyViewedIndex] = useState(0);
+  const [compareMode, setCompareMode] = useState(false);
+  const [selectedForCompare, setSelectedForCompare] = useState([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -211,14 +213,50 @@ export default function Dashboard() {
 
           {/* Quick Actions */}
           {followedCreators.length >= 2 && (
-            <div className="mb-8">
-              <Link
-                to={`/compare?creators=${followedCreators.slice(0, 3).map(c => `${c.platform}:${c.username}`).join(',')}`}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
-              >
-                <Scale className="w-4 h-4" />
-                Compare Followed Creators
-              </Link>
+            <div className="mb-8 flex flex-wrap items-center gap-3">
+              {!compareMode ? (
+                <button
+                  onClick={() => setCompareMode(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+                >
+                  <Scale className="w-4 h-4" />
+                  Compare Followed Creators
+                </button>
+              ) : (
+                <>
+                  <span className="text-sm text-gray-600">
+                    Select 2-3 creators to compare ({selectedForCompare.length}/3)
+                  </span>
+                  <Link
+                    to={`/compare?creators=${selectedForCompare.map(id => {
+                      const c = followedCreators.find(fc => fc.id === id);
+                      return c ? `${c.platform}:${c.username}` : '';
+                    }).filter(Boolean).join(',')}`}
+                    onClick={() => {
+                      setCompareMode(false);
+                      setSelectedForCompare([]);
+                    }}
+                    className={`inline-flex items-center gap-2 px-4 py-2 font-medium rounded-xl transition-colors ${
+                      selectedForCompare.length >= 2
+                        ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed pointer-events-none'
+                    }`}
+                  >
+                    <Scale className="w-4 h-4" />
+                    Compare Selected
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setCompareMode(false);
+                      setSelectedForCompare([]);
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 font-medium rounded-xl hover:bg-gray-200 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                    Cancel
+                  </button>
+                </>
+              )}
             </div>
           )}
 
@@ -338,12 +376,26 @@ export default function Dashboard() {
                   const isLive = creator.platform === 'twitch' && liveStreamers.has(creator.username.toLowerCase());
                   const growth = getGrowth(creator.id, creator.platform === 'youtube' ? 'subscribers' : 'followers');
 
-                  return (
-                    <Link
-                      key={creator.id}
-                      to={`/${creator.platform}/${creator.username}`}
-                      className="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors"
-                    >
+                  const isSelected = selectedForCompare.includes(creator.id);
+                  const toggleSelection = () => {
+                    if (isSelected) {
+                      setSelectedForCompare(prev => prev.filter(id => id !== creator.id));
+                    } else if (selectedForCompare.length < 3) {
+                      setSelectedForCompare(prev => [...prev, creator.id]);
+                    }
+                  };
+
+                  const CreatorRow = (
+                    <div className="flex items-center gap-4 p-4">
+                      {compareMode && (
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                          isSelected
+                            ? 'bg-indigo-600 border-indigo-600'
+                            : 'border-gray-300 hover:border-indigo-400'
+                        }`}>
+                          {isSelected && <Check className="w-4 h-4 text-white" />}
+                        </div>
+                      )}
                       <div className="relative">
                         <img
                           src={creator.profile_image || '/placeholder-avatar.svg'}
@@ -394,7 +446,27 @@ export default function Dashboard() {
                           )}
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-gray-300" />
+                      {!compareMode && <ChevronRight className="w-5 h-5 text-gray-300" />}
+                    </div>
+                  );
+
+                  return compareMode ? (
+                    <button
+                      key={creator.id}
+                      onClick={toggleSelection}
+                      className={`w-full text-left transition-colors ${
+                        isSelected ? 'bg-indigo-50' : 'hover:bg-gray-50'
+                      } ${selectedForCompare.length >= 3 && !isSelected ? 'opacity-50' : ''}`}
+                    >
+                      {CreatorRow}
+                    </button>
+                  ) : (
+                    <Link
+                      key={creator.id}
+                      to={`/${creator.platform}/${creator.username}`}
+                      className="block hover:bg-gray-50 transition-colors"
+                    >
+                      {CreatorRow}
                     </Link>
                   );
                 })}
