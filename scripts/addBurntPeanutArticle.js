@@ -11,14 +11,14 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 const article = {
   slug: 'theburntpeanut-twitch-rise-2025',
   title: 'TheBurntPeanut Twitch Stats: How He Became the Fastest-Growing Streamer of 2025',
-  description: 'TheBurntPeanut exploded from 30K to 740K+ Twitch followers in 2025. Track his real-time stats, watch hours, and growth on ShinyPull. Plus: the viewbotting controversy explained.',
+  description: 'TheBurntPeanut exploded from 30K to 1.8M+ Twitch followers in just over a year. Track his real-time stats, watch hours, and explosive growth on ShinyPull. Plus: the viewbotting controversy explained.',
   category: 'Twitch Trends',
   author: 'ShinyPull Team',
   published_at: '2026-02-07',
   read_time: '8 min read',
   image: 'https://static-cdn.jtvnw.net/jtv_user_pictures/53e6d242-7fc2-494e-9cc9-417fe7453a9e-profile_image-300x300.png',
   is_published: true,
-  content: `Who is TheBurntPeanut, and why is everyone talking about him? The Twitch streamer with the peanut VTuber avatar became the fastest-growing creator on the platform in 2025, going from 30,000 followers to over 740,000 in just 12 months. His rise through Escape from Tarkov streams, viral TikTok clips, and the ARC Raiders launch has been nothing short of explosive. But with rapid growth came controversy, as viewbotting accusations spread across Reddit and Twitter/X. Here's the full story of TheBurntPeanut's Twitch stats, his meteoric rise, and what the numbers actually show.
+  content: `Who is TheBurntPeanut, and why is everyone talking about him? The Twitch streamer with the peanut VTuber avatar became the fastest-growing creator on the platform in 2025, going from 30,000 followers to over 1.8 million in just over a year. His rise through Escape from Tarkov streams, viral TikTok clips, and the ARC Raiders launch has been nothing short of explosive. But with rapid growth came controversy, as viewbotting accusations spread across Reddit and Twitter/X. Here's the full story of TheBurntPeanut's Twitch stats, his meteoric rise, and what the numbers actually show.
 
 ## From Escape from Tarkov Streamer to Twitch Sensation
 
@@ -47,9 +47,9 @@ Boosted by a Twitch Drops campaign, his ARC Raiders streams pulled tens of thous
 The numbers from this period are staggering. In just 30 days, TheBurntPeanut gained over 250,000 new followers, making him the fastest-growing Twitch streamer on the entire platform.
 
 His current stats across platforms:
-- 740,000+ Twitch followers
+- 1.8 million Twitch followers
 - 9.4 million TikTok likes
-- 620,000 YouTube subscribers
+- 1.5 million YouTube subscribers
 
 [Compare TheBurntPeanut's growth to other top streamers →](https://www.shinypull.com/compare)
 
@@ -64,7 +64,7 @@ These nominations put him in the same conversation as creators who've been grind
 
 ## The Controversy: Viewbotting Accusations
 
-With explosive growth comes intense scrutiny. As TheBurntPeanut's Twitch follower count skyrocketed from 30K to 740K+ in under six months, questions emerged across Reddit and Twitter/X: "Is TheBurntPeanut viewbotting?" The accusations gained traction in January 2025 when community members noticed patterns they considered suspicious.
+With explosive growth comes intense scrutiny. As TheBurntPeanut's Twitch follower count skyrocketed from 30K to 1.8M+ in just over a year, questions emerged across Reddit and Twitter/X: "Is TheBurntPeanut viewbotting?" The accusations gained traction in January 2025 when community members noticed patterns they considered suspicious.
 
 The key evidence cited by skeptics:
 
@@ -134,7 +134,7 @@ Compare him to other top Twitch streamers and see exactly how his 250K-follower 
 
 ### Who is TheBurntPeanut?
 
-TheBurntPeanut is a Twitch streamer known for his peanut VTuber avatar and FPS gameplay, primarily Escape from Tarkov and ARC Raiders. He grew from 30K to 740K+ followers in 2025, making him the fastest-growing creator on Twitch for that period.
+TheBurntPeanut is a Twitch streamer known for his peanut VTuber avatar and FPS gameplay, primarily Escape from Tarkov and ARC Raiders. He grew from 30K to 1.8M+ followers in just over a year, making him one of the fastest-growing creators in Twitch history.
 
 ### Is TheBurntPeanut using viewbots?
 
@@ -146,7 +146,7 @@ TheBurntPeanut keeps his real identity private and has not publicly shared his r
 
 ### How many Twitch followers does TheBurntPeanut have?
 
-As of early 2026, TheBurntPeanut has over 740,000 Twitch followers, plus 9.4 million TikTok likes and 620,000 YouTube subscribers. [Track his live stats here](https://www.shinypull.com/twitch/theburntpeanut_247).
+As of February 2026, TheBurntPeanut has over 1.8 million Twitch followers, plus 9.4 million TikTok likes and 1.5 million YouTube subscribers. [Track his live stats here](https://www.shinypull.com/twitch/theburntpeanut_247).
 
 ### What games does TheBurntPeanut stream?
 
@@ -162,7 +162,7 @@ Whether you believe the viewbotting accusations or attribute his success to smar
 
 His rise shows where streaming is headed in 2026. Short-form content on TikTok drives long-form viewership on Twitch. Personality and entertainment value beat pure skill. And the creators who understand how to leverage multiple platforms simultaneously are the ones building massive audiences fast.
 
-TheBurntPeanut's stats tell the story: 740K+ followers, millions of watch hours, award nominations at The Game Awards and Streamer Awards. Not bad for a year's work.
+TheBurntPeanut's stats tell the story: 1.8M+ Twitch followers, 1.5M YouTube subscribers, millions of watch hours, and award nominations at The Game Awards and Streamer Awards. Going from 30K to nearly 2 million followers in just over a year is one of the fastest rises in Twitch history.
 
 Want to track TheBurntPeanut's continued growth? ShinyPull updates his stats in real-time, showing follower count, watch hours, peak viewers, and historical growth charts. [See his full analytics here](https://www.shinypull.com/twitch/theburntpeanut_247).
 
