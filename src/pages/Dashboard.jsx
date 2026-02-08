@@ -213,7 +213,7 @@ export default function Dashboard() {
           {followedCreators.length >= 2 && (
             <div className="mb-8">
               <Link
-                to={`/compare?creators=${followedCreators.slice(0, 4).map(c => `${c.platform}:${c.username}`).join(',')}`}
+                to={`/compare?creators=${followedCreators.slice(0, 3).map(c => `${c.platform}:${c.username}`).join(',')}`}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
               >
                 <Scale className="w-4 h-4" />
