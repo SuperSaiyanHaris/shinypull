@@ -260,66 +260,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Recently Viewed */}
-          {recentlyViewed.length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-gray-400" />
-                  <h2 className="text-lg font-semibold text-gray-900">Recently Viewed</h2>
-                </div>
-                {recentlyViewed.length > 4 && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setRecentlyViewedIndex(Math.max(0, recentlyViewedIndex - 4))}
-                      disabled={recentlyViewedIndex === 0}
-                      className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setRecentlyViewedIndex(Math.min(recentlyViewed.length - 4, recentlyViewedIndex + 4))}
-                      disabled={recentlyViewedIndex >= recentlyViewed.length - 4}
-                      className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {recentlyViewed.slice(recentlyViewedIndex, recentlyViewedIndex + 4).map((creator, idx) => {
-                  const PlatformIcon = platformIcons[creator.platform] || Users;
-                  const colors = platformColors[creator.platform] || { light: 'bg-gray-50', text: 'text-gray-600' };
-                  return (
-                    <Link
-                      key={`${creator.platform}-${creator.username}-${idx}`}
-                      to={`/${creator.platform}/${creator.username}`}
-                      className="bg-white rounded-xl border border-gray-200 p-3 hover:border-indigo-300 hover:shadow-sm transition-all"
-                    >
-                      <img
-                        src={creator.profileImage || '/placeholder-avatar.svg'}
-                        alt={creator.displayName}
-                        className="w-12 h-12 rounded-lg object-cover mx-auto mb-2"
-                      />
-                      <div className="text-center">
-                        <p className="font-medium text-gray-900 text-sm truncate">{creator.displayName}</p>
-                        <div className="flex items-center justify-center gap-1 mt-1">
-                          <span className={`p-0.5 rounded ${colors.light}`}>
-                            <PlatformIcon className={`w-3 h-3 ${colors.text}`} />
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {formatNumber(creator.subscribers || creator.followers || 0)}
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
           {/* Following List */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
@@ -473,6 +413,66 @@ export default function Dashboard() {
               </div>
             )}
           </div>
+
+          {/* Recently Viewed */}
+          {recentlyViewed.length > 0 && (
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-gray-400" />
+                  <h2 className="text-lg font-semibold text-gray-900">Recently Viewed</h2>
+                </div>
+                {recentlyViewed.length > 4 && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setRecentlyViewedIndex(Math.max(0, recentlyViewedIndex - 4))}
+                      disabled={recentlyViewedIndex === 0}
+                      className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setRecentlyViewedIndex(Math.min(recentlyViewed.length - 4, recentlyViewedIndex + 4))}
+                      disabled={recentlyViewedIndex >= recentlyViewed.length - 4}
+                      className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {recentlyViewed.slice(recentlyViewedIndex, recentlyViewedIndex + 4).map((creator, idx) => {
+                  const PlatformIcon = platformIcons[creator.platform] || Users;
+                  const colors = platformColors[creator.platform] || { light: 'bg-gray-50', text: 'text-gray-600' };
+                  return (
+                    <Link
+                      key={`${creator.platform}-${creator.username}-${idx}`}
+                      to={`/${creator.platform}/${creator.username}`}
+                      className="bg-white rounded-xl border border-gray-200 p-3 hover:border-indigo-300 hover:shadow-sm transition-all"
+                    >
+                      <img
+                        src={creator.profileImage || '/placeholder-avatar.svg'}
+                        alt={creator.displayName}
+                        className="w-12 h-12 rounded-lg object-cover mx-auto mb-2"
+                      />
+                      <div className="text-center">
+                        <p className="font-medium text-gray-900 text-sm truncate">{creator.displayName}</p>
+                        <div className="flex items-center justify-center gap-1 mt-1">
+                          <span className={`p-0.5 rounded ${colors.light}`}>
+                            <PlatformIcon className={`w-3 h-3 ${colors.text}`} />
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {formatNumber(creator.subscribers || creator.followers || 0)}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
