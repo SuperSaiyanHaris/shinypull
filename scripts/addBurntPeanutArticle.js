@@ -51,7 +51,7 @@ His current stats across platforms:
 - 9.4 million TikTok likes
 - 1.5 million YouTube subscribers
 
-[Compare TheBurntPeanut's growth to other top streamers →](https://www.shinypull.com/compare)
+[Compare TheBurntPeanut's growth to other top streamers →](https://www.shinypull.com/compare?creators=youtube:theburntpeanut,twitch:theburntpeanut)
 
 ## Award Recognition and Mainstream Attention
 
@@ -166,7 +166,7 @@ TheBurntPeanut's stats tell the story: 1.8M+ Twitch followers, 1.5M YouTube subs
 
 Want to track TheBurntPeanut's continued growth? ShinyPull updates his stats in real-time, showing follower count, watch hours, peak viewers, and historical growth charts. [See his full analytics here](https://www.shinypull.com/twitch/theburntpeanut).
 
-You can also [compare his stats to other top streamers](https://www.shinypull.com/compare) or check out our [Twitch rankings](https://www.shinypull.com/rankings/twitch) to see where he ranks against the biggest names on the platform.
+You can also [compare his stats to other top streamers](https://www.shinypull.com/compare?creators=youtube:theburntpeanut,twitch:theburntpeanut) or check out our [Twitch rankings](https://www.shinypull.com/rankings/twitch) to see where he ranks against the biggest names on the platform.
 
 ---
 
