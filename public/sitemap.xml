@@ -97,6 +97,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://shinypull.com/blog/theburntpeanut-twitch-rise-2025</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
     <loc>https://shinypull.com/twitch/liminha</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>daily</changefreq>
