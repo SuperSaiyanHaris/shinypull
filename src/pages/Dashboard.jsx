@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, Star, Users, Loader2 } from 'lucide-react';
+import { Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { getFollowedCreators } from '../services/followService';
 import { getCreatorStats } from '../services/creatorService';
+import { getLiveStreams } from '../services/twitchService';
+import { getRecentlyViewed } from '../lib/recentlyViewed';
 import { formatNumber } from '../lib/utils';
 import logger from '../lib/logger';
 
@@ -24,7 +26,9 @@ export default function Dashboard() {
   const [followedCreators, setFollowedCreators] = useState([]);
   const [creatorStats, setCreatorStats] = useState({});
   const [loading, setLoading] = useState(true);
-  const [platformFilter, setPlatformFilter] = useState(null); // null = all, 'youtube', 'twitch'
+  const [platformFilter, setPlatformFilter] = useState(null);
+  const [liveStreamers, setLiveStreamers] = useState(new Set());
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -36,6 +40,8 @@ export default function Dashboard() {
     if (user) {
       loadFollowedCreators();
     }
+    // Load recently viewed regardless of auth
+    setRecentlyViewed(getRecentlyViewed());
   }, [user]);
 
   async function loadFollowedCreators() {
@@ -44,21 +50,44 @@ export default function Dashboard() {
       const creators = await getFollowedCreators(user.id);
       setFollowedCreators(creators);
 
-      // Load stats for each creator
+      // Load stats for each creator (get 2 data points for growth comparison)
       const stats = {};
       for (const creator of creators) {
-        const creatorStats = await getCreatorStats(creator.id, 7);
-        if (creatorStats?.length > 0) {
-          stats[creator.id] = creatorStats[0];
+        const creatorStatsData = await getCreatorStats(creator.id, 7);
+        if (creatorStatsData?.length > 0) {
+          stats[creator.id] = {
+            current: creatorStatsData[0],
+            previous: creatorStatsData[1] || null,
+          };
         }
       }
       setCreatorStats(stats);
+
+      // Check live status for Twitch streamers
+      const twitchCreators = creators.filter(c => c.platform === 'twitch');
+      if (twitchCreators.length > 0) {
+        try {
+          const liveData = await getLiveStreams(twitchCreators.map(c => c.username));
+          setLiveStreamers(new Set(liveData.map(s => s.username.toLowerCase())));
+        } catch (e) {
+          logger.warn('Failed to check live status:', e);
+        }
+      }
     } catch (error) {
       logger.error('Failed to load followed creators:', error);
     } finally {
       setLoading(false);
     }
   }
+
+  // Calculate growth (difference between current and previous stats)
+  const getGrowth = (creatorId, field) => {
+    const stat = creatorStats[creatorId];
+    if (!stat?.current || !stat?.previous) return null;
+    const current = stat.current[field] || 0;
+    const previous = stat.previous[field] || 0;
+    return current - previous;
+  };
 
   if (authLoading) {
     return (
@@ -73,6 +102,8 @@ export default function Dashboard() {
   }
 
   const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User';
+  const filteredCreators = followedCreators.filter(c => !platformFilter || c.platform === platformFilter);
+  const liveCount = followedCreators.filter(c => c.platform === 'twitch' && liveStreamers.has(c.username.toLowerCase())).length;
 
   return (
     <>
@@ -96,88 +127,158 @@ export default function Dashboard() {
 
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Stats Summary */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <button
               onClick={() => setPlatformFilter(null)}
-              className={`bg-white rounded-xl border p-6 text-left transition-all ${
+              className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
                 platformFilter === null ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-indigo-100 rounded-lg">
-                  <Star className="w-6 h-6 text-indigo-600" />
+                <div className="p-2 sm:p-3 bg-indigo-100 rounded-lg">
+                  <Star className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">{followedCreators.length}</p>
-                  <p className="text-sm text-gray-500">Following</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{followedCreators.length}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Following</p>
                 </div>
               </div>
             </button>
             <button
               onClick={() => setPlatformFilter(platformFilter === 'youtube' ? null : 'youtube')}
-              className={`bg-white rounded-xl border p-6 text-left transition-all ${
+              className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
                 platformFilter === 'youtube' ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-red-100 rounded-lg">
-                  <Youtube className="w-6 h-6 text-red-600" />
+                <div className="p-2 sm:p-3 bg-red-100 rounded-lg">
+                  <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">
                     {followedCreators.filter(c => c.platform === 'youtube').length}
                   </p>
-                  <p className="text-sm text-gray-500">YouTube Creators</p>
+                  <p className="text-xs sm:text-sm text-gray-500">YouTube</p>
                 </div>
               </div>
             </button>
             <button
               onClick={() => setPlatformFilter(platformFilter === 'twitch' ? null : 'twitch')}
-              className={`bg-white rounded-xl border p-6 text-left transition-all ${
+              className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
                 platformFilter === 'twitch' ? 'border-purple-500 ring-2 ring-purple-200' : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <Twitch className="w-6 h-6 text-purple-600" />
+                <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
+                  <Twitch className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">
                     {followedCreators.filter(c => c.platform === 'twitch').length}
                   </p>
-                  <p className="text-sm text-gray-500">Twitch Streamers</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Twitch</p>
                 </div>
               </div>
             </button>
+            {/* Live Now Card */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 sm:p-3 bg-red-100 rounded-lg relative">
+                  <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+                  {liveCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{liveCount}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Live Now</p>
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* Quick Actions */}
+          {followedCreators.length >= 2 && (
+            <div className="mb-8">
+              <Link
+                to={`/compare?creators=${followedCreators.slice(0, 4).map(c => `${c.platform}:${c.username}`).join(',')}`}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+              >
+                <Scale className="w-4 h-4" />
+                Compare Followed Creators
+              </Link>
+            </div>
+          )}
+
+          {/* Recently Viewed */}
+          {recentlyViewed.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Clock className="w-5 h-5 text-gray-400" />
+                <h2 className="text-lg font-semibold text-gray-900">Recently Viewed</h2>
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {recentlyViewed.map((creator, idx) => {
+                  const PlatformIcon = platformIcons[creator.platform] || Users;
+                  const colors = platformColors[creator.platform] || { light: 'bg-gray-50', text: 'text-gray-600' };
+                  return (
+                    <Link
+                      key={`${creator.platform}-${creator.username}-${idx}`}
+                      to={`/${creator.platform}/${creator.username}`}
+                      className="flex-shrink-0 bg-white rounded-xl border border-gray-200 p-3 hover:border-indigo-300 hover:shadow-sm transition-all w-40"
+                    >
+                      <img
+                        src={creator.profileImage || '/placeholder-avatar.svg'}
+                        alt={creator.displayName}
+                        className="w-12 h-12 rounded-lg object-cover mx-auto mb-2"
+                      />
+                      <div className="text-center">
+                        <p className="font-medium text-gray-900 text-sm truncate">{creator.displayName}</p>
+                        <div className="flex items-center justify-center gap-1 mt-1">
+                          <span className={`p-0.5 rounded ${colors.light}`}>
+                            <PlatformIcon className={`w-3 h-3 ${colors.text}`} />
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {formatNumber(creator.subscribers || creator.followers || 0)}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Following List */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <Star className="w-5 h-5 text-yellow-500" />
-                {platformFilter === 'youtube' ? 'YouTube Creators You Follow' :
-                 platformFilter === 'twitch' ? 'Twitch Streamers You Follow' :
+                {platformFilter === 'youtube' ? 'YouTube Creators' :
+                 platformFilter === 'twitch' ? 'Twitch Streamers' :
                  'Creators You Follow'}
               </h2>
+              {liveCount > 0 && !platformFilter && (
+                <span className="text-sm text-red-600 font-medium flex items-center gap-1">
+                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  {liveCount} live
+                </span>
+              )}
             </div>
 
             {loading ? (
               <div className="flex items-center justify-center p-12">
                 <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
               </div>
-            ) : followedCreators.length === 0 || (platformFilter && followedCreators.filter(c => c.platform === platformFilter).length === 0) ? (
+            ) : filteredCreators.length === 0 ? (
               <div className="text-center p-12">
                 <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
                   {platformFilter ? `No ${platformFilter === 'youtube' ? 'YouTube creators' : 'Twitch streamers'} followed yet` : 'No creators followed yet'}
                 </h3>
                 <p className="text-gray-500 mb-6">
-                  {platformFilter ? (
-                    <>Click the "Following" card to see all creators, or search to find {platformFilter === 'youtube' ? 'YouTube creators' : 'Twitch streamers'}.</>
-                  ) : (
-                    'Start following creators to track their statistics here.'
-                  )}
+                  Start following creators to track their statistics here.
                 </p>
                 <Link
                   to="/search"
@@ -188,12 +289,12 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="divide-y divide-gray-100">
-                {followedCreators
-                  .filter(creator => !platformFilter || creator.platform === platformFilter)
-                  .map(creator => {
+                {filteredCreators.map(creator => {
                   const PlatformIcon = platformIcons[creator.platform] || Users;
                   const colors = platformColors[creator.platform] || { bg: 'bg-gray-600', light: 'bg-gray-50', text: 'text-gray-600' };
                   const stats = creatorStats[creator.id];
+                  const isLive = creator.platform === 'twitch' && liveStreamers.has(creator.username.toLowerCase());
+                  const growth = getGrowth(creator.id, creator.platform === 'youtube' ? 'subscribers' : 'followers');
 
                   return (
                     <Link
@@ -201,11 +302,18 @@ export default function Dashboard() {
                       to={`/${creator.platform}/${creator.username}`}
                       className="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors"
                     >
-                      <img
-                        src={creator.profile_image || '/placeholder-avatar.svg'}
-                        alt={creator.display_name}
-                        className="w-12 h-12 rounded-xl object-cover"
-                      />
+                      <div className="relative">
+                        <img
+                          src={creator.profile_image || '/placeholder-avatar.svg'}
+                          alt={creator.display_name}
+                          className="w-12 h-12 rounded-xl object-cover"
+                        />
+                        {isLive && (
+                          <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded uppercase">
+                            Live
+                          </span>
+                        )}
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className={`p-1 rounded ${colors.light}`}>
@@ -214,17 +322,37 @@ export default function Dashboard() {
                           <h3 className="font-semibold text-gray-900 truncate">
                             {creator.display_name}
                           </h3>
+                          {isLive && (
+                            <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-600 text-xs font-medium rounded-full">
+                              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                              Live
+                            </span>
+                          )}
                         </div>
                         <p className="text-sm text-gray-500">@{creator.username}</p>
                       </div>
                       <div className="text-right hidden sm:block">
                         <p className="font-semibold text-gray-900">
-                          {stats ? formatNumber(stats.subscribers || stats.followers) : '-'}
+                          {stats?.current ? formatNumber(stats.current.subscribers || stats.current.followers) : '-'}
                         </p>
-                        <p className="text-xs text-gray-500">
-                          {creator.platform === 'youtube' ? 'subscribers' : 'followers'}
-                        </p>
+                        <div className="flex items-center justify-end gap-1">
+                          {growth !== null && growth !== 0 ? (
+                            <span className={`flex items-center text-xs font-medium ${growth > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                              {growth > 0 ? (
+                                <TrendingUp className="w-3 h-3 mr-0.5" />
+                              ) : (
+                                <TrendingDown className="w-3 h-3 mr-0.5" />
+                              )}
+                              {growth > 0 ? '+' : ''}{formatNumber(growth)}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-400">
+                              {creator.platform === 'youtube' ? 'subs' : 'followers'}
+                            </span>
+                          )}
+                        </div>
                       </div>
+                      <ChevronRight className="w-5 h-5 text-gray-300" />
                     </Link>
                   );
                 })}

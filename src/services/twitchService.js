@@ -40,3 +40,25 @@ export const getChannelByUsername = withErrorHandling(
   },
   'twitchService.getChannelByUsername'
 );
+
+/**
+ * Check which streamers are live
+ * @param {string[]} usernames - Array of Twitch usernames
+ * @returns {Promise<Object[]>} - Array of live stream info
+ */
+export const getLiveStreams = withErrorHandling(
+  async (usernames) => {
+    if (!usernames || usernames.length === 0) return [];
+
+    const response = await fetch(`${API_BASE}?action=streams&usernames=${encodeURIComponent(usernames.join(','))}`);
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to get live streams');
+    }
+
+    const { data } = await response.json();
+    return data;
+  },
+  'twitchService.getLiveStreams'
+);

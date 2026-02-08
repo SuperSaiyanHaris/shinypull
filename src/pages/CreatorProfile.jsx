@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
+import { addRecentlyViewed } from '../lib/recentlyViewed';
 import logger from '../lib/logger';
 
 const platformIcons = {
@@ -103,6 +104,16 @@ export default function CreatorProfile() {
         }
 
         setCreator(channelData);
+
+        // Track recently viewed
+        addRecentlyViewed({
+          platform,
+          username: channelData.username || username,
+          displayName: channelData.displayName,
+          profileImage: channelData.profileImage,
+          subscribers: channelData.subscribers,
+          followers: channelData.followers,
+        });
       }
     } catch (err) {
       logger.error('Error loading creator:', err);

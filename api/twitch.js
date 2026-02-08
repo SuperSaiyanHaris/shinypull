@@ -192,6 +192,44 @@ function transformChannel(channel) {
   };
 }
 
+// Check live status for multiple usernames
+async function getLiveStreams(usernames) {
+  if (!usernames || usernames.length === 0) return [];
+
+  const token = await getAccessToken();
+
+  // Twitch API allows up to 100 user_login params
+  const logins = usernames.slice(0, 100).map(u => `user_login=${encodeURIComponent(u)}`).join('&');
+
+  const response = await fetch(
+    `https://api.twitch.tv/helix/streams?${logins}`,
+    {
+      headers: {
+        'Client-ID': TWITCH_CLIENT_ID,
+        'Authorization': `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to get live streams');
+  }
+
+  const data = await response.json();
+  const streams = data.data || [];
+
+  // Return map of username -> stream info
+  return streams.map(stream => ({
+    username: stream.user_login,
+    displayName: stream.user_name,
+    title: stream.title,
+    gameName: stream.game_name,
+    viewerCount: stream.viewer_count,
+    thumbnailUrl: stream.thumbnail_url,
+    startedAt: stream.started_at,
+  }));
+}
+
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -222,7 +260,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ data: channel });
     }
 
-    return res.status(400).json({ error: 'Invalid action. Use ?action=search&query=... or ?action=channel&username=...' });
+    if (action === 'streams') {
+      const { usernames } = req.query;
+      if (!usernames) {
+        return res.status(400).json({ error: 'Missing usernames parameter' });
+      }
+      const usernameList = usernames.split(',').map(u => u.trim()).filter(Boolean);
+      const streams = await getLiveStreams(usernameList);
+      return res.status(200).json({ data: streams });
+    }
+
+    return res.status(400).json({ error: 'Invalid action. Use ?action=search&query=..., ?action=channel&username=..., or ?action=streams&usernames=...' });
   } catch (error) {
     console.error('Twitch API error:', error);
     return res.status(500).json({ error: error.message || 'Internal server error' });

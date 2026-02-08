@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2 } from 'lucide-react';
-import { searchChannels as searchYouTube } from '../services/youtubeService';
-import { searchChannels as searchTwitch } from '../services/twitchService';
+import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
+import { searchChannels as searchTwitch, getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
@@ -15,6 +15,63 @@ const platformConfig = {
 
 export default function Compare() {
   const [creators, setCreators] = useState([null, null]);
+  const [loadingFromUrl, setLoadingFromUrl] = useState(false);
+  const location = useLocation();
+
+  // Parse ?creators=platform:username,platform:username from URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const creatorsParam = params.get('creators');
+
+    if (!creatorsParam) return;
+
+    const creatorList = creatorsParam.split(',').filter(Boolean);
+    if (creatorList.length === 0) return;
+
+    setLoadingFromUrl(true);
+
+    const loadCreators = async () => {
+      const loadedCreators = await Promise.all(
+        creatorList.slice(0, 3).map(async (entry) => {
+          const [platform, username] = entry.split(':');
+          if (!platform || !username) return null;
+
+          try {
+            if (platform === 'youtube') {
+              return await getYouTubeChannel(username);
+            } else if (platform === 'twitch') {
+              return await getTwitchChannel(username);
+            }
+          } catch (err) {
+            // Skip creators that fail to load
+            return null;
+          }
+          return null;
+        })
+      );
+
+      const validCreators = loadedCreators.filter(Boolean);
+
+      // Ensure we always have at least 2 slots
+      while (validCreators.length < 2) {
+        validCreators.push(null);
+      }
+
+      setCreators(validCreators);
+      setLoadingFromUrl(false);
+
+      // Track comparison if we have multiple creators
+      if (validCreators.filter(Boolean).length >= 2) {
+        const first = validCreators[0];
+        const second = validCreators[1];
+        if (first && second) {
+          analytics.compare(first.platform, first.username, second.platform, second.username);
+        }
+      }
+    };
+
+    loadCreators();
+  }, [location.search]);
 
   const selectCreator = (index, creator) => {
     const newCreators = [...creators];
@@ -83,7 +140,16 @@ export default function Compare() {
         </div>
 
         <div className="max-w-6xl mx-auto px-4 py-8">
+          {/* Loading State */}
+          {loadingFromUrl && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mr-3" />
+              <span className="text-gray-600">Loading creators...</span>
+            </div>
+          )}
+
           {/* Creator Slots */}
+          {!loadingFromUrl && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {creators.map((creator, index) => (
               <div key={index}>
@@ -109,9 +175,10 @@ export default function Compare() {
               </button>
             )}
           </div>
+          )}
 
           {/* Comparison Section */}
-          {filledCreators.length >= 2 && (
+          {!loadingFromUrl && filledCreators.length >= 2 && (
             <>
               {/* Desktop Table View */}
               <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -246,7 +313,7 @@ export default function Compare() {
             </>
           )}
 
-          {filledCreators.length < 2 && (
+          {!loadingFromUrl && filledCreators.length < 2 && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
               <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-indigo-600" />
