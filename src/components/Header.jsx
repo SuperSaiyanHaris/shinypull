@@ -36,7 +36,7 @@ export default function Header() {
     { path: '/search', label: 'Search', icon: Search },
     { path: '/rankings', label: 'Rankings', icon: Trophy },
     { path: '/compare', label: 'Compare', icon: Scale },
-    { path: '/youtube/money-calculator', label: 'Calculator', icon: Calculator },
+    { path: '/youtube/money-calculator', label: 'Money Calculator', icon: Calculator },
     { path: '/blog', label: 'Blog', icon: BookOpen },
   ];
 
