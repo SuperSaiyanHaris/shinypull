@@ -10,25 +10,25 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 
 const article = {
   slug: 'theburntpeanut-twitch-rise-2025',
-  title: 'TheBurntPeanut: The Fastest-Growing Twitch Streamer of 2025',
-  description: 'How TheBurntPeanut exploded from 30K to 740K+ followers in one year, earned award nominations, and sparked controversy along the way.',
+  title: 'TheBurntPeanut Twitch Stats: How He Became the Fastest-Growing Streamer of 2025',
+  description: 'TheBurntPeanut exploded from 30K to 740K+ Twitch followers in 2025. Track his real-time stats, watch hours, and growth on ShinyPull. Plus: the viewbotting controversy explained.',
   category: 'Twitch Trends',
   author: 'ShinyPull Team',
   published_at: '2026-02-07',
   read_time: '8 min read',
   image: 'https://static-cdn.jtvnw.net/jtv_user_pictures/53e6d242-7fc2-494e-9cc9-417fe7453a9e-profile_image-300x300.png',
   is_published: true,
-  content: `If you're following Twitch trends in 2025, you've probably heard the name TheBurntPeanut. The FPS streamer with the distinctive peanut avatar has become one of the platform's most talked-about creators, and for good reason. His rapid rise from obscurity to mainstream recognition shows what happens when consistency, cross-platform promotion, and perfect timing all align.
+  content: `Who is TheBurntPeanut, and why is everyone talking about him? The Twitch streamer with the peanut VTuber avatar became the fastest-growing creator on the platform in 2025, going from 30,000 followers to over 740,000 in just 12 months. His rise through Escape from Tarkov streams, viral TikTok clips, and the ARC Raiders launch has been nothing short of explosive. But with rapid growth came controversy, as viewbotting accusations spread across Reddit and Twitter/X. Here's the full story of TheBurntPeanut's Twitch stats, his meteoric rise, and what the numbers actually show.
 
-## From Tarkov to The Top
+## From Escape from Tarkov Streamer to Twitch Sensation
 
-TheBurntPeanut (who keeps his real name private) started streaming on Twitch in 2019, but 2024 marked when things got serious. Armed with his signature VTuber peanut avatar and a deep love for Escape from Tarkov, he built a small but loyal community of hardcore FPS fans.
+TheBurntPeanut (real name unknown) started streaming on Twitch in 2019, but 2024 is when he got serious about content creation. With his signature peanut avatar and deep knowledge of Escape from Tarkov, he built a dedicated community of FPS fans who loved his mix of skill and humor.
 
-By early 2025, he'd grown to a respectable 30,000 followers. Impressive, but not yet mainstream. What happened next was extraordinary.
+By early 2025, TheBurntPeanut had grown to 30,000 Twitch followers. Not bad, but nowhere near the big names. Then something changed.
 
-Throughout 2025, TheBurntPeanut livestreamed with remarkable consistency. He leveraged TikTok and YouTube Shorts to clip his best moments, funniest plays, and most chaotic streams. This cross-platform strategy worked. By mid-year, he'd crossed 200,000 followers.
+Throughout 2025, he streamed consistently, often 6-8 hours per day. More importantly, he started clipping his best moments for TikTok and YouTube Shorts. These short-form videos went viral, introducing TheBurntPeanut to audiences who'd never heard of Escape from Tarkov. By mid-year, he'd crossed 200,000 followers.
 
-[Track TheBurntPeanut's real-time stats on ShinyPull →](https://www.shinypull.com/twitch/theburntpeanut_247)
+[Track TheBurntPeanut's live Twitch stats on ShinyPull →](https://www.shinypull.com/twitch/theburntpeanut_247)
 
 ## The Battlefield 6 Breakthrough
 
@@ -38,15 +38,20 @@ This wasn't just luck. TheBurntPeanut's comedic timing, high-energy moments, and
 
 Around this time, he began collaborating with Twitch legends like summit1g and shroud, further expanding his reach.
 
-## ARC Raiders: The Rocket Fuel
+## ARC Raiders: The Game That Changed Everything
 
-The late October release of ARC Raiders (a third-person extraction shooter similar to Tarkov) was perfectly timed for TheBurntPeanut's skill set. His reputation as the go-to Tarkov creator made him the obvious choice for fans curious about the new game.
+The late October 2025 release of ARC Raiders (a third-person extraction shooter similar to Tarkov) was perfectly timed for TheBurntPeanut's audience. His reputation as one of the top Escape from Tarkov streamers made him the obvious choice for fans curious about the new game.
 
-Boosted by another Twitch Drops campaign, his ARC Raiders streams pulled tens of thousands of concurrent viewers. He became the most-watched ARC Raiders creator, achieving similar watch time to shroud himself.
+Boosted by a Twitch Drops campaign, his ARC Raiders streams pulled tens of thousands of concurrent viewers. He became the most-watched ARC Raiders streamer on Twitch, achieving similar watch hours to shroud himself.
 
-In just 30 days during this period, TheBurntPeanut gained 250,000+ new followers, making him the fastest-growing creator on Twitch.
+The numbers from this period are staggering. In just 30 days, TheBurntPeanut gained over 250,000 new followers, making him the fastest-growing Twitch streamer on the entire platform.
 
-His stats today? Over 740,000 Twitch followers, 9.4 million TikTok likes, and 620,000 YouTube subscribers.
+His current stats across platforms:
+- 740,000+ Twitch followers
+- 9.4 million TikTok likes
+- 620,000 YouTube subscribers
+
+[Compare TheBurntPeanut's growth to other top streamers →](https://www.shinypull.com/compare)
 
 ## Award Recognition and Mainstream Attention
 
@@ -59,19 +64,23 @@ These nominations put him in the same conversation as creators who've been grind
 
 ## The Controversy: Viewbotting Accusations
 
-With great success comes scrutiny. As TheBurntPeanut's numbers skyrocketed, skeptics on Twitter/X and Reddit began raising eyebrows. Some users pointed to:
+With explosive growth comes intense scrutiny. As TheBurntPeanut's Twitch follower count skyrocketed from 30K to 740K+ in under six months, questions emerged across Reddit and Twitter/X: "Is TheBurntPeanut viewbotting?" The accusations gained traction in January 2025 when community members noticed patterns they considered suspicious.
 
-- Sudden viewer spikes: Streams jumping from zero to tens of thousands almost instantly
-- Low chat activity: Viewer-to-chat ratios that seemed unusual compared to similarly sized streams
-- Comparisons to past controversies: The Escape from Tarkov community has dealt with viewbotting scandals before
+The key evidence cited by skeptics:
 
-Supporters counter that his explosive growth is explained by:
+- Sudden viewer spikes: Streams jumping from zero to tens of thousands of concurrent viewers almost instantly
+- Low chat activity: Viewer-to-chat ratios that seemed unusual compared to similarly sized streamers
+- Comparisons to past controversies: The Escape from Tarkov community has dealt with viewbotting scandals before, making them more vigilant
 
-- Viral TikTok and YouTube Shorts: Expanding his reach to casual "normie" audiences
-- Twitch Drops campaigns: Artificially inflating viewer counts temporarily but legitimately
-- Cross-platform momentum: Different from organic Twitch-only growth patterns
+Those who believe TheBurntPeanut's growth is legitimate point to:
 
-It's important to note: Twitch has taken no action against TheBurntPeanut, and no concrete evidence of viewbotting has been presented. The streamer himself has not publicly addressed the allegations. Until proven otherwise, these remain unverified claims from skeptical viewers.
+- Viral TikTok and YouTube Shorts: His content regularly hits millions of views, expanding reach to casual audiences who may lurk rather than chat
+- Twitch Drops campaigns: Games like Battlefield 6 and ARC Raiders used his channel for Drops, temporarily inflating viewer counts within Twitch's rules
+- Cross-platform momentum: Growth fueled by multiple platforms simultaneously looks different from organic Twitch-only patterns
+
+It's crucial to note: **Twitch has taken no action against TheBurntPeanut**, and no concrete evidence of viewbot usage has been presented. The streamer himself has not directly addressed the viewbotting allegations in any public statement. Twitch is known for aggressively banning streamers caught using viewbots, yet TheBurntPeanut continues streaming with full partnership status.
+
+Until evidence emerges or Twitch takes action, the viewbotting controversy remains speculation from skeptical community members. His real-time stats and growth continue to be tracked on ShinyPull.
 
 ## What Makes TheBurntPeanut Different?
 
@@ -119,13 +128,45 @@ Want to see TheBurntPeanut's growth in real-time? ShinyPull tracks his:
 
 Compare him to other top Twitch streamers and see exactly how his 250K-follower month stacks up against the competition.
 
+[Check out other fastest-growing Twitch streamers on our rankings →](https://www.shinypull.com/rankings/twitch)
+
+## Frequently Asked Questions About TheBurntPeanut
+
+### Who is TheBurntPeanut?
+
+TheBurntPeanut is a Twitch streamer known for his peanut VTuber avatar and FPS gameplay, primarily Escape from Tarkov and ARC Raiders. He grew from 30K to 740K+ followers in 2025, making him the fastest-growing creator on Twitch for that period.
+
+### Is TheBurntPeanut using viewbots?
+
+There's no evidence of viewbotting. While some viewers have questioned sudden viewer spikes and low chat activity, Twitch has taken no action against him. His growth can be explained by viral TikTok content, Twitch Drops campaigns, and collaborations with large streamers like summit1g and shroud.
+
+### What is TheBurntPeanut's real name?
+
+TheBurntPeanut keeps his real identity private and has not publicly shared his real name.
+
+### How many Twitch followers does TheBurntPeanut have?
+
+As of early 2026, TheBurntPeanut has over 740,000 Twitch followers, plus 9.4 million TikTok likes and 620,000 YouTube subscribers. [Track his live stats here](https://www.shinypull.com/twitch/theburntpeanut_247).
+
+### What games does TheBurntPeanut stream?
+
+TheBurntPeanut primarily streams Escape from Tarkov and ARC Raiders, though he occasionally plays other FPS games like Battlefield and Call of Duty.
+
+### Why is TheBurntPeanut controversial?
+
+Some viewers have accused TheBurntPeanut of viewbotting due to sudden viewer spikes and low chat engagement compared to his viewer count. However, supporters point to his viral TikTok content and Twitch Drops campaigns as legitimate explanations for his rapid growth.
+
 ## The Verdict
 
-Whether you believe the viewbotting allegations or chalk his success up to cross-platform savvy and good timing, one thing is undeniable: TheBurntPeanut is one of the most fascinating creator stories of 2025.
+Whether you believe the viewbotting accusations or attribute his success to smart cross-platform strategy and perfect timing, TheBurntPeanut's growth story is one of the most compelling in streaming right now.
 
-His rise mirrors the broader shift in streaming. Short-form content drives long-form viewership, and personality beats perfection. The creators who understand this (and execute relentlessly) are the ones winning in 2026.
+His rise shows where streaming is headed in 2026. Short-form content on TikTok drives long-form viewership on Twitch. Personality and entertainment value beat pure skill. And the creators who understand how to leverage multiple platforms simultaneously are the ones building massive audiences fast.
 
-Will TheBurntPeanut's momentum continue into the new year? Only time will tell. But for now, he's living proof that with the right strategy, consistency, and a little bit of chaos, even brand-new creators can break into the top tier.
+TheBurntPeanut's stats tell the story: 740K+ followers, millions of watch hours, award nominations at The Game Awards and Streamer Awards. Not bad for a year's work.
+
+Want to track TheBurntPeanut's continued growth? ShinyPull updates his stats in real-time, showing follower count, watch hours, peak viewers, and historical growth charts. [See his full analytics here](https://www.shinypull.com/twitch/theburntpeanut_247).
+
+You can also [compare his stats to other top streamers](https://www.shinypull.com/compare) or check out our [Twitch rankings](https://www.shinypull.com/rankings/twitch) to see where he ranks against the biggest names on the platform.
 
 ---
 
