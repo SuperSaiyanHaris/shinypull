@@ -779,14 +779,16 @@ function StatCard({ icon: Icon, label, value, sublabel }) {
 function SummaryCard({ label, sublabel, value, change }) {
   const isPositive = change !== undefined && change > 0;
   const isNegative = change !== undefined && change < 0;
+  // Use smaller text for longer values (like earnings ranges)
+  const isLongValue = value && value.length > 12;
 
   return (
     <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 sm:p-5 border border-indigo-100">
-      <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 truncate">{value}</p>
-      <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">{label}</p>
-      {sublabel && <p className="text-xs text-gray-500 mt-1 truncate">{sublabel}</p>}
+      <p className={`font-bold text-gray-900 mb-1 ${isLongValue ? 'text-lg sm:text-xl md:text-2xl' : 'text-xl sm:text-2xl md:text-3xl'}`}>{value}</p>
+      <p className="text-xs sm:text-sm font-medium text-gray-700">{label}</p>
+      {sublabel && <p className="text-xs text-gray-500 mt-1">{sublabel}</p>}
       {change !== undefined && change !== null && (
-        <p className={`text-xs mt-2 font-medium truncate ${isPositive ? 'text-emerald-600' : isNegative ? 'text-red-500' : 'text-gray-400'}`}>
+        <p className={`text-xs mt-2 font-medium ${isPositive ? 'text-emerald-600' : isNegative ? 'text-red-500' : 'text-gray-400'}`}>
           {isPositive ? '+' : ''}{formatNumber(change)}
         </p>
       )}
