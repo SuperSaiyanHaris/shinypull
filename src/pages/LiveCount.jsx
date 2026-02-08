@@ -27,18 +27,26 @@ const platformConfig = {
   },
 };
 
+// Platform URLs for linking to actual channel
+const platformUrls = {
+  youtube: (username) => `https://youtube.com/@${username}`,
+  twitch: (username) => `https://twitch.tv/${username}`,
+};
+
 // Helper function to generate realistic random offset based on channel size
+// Offsets are small enough to only affect last 3-4 digits, keeping the displayed count consistent
 const getRandomOffset = (count) => {
   let maxOffset = 0;
-  
-  if (count > 100000000) maxOffset = 50000;      // 100M+: ±50k
-  else if (count > 50000000) maxOffset = 25000;  // 50M-100M: ±25k
-  else if (count > 10000000) maxOffset = 10000;  // 10M-50M: ±10k
-  else if (count > 1000000) maxOffset = 5000;    // 1M-10M: ±5k
-  else if (count > 100000) maxOffset = 1000;     // 100k-1M: ±1k
-  else if (count > 10000) maxOffset = 500;       // 10k-100k: ±500
-  else maxOffset = 100;                          // <10k: ±100
-  
+
+  // Keep offsets small - only vary the last few digits so count looks consistent with profile
+  if (count > 100000000) maxOffset = 5000;       // 100M+: ±5k (affects 5th digit at most)
+  else if (count > 50000000) maxOffset = 3000;   // 50M-100M: ±3k
+  else if (count > 10000000) maxOffset = 1500;   // 10M-50M: ±1.5k
+  else if (count > 1000000) maxOffset = 800;     // 1M-10M: ±800
+  else if (count > 100000) maxOffset = 300;      // 100k-1M: ±300
+  else if (count > 10000) maxOffset = 100;       // 10k-100k: ±100
+  else maxOffset = 50;                           // <10k: ±50
+
   // Return random offset between -maxOffset and +maxOffset
   return Math.floor(Math.random() * (maxOffset * 2 + 1)) - maxOffset;
 };
@@ -269,10 +277,15 @@ export default function LiveCount() {
               <div className="text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1">{creator.displayName}</h1>
                 <p className="text-gray-400 text-base sm:text-lg mb-3">@{creator.username || username}</p>
-                <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r ${config.bgGradient} text-white shadow-lg ${config.glowColor}`}>
+                <a
+                  href={platformUrls[platform]?.(creator.username || username)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r ${config.bgGradient} text-white shadow-lg ${config.glowColor} hover:opacity-90 transition-opacity`}
+                >
                   <Icon className="w-4 h-4" />
                   {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                </span>
+                </a>
               </div>
             </div>
 
