@@ -47,11 +47,6 @@ export default function Footer() {
                   Money Calculator
                 </Link>
               </li>
-              <li>
-                <Link to="/live/youtube/mrbeast" className="text-gray-500 hover:text-indigo-600 transition-colors">
-                  Live Sub Count
-                </Link>
-              </li>
             </ul>
           </div>
 
