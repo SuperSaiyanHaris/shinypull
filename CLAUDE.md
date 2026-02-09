@@ -167,13 +167,20 @@ Scripts use `dotenv` to load `.env` automatically.
 
 ## Authentication & Follow System
 
-**AuthPanel Component:**
+**AuthPanel Component (ALWAYS use this — NEVER `navigate('/auth')`):**
 - Slide-out panel from the right side (not a separate page)
 - Controlled by custom events: `openAuthPanel` and `closeAuthPanel`
 - Supports contextual messages (e.g., "Sign in to follow creators")
 - Smooth animations: `translate-x-full` → `translate-x-0` with transition
 - Input fields have visible text (text-gray-900) and placeholders
 - Integrated into Header component with event listeners
+- **NEVER use `navigate('/auth')` or `<Link to="/auth">` to send users to sign in.** Always dispatch the `openAuthPanel` event instead:
+  ```jsx
+  window.dispatchEvent(new CustomEvent('openAuthPanel', {
+    detail: { message: 'Sign in to access this feature' }
+  }));
+  ```
+- The `/auth` page route exists only as a direct-URL fallback, not for programmatic navigation
 
 **Follow Button Integration:**
 - Follow/unfollow buttons dispatch `openAuthPanel` event when user not authenticated

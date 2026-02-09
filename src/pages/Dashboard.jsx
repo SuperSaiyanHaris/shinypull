@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft, Check, X } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,7 +22,6 @@ const platformColors = {
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
   const [followedCreators, setFollowedCreators] = useState([]);
   const [creatorStats, setCreatorStats] = useState({});
   const [loading, setLoading] = useState(true);
@@ -35,9 +34,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/auth');
+      window.dispatchEvent(new CustomEvent('openAuthPanel', {
+        detail: { message: 'Sign in to access your dashboard' }
+      }));
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading]);
 
   useEffect(() => {
     if (user) {

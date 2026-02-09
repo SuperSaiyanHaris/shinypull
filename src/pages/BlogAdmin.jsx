@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Plus,
   Edit3,
@@ -69,7 +69,6 @@ const emptyProduct = {
 
 export default function BlogAdmin() {
   const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminChecked, setAdminChecked] = useState(false);
 
@@ -103,7 +102,9 @@ export default function BlogAdmin() {
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      navigate('/auth');
+      window.dispatchEvent(new CustomEvent('openAuthPanel', {
+        detail: { message: 'Sign in to access the admin panel' }
+      }));
       return;
     }
 
@@ -123,7 +124,7 @@ export default function BlogAdmin() {
       }
     }
     checkAdmin();
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading]);
 
   useEffect(() => {
     if (isAdmin) fetchData();
@@ -372,7 +373,35 @@ export default function BlogAdmin() {
     }
   }
 
-  if (authLoading || !adminChecked) {
+  if (authLoading || (!user && !adminChecked)) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <ShieldAlert className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Sign In Required</h1>
+          <p className="text-gray-500 mb-6">Please sign in to access this page.</p>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('openAuthPanel', {
+              detail: { message: 'Sign in to access the admin panel' }
+            }))}
+            className="px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!adminChecked) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
