@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Plus,
   Edit3,
@@ -19,8 +19,10 @@ import {
   Package,
   ShoppingBag,
   Copy,
+  ShieldX,
 } from 'lucide-react';
 import SEO from '../components/SEO';
+import { useAuth } from '../contexts/AuthContext';
 import { TIMEOUTS, BLOG_CATEGORIES } from '../lib/constants';
 import {
   getAllPostsAdmin,
@@ -66,6 +68,11 @@ const emptyProduct = {
 };
 
 export default function BlogAdmin() {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminChecked, setAdminChecked] = useState(false);
+
   const [activeTab, setActiveTab] = useState('posts');
   const [posts, setPosts] = useState([]);
   const [products, setProducts] = useState([]);
@@ -92,9 +99,35 @@ export default function BlogAdmin() {
   const [postErrors, setPostErrors] = useState({});
   const [productErrors, setProductErrors] = useState({});
 
+  // Check admin status
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (authLoading) return;
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    async function checkAdmin() {
+      try {
+        const res = await fetch('/api/admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email }),
+        });
+        const data = await res.json();
+        setIsAdmin(data.isAdmin);
+      } catch {
+        setIsAdmin(false);
+      } finally {
+        setAdminChecked(true);
+      }
+    }
+    checkAdmin();
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    if (isAdmin) fetchData();
+  }, [isAdmin]);
 
   // Scroll to top when entering edit mode
   useEffect(() => {
@@ -337,6 +370,29 @@ export default function BlogAdmin() {
     } catch (err) {
       showError('Failed to delete product');
     }
+  }
+
+  if (authLoading || !adminChecked) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <ShieldX className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+          <p className="text-gray-500 mb-6">You don't have permission to access this page.</p>
+          <Link to="/" className="px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors">
+            Go Home
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   if (loading) {
