@@ -2,6 +2,13 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "redirects": [
+    {
+      "source": "/creator/:username",
+      "destination": "/youtube/:username",
+      "statusCode": 301
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
