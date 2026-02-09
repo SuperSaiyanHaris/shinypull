@@ -1,4 +1,12 @@
-import { Twitter, Facebook, Linkedin, Link2, Check } from 'lucide-react';
+import { Facebook, Linkedin, Link2, Check } from 'lucide-react';
+
+function XIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
 import { useState } from 'react';
 import logger from '../lib/logger';
 import { SOCIAL_SHARE_URLS } from '../lib/config';
@@ -32,15 +40,15 @@ export default function ShareButtons({ url, title }) {
       <span className="text-sm font-medium text-gray-700">Share:</span>
       
       <div className="flex items-center gap-2">
-        {/* Twitter */}
+        {/* X (formerly Twitter) */}
         <a
           href={shareLinks.twitter}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-lg bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-600 transition-colors"
-          aria-label="Share on Twitter"
+          className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-black transition-colors"
+          aria-label="Share on X"
         >
-          <Twitter className="w-4 h-4" />
+          <XIcon className="w-4 h-4" />
         </a>
 
         {/* Facebook */}
