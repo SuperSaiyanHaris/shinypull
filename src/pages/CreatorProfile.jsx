@@ -578,12 +578,14 @@ export default function CreatorProfile() {
                       sublabel="Based on avg CPM"
                       value={metrics && metrics.last30Days.views > 0
                         ? formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)
-                        : creator.totalViews && creator.createdAt
+                        : creator.totalViews && creator.totalPosts > 0
                           ? (() => {
-                              // Calculate monthly average from lifetime views
-                              const channelAgeMonths = Math.max(1, Math.floor((Date.now() - new Date(creator.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 30)));
-                              const avgMonthlyViews = Math.floor(creator.totalViews / channelAgeMonths);
-                              return formatEarnings(avgMonthlyViews / 1000 * 2, avgMonthlyViews / 1000 * 7);
+                              // Estimate based on avg views per video × typical monthly uploads
+                              // Similar to calculator's formula: totalViews / (totalPosts * 30)
+                              const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
+                              const monthlyViews = estimatedDailyViews * 30;
+                              // Use RPM range: $0.25 - $4.00 (same as calculator)
+                              return formatEarnings(monthlyViews / 1000 * 0.25, monthlyViews / 1000 * 4);
                             })()
                           : '--'
                       }
@@ -593,12 +595,13 @@ export default function CreatorProfile() {
                       sublabel="Based on avg CPM"
                       value={metrics && metrics.last30Days.views > 0
                         ? formatEarnings(metrics.last30Days.views / 1000 * 2 * 12, metrics.last30Days.views / 1000 * 7 * 12)
-                        : creator.totalViews && creator.createdAt
+                        : creator.totalViews && creator.totalPosts > 0
                           ? (() => {
-                              // Calculate yearly average from lifetime views
-                              const channelAgeYears = Math.max(1, (Date.now() - new Date(creator.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365));
-                              const avgYearlyViews = Math.floor(creator.totalViews / channelAgeYears);
-                              return formatEarnings(avgYearlyViews / 1000 * 2, avgYearlyViews / 1000 * 7);
+                              // Estimate based on avg views per video × typical yearly performance
+                              const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
+                              const yearlyViews = estimatedDailyViews * 365;
+                              // Use RPM range: $0.25 - $4.00 (same as calculator)
+                              return formatEarnings(yearlyViews / 1000 * 0.25, yearlyViews / 1000 * 4);
                             })()
                           : '--'
                       }
