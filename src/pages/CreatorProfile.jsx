@@ -223,6 +223,15 @@ export default function CreatorProfile() {
     const weeklyAvgSubs = Math.round(subsGrowth / (days / 7));
     const weeklyAvgViews = Math.round(viewsGrowth / (days / 7));
 
+    // Calculate hours watched averages for Twitch
+    const hoursWatchedStats = sortedStats.filter(s => s.hours_watched_day != null);
+    const avgHoursWatchedDay = hoursWatchedStats.length > 0
+      ? Math.round(hoursWatchedStats.reduce((sum, s) => sum + (s.hours_watched_day || 0), 0) / hoursWatchedStats.length)
+      : 0;
+    const avgHoursWatchedWeek = avgHoursWatchedDay * 7;
+    const totalHoursWatched30Days = hoursWatchedStats.slice(0, Math.min(30, hoursWatchedStats.length))
+      .reduce((sum, s) => sum + (s.hours_watched_day || 0), 0);
+
     const last14Days = sortedStats.slice(0, Math.min(14, sortedStats.length));
     const last14First = last14Days[last14Days.length - 1];
     const last14Subs = last14Days.length > 1 ? (latest.subscribers || latest.followers) - (last14First.subscribers || last14First.followers) : 0;
@@ -230,10 +239,10 @@ export default function CreatorProfile() {
 
     return {
       dailyStats: dailyStats.slice(0, 14),
-      last30Days: { subs: subsGrowth, views: viewsGrowth, videos: videosGrowth },
+      last30Days: { subs: subsGrowth, views: viewsGrowth, videos: videosGrowth, hoursWatched: totalHoursWatched30Days },
       last14Days: { subs: last14Subs, views: last14Views },
-      dailyAverage: { subs: dailyAvgSubs, views: dailyAvgViews },
-      weeklyAverage: { subs: weeklyAvgSubs, views: weeklyAvgViews },
+      dailyAverage: { subs: dailyAvgSubs, views: dailyAvgViews, hoursWatched: avgHoursWatchedDay },
+      weeklyAverage: { subs: weeklyAvgSubs, views: weeklyAvgViews, hoursWatched: avgHoursWatchedWeek },
     };
   };
 
@@ -796,8 +805,11 @@ export default function CreatorProfile() {
                           )}
                         </td>
                         {platform === 'twitch' && (
-                          <td className="px-6 py-4 text-right">
-                            <span className="text-gray-400">—</span>
+                          <td className="px-6 py-4 text-right text-indigo-900">
+                            {metrics.dailyAverage?.hoursWatched > 0
+                              ? `${(metrics.dailyAverage.hoursWatched / 1000).toFixed(1)}K`
+                              : '—'
+                            }
                           </td>
                         )}
                         {platform !== 'twitch' && platform !== 'kick' && (
@@ -836,8 +848,11 @@ export default function CreatorProfile() {
                           )}
                         </td>
                         {platform === 'twitch' && (
-                          <td className="px-6 py-4 text-right">
-                            <span className="text-gray-400">—</span>
+                          <td className="px-6 py-4 text-right text-indigo-900">
+                            {metrics.weeklyAverage?.hoursWatched > 0
+                              ? `${(metrics.weeklyAverage.hoursWatched / 1000).toFixed(1)}K`
+                              : '—'
+                            }
                           </td>
                         )}
                         {platform !== 'twitch' && platform !== 'kick' && (
@@ -877,8 +892,11 @@ export default function CreatorProfile() {
                           )}
                         </td>
                         {platform === 'twitch' && (
-                          <td className="px-6 py-4 text-right">
-                            <span className="text-gray-400">—</span>
+                          <td className="px-6 py-4 text-right text-indigo-900">
+                            {metrics.last30Days?.hoursWatched > 0
+                              ? `${(metrics.last30Days.hoursWatched / 1000).toFixed(1)}K`
+                              : '—'
+                            }
                           </td>
                         )}
                         {platform !== 'twitch' && platform !== 'kick' && (
