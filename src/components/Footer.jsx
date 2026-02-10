@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { BarChart3, Youtube, Twitch } from 'lucide-react';
+import KickIcon from './KickIcon';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -64,6 +65,12 @@ export default function Footer() {
                 <Link to="/rankings/twitch" className="text-gray-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
                   <Twitch className="w-4 h-4" />
                   Twitch Stats
+                </Link>
+              </li>
+              <li>
+                <Link to="/rankings/kick" className="text-gray-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                  <KickIcon className="w-4 h-4" />
+                  Kick Stats
                 </Link>
               </li>
             </ul>
