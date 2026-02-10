@@ -482,18 +482,38 @@ export default function CreatorProfile() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              {/* Subscribers/Followers Card */}
               <StatCard
                 icon={Users}
-                label={platform === 'twitch' ? 'Followers' : 'Subscribers'}
+                label={platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subscribers' : 'Subscribers'}
                 value={formatNumber(creator.subscribers || creator.followers)}
                 sublabel={creator.hiddenSubscribers ? '(hidden)' : platform === 'youtube' ? '(rounded by YouTube)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
               />
+              
+              {/* Followers Card for Kick (not available) */}
+              {platform === 'kick' && (
+                <StatCard
+                  icon={Users}
+                  label="Followers"
+                  value="—"
+                  sublabel="Not available via Kick API"
+                />
+              )}
+              
+              {/* Hours Watched / Total Views */}
               {platform === 'twitch' ? (
                 <StatCard
                   icon={Eye}
                   label="Hours Watched"
                   value={creator.hoursWatchedMonth ? formatHoursWatched(creator.hoursWatchedMonth) : 'Tracking...'}
                   sublabel="Last 30 days"
+                />
+              ) : platform === 'kick' ? (
+                <StatCard
+                  icon={Eye}
+                  label="Total Views"
+                  value="—"
+                  sublabel="Not available via Kick API"
                 />
               ) : (
                 <StatCard
@@ -502,13 +522,8 @@ export default function CreatorProfile() {
                   value={formatNumber(creator.totalViews)}
                 />
               )}
-              {platform !== 'twitch' && (
-                <StatCard
-                  icon={Video}
-                  label="Videos"
-                  value={formatNumber(creator.totalPosts)}
-                />
-              )}
+              
+              {/* Videos / Category */}
               {platform === 'twitch' && creator.category && (
                 <StatCard
                   icon={Video}
@@ -516,7 +531,23 @@ export default function CreatorProfile() {
                   value={creator.category}
                 />
               )}
-              {platform !== 'twitch' && (
+              {platform === 'kick' && creator.category && (
+                <StatCard
+                  icon={Video}
+                  label="Category"
+                  value={creator.category}
+                />
+              )}
+              {platform !== 'twitch' && platform !== 'kick' && (
+                <StatCard
+                  icon={Video}
+                  label="Videos"
+                  value={formatNumber(creator.totalPosts)}
+                />
+              )}
+              
+              {/* Avg Views/Video (not for Twitch or Kick) */}
+              {platform !== 'twitch' && platform !== 'kick' && (
                 <StatCard
                   icon={TrendingUp}
                   label="Avg Views/Video"
@@ -562,6 +593,15 @@ export default function CreatorProfile() {
                       change={metrics?.last30Days.subs}
                     />
                   </>
+                ) : platform === 'kick' ? (
+                  <>
+                    <SummaryCard
+                      label="Paid Subscribers"
+                      sublabel="Last 30 days"
+                      value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
+                      change={metrics?.last30Days.subs}
+                    />
+                  </>
                 ) : (
                   <>
                     <SummaryCard
@@ -591,7 +631,9 @@ export default function CreatorProfile() {
                   <Radio className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-semibold text-sm sm:text-base truncate">Live {platform === 'twitch' ? 'Follower' : 'Subscriber'} Count</p>
+                  <p className="font-semibold text-sm sm:text-base truncate">
+                    Live {platform === 'twitch' ? 'Follower' : platform === 'kick' ? 'Paid Subscriber' : 'Subscriber'} Count
+                  </p>
                   <p className="text-xs sm:text-sm text-indigo-200 truncate">Watch the count update in real-time</p>
                 </div>
               </div>
@@ -637,11 +679,13 @@ export default function CreatorProfile() {
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50 text-left">
                         <th className="px-6 py-4 font-semibold text-gray-600">Date</th>
-                        <th className="px-6 py-4 font-semibold text-gray-600 text-right">{platform === 'twitch' ? 'Followers' : 'Subscribers'}</th>
+                        <th className="px-6 py-4 font-semibold text-gray-600 text-right">
+                          {platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : 'Subscribers'}
+                        </th>
                         {platform === 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Watch Hours</th>}
-                        {platform !== 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
-                        {platform !== 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
-                        {platform !== 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Est. Earnings</th>}
+                        {platform !== 'twitch' && platform !== 'kick' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
+                        {platform !== 'twitch' && platform !== 'kick' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
+                        {platform !== 'twitch' && platform !== 'kick' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Est. Earnings</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -657,8 +701,8 @@ export default function CreatorProfile() {
                           <td className="px-6 py-4 text-right">
                             <div className="flex flex-col items-end">
                               <span className="font-medium text-gray-900">{formatNumber(stat.subscribers || stat.followers)}</span>
-                              {/* Only show subscriber changes for Twitch (YouTube rounds counts making changes unreliable) */}
-                              {platform === 'twitch' && stat.subsChange !== 0 && (
+                              {/* Only show subscriber changes for Twitch and Kick (YouTube rounds counts making changes unreliable) */}
+                              {(platform === 'twitch' || platform === 'kick') && stat.subsChange !== 0 && (
                                 <span className={`text-xs ${stat.subsChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                                   {stat.subsChange > 0 ? '+' : ''}{formatNumber(stat.subsChange)}
                                 </span>
@@ -674,7 +718,7 @@ export default function CreatorProfile() {
                               </div>
                             </td>
                           )}
-                          {platform !== 'twitch' && (
+                          {platform !== 'twitch' && platform !== 'kick' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex flex-col items-end">
                                 <span className="font-medium text-gray-900">{formatNumber(stat.total_views)}</span>
@@ -686,7 +730,7 @@ export default function CreatorProfile() {
                               </div>
                             </td>
                           )}
-                          {platform !== 'twitch' && (
+                          {platform !== 'twitch' && platform !== 'kick' && (
                             <>
                               <td className="px-6 py-4 text-right">
                                 <div className="flex flex-col items-end">
@@ -724,7 +768,7 @@ export default function CreatorProfile() {
                             <span className="text-gray-400">—</span>
                           </td>
                         )}
-                        {platform !== 'twitch' && (
+                        {platform !== 'twitch' && platform !== 'kick' && (
                           <>
                             <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.dailyAverage.views)}</td>
                             <td className="px-6 py-4 text-right"></td>
@@ -751,7 +795,7 @@ export default function CreatorProfile() {
                             <span className="text-gray-400">—</span>
                           </td>
                         )}
-                        {platform !== 'twitch' && (
+                        {platform !== 'twitch' && platform !== 'kick' && (
                           <>
                             <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.weeklyAverage.views)}</td>
                             <td className="px-6 py-4 text-right"></td>
@@ -778,7 +822,7 @@ export default function CreatorProfile() {
                             <span className="text-gray-400">—</span>
                           </td>
                         )}
-                        {platform !== 'twitch' && (
+                        {platform !== 'twitch' && platform !== 'kick' && (
                           <>
                             <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.last30Days.views)}</td>
                             <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
