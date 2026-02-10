@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Search as SearchIcon, Youtube, Twitch, Instagram, User, AlertCircle, ArrowRight } from 'lucide-react';
+import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
@@ -15,23 +15,18 @@ const platformIcons = {
   youtube: Youtube,
   twitch: Twitch,
   kick: KickIcon,
-  instagram: Instagram,
 };
 
 const platformColors = {
   youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
   kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
-  instagram: { bg: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', light: 'bg-purple-50', text: 'text-purple-600' },
-  tiktok: { bg: 'bg-pink-500', light: 'bg-pink-50', text: 'text-pink-500' },
 };
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, available: true },
-  { id: 'tiktok', name: 'TikTok', icon: null, available: false },
-  { id: 'instagram', name: 'Instagram', icon: Instagram, available: false },
 ];
 
 export default function Search() {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, TrendingUp, Users, Eye, Trophy, Info } from 'lucide-react';
+import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import { getRankedCreators } from '../services/creatorService';
 import SEO from '../components/SEO';
@@ -12,8 +12,6 @@ const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', hoverColor: 'hover:bg-red-700', lightBg: 'bg-red-50', textColor: 'text-red-600', available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', hoverColor: 'hover:bg-purple-700', lightBg: 'bg-purple-50', textColor: 'text-purple-600', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'bg-green-500', hoverColor: 'hover:bg-green-600', lightBg: 'bg-green-50', textColor: 'text-green-600', available: true },
-  { id: 'tiktok', name: 'TikTok', icon: null, color: 'bg-pink-500', lightBg: 'bg-pink-50', textColor: 'text-pink-500', available: false },
-  { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', lightBg: 'bg-purple-50', textColor: 'text-purple-500', available: false },
 ];
 
 export default function Rankings() {

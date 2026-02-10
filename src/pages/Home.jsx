@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, Instagram, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign } from 'lucide-react';
+import { Search, Youtube, Twitch, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,8 +10,6 @@ const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-600', stats: '72M+ channels', available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50', textColor: 'text-purple-600', stats: '7M+ channels', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50', textColor: 'text-green-600', stats: 'New!', available: true },
-  { id: 'tiktok', name: 'TikTok', icon: null, color: 'from-pink-500 to-pink-600', bgColor: 'bg-pink-50', textColor: 'text-pink-600', stats: 'Coming Soon', available: false },
-  { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'from-purple-500 to-orange-500', bgColor: 'bg-gradient-to-br from-purple-50 to-orange-50', textColor: 'text-purple-600', stats: 'Coming Soon', available: false },
 ];
 
 const features = [
@@ -61,8 +59,8 @@ export default function Home() {
     <>
       <SEO
         title="Home"
-        description="Track YouTube, Twitch, TikTok, Instagram & Twitter statistics. View subscriber counts, earnings estimates, rankings and growth analytics for your favorite creators."
-        keywords="youtube statistics, twitch statistics, subscriber count, social blade alternative, creator analytics, earnings calculator"
+        description="Track YouTube, Twitch, and Kick statistics. View subscriber counts, earnings estimates, rankings and growth analytics for your favorite creators."
+        keywords="youtube statistics, twitch statistics, kick statistics, subscriber count, social blade alternative, creator analytics, earnings calculator"
       />
 
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -94,7 +92,7 @@ export default function Home() {
               </h1>
 
               <p className="text-base sm:text-lg lg:text-xl text-slate-300 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-4">
-                Track followers, views, and growth for your favorite YouTube and Twitch creators. Get detailed analytics and insights.
+                Track followers, views, and growth for your favorite YouTube, Twitch, and Kick creators. Get detailed analytics and insights.
               </p>
 
               {/* Search Bar - Modern Clean Design */}
@@ -123,7 +121,7 @@ export default function Home() {
               </form>
 
               {/* Platform Cards - Glass style */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto px-4">
+              <div className="grid grid-cols-3 gap-4 max-w-3xl mx-auto px-4">
                 {platforms.map((platform) => {
                   const Icon = platform.icon;
 

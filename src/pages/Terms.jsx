@@ -30,7 +30,7 @@ export default function Terms() {
               <Section title="2. Description of Service">
                 <p>
                   ShinyPull provides social media analytics and statistics for content creators across multiple
-                  platforms including YouTube, Twitch, TikTok, Instagram, and Twitter. We collect publicly available
+                  platforms including YouTube, Twitch, and Kick. We collect publicly available
                   data from official platform APIs.
                 </p>
               </Section>
