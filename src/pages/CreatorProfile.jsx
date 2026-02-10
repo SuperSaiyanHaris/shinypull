@@ -766,7 +766,16 @@ export default function CreatorProfile() {
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-right text-gray-600">
-                                {stat.viewsChange > 0 ? formatEarnings(stat.viewsChange / 1000 * 2, stat.viewsChange / 1000 * 7) : '$0'}
+                                {stat.viewsChange > 0
+                                  ? formatEarnings(stat.viewsChange / 1000 * 2, stat.viewsChange / 1000 * 7)
+                                  : creator.totalViews && creator.totalPosts > 0
+                                    ? (() => {
+                                        // For mega-channels with no daily growth, estimate from lifetime avg
+                                        const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
+                                        return formatEarnings(estimatedDailyViews / 1000 * 0.25, estimatedDailyViews / 1000 * 4);
+                                      })()
+                                    : '$0'
+                                }
                               </td>
                             </>
                           )}
@@ -793,10 +802,23 @@ export default function CreatorProfile() {
                         )}
                         {platform !== 'twitch' && platform !== 'kick' && (
                           <>
-                            <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.dailyAverage.views)}</td>
+                            <td className="px-6 py-4 text-right text-emerald-600">
+                              {metrics.dailyAverage.views > 0
+                                ? `+${formatNumber(metrics.dailyAverage.views)}`
+                                : '—'
+                              }
+                            </td>
                             <td className="px-6 py-4 text-right"></td>
                             <td className="px-6 py-4 text-right text-indigo-900">
-                              {formatEarnings(metrics.dailyAverage.views / 1000 * 2, metrics.dailyAverage.views / 1000 * 7)}
+                              {metrics.dailyAverage.views > 0
+                                ? formatEarnings(metrics.dailyAverage.views / 1000 * 2, metrics.dailyAverage.views / 1000 * 7)
+                                : creator.totalViews && creator.totalPosts > 0
+                                  ? (() => {
+                                      const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
+                                      return formatEarnings(estimatedDailyViews / 1000 * 0.25, estimatedDailyViews / 1000 * 4);
+                                    })()
+                                  : '—'
+                              }
                             </td>
                           </>
                         )}
@@ -820,10 +842,24 @@ export default function CreatorProfile() {
                         )}
                         {platform !== 'twitch' && platform !== 'kick' && (
                           <>
-                            <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.weeklyAverage.views)}</td>
+                            <td className="px-6 py-4 text-right text-emerald-600">
+                              {metrics.weeklyAverage.views > 0
+                                ? `+${formatNumber(metrics.weeklyAverage.views)}`
+                                : '—'
+                              }
+                            </td>
                             <td className="px-6 py-4 text-right"></td>
                             <td className="px-6 py-4 text-right text-indigo-900">
-                              {formatEarnings(metrics.weeklyAverage.views / 1000 * 2, metrics.weeklyAverage.views / 1000 * 7)}
+                              {metrics.weeklyAverage.views > 0
+                                ? formatEarnings(metrics.weeklyAverage.views / 1000 * 2, metrics.weeklyAverage.views / 1000 * 7)
+                                : creator.totalViews && creator.totalPosts > 0
+                                  ? (() => {
+                                      const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
+                                      const weeklyViews = estimatedDailyViews * 7;
+                                      return formatEarnings(weeklyViews / 1000 * 0.25, weeklyViews / 1000 * 4);
+                                    })()
+                                  : '—'
+                              }
                             </td>
                           </>
                         )}
