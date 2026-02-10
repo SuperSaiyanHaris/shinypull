@@ -8,7 +8,7 @@ export default function Footer() {
   return (
     <footer className="bg-white border-t border-gray-100 mt-auto">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
@@ -76,15 +76,27 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Resources */}
           <div>
-            <h3 className="font-semibold mb-4 text-gray-900">Company</h3>
+            <h3 className="font-semibold mb-4 text-gray-900">Resources</h3>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link to="/blog" className="text-gray-500 hover:text-indigo-600 transition-colors">
                   Blog
                 </Link>
               </li>
+              <li>
+                <Link to="/gear" className="text-gray-500 hover:text-indigo-600 transition-colors">
+                  Gear
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="font-semibold mb-4 text-gray-900">Company</h3>
+            <ul className="space-y-3 text-sm">
               <li>
                 <Link to="/about" className="text-gray-500 hover:text-indigo-600 transition-colors">
                   About Us
