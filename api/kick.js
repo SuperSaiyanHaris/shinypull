@@ -1,8 +1,12 @@
 // Vercel Serverless Function for Kick API
 // Keeps client secret secure on server-side
 
+import { createClient } from '@supabase/supabase-js';
+
 const KICK_CLIENT_ID = process.env.KICK_CLIENT_ID;
 const KICK_CLIENT_SECRET = process.env.KICK_CLIENT_SECRET;
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
 const KICK_API_BASE = 'https://api.kick.com/public/v1';
 const KICK_AUTH_URL = 'https://id.kick.com/oauth/token';
@@ -97,15 +101,64 @@ async function getChannelBySlug(slug) {
 }
 
 async function searchChannels(query, maxResults = 25) {
-  // Kick API doesn't have a search endpoint, so we try to find by slug
-  // For search, we attempt a direct slug lookup
-  const slug = query.toLowerCase().replace(/[^a-z0-9_-]/g, '');
-
-  const channel = await getChannelBySlug(slug);
-  if (channel) {
-    return [channel];
+  // Kick API doesn't have a search endpoint, so we search our database
+  // for creators whose usernames contain the search term
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  
+  const searchTerm = query.toLowerCase().trim();
+  
+  // Search for creators in database with matching usernames
+  const { data: creators, error } = await supabase
+    .from('creators')
+    .select('*')
+    .eq('platform', 'kick')
+    .or(`username.ilike.%${searchTerm}%,display_name.ilike.%${searchTerm}%`)
+    .limit(maxResults);
+  
+  if (error) {
+    console.error('Database search error:', error);
+    return [];
   }
-  return [];
+  
+  if (!creators || creators.length === 0) {
+    return [];
+  }
+  
+  // Get latest stats for each creator
+  const creatorIds = creators.map(c => c.id);
+  const { data: stats } = await supabase
+    .from('creator_stats')
+    .select('*')
+    .in('creator_id', creatorIds)
+    .order('recorded_at', { ascending: false });
+  
+  // Map stats to creators (get latest for each)
+  const statsMap = new Map();
+  if (stats) {
+    for (const stat of stats) {
+      if (!statsMap.has(stat.creator_id)) {
+        statsMap.set(stat.creator_id, stat);
+      }
+    }
+  }
+  
+  // Transform to expected format
+  return creators.map(creator => {
+    const latestStats = statsMap.get(creator.id) || {};
+    return {
+      platform: 'kick',
+      platformId: creator.platform_id,
+      username: creator.username,
+      displayName: creator.display_name || creator.username,
+      profileImage: creator.profile_image,
+      description: creator.description || '',
+      category: creator.category,
+      subscribers: latestStats.subscribers || 0,
+      isLive: false, // We don't track live status in database
+      viewerCount: 0,
+      streamTitle: null,
+    };
+  });
 }
 
 async function getLiveStreams(slugs) {
