@@ -23,6 +23,7 @@ const staticPages = [
   { url: '/rankings', changefreq: 'daily', priority: 0.9 },
   { url: '/rankings/youtube', changefreq: 'daily', priority: 0.85 },
   { url: '/rankings/twitch', changefreq: 'daily', priority: 0.85 },
+  { url: '/rankings/kick', changefreq: 'daily', priority: 0.85 },
   { url: '/compare', changefreq: 'weekly', priority: 0.8 },
   { url: '/search', changefreq: 'weekly', priority: 0.7 },
   { url: '/about', changefreq: 'monthly', priority: 0.6 },
