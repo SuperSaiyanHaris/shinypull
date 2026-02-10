@@ -49,10 +49,29 @@ export default function Home() {
   useEffect(() => {
     getAllPosts().then(posts => setLatestPosts(posts.slice(0, 3)));
     getActiveProducts().then(products => {
-      // Prioritize products with badges, then take first 4
-      const withBadges = products.filter(p => p.badge);
-      const selected = withBadges.length >= 4 ? withBadges.slice(0, 4) : products.slice(0, 4);
-      setFeaturedProducts(selected);
+      // Daily rotation: shuffle products based on today's date
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      
+      // Simple hash function using date as seed
+      const hashWithSeed = (str, seed) => {
+        let hash = seed;
+        for (let i = 0; i < str.length; i++) {
+          hash = ((hash << 5) - hash) + str.charCodeAt(i);
+          hash = hash & hash; // Convert to 32-bit integer
+        }
+        return Math.abs(hash);
+      };
+      
+      const seed = hashWithSeed(today, 0);
+      
+      // Shuffle array deterministically based on daily seed
+      const shuffled = [...products].sort((a, b) => {
+        const hashA = hashWithSeed(a.id || a.slug, seed);
+        const hashB = hashWithSeed(b.id || b.slug, seed);
+        return hashA - hashB;
+      });
+      
+      setFeaturedProducts(shuffled.slice(0, 4));
     });
   }, []);
 
