@@ -138,8 +138,8 @@ export default function Gear() {
                 </div>
               </aside>
 
-              {/* Mobile Filter Button */}
-              <div className="lg:hidden fixed bottom-6 right-6 z-40">
+              {/* Mobile Filter Button - Bottom Left */}
+              <div className="lg:hidden fixed bottom-6 left-6 z-40">
                 <button
                   onClick={() => setMobileFiltersOpen(true)}
                   className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full shadow-lg transition-colors"
@@ -226,51 +226,51 @@ export default function Gear() {
                     <p className="text-gray-500 text-lg">No products in this category yet.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
                 {filtered.map(product => {
                   const affiliateLink = product.affiliate_link || product.affiliateLink;
                   const hasImage = product.image && product.image.trim() !== '';
 
                   return (
-                    <div key={product.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg hover:border-indigo-200 transition-all flex flex-col group">
+                    <div key={product.id} className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 hover:shadow-lg hover:border-indigo-200 transition-all flex flex-col group">
                       {/* Image */}
-                      <div className="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden mb-3">
+                      <div className="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden mb-2 sm:mb-3">
                         {hasImage ? (
                           <img
                             src={product.image}
                             alt={product.name}
                             loading="lazy"
-                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-contain p-1 sm:p-2 group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
-                            <ShoppingBag className="w-8 h-8 text-indigo-300" />
+                            <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-300" />
                           </div>
                         )}
                       </div>
 
                       {/* Badge */}
                       {product.badge && (
-                        <span className="inline-block self-start px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full mb-2">
+                        <span className="inline-block self-start px-1.5 sm:px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full mb-1 sm:mb-2">
                           {product.badge}
                         </span>
                       )}
 
                       {/* Name */}
-                      <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-1">
+                      <h3 className="text-xs sm:text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-1">
                         {product.name}
                       </h3>
 
-                      {/* Description */}
+                      {/* Description - Hidden on mobile */}
                       {product.description && (
-                        <p className="text-xs text-gray-500 line-clamp-2 mb-3">
+                        <p className="hidden sm:block text-xs text-gray-500 line-clamp-2 mb-3">
                           {product.description}
                         </p>
                       )}
 
                       {/* Price + Button */}
-                      <div className="flex items-center justify-between mt-auto pt-2">
-                        <p className="text-lg font-bold text-indigo-600">
+                      <div className="flex items-center justify-between mt-auto pt-1 sm:pt-2">
+                        <p className="text-base sm:text-lg font-bold text-indigo-600">
                           {product.price}
                         </p>
                         {affiliateLink ? (
@@ -278,13 +278,13 @@ export default function Gear() {
                             href={affiliateLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors"
                           >
                             Buy
-                            <ExternalLink className="w-3.5 h-3.5" />
+                            <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                           </a>
                         ) : (
-                          <span className="px-4 py-2 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg">
+                          <span className="px-2.5 py-1.5 sm:px-4 sm:py-2 bg-gray-100 text-gray-400 text-xs sm:text-sm font-medium rounded-lg">
                             Soon
                           </span>
                         )}
