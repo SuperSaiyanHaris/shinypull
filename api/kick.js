@@ -60,7 +60,7 @@ async function kickFetch(endpoint) {
 
 async function getChannelBySlug(slug) {
   // Get channel info by slug
-  const channelData = await kickFetch(`/channels?slug[]=${encodeURIComponent(slug)}`);
+  const channelData = await kickFetch(`/channels?slug=${encodeURIComponent(slug)}`);
   const channels = channelData.data || [];
 
   if (channels.length === 0) {
@@ -72,7 +72,7 @@ async function getChannelBySlug(slug) {
   // Get user info for profile picture
   let profileImage = channel.banner_picture || null;
   try {
-    const userData = await kickFetch(`/users?id[]=${channel.broadcaster_user_id}`);
+    const userData = await kickFetch(`/users?id=${channel.broadcaster_user_id}`);
     const users = userData.data || [];
     if (users.length > 0) {
       profileImage = users[0].profile_picture || profileImage;
@@ -120,7 +120,7 @@ async function getLiveStreams(slugs) {
 
   for (let i = 0; i < slugs.length; i += batchSize) {
     const batch = slugs.slice(i, i + batchSize);
-    const slugParams = batch.map(s => `slug[]=${encodeURIComponent(s)}`).join('&');
+    const slugParams = batch.map(s => `slug=${encodeURIComponent(s)}`).join('&');
 
     try {
       const channelData = await kickFetch(`/channels?${slugParams}`);

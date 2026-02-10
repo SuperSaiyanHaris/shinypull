@@ -146,7 +146,7 @@ async function seedKick() {
     console.log(`   Fetching batch ${Math.floor(i / 50) + 1}/${Math.ceil(uniqueSlugs.length / 50)}...`);
 
     try {
-      const slugParams = batch.map(s => `slug[]=${encodeURIComponent(s)}`).join('&');
+      const slugParams = batch.map(s => `slug=${encodeURIComponent(s)}`).join('&');
       const channelData = await kickFetch(`/channels?${slugParams}`);
       const channels = channelData.data || [];
 
@@ -155,7 +155,7 @@ async function seedKick() {
       let userMap = new Map();
       if (userIds.length > 0) {
         try {
-          const userParams = userIds.map(id => `id[]=${id}`).join('&');
+          const userParams = userIds.map(id => `id=${id}`).join('&');
           const userData = await kickFetch(`/users?${userParams}`);
           (userData.data || []).forEach(u => {
             userMap.set(u.user_id, u);

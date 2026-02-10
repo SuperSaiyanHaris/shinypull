@@ -169,7 +169,7 @@ async function getKickAccessToken() {
  */
 async function fetchKickChannelsBatch(slugs) {
   const token = await getKickAccessToken();
-  const slugParams = slugs.map(s => `slug[]=${encodeURIComponent(s)}`).join('&');
+  const slugParams = slugs.map(s => `slug=${encodeURIComponent(s)}`).join('&');
 
   const response = await fetch(`https://api.kick.com/public/v1/channels?${slugParams}`, {
     headers: { 'Authorization': `Bearer ${token}` },
