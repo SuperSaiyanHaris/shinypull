@@ -656,7 +656,7 @@ export default function CreatorProfile() {
             {/* Live Counter Link */}
             <Link
               to={`/live/${platform}/${creator.username}`}
-              className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:from-indigo-700 hover:to-purple-700 transition-all group\"
+              className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:from-indigo-700 hover:to-purple-700 transition-all group"
             >
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">

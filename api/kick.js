@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 const KICK_CLIENT_ID = process.env.KICK_CLIENT_ID;
 const KICK_CLIENT_SECRET = process.env.KICK_CLIENT_SECRET;
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY;
 
 const KICK_API_BASE = 'https://api.kick.com/public/v1';
 const KICK_AUTH_URL = 'https://id.kick.com/oauth/token';
@@ -260,8 +260,17 @@ async function getLiveStreams(slugs) {
 }
 
 export default async function handler(req, res) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Enable CORS - Allow production and localhost
+  const allowedOrigins = [
+    'https://shinypull.com',
+    'https://www.shinypull.com',
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
