@@ -49,7 +49,38 @@ export default function Home() {
   useEffect(() => {
     getAllPosts().then(posts => setLatestPosts(posts.slice(0, 3)));
     getActiveProducts().then(products => {
-      // Daily rotation: shuffle products based on today's date
+      // Categorize products (same logic as Gear page)
+      const categorizeProduct = (product) => {
+        const name = (product.name || '').toLowerCase();
+        const slug = (product.slug || '').toLowerCase();
+        
+        if (name.includes('microphone') || name.includes('mic ') || slug.includes('mic') || name.includes('sm7b') || name.includes('k669')) {
+          return 'microphones';
+        }
+        if (name.includes('camera') || name.includes('webcam') || slug.includes('cam') || name.includes('zv-1') || name.includes('zv1') || name.includes('kiyo')) {
+          return 'cameras';
+        }
+        if (name.includes('light') || name.includes('softbox') || name.includes('ring light') || slug.includes('light') || slug.includes('green-screen')) {
+          return 'lighting';
+        }
+        if (name.includes('audio interface') || name.includes('xlr') || name.includes('mixer') || name.includes('goxlr') || name.includes('rodecaster') || name.includes('cloudlifter') || name.includes('scarlett') || name.includes('beacn') || slug.includes('wave-xlr')) {
+          return 'audio';
+        }
+        if (name.includes('capture card') || name.includes('cam link') || slug.includes('hd60') || slug.includes('cam-link') || slug.includes('gamer-mini')) {
+          return 'capture';
+        }
+        return 'accessories';
+      };
+      
+      // Group products by category
+      const byCategory = {};
+      products.forEach(product => {
+        const category = categorizeProduct(product);
+        if (!byCategory[category]) byCategory[category] = [];
+        byCategory[category].push(product);
+      });
+      
+      // Daily rotation with category diversity
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
       
       // Simple hash function using date as seed
@@ -57,21 +88,32 @@ export default function Home() {
         let hash = seed;
         for (let i = 0; i < str.length; i++) {
           hash = ((hash << 5) - hash) + str.charCodeAt(i);
-          hash = hash & hash; // Convert to 32-bit integer
+          hash = hash & hash;
         }
         return Math.abs(hash);
       };
       
       const seed = hashWithSeed(today, 0);
       
-      // Shuffle array deterministically based on daily seed
-      const shuffled = [...products].sort((a, b) => {
-        const hashA = hashWithSeed(a.id || a.slug, seed);
-        const hashB = hashWithSeed(b.id || b.slug, seed);
-        return hashA - hashB;
+      // Get categories with products, shuffle them daily
+      const categories = Object.keys(byCategory).sort((a, b) => {
+        return hashWithSeed(a, seed) - hashWithSeed(b, seed);
       });
       
-      setFeaturedProducts(shuffled.slice(0, 4));
+      // Pick one product from each of the first 4 categories
+      const selected = [];
+      for (let i = 0; i < Math.min(4, categories.length); i++) {
+        const categoryProducts = byCategory[categories[i]];
+        // Shuffle products within category and pick first one
+        const shuffled = [...categoryProducts].sort((a, b) => {
+          const hashA = hashWithSeed(a.id || a.slug, seed);
+          const hashB = hashWithSeed(b.id || b.slug, seed);
+          return hashA - hashB;
+        });
+        selected.push(shuffled[0]);
+      }
+      
+      setFeaturedProducts(selected);
     });
   }, []);
 
