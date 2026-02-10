@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, ShoppingBag, Mic, Camera, Lightbulb, Headphones, Monitor, Package } from 'lucide-react';
+import { ExternalLink, ShoppingBag, Mic, Camera, Lightbulb, Headphones, Monitor, Package, Filter, X } from 'lucide-react';
 import SEO from '../components/SEO';
 import { getActiveProducts } from '../services/productsService';
 
@@ -40,6 +40,7 @@ export default function Gear() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
     getActiveProducts().then(data => {
@@ -95,59 +96,137 @@ export default function Gear() {
           <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-gray-50 to-transparent"></div>
         </section>
 
-        {/* Category Tabs */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 -mt-4 relative z-10">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {categories.map(cat => {
-                const Icon = cat.icon;
-                const count = cat.id === 'all' ? products.length : (categoryCounts[cat.id] || 0);
-                const isActive = activeCategory === cat.id;
-
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => setActiveCategory(cat.id)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                      isActive
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
-                        : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {cat.label}
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
-                    }`}>
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* Products Grid */}
+        {/* Category Tabs - Now Sidebar + Mobile Slide Panel */}
         <section className="w-full px-4 sm:px-6 lg:px-8 py-12">
-          <div className="max-w-6xl mx-auto">
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 animate-pulse">
-                    <div className="w-full aspect-square bg-gray-100 rounded-lg mb-3"></div>
-                    <div className="h-4 bg-gray-100 rounded mb-2 w-3/4"></div>
-                    <div className="h-6 bg-gray-100 rounded w-1/3"></div>
+          <div className="max-w-7xl mx-auto">
+            <div className="flex gap-8">
+              {/* Desktop Sidebar */}
+              <aside className="hidden lg:block w-64 flex-shrink-0">
+                <div className="sticky top-24">
+                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">
+                    Categories
+                  </h3>
+                  <nav className="space-y-1">
+                    {categories.map(cat => {
+                      const Icon = cat.icon;
+                      const count = cat.id === 'all' ? products.length : (categoryCounts[cat.id] || 0);
+                      const isActive = activeCategory === cat.id;
+
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => setActiveCategory(cat.id)}
+                          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                            isActive
+                              ? 'bg-indigo-600 text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Icon className="w-5 h-5" />
+                            <span>{cat.label}</span>
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                            isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                          }`}>
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </nav>
+                </div>
+              </aside>
+
+              {/* Mobile Filter Button */}
+              <div className="lg:hidden fixed bottom-6 right-6 z-40">
+                <button
+                  onClick={() => setMobileFiltersOpen(true)}
+                  className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full shadow-lg transition-colors"
+                >
+                  <Filter className="w-5 h-5" />
+                  Filters
+                </button>
+              </div>
+
+              {/* Mobile Slide Panel */}
+              {mobileFiltersOpen && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    className="lg:hidden fixed inset-0 bg-black/50 z-50 animate-fade-in"
+                    onClick={() => setMobileFiltersOpen(false)}
+                  />
+
+                  {/* Slide Panel */}
+                  <div className="lg:hidden fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl animate-slide-in-left overflow-y-auto">
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-bold text-gray-900">Filter by Category</h3>
+                        <button
+                          onClick={() => setMobileFiltersOpen(false)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <X className="w-5 h-5 text-gray-500" />
+                        </button>
+                      </div>
+
+                      <nav className="space-y-1">
+                        {categories.map(cat => {
+                          const Icon = cat.icon;
+                          const count = cat.id === 'all' ? products.length : (categoryCounts[cat.id] || 0);
+                          const isActive = activeCategory === cat.id;
+
+                          return (
+                            <button
+                              key={cat.id}
+                              onClick={() => {
+                                setActiveCategory(cat.id);
+                                setMobileFiltersOpen(false);
+                              }}
+                              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                                isActive
+                                  ? 'bg-indigo-600 text-white shadow-md'
+                                  : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Icon className="w-5 h-5" />
+                                <span>{cat.label}</span>
+                              </div>
+                              <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                                isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                              }`}>
+                                {count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </nav>
+                    </div>
                   </div>
-                ))}
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="text-center py-16">
-                <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg">No products in this category yet.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                </>
+              )}
+
+              {/* Products Grid */}
+              <div className="flex-1 min-w-0">
+                {loading ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 animate-pulse">
+                        <div className="w-full aspect-square bg-gray-100 rounded-lg mb-3"></div>
+                        <div className="h-4 bg-gray-100 rounded mb-2 w-3/4"></div>
+                        <div className="h-6 bg-gray-100 rounded w-1/3"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : filtered.length === 0 ? (
+                  <div className="text-center py-16">
+                    <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 text-lg">No products in this category yet.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {filtered.map(product => {
                   const affiliateLink = product.affiliate_link || product.affiliateLink;
                   const hasImage = product.image && product.image.trim() !== '';
@@ -214,8 +293,8 @@ export default function Gear() {
                   );
                 })}
               </div>
-            )}
-          </div>
+            )}              </div>
+            </div>          </div>
         </section>
 
         {/* Blog Posts CTA */}
