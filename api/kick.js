@@ -101,13 +101,13 @@ async function getChannelBySlug(slug) {
 }
 
 async function searchChannels(query, maxResults = 25) {
-  // Kick API doesn't have a search endpoint, so we search our database
-  // for creators whose usernames contain the search term
+  // Kick API doesn't have a search endpoint, so we search our database first
+  // If nothing found, fallback to direct API lookup by slug
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
   
   const searchTerm = query.toLowerCase().trim();
   
-  // Search for creators in database with matching usernames
+  // Step 1: Search for creators in database with matching usernames
   const { data: creators, error } = await supabase
     .from('creators')
     .select('*')
@@ -117,48 +117,107 @@ async function searchChannels(query, maxResults = 25) {
   
   if (error) {
     console.error('Database search error:', error);
-    return [];
+    // Don't return early, try API fallback
   }
   
-  if (!creators || creators.length === 0) {
-    return [];
-  }
-  
-  // Get latest stats for each creator
-  const creatorIds = creators.map(c => c.id);
-  const { data: stats } = await supabase
-    .from('creator_stats')
-    .select('*')
-    .in('creator_id', creatorIds)
-    .order('recorded_at', { ascending: false });
-  
-  // Map stats to creators (get latest for each)
-  const statsMap = new Map();
-  if (stats) {
-    for (const stat of stats) {
-      if (!statsMap.has(stat.creator_id)) {
-        statsMap.set(stat.creator_id, stat);
+  // Step 2: If database returned results, use them
+  if (creators && creators.length > 0) {
+    // Get latest stats for each creator
+    const creatorIds = creators.map(c => c.id);
+    const { data: stats } = await supabase
+      .from('creator_stats')
+      .select('*')
+      .in('creator_id', creatorIds)
+      .order('recorded_at', { ascending: false });
+    
+    // Map stats to creators (get latest for each)
+    const statsMap = new Map();
+    if (stats) {
+      for (const stat of stats) {
+        if (!statsMap.has(stat.creator_id)) {
+          statsMap.set(stat.creator_id, stat);
+        }
       }
     }
+    
+    // Transform to expected format
+    return creators.map(creator => {
+      const latestStats = statsMap.get(creator.id) || {};
+      return {
+        platform: 'kick',
+        platformId: creator.platform_id,
+        username: creator.username,
+        displayName: creator.display_name || creator.username,
+        profileImage: creator.profile_image,
+        description: creator.description || '',
+        category: creator.category,
+        subscribers: latestStats.subscribers || 0,
+        isLive: false, // We don't track live status in database
+        viewerCount: 0,
+        streamTitle: null,
+      };
+    });
   }
   
-  // Transform to expected format
-  return creators.map(creator => {
-    const latestStats = statsMap.get(creator.id) || {};
-    return {
-      platform: 'kick',
-      platformId: creator.platform_id,
-      username: creator.username,
-      displayName: creator.display_name || creator.username,
-      profileImage: creator.profile_image,
-      description: creator.description || '',
-      category: creator.category,
-      subscribers: latestStats.subscribers || 0,
-      isLive: false, // We don't track live status in database
-      viewerCount: 0,
-      streamTitle: null,
-    };
-  });
+  // Step 3: No database results - try Kick API as fallback (treat query as exact slug)
+  try {
+    const slug = searchTerm.replace(/[^a-z0-9_-]/g, '');
+    if (!slug) return [];
+    
+    const channel = await getChannelBySlug(slug);
+    if (channel) {
+      // Optionally save to database for future searches
+      try {
+        const { data: existingCreator } = await supabase
+          .from('creators')
+          .select('id')
+          .eq('platform', 'kick')
+          .eq('platform_id', channel.platformId)
+          .single();
+        
+        if (!existingCreator) {
+          // Add to database
+          const { data: newCreator } = await supabase
+            .from('creators')
+            .insert({
+              platform: channel.platform,
+              platform_id: channel.platformId,
+              username: channel.username,
+              display_name: channel.displayName,
+              profile_image: channel.profileImage,
+              description: channel.description,
+              category: channel.category,
+              updated_at: new Date().toISOString(),
+            })
+            .select()
+            .single();
+          
+          // Add initial stats
+          if (newCreator) {
+            await supabase
+              .from('creator_stats')
+              .insert({
+                creator_id: newCreator.id,
+                recorded_at: new Date().toISOString().split('T')[0],
+                subscribers: channel.subscribers,
+                followers: channel.subscribers,
+                total_views: 0,
+                total_posts: 0,
+              });
+          }
+        }
+      } catch (dbError) {
+        // Continue even if database save fails
+        console.error('Failed to save discovered creator:', dbError);
+      }
+      
+      return [channel];
+    }
+  } catch (apiError) {
+    console.error('Kick API fallback error:', apiError);
+  }
+  
+  return [];
 }
 
 async function getLiveStreams(slugs) {
