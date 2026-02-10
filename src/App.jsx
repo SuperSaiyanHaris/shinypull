@@ -22,6 +22,7 @@ import BlogPost from './pages/BlogPost';
 import BlogAdmin from './pages/BlogAdmin';
 import ResetPassword from './pages/ResetPassword';
 import Calculator from './pages/Calculator';
+import Gear from './pages/Gear';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
             <Route path="/rankings/:platform" element={<Rankings />} />
             <Route path="/compare" element={<Compare />} />
             <Route path="/youtube/money-calculator" element={<Calculator />} />
+            <Route path="/gear" element={<Gear />} />
             <Route path="/live/:platform/:username" element={<LiveCount />} />
             <Route path="/:platform/:username" element={<CreatorProfile />} />
             <Route path="/auth" element={<Auth />} />

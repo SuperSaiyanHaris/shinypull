@@ -1,0 +1,241 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ExternalLink, ShoppingBag, Mic, Camera, Lightbulb, Headphones, Monitor, Package } from 'lucide-react';
+import SEO from '../components/SEO';
+import { getActiveProducts } from '../services/productsService';
+
+const categories = [
+  { id: 'all', label: 'All Gear', icon: ShoppingBag },
+  { id: 'microphones', label: 'Microphones', icon: Mic },
+  { id: 'cameras', label: 'Cameras', icon: Camera },
+  { id: 'lighting', label: 'Lighting', icon: Lightbulb },
+  { id: 'audio', label: 'Audio & Mixers', icon: Headphones },
+  { id: 'capture', label: 'Capture Cards', icon: Monitor },
+  { id: 'accessories', label: 'Accessories', icon: Package },
+];
+
+function categorizeProduct(product) {
+  const name = (product.name || '').toLowerCase();
+  const slug = (product.slug || '').toLowerCase();
+
+  if (name.includes('microphone') || name.includes('mic ') || slug.includes('mic') || name.includes('sm7b') || name.includes('k669')) {
+    return 'microphones';
+  }
+  if (name.includes('camera') || name.includes('webcam') || slug.includes('cam') || name.includes('zv-1') || name.includes('zv1') || name.includes('kiyo')) {
+    return 'cameras';
+  }
+  if (name.includes('light') || name.includes('softbox') || name.includes('ring light') || slug.includes('light') || slug.includes('green-screen')) {
+    return 'lighting';
+  }
+  if (name.includes('audio interface') || name.includes('xlr') || name.includes('mixer') || name.includes('goxlr') || name.includes('rodecaster') || name.includes('cloudlifter') || name.includes('scarlett') || name.includes('beacn') || slug.includes('wave-xlr')) {
+    return 'audio';
+  }
+  if (name.includes('capture card') || name.includes('cam link') || slug.includes('hd60') || slug.includes('cam-link') || slug.includes('gamer-mini')) {
+    return 'capture';
+  }
+  return 'accessories';
+}
+
+export default function Gear() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('all');
+
+  useEffect(() => {
+    getActiveProducts().then(data => {
+      setProducts(data);
+      setLoading(false);
+    });
+  }, []);
+
+  const filtered = activeCategory === 'all'
+    ? products
+    : products.filter(p => categorizeProduct(p) === activeCategory);
+
+  const categoryCounts = {};
+  products.forEach(p => {
+    const cat = categorizeProduct(p);
+    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+  });
+
+  return (
+    <>
+      <SEO
+        title="Recommended Streaming Gear"
+        description="The best streaming equipment for YouTube, Twitch, and Kick creators. Microphones, cameras, lighting, audio interfaces, and accessories hand-picked by the ShinyPull team."
+        keywords="best streaming gear, streaming setup, streaming microphone, streaming camera, streaming lights, capture card, audio interface, streamer equipment 2026"
+      />
+
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        {/* Hero */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          </div>
+
+          <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-16 sm:pb-20">
+            <div className="text-center max-w-4xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-sm font-medium text-indigo-300 mb-6">
+                <ShoppingBag className="w-4 h-4" />
+                Hand-picked by the ShinyPull team
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
+                Recommended Streaming{' '}
+                <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                  Gear
+                </span>
+              </h1>
+              <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                The best equipment for YouTube, Twitch, and Kick creators at every budget. We use and recommend these products.
+              </p>
+            </div>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-gray-50 to-transparent"></div>
+        </section>
+
+        {/* Category Tabs */}
+        <section className="w-full px-4 sm:px-6 lg:px-8 -mt-4 relative z-10">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {categories.map(cat => {
+                const Icon = cat.icon;
+                const count = cat.id === 'all' ? products.length : (categoryCounts[cat.id] || 0);
+                const isActive = activeCategory === cat.id;
+
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
+                      isActive
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
+                        : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {cat.label}
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Products Grid */}
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-12">
+          <div className="max-w-6xl mx-auto">
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 animate-pulse">
+                    <div className="w-full aspect-square bg-gray-100 rounded-lg mb-3"></div>
+                    <div className="h-4 bg-gray-100 rounded mb-2 w-3/4"></div>
+                    <div className="h-6 bg-gray-100 rounded w-1/3"></div>
+                  </div>
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="text-center py-16">
+                <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 text-lg">No products in this category yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {filtered.map(product => {
+                  const affiliateLink = product.affiliate_link || product.affiliateLink;
+                  const hasImage = product.image && product.image.trim() !== '';
+
+                  return (
+                    <div key={product.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg hover:border-indigo-200 transition-all flex flex-col group">
+                      {/* Image */}
+                      <div className="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden mb-3">
+                        {hasImage ? (
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            loading="lazy"
+                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                            <ShoppingBag className="w-8 h-8 text-indigo-300" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Badge */}
+                      {product.badge && (
+                        <span className="inline-block self-start px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full mb-2">
+                          {product.badge}
+                        </span>
+                      )}
+
+                      {/* Name */}
+                      <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-1">
+                        {product.name}
+                      </h3>
+
+                      {/* Description */}
+                      {product.description && (
+                        <p className="text-xs text-gray-500 line-clamp-2 mb-3">
+                          {product.description}
+                        </p>
+                      )}
+
+                      {/* Price + Button */}
+                      <div className="flex items-center justify-between mt-auto pt-2">
+                        <p className="text-lg font-bold text-indigo-600">
+                          {product.price}
+                        </p>
+                        {affiliateLink ? (
+                          <a
+                            href={affiliateLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+                          >
+                            Buy
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        ) : (
+                          <span className="px-4 py-2 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg">
+                            Soon
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Blog Posts CTA */}
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-white border-t border-gray-100">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+              Need help choosing?
+            </h2>
+            <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
+              Check out our in-depth gear guides and comparison articles to find the perfect setup for your budget.
+            </p>
+            <Link
+              to="/blog"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-500/20"
+            >
+              Read Our Gear Guides
+            </Link>
+          </div>
+        </section>
+      </div>
+    </>
+  );
+}

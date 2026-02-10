@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign } from 'lucide-react';
+import { Search, Youtube, Twitch, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, ShoppingBag, ExternalLink } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { getAllPosts } from '../services/blogService';
+import { getActiveProducts } from '../services/productsService';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-600', stats: '72M+ channels', available: true },
@@ -42,10 +43,17 @@ const features = [
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [latestPosts, setLatestPosts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     getAllPosts().then(posts => setLatestPosts(posts.slice(0, 3)));
+    getActiveProducts().then(products => {
+      // Prioritize products with badges, then take first 4
+      const withBadges = products.filter(p => p.badge);
+      const selected = withBadges.length >= 4 ? withBadges.slice(0, 4) : products.slice(0, 4);
+      setFeaturedProducts(selected);
+    });
   }, []);
 
   const handleSearch = (e) => {
@@ -230,6 +238,86 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Recommended Gear */}
+        {featuredProducts.length > 0 && (
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-24 bg-white">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex items-center justify-between mb-12">
+                <div>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                    Recommended Gear
+                  </h2>
+                  <p className="text-lg text-gray-600">
+                    Top picks for streamers and content creators
+                  </p>
+                </div>
+                <Link
+                  to="/gear"
+                  className="hidden sm:flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+                >
+                  View all gear <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+                {featuredProducts.map(product => {
+                  const affiliateLink = product.affiliate_link || product.affiliateLink;
+                  const hasImage = product.image && product.image.trim() !== '';
+
+                  return (
+                    <div key={product.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg hover:border-indigo-200 transition-all flex flex-col group">
+                      <div className="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden mb-3">
+                        {hasImage ? (
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            loading="lazy"
+                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                            <ShoppingBag className="w-8 h-8 text-indigo-300" />
+                          </div>
+                        )}
+                      </div>
+                      {product.badge && (
+                        <span className="inline-block self-start px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full mb-2">
+                          {product.badge}
+                        </span>
+                      )}
+                      <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-2">
+                        {product.name}
+                      </h3>
+                      <div className="flex items-center justify-between mt-auto">
+                        <p className="text-lg font-bold text-indigo-600">{product.price}</p>
+                        {affiliateLink ? (
+                          <a
+                            href={affiliateLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+                          >
+                            Buy <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ) : (
+                          <span className="px-3 py-1.5 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg">Soon</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <Link
+                to="/gear"
+                className="mt-8 flex sm:hidden items-center justify-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+              >
+                View all gear <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* Latest Blog Posts */}
         {latestPosts.length > 0 && (

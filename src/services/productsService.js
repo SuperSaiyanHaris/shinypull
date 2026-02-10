@@ -21,6 +21,24 @@ export async function getProduct(slug) {
 }
 
 /**
+ * Get all active products (for public pages like /gear)
+ */
+export async function getActiveProducts() {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('is_active', true)
+    .order('name');
+
+  if (error) {
+    logger.error('Error fetching active products:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+/**
  * Get all products (for admin)
  */
 export async function getAllProducts() {

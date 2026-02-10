@@ -21,7 +21,8 @@
     "generate:sitemap": "node scripts/generateSitemap.js",
     "discover:youtube": "node scripts/discoverYouTubeCreators.js",
     "discover:twitch": "node scripts/discoverTwitchCreators.js",
-    "discover:kick": "node scripts/discoverKickCreators.js"
+    "discover:kick": "node scripts/discoverKickCreators.js",
+    "seed:gear-blog": "node scripts/seedGearBlogPosts.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",
