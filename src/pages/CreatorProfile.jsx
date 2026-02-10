@@ -576,12 +576,32 @@ export default function CreatorProfile() {
                     <SummaryCard
                       label="Monthly Est."
                       sublabel="Based on avg CPM"
-                      value={metrics ? formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7) : '--'}
+                      value={metrics && metrics.last30Days.views > 0
+                        ? formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)
+                        : creator.totalViews && creator.createdAt
+                          ? (() => {
+                              // Calculate monthly average from lifetime views
+                              const channelAgeMonths = Math.max(1, Math.floor((Date.now() - new Date(creator.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 30)));
+                              const avgMonthlyViews = Math.floor(creator.totalViews / channelAgeMonths);
+                              return formatEarnings(avgMonthlyViews / 1000 * 2, avgMonthlyViews / 1000 * 7);
+                            })()
+                          : '--'
+                      }
                     />
                     <SummaryCard
                       label="Yearly Est."
                       sublabel="Based on avg CPM"
-                      value={metrics ? formatEarnings(metrics.last30Days.views / 1000 * 2 * 12, metrics.last30Days.views / 1000 * 7 * 12) : '--'}
+                      value={metrics && metrics.last30Days.views > 0
+                        ? formatEarnings(metrics.last30Days.views / 1000 * 2 * 12, metrics.last30Days.views / 1000 * 7 * 12)
+                        : creator.totalViews && creator.createdAt
+                          ? (() => {
+                              // Calculate yearly average from lifetime views
+                              const channelAgeYears = Math.max(1, (Date.now() - new Date(creator.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365));
+                              const avgYearlyViews = Math.floor(creator.totalViews / channelAgeYears);
+                              return formatEarnings(avgYearlyViews / 1000 * 2, avgYearlyViews / 1000 * 7);
+                            })()
+                          : '--'
+                      }
                     />
                   </>
                 ) : platform === 'twitch' ? (
