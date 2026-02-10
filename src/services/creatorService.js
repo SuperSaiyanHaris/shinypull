@@ -245,6 +245,9 @@ export const getRankedCreators = withErrorHandling(
           if (platform === 'youtube') {
             // For YouTube, use view growth
             calculatedGrowth = (newestStat?.total_views || 0) - (oldestStat?.total_views || 0);
+          } else if (platform === 'kick') {
+            // For Kick, use paid subscriber growth (followers field stores paid subs for Kick)
+            calculatedGrowth = (newestStat?.subscribers || newestStat?.followers || 0) - (oldestStat?.subscribers || oldestStat?.followers || 0);
           } else {
             // For Twitch, use watch hours growth
             calculatedGrowth = (newestStat?.hours_watched_month || 0) - (oldestStat?.hours_watched_month || 0);

@@ -27,7 +27,8 @@ export default function Rankings() {
 
   const rankTypes = [
     { id: 'subscribers', name: selectedPlatform === 'twitch' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
-    { id: 'views', name: 'Most Views', icon: Eye },
+    // Hide views for Kick since API doesn't provide view data
+    ...(selectedPlatform !== 'kick' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
     { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
   ];
 
@@ -141,9 +142,9 @@ export default function Rankings() {
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-500 uppercase tracking-wider">
               <div className="col-span-1">Rank</div>
-              <div className="col-span-5">Creator</div>
+              <div className={selectedPlatform === 'kick' ? 'col-span-7' : 'col-span-5'}>Creator</div>
               <div className="col-span-2 text-right">{followerLabel}</div>
-              <div className="col-span-2 text-right">Views</div>
+              {selectedPlatform !== 'kick' && <div className="col-span-2 text-right">Views</div>}
               <div className="col-span-2 text-right flex items-center justify-end gap-1 group">
                 <span>30-Day Growth</span>
                 <div className="relative">
@@ -151,6 +152,8 @@ export default function Rankings() {
                   <div className="absolute right-0 top-6 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none">
                     {selectedPlatform === 'youtube' 
                       ? 'YouTube growth based on total views' 
+                      : selectedPlatform === 'kick'
+                      ? 'Kick growth based on paid subscribers'
                       : 'Twitch growth based on watch hours'}
                   </div>
                 </div>
@@ -209,7 +212,7 @@ export default function Rankings() {
                 </div>
 
                 {/* Creator Info */}
-                <div className="col-span-10 md:col-span-5 flex items-center gap-3 min-w-0">
+                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' ? 'md:col-span-7' : 'md:col-span-5'}`}>
                   <img
                     src={creator.profile_image || '/placeholder-avatar.svg'}
                     alt={creator.display_name}
@@ -231,9 +234,11 @@ export default function Rankings() {
                 <div className="hidden md:block col-span-2 text-right">
                   <span className="font-semibold text-gray-900">{formatNumber(creator.subscribers)}</span>
                 </div>
-                <div className="hidden md:block col-span-2 text-right">
-                  <span className="text-gray-600">{formatNumber(creator.totalViews)}</span>
-                </div>
+                {selectedPlatform !== 'kick' && (
+                  <div className="hidden md:block col-span-2 text-right">
+                    <span className="text-gray-600">{formatNumber(creator.totalViews)}</span>
+                  </div>
+                )}
                 <div className="hidden md:block col-span-2 text-right">
                   <span className={`font-medium ${creator.growth30d > 0 ? 'text-emerald-600' : creator.growth30d < 0 ? 'text-red-500' : 'text-gray-400'}`}>
                     {creator.growth30d > 0 ? '+' : ''}{formatNumber(creator.growth30d)}
@@ -245,9 +250,11 @@ export default function Rankings() {
                   <span className="text-gray-500">
                     <span className="font-medium text-gray-900">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
                   </span>
-                  <span className="text-gray-500">
-                    <span className="font-medium text-gray-900">{formatNumber(creator.totalViews)}</span> views
-                  </span>
+                  {selectedPlatform !== 'kick' && (
+                    <span className="text-gray-500">
+                      <span className="font-medium text-gray-900">{formatNumber(creator.totalViews)}</span> views
+                    </span>
+                  )}
                 </div>
               </Link>
             ))}
