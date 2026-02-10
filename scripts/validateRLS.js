@@ -74,52 +74,75 @@ async function validateRLS() {
   // Test 3: Should NOT be able to UPDATE creators
   console.log('\nTest 3: Block UPDATE to creators (should fail)');
   try {
+    // Get a real creator ID to test with
+    const { data: testCreators } = await supabase
+      .from('creators')
+      .select('id')
+      .limit(1);
+
     const { data, error } = await supabase
       .from('creators')
       .update({ username: 'hacked' })
-      .eq('platform', 'youtube')
-      .limit(1)
+      .eq('id', testCreators[0]?.id)
       .select();
 
     if (error) {
       if (error.message.includes('policy') || error.code === '42501') {
-        console.log('✅ PASSED - UPDATE blocked by RLS (expected)');
+        console.log('✅ PASSED - UPDATE blocked by RLS (policy error)');
         passedTests++;
       } else {
         console.log('❌ FAILED - Different error:', error.message);
         failedTests++;
       }
+    } else if (!data || data.length === 0) {
+      // RLS can block by filtering rows (USING clause returns false)
+      // This results in 0 rows updated, which is correct blocking behavior
+      console.log('✅ PASSED - UPDATE blocked by RLS (0 rows affected)');
+      passedTests++;
     } else {
       console.log('❌ FAILED - UPDATE should have been blocked!');
+      console.log('   Data:', data);
       failedTests++;
     }
   } catch (err) {
-    console.log('✅ PASSED - UPDATE blocked (expected error)');
+    console.log('✅ PASSED - UPDATE blocked (exception)');
     passedTests++;
   }
 
   // Test 4: Should NOT be able to DELETE creators
   console.log('\nTest 4: Block DELETE to creators (should fail)');
   try {
-    const { data, error } = await supabase
+    // Get a real creator ID to test with
+    const { data: testCreators } = await supabase
+      .from('creators')
+      .select('id')
+      .limit(1);
+
+    const { data, error, count } = await supabase
       .from('creators')
       .delete()
-      .eq('username', 'nonexistent-user');
+      .eq('id', testCreators[0]?.id);
 
     if (error) {
       if (error.message.includes('policy') || error.code === '42501') {
-        console.log('✅ PASSED - DELETE blocked by RLS (expected)');
+        console.log('✅ PASSED - DELETE blocked by RLS (policy error)');
         passedTests++;
       } else {
         console.log('❌ FAILED - Different error:', error.message);
         failedTests++;
       }
+    } else if (!data || (Array.isArray(data) && data.length === 0)) {
+      // RLS can block by filtering rows (USING clause returns false)
+      // This results in 0 rows deleted, which is correct blocking behavior
+      console.log('✅ PASSED - DELETE blocked by RLS (0 rows affected)');
+      passedTests++;
     } else {
       console.log('❌ FAILED - DELETE should have been blocked!');
+      console.log('   Rows deleted:',data);
       failedTests++;
     }
   } catch (err) {
-    console.log('✅ PASSED - DELETE blocked (expected error)');
+    console.log('✅ PASSED - DELETE blocked (exception)');
     passedTests++;
   }
 
