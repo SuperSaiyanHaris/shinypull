@@ -1,13 +1,11 @@
 /**
  * Custom Kick platform icon
- * Kick doesn't have a lucide-react icon, so we use a custom SVG based on their official logo
+ * Kick doesn't have a lucide-react icon, so we use a custom SVG
  */
 export default function KickIcon({ className }) {
   return (
-    <svg className={className} viewBox="0 0 200 200" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-      <path d="M45 30h25v50l20-25h30l-28 35 28 40h-30l-20-25v50H45V30z"/>
-      <path d="M135 30h30v30h-30V30z"/>
-      <path d="M135 75h30v95h-30V75z"/>
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <path stroke="currentColor" strokeLinejoin="round" d="M2.86957 1.5h6.84782v4.56522H12V3.78261h2.2826V1.5h6.8478v6.84783h-2.2826v2.28257h-2.2826v2.7392h2.2826v2.2826h2.2826V22.5h-6.8478v-2.2826H12v-2.2826H9.71739V22.5H2.86957v-21Z" strokeWidth="1"></path>
     </svg>
   );
 }
