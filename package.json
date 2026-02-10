@@ -20,7 +20,8 @@
     "validate:data": "node scripts/validateData.js",
     "generate:sitemap": "node scripts/generateSitemap.js",
     "discover:youtube": "node scripts/discoverYouTubeCreators.js",
-    "discover:twitch": "node scripts/discoverTwitchCreators.js"
+    "discover:twitch": "node scripts/discoverTwitchCreators.js",
+    "discover:kick": "node scripts/discoverKickCreators.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",

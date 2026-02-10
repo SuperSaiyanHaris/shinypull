@@ -38,6 +38,14 @@ jobs:
           VITE_TWITCH_CLIENT_SECRET: ${{ secrets.VITE_TWITCH_CLIENT_SECRET }}
         run: node scripts/discoverTwitchCreators.js
 
+      - name: Discover Kick creators
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          KICK_CLIENT_ID: ${{ secrets.KICK_CLIENT_ID }}
+          KICK_CLIENT_SECRET: ${{ secrets.KICK_CLIENT_SECRET }}
+        run: node scripts/discoverKickCreators.js
+
       - name: Report completion
         if: success()
         run: echo "✅ Creator discovery completed successfully"
