@@ -4,9 +4,9 @@
 
 ## Project Overview
 
-ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube and Twitch.
+ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube, Twitch, and Kick.
 
-**Status:** YouTube and Twitch integrations fully working. Live subscriber/follower counts, historical charts, and automated data collection operational.
+**Status:** YouTube, Twitch, and Kick integrations fully working. Live subscriber/follower counts, historical charts, and automated data collection operational.
 
 ## Critical Rules
 
@@ -34,7 +34,7 @@ ShinyPull is a social media analytics platform (similar to SocialBlade) that tra
 - **Database:** Supabase (PostgreSQL)
 - **Hosting:** Vercel (auto-deploys on push to main)
 - **Icons:** Lucide React
-- **APIs:** YouTube Data API v3, Twitch Helix API
+- **APIs:** YouTube Data API v3, Twitch Helix API, Kick API v1
 
 ## Project Structure
 
@@ -45,6 +45,7 @@ src/
 │   ├── Footer.jsx        # Site footer
 │   ├── SEO.jsx           # Meta tags for pages
 │   ├── Odometer.jsx      # Animated number counter
+│   ├── KickIcon.jsx      # Custom Kick platform SVG icon
 │   ├── ProductCard.jsx   # Full-size affiliate product card
 │   └── MiniProductCard.jsx # Compact product card + grid
 ├── pages/
@@ -65,6 +66,7 @@ src/
 ├── services/
 │   ├── youtubeService.js # YouTube Data API integration
 │   ├── twitchService.js  # Twitch Helix API integration
+│   ├── kickService.js    # Kick API integration
 │   ├── creatorService.js # Supabase CRUD operations
 │   ├── blogService.js    # Blog posts CRUD
 │   ├── blogAdminService.js # Blog admin operations
@@ -79,12 +81,19 @@ src/
 scripts/
 ├── collectDailyStats.js      # Daily stats collection (runs 3x daily)
 ├── monitorTwitchStreams.js   # Twitch stream monitoring (every 5 min)
-├── aggregateHoursWatched.js  # Calculate Twitch hours watched
+├── monitorKickStreams.js     # Kick stream monitoring (every 5 min)
+├── aggregateHoursWatched.js  # Calculate Twitch/Kick hours watched
 ├── seedTopCreators.js        # Seed top 50 creators
 ├── seedTopCreatorsExpanded.js # Seed 200+ creators
+├── seedTopKickCreators.js    # Seed top Kick creators
 ├── seedBlogPosts.js          # Seed initial blog posts
 ├── seedProducts.js           # Seed affiliate products
 └── updateBlogPost.js         # Update blog post content from temp files
+
+api/                              # Vercel serverless functions
+├── twitch.js                 # Twitch API proxy (keeps secrets server-side)
+├── kick.js                   # Kick API proxy (keeps secrets server-side)
+└── admin.js                  # Admin verification endpoint
 ```
 
 ## Routes
@@ -127,16 +136,26 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
 - We track **Hours Watched** instead (industry standard)
 - Follower counts are accurate
 
+**Kick:**
+- No follower count endpoint in API — only `active_subscribers_count` (paid subs)
+- `subscribers` field stores paid subscriber count (not free followers)
+- Live stream status available via `/channels` endpoint (`stream.is_live`)
+- Uses OAuth2 Client Credentials flow (same pattern as Twitch)
+- Batch up to 50 slugs per request
+- Custom `KickIcon` SVG component (no lucide-react icon available)
+
 ## Commands
 
 ```bash
 npm run dev                    # Dev server on port 3000
 npm run build                  # Production build
 npm run seed:top-creators      # Seed top creators
+npm run seed:kick              # Seed top Kick creators
 npm run seed:blog              # Seed blog posts
 npm run seed:products          # Seed affiliate products
-npm run collect:daily          # Collect daily stats
+npm run collect:daily          # Collect daily stats (YouTube, Twitch, Kick)
 npm run monitor:twitch         # Monitor Twitch streams
+npm run monitor:kick           # Monitor Kick streams
 npm run aggregate:hours-watched # Aggregate hours watched
 ```
 
@@ -149,14 +168,17 @@ VITE_SUPABASE_ANON_KEY=<key>
 VITE_YOUTUBE_API_KEY=<key>
 VITE_TWITCH_CLIENT_ID=<key>
 TWITCH_CLIENT_SECRET=<key>
+KICK_CLIENT_ID=<key>
+KICK_CLIENT_SECRET=<key>
 ```
 
 Scripts use `dotenv` to load `.env` automatically.
 
 ## GitHub Actions
 
-- **Daily Stats Collection:** Runs 3x daily (6 AM, 2 PM, 10 PM UTC)
+- **Daily Stats Collection:** Runs 3x daily (6 AM, 2 PM, 10 PM UTC) — collects YouTube, Twitch, and Kick
 - **Twitch Stream Monitor:** Runs every 5 minutes
+- **Kick Stream Monitor:** Runs every 5 minutes
 
 ## Conventions
 
@@ -201,10 +223,10 @@ All search interfaces (Home, Search, Compare) follow this pattern:
 - Responsive button width: `w-full sm:w-auto sm:min-w-[200px]`
 - Full width on mobile, auto-sized on desktop (min 200px)
 
-## Twitch-Specific Features
+## Twitch & Kick Stream Features
 
 **Hours Watched Tracking:**
-- Primary metric for Twitch (view_count deprecated in 2022)
+- Primary metric for Twitch and Kick
 - Tracked via `stream_sessions` table with start/end times
 - `viewer_samples` table stores viewer count every 5 minutes
 - Aggregated daily/weekly/monthly via `aggregateHoursWatched.js`

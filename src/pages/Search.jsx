@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Search as SearchIcon, Youtube, Twitch, Instagram, User, AlertCircle, ArrowRight } from 'lucide-react';
+import KickIcon from '../components/KickIcon';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
+import { searchChannels as searchKick } from '../services/kickService';
 import { upsertCreator, saveCreatorStats } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
@@ -12,12 +14,14 @@ import logger from '../lib/logger';
 const platformIcons = {
   youtube: Youtube,
   twitch: Twitch,
+  kick: KickIcon,
   instagram: Instagram,
 };
 
 const platformColors = {
   youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
+  kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
   instagram: { bg: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', light: 'bg-purple-50', text: 'text-purple-600' },
   tiktok: { bg: 'bg-pink-500', light: 'bg-pink-50', text: 'text-pink-500' },
 };
@@ -25,6 +29,7 @@ const platformColors = {
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, available: true },
+  { id: 'kick', name: 'Kick', icon: KickIcon, available: true },
   { id: 'tiktok', name: 'TikTok', icon: null, available: false },
   { id: 'instagram', name: 'Instagram', icon: Instagram, available: false },
 ];
@@ -71,6 +76,8 @@ export default function Search() {
         }
       } else if (selectedPlatform === 'twitch') {
         channels = await searchTwitch(searchQuery, 25);
+      } else if (selectedPlatform === 'kick') {
+        channels = await searchKick(searchQuery, 25);
       }
       setResults(channels);
     } catch (err) {
@@ -255,7 +262,7 @@ export default function Search() {
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-gray-900 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
-                        <p className="text-xs sm:text-sm text-gray-500">{creator.platform === 'twitch' ? 'followers' : 'subscribers'}</p>
+                        <p className="text-xs sm:text-sm text-gray-500">{creator.platform === 'twitch' ? 'followers' : creator.platform === 'kick' ? 'paid subs' : 'subscribers'}</p>
                       </div>
                       <ArrowRight className="hidden sm:block w-5 h-5 text-gray-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
                     </Link>

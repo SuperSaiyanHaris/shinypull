@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Search, Youtube, Twitch, Instagram, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign } from 'lucide-react';
+import KickIcon from '../components/KickIcon';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
@@ -8,6 +9,7 @@ import { getAllPosts } from '../services/blogService';
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-600', stats: '72M+ channels', available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50', textColor: 'text-purple-600', stats: '7M+ channels', available: true },
+  { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50', textColor: 'text-green-600', stats: 'New!', available: true },
   { id: 'tiktok', name: 'TikTok', icon: null, color: 'from-pink-500 to-pink-600', bgColor: 'bg-pink-50', textColor: 'text-pink-600', stats: 'Coming Soon', available: false },
   { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'from-purple-500 to-orange-500', bgColor: 'bg-gradient-to-br from-purple-50 to-orange-50', textColor: 'text-purple-600', stats: 'Coming Soon', available: false },
 ];

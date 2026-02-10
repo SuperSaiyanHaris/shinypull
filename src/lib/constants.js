@@ -112,6 +112,7 @@ export const BLOG_CATEGORIES = [
 export const PLATFORMS = {
   YOUTUBE: 'youtube',
   TWITCH: 'twitch',
+  KICK: 'kick',
   TIKTOK: 'tiktok',
   INSTAGRAM: 'instagram',
 };

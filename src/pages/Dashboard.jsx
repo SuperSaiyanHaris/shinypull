@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft, Check, X } from 'lucide-react';
+import KickIcon from '../components/KickIcon';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { getFollowedCreators } from '../services/followService';
 import { getCreatorStats } from '../services/creatorService';
-import { getLiveStreams } from '../services/twitchService';
+import { getLiveStreams as getTwitchLiveStreams } from '../services/twitchService';
+import { getLiveStreams as getKickLiveStreams } from '../services/kickService';
 import { getRecentlyViewed } from '../lib/recentlyViewed';
 import { formatNumber } from '../lib/utils';
 import logger from '../lib/logger';
@@ -13,11 +15,13 @@ import logger from '../lib/logger';
 const platformIcons = {
   youtube: Youtube,
   twitch: Twitch,
+  kick: KickIcon,
 };
 
 const platformColors = {
   youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
+  kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
 };
 
 export default function Dashboard() {
@@ -67,16 +71,28 @@ export default function Dashboard() {
       }
       setCreatorStats(stats);
 
-      // Check live status for Twitch streamers
+      // Check live status for Twitch and Kick streamers
+      const allLive = new Set();
       const twitchCreators = creators.filter(c => c.platform === 'twitch');
+      const kickCreators = creators.filter(c => c.platform === 'kick');
+
       if (twitchCreators.length > 0) {
         try {
-          const liveData = await getLiveStreams(twitchCreators.map(c => c.username));
-          setLiveStreamers(new Set(liveData.map(s => s.username.toLowerCase())));
+          const liveData = await getTwitchLiveStreams(twitchCreators.map(c => c.username));
+          liveData.forEach(s => allLive.add(s.username.toLowerCase()));
         } catch (e) {
-          logger.warn('Failed to check live status:', e);
+          logger.warn('Failed to check Twitch live status:', e);
         }
       }
+      if (kickCreators.length > 0) {
+        try {
+          const liveData = await getKickLiveStreams(kickCreators.map(c => c.username));
+          liveData.forEach(s => allLive.add(s.username.toLowerCase()));
+        } catch (e) {
+          logger.warn('Failed to check Kick live status:', e);
+        }
+      }
+      setLiveStreamers(allLive);
     } catch (error) {
       logger.error('Failed to load followed creators:', error);
     } finally {
@@ -106,10 +122,10 @@ export default function Dashboard() {
   }
 
   const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User';
-  const liveCount = followedCreators.filter(c => c.platform === 'twitch' && liveStreamers.has(c.username.toLowerCase())).length;
+  const liveCount = followedCreators.filter(c => (c.platform === 'twitch' || c.platform === 'kick') && liveStreamers.has(c.username.toLowerCase())).length;
   const filteredCreators = followedCreators.filter(c => {
     if (platformFilter === 'live') {
-      return c.platform === 'twitch' && liveStreamers.has(c.username.toLowerCase());
+      return (c.platform === 'twitch' || c.platform === 'kick') && liveStreamers.has(c.username.toLowerCase());
     }
     return !platformFilter || c.platform === platformFilter;
   });

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star } from 'lucide-react';
+import KickIcon from '../components/KickIcon';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
-import { getChannelByUsername as getTwitchChannel, getLiveStreams } from '../services/twitchService';
+import { getChannelByUsername as getTwitchChannel, getLiveStreams as getTwitchLiveStreams } from '../services/twitchService';
+import { getChannelByUsername as getKickChannel, getLiveStreams as getKickLiveStreams } from '../services/kickService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import { followCreator, unfollowCreator, isFollowing as checkIsFollowing } from '../services/followService';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,12 +18,14 @@ import logger from '../lib/logger';
 const platformIcons = {
   youtube: Youtube,
   twitch: Twitch,
+  kick: KickIcon,
   instagram: Instagram,
 };
 
 const platformColors = {
   youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600', border: 'border-red-200' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-200' },
+  kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600', border: 'border-green-200' },
   instagram: { bg: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500', light: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-200' },
   tiktok: { bg: 'bg-pink-500', light: 'bg-pink-50', text: 'text-pink-600', border: 'border-pink-200' },
 };
@@ -29,6 +33,7 @@ const platformColors = {
 const platformUrls = {
   youtube: (username) => `https://youtube.com/@${username}`,
   twitch: (username) => `https://twitch.tv/${username}`,
+  kick: (username) => `https://kick.com/${username}`,
   instagram: (username) => `https://instagram.com/${username}`,
   tiktok: (username) => `https://tiktok.com/@${username}`,
 };
@@ -64,6 +69,8 @@ export default function CreatorProfile() {
         channelData = await getYouTubeChannel(username);
       } else if (platform === 'twitch') {
         channelData = await getTwitchChannel(username);
+      } else if (platform === 'kick') {
+        channelData = await getKickChannel(username);
       } else {
         const dbCreator = await getCreatorByUsername(platform, username);
         if (dbCreator) {
@@ -90,8 +97,8 @@ export default function CreatorProfile() {
           const history = await getCreatorStats(dbCreator.id, 90);
           setStatsHistory(history || []);
 
-          // For Twitch, fetch hours watched data
-          if (platform === 'twitch') {
+          // For Twitch/Kick, fetch hours watched data
+          if (platform === 'twitch' || platform === 'kick') {
             const hoursWatchedData = await getHoursWatched(dbCreator.id);
             if (hoursWatchedData) {
               channelData.hoursWatchedDay = hoursWatchedData.hours_watched_day;
@@ -117,10 +124,11 @@ export default function CreatorProfile() {
           followers: channelData.followers,
         });
 
-        // Check if Twitch streamer is live
-        if (platform === 'twitch') {
+        // Check if streamer is live (Twitch or Kick)
+        if (platform === 'twitch' || platform === 'kick') {
           try {
-            const liveData = await getLiveStreams([channelData.username || username]);
+            const liveStreamFn = platform === 'twitch' ? getTwitchLiveStreams : getKickLiveStreams;
+            const liveData = await liveStreamFn([channelData.username || username]);
             if (liveData && liveData.length > 0) {
               setIsLive(true);
               setLiveStreamInfo(liveData[0]);

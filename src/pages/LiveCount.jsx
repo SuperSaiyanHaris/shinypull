@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Youtube, Twitch, ExternalLink, Share2, AlertCircle } from 'lucide-react';
+import KickIcon from '../components/KickIcon';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
+import { getChannelByUsername as getKickChannel } from '../services/kickService';
 import Odometer from '../components/Odometer';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
@@ -25,12 +27,21 @@ const platformConfig = {
     label: 'followers',
     avgGrowthPerSecond: 0.8,
   },
+  kick: {
+    icon: KickIcon,
+    color: 'text-green-500',
+    bgGradient: 'from-green-500 to-green-600',
+    glowColor: 'shadow-green-500/20',
+    label: 'paid subscribers',
+    avgGrowthPerSecond: 0.3,
+  },
 };
 
 // Platform URLs for linking to actual channel
 const platformUrls = {
   youtube: (username) => `https://youtube.com/@${username}`,
   twitch: (username) => `https://twitch.tv/${username}`,
+  kick: (username) => `https://kick.com/${username}`,
 };
 
 // Helper function to generate realistic random offset based on channel size
@@ -75,6 +86,8 @@ export default function LiveCount() {
           data = await getYouTubeChannel(username);
         } else if (platform === 'twitch') {
           data = await getTwitchChannel(username);
+        } else if (platform === 'kick') {
+          data = await getKickChannel(username);
         }
 
         if (data) {

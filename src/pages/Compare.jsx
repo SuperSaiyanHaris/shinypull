@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2 } from 'lucide-react';
+import KickIcon from '../components/KickIcon';
 import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { searchChannels as searchTwitch, getChannelByUsername as getTwitchChannel } from '../services/twitchService';
+import { searchChannels as searchKick, getChannelByUsername as getKickChannel } from '../services/kickService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
@@ -11,6 +13,7 @@ import logger from '../lib/logger';
 const platformConfig = {
   youtube: { icon: Youtube, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
   twitch: { icon: Twitch, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
+  kick: { icon: KickIcon, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
 };
 
 export default function Compare() {
@@ -41,6 +44,8 @@ export default function Compare() {
               return await getYouTubeChannel(username);
             } else if (platform === 'twitch') {
               return await getTwitchChannel(username);
+            } else if (platform === 'kick') {
+              return await getKickChannel(username);
             }
           } catch (err) {
             // Skip creators that fail to load
@@ -386,6 +391,8 @@ function SearchableSlot({ onSelect, onRemove }) {
         results = await searchYouTube(searchQuery, 5);
       } else if (searchPlatform === 'twitch') {
         results = await searchTwitch(searchQuery, 5);
+      } else if (searchPlatform === 'kick') {
+        results = await searchKick(searchQuery, 5);
       }
       setSearchResults(results);
     } catch (err) {
@@ -421,6 +428,7 @@ function SearchableSlot({ onSelect, onRemove }) {
           >
             <option value="youtube">YouTube</option>
             <option value="twitch">Twitch</option>
+            <option value="kick">Kick</option>
           </select>
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />

@@ -229,7 +229,7 @@ export const getRankedCreators = withErrorHandling(
       
       // Calculate 30-day growth from historical data
       // YouTube: require at least 7 days of data for accurate growth
-      // Twitch: require at least 2 days (follower counts are exact)
+      // Twitch/Kick: require at least 2 days (counts are exact)
       let calculatedGrowth = 0;
       const minDataPoints = platform === 'youtube' ? 7 : 2;
       

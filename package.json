@@ -11,6 +11,8 @@
     "seed:expanded": "node scripts/seedTopCreatorsExpanded.js",
     "collect:daily": "node scripts/collectDailyStats.js",
     "monitor:twitch": "node scripts/monitorTwitchStreams.js",
+    "monitor:kick": "node scripts/monitorKickStreams.js",
+    "seed:kick": "node scripts/seedTopKickCreators.js",
     "aggregate:hours-watched": "node scripts/aggregateHoursWatched.js",
     "seed:blog": "node scripts/seedBlogPosts.js",
     "seed:products": "node scripts/seedProducts.js",

@@ -5,11 +5,14 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_S
 const YOUTUBE_API_KEY = process.env.VITE_YOUTUBE_API_KEY;
 const TWITCH_CLIENT_ID = process.env.VITE_TWITCH_CLIENT_ID;
 const TWITCH_CLIENT_SECRET = process.env.VITE_TWITCH_CLIENT_SECRET;
+const KICK_CLIENT_ID = process.env.KICK_CLIENT_ID;
+const KICK_CLIENT_SECRET = process.env.KICK_CLIENT_SECRET;
 
 // Batch sizes
 const YOUTUBE_BATCH_SIZE = 50;  // YouTube allows up to 50 channel IDs per request
 const TWITCH_BATCH_SIZE = 100;  // Twitch allows up to 100 logins per request
 const TWITCH_PARALLEL_FOLLOWERS = 10;  // Parallel follower requests
+const KICK_BATCH_SIZE = 50;    // Kick allows up to 50 slugs per request
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
@@ -140,6 +143,48 @@ async function fetchTwitchVODViews(broadcasterId) {
   }
 }
 
+// ========== KICK API HELPERS ==========
+let kickAccessToken = null;
+
+async function getKickAccessToken() {
+  if (kickAccessToken) return kickAccessToken;
+
+  const response = await fetch('https://id.kick.com/oauth/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: KICK_CLIENT_ID,
+      client_secret: KICK_CLIENT_SECRET,
+      grant_type: 'client_credentials',
+    }),
+  });
+
+  const data = await response.json();
+  kickAccessToken = data.access_token;
+  return kickAccessToken;
+}
+
+/**
+ * Fetch Kick channel info for multiple slugs (up to 50)
+ */
+async function fetchKickChannelsBatch(slugs) {
+  const token = await getKickAccessToken();
+  const slugParams = slugs.map(s => `slug[]=${encodeURIComponent(s)}`).join('&');
+
+  const response = await fetch(`https://api.kick.com/public/v1/channels?${slugParams}`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+
+  const data = await response.json();
+  const channelMap = new Map();
+  (data.data || []).forEach(channel => {
+    channelMap.set(channel.slug.toLowerCase(), {
+      subscribers: channel.active_subscribers_count || 0,
+    });
+  });
+  return channelMap;
+}
+
 /**
  * Get today's date in America/New_York timezone (YYYY-MM-DD format)
  * This ensures consistent date handling regardless of UTC offset
@@ -197,6 +242,8 @@ async function collectDailyStats() {
   console.log(`   YouTube API Key: ${YOUTUBE_API_KEY ? '✅ Set' : '❌ Missing'}`);
   console.log(`   Twitch Client ID: ${TWITCH_CLIENT_ID ? '✅ Set' : '❌ Missing'}`);
   console.log(`   Twitch Client Secret: ${TWITCH_CLIENT_SECRET ? '✅ Set' : '❌ Missing'}`);
+  console.log(`   Kick Client ID: ${KICK_CLIENT_ID ? '✅ Set' : '❌ Missing'}`);
+  console.log(`   Kick Client Secret: ${KICK_CLIENT_SECRET ? '✅ Set' : '❌ Missing'}`);
   console.log('');
 
   // Get all creators from database
@@ -211,10 +258,12 @@ async function collectDailyStats() {
 
   const youtubeCreators = creators.filter((c) => c.platform === 'youtube');
   const twitchCreators = creators.filter((c) => c.platform === 'twitch');
+  const kickCreators = creators.filter((c) => c.platform === 'kick');
 
   console.log(`Found ${creators.length} creators to update`);
   console.log(`   YouTube: ${youtubeCreators.length}`);
-  console.log(`   Twitch: ${twitchCreators.length}\n`);
+  console.log(`   Twitch: ${twitchCreators.length}`);
+  console.log(`   Kick: ${kickCreators.length}\n`);
 
   let successCount = 0;
   let errorCount = 0;
@@ -333,6 +382,48 @@ async function collectDailyStats() {
     }
   }
 
+  // ========== KICK (batch by 50) ==========
+  if (kickCreators.length > 0 && KICK_CLIENT_ID && KICK_CLIENT_SECRET) {
+    console.log('\n🟢 Processing Kick creators...');
+    const kickBatches = chunk(kickCreators, KICK_BATCH_SIZE);
+    console.log(`   ${kickBatches.length} batch(es) of up to ${KICK_BATCH_SIZE} channels\n`);
+
+    for (let i = 0; i < kickBatches.length; i++) {
+      const batch = kickBatches[i];
+      const slugs = batch.map((c) => c.username.toLowerCase());
+
+      try {
+        const channelMap = await fetchKickChannelsBatch(slugs);
+
+        for (const creator of batch) {
+          const channelData = channelMap.get(creator.username.toLowerCase());
+          if (channelData) {
+            statsToUpsert.push({
+              creator_id: creator.id,
+              recorded_at: today,
+              subscribers: channelData.subscribers,
+              followers: channelData.subscribers,
+              total_views: 0,
+              total_posts: 0,
+            });
+            console.log(`   ✅ ${creator.display_name}: ${channelData.subscribers} paid subs`);
+            successCount++;
+          } else {
+            console.log(`   ❌ ${creator.display_name}: Channel not found`);
+            errorCount++;
+          }
+        }
+      } catch (error) {
+        console.error(`   ❌ Batch ${i + 1} failed: ${error.message}`);
+        errorCount += batch.length;
+      }
+
+      if (i < kickBatches.length - 1) {
+        await new Promise((r) => setTimeout(r, 200));
+      }
+    }
+  }
+
   // ========== BULK UPSERT TO DATABASE ==========
   if (statsToUpsert.length > 0) {
     console.log(`\n💾 Saving ${statsToUpsert.length} stats entries to database...`);
@@ -363,11 +454,13 @@ async function collectDailyStats() {
     youtube: Math.ceil(youtubeCreators.length / YOUTUBE_BATCH_SIZE),
     twitchUsers: Math.ceil(twitchCreators.length / TWITCH_BATCH_SIZE),
     twitchFollowers: twitchCreators.length,
+    kick: Math.ceil(kickCreators.length / KICK_BATCH_SIZE),
   };
   console.log(`\n📡 API calls made:`);
   console.log(`   YouTube: ${apiCalls.youtube} (batched ${YOUTUBE_BATCH_SIZE}/request)`);
   console.log(`   Twitch Users: ${apiCalls.twitchUsers} (batched ${TWITCH_BATCH_SIZE}/request)`);
   console.log(`   Twitch Followers: ${apiCalls.twitchFollowers} (parallel ${TWITCH_PARALLEL_FOLLOWERS}x)`);
+  console.log(`   Kick: ${apiCalls.kick} (batched ${KICK_BATCH_SIZE}/request)`);
 }
 
 collectDailyStats().catch(console.error);
