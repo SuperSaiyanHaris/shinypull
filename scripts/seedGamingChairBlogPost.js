@@ -10,7 +10,7 @@ const blogPost = {
   slug: 'best-gaming-chairs-2026',
   title: 'Best Gaming Chairs in 2026: Find Your Perfect Seat',
   description: 'Discover the best gaming chairs of 2026, from budget picks to premium ergonomic thrones. Real reviews, expert recommendations, and everything you need to upgrade your setup.',
-  category: 'Gear',
+  category: 'Streaming Gear',
   author: 'ShinyPull',
   image: '/blog/gaming-chairs.jpg',
   read_time: 12,

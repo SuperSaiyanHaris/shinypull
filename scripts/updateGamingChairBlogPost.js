@@ -173,7 +173,8 @@ async function updateBlogPost() {
       .update({ 
         content: updatedContent,
         image: 'https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=800',
-        read_time: 14
+        read_time: 14,
+        category: 'Streaming Gear'
       })
       .eq('slug', 'best-gaming-chairs-2026');
 
