@@ -811,13 +811,13 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/slicksteve&thegangsters-topic</loc>
+    <loc>https://shinypull.com/youtube/slicksteve&amp;thegangsters-topic</loc>
     <lastmod>2026-02-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/live/youtube/slicksteve&thegangsters-topic</loc>
+    <loc>https://shinypull.com/live/youtube/slicksteve&amp;thegangsters-topic</loc>
     <lastmod>2026-02-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
