@@ -193,31 +193,50 @@ export const getLatestStats = withErrorHandling(
  */
 export const getRankedCreators = withErrorHandling(
   async (platform, rankType = 'subscribers', limit = 50) => {
-    const { data, error } = await supabase
-      .from('creators')
-      .select(`
-        id,
-        platform,
-        platform_id,
-        username,
-        display_name,
-        profile_image,
-        creator_stats (
-          recorded_at,
-          subscribers,
-          followers,
-          total_views,
-          total_posts,
-          followers_gained_month,
-          views_gained_month,
-          hours_watched_day,
-          hours_watched_week,
-          hours_watched_month
-        )
-      `)
-      .eq('platform', platform);
+    // Fetch all creators with pagination to bypass Supabase's 1000 row limit
+    let allData = [];
+    let page = 0;
+    const pageSize = 1000;
+    let hasMore = true;
 
-    if (error) throw error;
+    while (hasMore) {
+      const { data, error } = await supabase
+        .from('creators')
+        .select(`
+          id,
+          platform,
+          platform_id,
+          username,
+          display_name,
+          profile_image,
+          creator_stats (
+            recorded_at,
+            subscribers,
+            followers,
+            total_views,
+            total_posts,
+            followers_gained_month,
+            views_gained_month,
+            hours_watched_day,
+            hours_watched_week,
+            hours_watched_month
+          )
+        `)
+        .eq('platform', platform)
+        .range(page * pageSize, (page + 1) * pageSize - 1);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        allData = allData.concat(data);
+        page++;
+        hasMore = data.length === pageSize; // Continue if we got a full page
+      } else {
+        hasMore = false;
+      }
+    }
+
+    const data = allData;
 
     // Map creators and calculate growth from their stats history
     const creators = (data || []).map((creator) => {
