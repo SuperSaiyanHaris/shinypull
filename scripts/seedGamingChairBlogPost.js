@@ -93,14 +93,6 @@ The RESPAWN 900 takes a completely different approach. Instead of a traditional 
 
 The built-in cup holder and side pocket for controllers show that RESPAWN understands how people actually use this chair. It's not for everyone—the recliner style doesn't work great with traditional desks—but for the right setup, it's incredibly comfortable.
 
-### Best Mid-Range: Razer Iskur V2
-
-{{product:razer-iskur-v2}}
-
-The Razer Iskur V2 stands out with its fully adjustable built-in lumbar support system. Unlike chairs that use separate pillows or fixed curves, the Iskur V2's lumbar support actually moves with you as you recline. It's a smart design that maintains proper back support regardless of your position.
-
-The multi-layered synthetic leather is higher quality than typical gaming chair upholstery, and the high-density foam cushions strike a good balance between support and comfort. At $649, it's not cheap, but it's also not approaching Herman Miller territory.
-
 ## How to Choose the Right Gaming Chair
 
 With so many options out there, how do you actually pick? Start by answering these questions:
@@ -108,8 +100,7 @@ With so many options out there, how do you actually pick? Start by answering the
 **What's your budget?**
 - Under $350: Look at the Razer Iskur V2 X or Corsair TC100 Relaxed
 - $350-$600: Consider the Secretlab Titan Evo, ThunderX3 Core, or AndaSeat Kaiser 4 XL
-- $600-$1000: The Razer Iskur V2 offers premium features at a reasonable price
-- Over $1000: The Herman Miller Embody is the ultimate investment
+- Over $600: The Herman Miller Embody is the ultimate investment
 
 **What's your body type?**
 - Larger frames: AndaSeat Kaiser 4 XL is specifically designed for you
@@ -117,7 +108,7 @@ With so many options out there, how do you actually pick? Start by answering the
 - Smaller frame: Consider the Small size of the Secretlab Titan Evo
 
 **What's your priority?**
-- Back pain: ThunderX3 Core or Razer Iskur V2
+- Back pain: ThunderX3 Core
 - Durability: Secretlab Titan Evo or Razer Iskur V2 X
 - Budget: Corsair TC100 Relaxed or Razer Iskur V2 X
 - Luxury/ergonomics: Herman Miller Embody
