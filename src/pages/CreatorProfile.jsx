@@ -883,12 +883,32 @@ export default function CreatorProfile() {
                         )}
                         {platform !== 'twitch' && platform !== 'kick' && (
                           <>
-                            <td className="px-6 py-4 text-right text-emerald-600">+{formatNumber(metrics.last30Days.views)}</td>
+                            <td className="px-6 py-4 text-right text-emerald-600">
+                              {metrics.last30Days.views > 0
+                                ? `+${formatNumber(metrics.last30Days.views)}`
+                                : creator.totalViews && creator.totalPosts > 0
+                                  ? (() => {
+                                      const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
+                                      const estimated30DayViews = estimatedDailyViews * 30;
+                                      return `~${formatNumber(Math.round(estimated30DayViews))}`;
+                                    })()
+                                  : '—'
+                              }
+                            </td>
                             <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                               {metrics.last30Days.videos >= 0 ? '+' : ''}{metrics.last30Days.videos}
                             </td>
                             <td className="px-6 py-4 text-right text-indigo-900">
-                              {formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)}
+                              {metrics.last30Days.views > 0
+                                ? formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)
+                                : creator.totalViews && creator.totalPosts > 0
+                                  ? (() => {
+                                      const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
+                                      const estimated30DayViews = estimatedDailyViews * 30;
+                                      return formatEarnings(estimated30DayViews / 1000 * 0.25, estimated30DayViews / 1000 * 4);
+                                    })()
+                                  : '—'
+                              }
                             </td>
                           </>
                         )}
