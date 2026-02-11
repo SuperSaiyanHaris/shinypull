@@ -174,14 +174,25 @@ async function getChannelByUsername(username) {
     }
   }
 
-  // Fallback: search for channel
+  // Fallback: search for channel, but only return if the result's handle
+  // closely matches the requested username (prevents "music" → "musictravellove")
   const searchResults = await searchChannels(username);
   if (searchResults.length === 0) {
     throw new Error('Channel not found');
   }
 
   // Get full details of the first result
-  return await getChannel(searchResults[0].id);
+  const topResult = await getChannel(searchResults[0].id);
+
+  // Verify the result actually matches — check customUrl/username
+  const resultUsername = (topResult.username || '').toLowerCase();
+  const requestedUsername = username.toLowerCase();
+  if (resultUsername === requestedUsername || resultUsername.includes(requestedUsername)) {
+    return topResult;
+  }
+
+  // If the top result doesn't match, throw not found rather than returning wrong channel
+  throw new Error('Channel not found');
 }
 
 /**

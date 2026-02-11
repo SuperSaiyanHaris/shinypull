@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
-import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
+import { getChannelByUsername as getYouTubeChannel, getChannelById as getYouTubeChannelById } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel, getLiveStreams as getTwitchLiveStreams } from '../services/twitchService';
 import { getChannelByUsername as getKickChannel, getLiveStreams as getKickLiveStreams } from '../services/kickService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
@@ -66,7 +66,16 @@ export default function CreatorProfile() {
       let channelData = null;
 
       if (platform === 'youtube') {
-        channelData = await getYouTubeChannel(username);
+        // Check database first — the stored platform_id gives an exact lookup
+        // This prevents the search fallback from matching wrong channels
+        // (e.g., "music" matching "@musictravellove" instead of YouTube Music)
+        const knownCreator = await getCreatorByUsername('youtube', username);
+        if (knownCreator?.platform_id) {
+          channelData = await getYouTubeChannelById(knownCreator.platform_id);
+        }
+        if (!channelData) {
+          channelData = await getYouTubeChannel(username);
+        }
       } else if (platform === 'twitch') {
         channelData = await getTwitchChannel(username);
       } else if (platform === 'kick') {
