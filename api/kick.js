@@ -2,6 +2,7 @@
 // Keeps client secret secure on server-side
 
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, getClientIdentifier } from './_ratelimit.js';
 
 const KICK_CLIENT_ID = process.env.KICK_CLIENT_ID;
 const KICK_CLIENT_SECRET = process.env.KICK_CLIENT_SECRET;
@@ -163,54 +164,12 @@ async function searchChannels(query, maxResults = 25) {
   try {
     const slug = searchTerm.replace(/[^a-z0-9_-]/g, '');
     if (!slug) return [];
-    
+
     const channel = await getChannelBySlug(slug);
     if (channel) {
-      // Optionally save to database for future searches
-      try {
-        const { data: existingCreator } = await supabase
-          .from('creators')
-          .select('id')
-          .eq('platform', 'kick')
-          .eq('platform_id', channel.platformId)
-          .single();
-        
-        if (!existingCreator) {
-          // Add to database
-          const { data: newCreator } = await supabase
-            .from('creators')
-            .insert({
-              platform: channel.platform,
-              platform_id: channel.platformId,
-              username: channel.username,
-              display_name: channel.displayName,
-              profile_image: channel.profileImage,
-              description: channel.description,
-              category: channel.category,
-              updated_at: new Date().toISOString(),
-            })
-            .select()
-            .single();
-          
-          // Add initial stats
-          if (newCreator) {
-            await supabase
-              .from('creator_stats')
-              .insert({
-                creator_id: newCreator.id,
-                recorded_at: new Date().toISOString().split('T')[0],
-                subscribers: channel.subscribers,
-                followers: channel.subscribers,
-                total_views: 0,
-                total_posts: 0,
-              });
-          }
-        }
-      } catch (dbError) {
-        // Continue even if database save fails
-        console.error('Failed to save discovered creator:', dbError);
-      }
-      
+      // SECURITY: Don't save to database from frontend-facing API
+      // Frontend should call /api/update-creator if it wants to save the creator
+      // This follows our RLS security model (read-only frontend, write-only server)
       return [channel];
     }
   } catch (apiError) {
@@ -280,6 +239,18 @@ export default async function handler(req, res) {
 
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting: 60 requests per minute
+  const clientId = getClientIdentifier(req);
+  const rateLimit = checkRateLimit(clientId, 60, 60000);
+
+  res.setHeader('X-RateLimit-Limit', '60');
+  res.setHeader('X-RateLimit-Remaining', String(rateLimit.remaining));
+  res.setHeader('X-RateLimit-Reset', String(Math.ceil(rateLimit.resetTime / 1000)));
+
+  if (!rateLimit.allowed) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
   const { action, query, username, maxResults } = req.query;

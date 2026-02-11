@@ -1,6 +1,8 @@
 // Server-side API endpoint to handle creator and stats updates
 // Uses service role key (bypasses RLS) with proper validation
 
+import { checkRateLimit, getClientIdentifier } from './_ratelimit.js';
+
 export default async function handler(req, res) {
   // Enable CORS
   const allowedOrigins = [
@@ -22,6 +24,18 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting: 120 requests per minute (2 per second)
+  const clientId = getClientIdentifier(req);
+  const rateLimit = checkRateLimit(clientId, 120, 60000);
+
+  res.setHeader('X-RateLimit-Limit', '120');
+  res.setHeader('X-RateLimit-Remaining', String(rateLimit.remaining));
+  res.setHeader('X-RateLimit-Reset', String(Math.ceil(rateLimit.resetTime / 1000)));
+
+  if (!rateLimit.allowed) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
   try {

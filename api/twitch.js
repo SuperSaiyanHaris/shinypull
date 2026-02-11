@@ -1,6 +1,8 @@
 // Vercel Serverless Function for Twitch API
 // Keeps client secret secure on server-side
 
+import { checkRateLimit, getClientIdentifier } from './_ratelimit.js';
+
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
 
@@ -251,6 +253,18 @@ export default async function handler(req, res) {
 
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting: 60 requests per minute
+  const clientId = getClientIdentifier(req);
+  const rateLimit = checkRateLimit(clientId, 60, 60000);
+
+  res.setHeader('X-RateLimit-Limit', '60');
+  res.setHeader('X-RateLimit-Remaining', String(rateLimit.remaining));
+  res.setHeader('X-RateLimit-Reset', String(Math.ceil(rateLimit.resetTime / 1000)));
+
+  if (!rateLimit.allowed) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
   const { action, query, username, maxResults } = req.query;
