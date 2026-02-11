@@ -146,14 +146,20 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
 
 **Instagram:**
 - No official public API for querying arbitrary profiles
-- Currently uses **manual seed** with top 100+ creators (Cristiano 639M, Messi 505M, etc.)
-- Public API endpoints require authentication and rate-limit aggressively
-- Future: Could implement browser-based scraping with Puppeteer for expansion
+- Uses **Puppeteer browser automation** to scrape public profiles in real-time
+- Launches headless Chrome to fully render JavaScript-based pages
+- Collects: Followers, Posts, Profile Images, Bios, Verification status
+- Rate-limited scraping: 5-8 seconds between requests (randomized delays)
+- Integrated into daily stats collection (runs alongside YouTube/Twitch/Kick)
+- Expected success rate: ~60-70% (Instagram actively blocks automated scraping)
+- Failed requests are logged but don't break collection process
+- Profile images auto-update when changed
 - Custom `InstagramIcon` component using `currentColor` pattern (like Lucide icons)
 - Profile displays: Followers, Posts (no views/earnings data available)
 - Profile stats grid shows 4 cards: Followers, Posts, Total Views (—), Engagement (—)
 - Growth summary shows: Followers and Posts growth (no earnings estimates)
 - Daily Metrics Table columns: Date, Followers (with changes), Posts (with changes)
+- Service: `src/services/instagramPuppeteer.js` (Puppeteer-based scraping)
 
 ## Commands
 
