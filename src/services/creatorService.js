@@ -77,12 +77,14 @@ export const saveCreatorStats = withErrorHandling(
 export const getCreatorByUsername = withErrorHandling(
   async (platform, username) => {
     // Note: Multiple creators can have the same username (e.g., MrBeast main channel, MrBeast Gaming, etc.)
-    // Query all matching creators and return the one with most subscribers/followers
+    // Query all matching creators and return the most recently updated one (likely the main/active channel)
     const { data, error } = await supabase
       .from('creators')
       .select('*')
       .eq('platform', platform)
-      .eq('username', username.toLowerCase());
+      .eq('username', username.toLowerCase())
+      .order('updated_at', { ascending: false })
+      .limit(1);
 
     if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
 
@@ -90,18 +92,8 @@ export const getCreatorByUsername = withErrorHandling(
       return null;
     }
 
-    // If only one match, return it
-    if (data.length === 1) {
-      return data[0];
-    }
-
-    // Multiple matches - return the one with most subscribers/followers
-    // (This handles cases where username restoration created duplicates)
-    return data.reduce((best, current) => {
-      const bestCount = (best.totalSubscribers || 0) + (best.totalFollowers || 0);
-      const currentCount = (current.totalSubscribers || 0) + (current.totalFollowers || 0);
-      return currentCount > bestCount ? current : best;
-    });
+    // Return the most recently updated creator
+    return data[0];
   },
   'creatorService.getCreatorByUsername'
 );
