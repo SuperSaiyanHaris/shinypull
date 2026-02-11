@@ -129,10 +129,15 @@ function transformChannel(channel) {
   const statistics = channel.statistics || {};
   const branding = channel.brandingSettings?.channel || {};
 
+  // Skip channels without a customUrl (topic/system channels with no public page)
+  if (!snippet.customUrl) {
+    return null;
+  }
+
   return {
     platform: 'youtube',
     platform_id: channel.id,
-    username: snippet.customUrl?.replace('@', '') || channel.id,
+    username: snippet.customUrl.replace('@', ''),
     display_name: snippet.title,
     profile_image: snippet.thumbnails?.high?.url || snippet.thumbnails?.default?.url,
     description: snippet.description?.substring(0, 500) || null,
@@ -291,6 +296,10 @@ async function discoverCreators() {
 
     try {
       const creatorData = transformChannel(channel);
+      if (!creatorData) {
+        console.log(`   ⏭️  ${name} (no public page, skipping)`);
+        continue;
+      }
       const creator = await addCreator(creatorData);
 
       if (creator) {

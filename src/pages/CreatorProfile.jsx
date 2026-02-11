@@ -94,27 +94,32 @@ export default function CreatorProfile() {
         analytics.viewProfile(platform, username, channelData.displayName);
 
         try {
-          const dbCreator = await upsertCreator(channelData);
-          setDbCreatorId(dbCreator.id); // Store the database UUID
-          
-          await saveCreatorStats(dbCreator.id, {
-            subscribers: channelData.subscribers || channelData.followers,
-            totalViews: channelData.totalViews,
-            totalPosts: channelData.totalPosts,
-          });
+          // Skip saving YouTube channels without a public page (e.g., topic channels)
+          if (platform === 'youtube' && channelData.hasPublicPage === false) {
+            logger.info('Skipping DB save for YouTube channel without public page:', username);
+          } else {
+            const dbCreator = await upsertCreator(channelData);
+            setDbCreatorId(dbCreator.id); // Store the database UUID
 
-          const history = await getCreatorStats(dbCreator.id, 90);
-          setStatsHistory(history || []);
+            await saveCreatorStats(dbCreator.id, {
+              subscribers: channelData.subscribers || channelData.followers,
+              totalViews: channelData.totalViews,
+              totalPosts: channelData.totalPosts,
+            });
 
-          // For Twitch/Kick, fetch hours watched data
-          if (platform === 'twitch' || platform === 'kick') {
-            const hoursWatchedData = await getHoursWatched(dbCreator.id);
-            if (hoursWatchedData) {
-              channelData.hoursWatchedDay = hoursWatchedData.hours_watched_day;
-              channelData.hoursWatchedWeek = hoursWatchedData.hours_watched_week;
-              channelData.hoursWatchedMonth = hoursWatchedData.hours_watched_month;
-              channelData.peakViewersDay = hoursWatchedData.peak_viewers_day;
-              channelData.avgViewersDay = hoursWatchedData.avg_viewers_day;
+            const history = await getCreatorStats(dbCreator.id, 90);
+            setStatsHistory(history || []);
+
+            // For Twitch/Kick, fetch hours watched data
+            if (platform === 'twitch' || platform === 'kick') {
+              const hoursWatchedData = await getHoursWatched(dbCreator.id);
+              if (hoursWatchedData) {
+                channelData.hoursWatchedDay = hoursWatchedData.hours_watched_day;
+                channelData.hoursWatchedWeek = hoursWatchedData.hours_watched_week;
+                channelData.hoursWatchedMonth = hoursWatchedData.hours_watched_month;
+                channelData.peakViewersDay = hoursWatchedData.peak_viewers_day;
+                channelData.avgViewersDay = hoursWatchedData.avg_viewers_day;
+              }
             }
           }
         } catch (dbErr) {

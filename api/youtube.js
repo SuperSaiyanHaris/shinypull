@@ -127,6 +127,7 @@ async function getChannel(channelId) {
     totalViews: parseInt(statistics.viewCount || 0),
     totalPosts: parseInt(statistics.videoCount || 0),
     hiddenSubscribers: statistics.hiddenSubscriberCount || false,
+    hasPublicPage: !!snippet.customUrl,
     createdAt: snippet.publishedAt,
   };
 }
@@ -169,6 +170,7 @@ async function getChannelByUsername(username) {
         totalViews: parseInt(statistics.viewCount || 0),
         totalPosts: parseInt(statistics.videoCount || 0),
         hiddenSubscribers: statistics.hiddenSubscriberCount || false,
+        hasPublicPage: !!snippet.customUrl,
         createdAt: snippet.publishedAt,
       };
     }

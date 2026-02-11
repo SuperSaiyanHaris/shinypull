@@ -184,10 +184,15 @@ function transformYouTubeChannel(channel) {
   const statistics = channel.statistics || {};
   const branding = channel.brandingSettings?.channel || {};
 
+  // Skip channels without a customUrl (topic/system channels with no public page)
+  if (!snippet.customUrl) {
+    return null;
+  }
+
   return {
     platform: 'youtube',
     platformId: channel.id,
-    username: snippet.customUrl?.replace('@', '') || channel.id,
+    username: snippet.customUrl.replace('@', ''),
     displayName: snippet.title,
     profileImage: snippet.thumbnails?.high?.url || snippet.thumbnails?.default?.url,
     description: snippet.description,

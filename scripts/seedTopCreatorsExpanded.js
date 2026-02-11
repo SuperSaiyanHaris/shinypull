@@ -310,19 +310,21 @@ async function fetchYouTubeChannelsBatch(channelIds) {
   }
 
   const data = await response.json();
-  return (data.items || []).map(channel => ({
-    platform: 'youtube',
-    platformId: channel.id,
-    username: channel.snippet.customUrl?.replace('@', '') || channel.id,
-    displayName: channel.snippet.title,
-    profileImage: channel.snippet.thumbnails?.high?.url,
-    description: channel.snippet.description?.slice(0, 500),
-    country: channel.brandingSettings?.channel?.country || null,
-    category: null,
-    subscribers: parseInt(channel.statistics.subscriberCount) || 0,
-    totalViews: parseInt(channel.statistics.viewCount) || 0,
-    totalPosts: parseInt(channel.statistics.videoCount) || 0,
-  }));
+  return (data.items || [])
+    .filter(channel => !!channel.snippet.customUrl) // Skip topic/system channels
+    .map(channel => ({
+      platform: 'youtube',
+      platformId: channel.id,
+      username: channel.snippet.customUrl.replace('@', ''),
+      displayName: channel.snippet.title,
+      profileImage: channel.snippet.thumbnails?.high?.url,
+      description: channel.snippet.description?.slice(0, 500),
+      country: channel.brandingSettings?.channel?.country || null,
+      category: null,
+      subscribers: parseInt(channel.statistics.subscriberCount) || 0,
+      totalViews: parseInt(channel.statistics.viewCount) || 0,
+      totalPosts: parseInt(channel.statistics.videoCount) || 0,
+    }));
 }
 
 // Twitch functions

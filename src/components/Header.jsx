@@ -12,6 +12,11 @@ export default function Header() {
   const location = useLocation();
   const { user, signOut, isAuthenticated } = useAuth();
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   // Listen for custom event to open auth panel
   useEffect(() => {
     const handleOpenAuthPanel = (e) => {
