@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { TIMEOUTS, BLOG_CATEGORIES } from '../lib/constants';
 import {
   getAllPostsAdmin,
@@ -110,13 +111,31 @@ export default function BlogAdmin() {
 
     async function checkAdmin() {
       try {
+        // Get access token from current session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          setIsAdmin(false);
+          setAdminChecked(true);
+          return;
+        }
+
+        // Send JWT token for validation
         const res = await fetch('/api/admin', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: user.email }),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
         });
-        const data = await res.json();
-        setIsAdmin(data.isAdmin);
+
+        if (res.status === 401) {
+          // Token invalid/expired - sign out
+          await supabase.auth.signOut();
+          setIsAdmin(false);
+        } else {
+          const data = await res.json();
+          setIsAdmin(data.isAdmin);
+        }
       } catch {
         setIsAdmin(false);
       } finally {
