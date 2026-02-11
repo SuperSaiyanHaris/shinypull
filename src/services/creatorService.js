@@ -53,36 +53,25 @@ function getTodayLocal() {
 
 /**
  * Save creator stats snapshot via server-side API
+ * This should ONLY save stats, not touch the creator record
  */
 export const saveCreatorStats = withErrorHandling(
   async (creatorId, stats) => {
-    // Get the creator first to pass required data to API
-    const { data: creator, error: getError } = await supabase
-      .from('creators')
-      .select('platform, platform_id, username, display_name')
-      .eq('id', creatorId)
-      .single();
-
-    if (getError) throw getError;
-
-    // Call server-side API with creator and stats data
+    // Call server-side API with ONLY stats data
+    // Send creatorId so API knows which creator these stats belong to
     const response = await fetch('/api/update-creator', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        creatorData: {
-          platform: creator.platform,
-          platformId: creator.platform_id,
-          username: creator.username,
-          displayName: creator.display_name,
-        },
+        creatorId: creatorId, // Just send the ID
         statsData: {
           subscribers: stats.subscribers,
           totalViews: stats.totalViews,
           totalPosts: stats.totalPosts,
-        }
+        },
+        // NO creatorData - we don't want to update the creator record
       }),
     });
 

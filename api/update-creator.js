@@ -25,12 +25,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { creatorData, statsData } = req.body;
-
-    // Validate required fields
-    if (!creatorData || !creatorData.platform || !creatorData.platformId) {
-      return res.status(400).json({ error: 'Invalid creator data' });
-    }
+    const { creatorData, creatorId, statsData } = req.body;
 
     // Import Supabase client with service role key
     const { createClient } = await import('@supabase/supabase-js');
@@ -39,32 +34,46 @@ export default async function handler(req, res) {
       process.env.SUPABASE_SERVICE_ROLE_KEY // Server-side only
     );
 
-    // Upsert creator
-    const { data: creator, error: creatorError } = await supabase
-      .from('creators')
-      .upsert({
-        platform: creatorData.platform,
-        platform_id: creatorData.platformId,
-        username: creatorData.username,
-        display_name: creatorData.displayName,
-        profile_image: creatorData.profileImage,
-        description: creatorData.description,
-        country: creatorData.country,
-        category: creatorData.category,
-        updated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'platform,platform_id',
-      })
-      .select()
-      .single();
+    let creator = null;
 
-    if (creatorError) {
-      console.error('Creator upsert error:', creatorError);
-      return res.status(500).json({ error: 'Failed to save creator' });
+    // If creatorData provided, upsert the creator
+    if (creatorData) {
+      // Validate required fields for creator upsert
+      if (!creatorData.platform || !creatorData.platformId) {
+        return res.status(400).json({ error: 'Invalid creator data' });
+      }
+
+      const { data: upsertedCreator, error: creatorError } = await supabase
+        .from('creators')
+        .upsert({
+          platform: creatorData.platform,
+          platform_id: creatorData.platformId,
+          username: creatorData.username,
+          display_name: creatorData.displayName,
+          profile_image: creatorData.profileImage,
+          description: creatorData.description,
+          country: creatorData.country,
+          category: creatorData.category,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'platform,platform_id',
+        })
+        .select()
+        .single();
+
+      if (creatorError) {
+        console.error('Creator upsert error:', creatorError);
+        return res.status(500).json({ error: 'Failed to save creator' });
+      }
+
+      creator = upsertedCreator;
     }
 
     // If stats data provided, save it
-    if (statsData && creator) {
+    // Use creatorId from request if provided, otherwise use creator.id from upsert above
+    if (statsData && (creatorId || creator)) {
+      const targetCreatorId = creatorId || creator.id;
+
       // Get today's date in America/New_York timezone
       const today = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'America/New_York',
@@ -76,7 +85,7 @@ export default async function handler(req, res) {
       const { error: statsError } = await supabase
         .from('creator_stats')
         .upsert({
-          creator_id: creator.id,
+          creator_id: targetCreatorId,
           recorded_at: today,
           subscribers: statsData.subscribers,
           total_views: statsData.totalViews,
@@ -88,7 +97,7 @@ export default async function handler(req, res) {
 
       if (statsError) {
         console.error('Stats upsert error:', statsError);
-        // Don't fail the whole request if stats save fails
+        return res.status(500).json({ error: 'Failed to save stats' });
       }
     }
 
