@@ -13,29 +13,107 @@ export default function Terms() {
         <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
-            <p className="text-indigo-100">Last updated: February 1, 2026</p>
+            <p className="text-indigo-100">Last updated: February 11, 2026</p>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto px-4 py-12">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
             <div className="prose max-w-none">
-              <Section title="1. Acceptance of Terms">
+              <p className="text-gray-600 mb-8 leading-relaxed">
+                This is the terms of use agreement (the "Agreement") that governs your use of ShinyPull's website
+                and data. If you do not agree with these terms, please stop using ShinyPull's website and refrain
+                from using our data.
+              </p>
+
+              <Section title="General Terms">
+                <p className="mb-4">
+                  ShinyPull may change any of the terms and conditions in this Agreement at any time for any reason.
+                  A notice of material change will be posted on ShinyPull's website, and you are responsible for
+                  reviewing the changes. If you do not agree with them, do not continue to use ShinyPull's website
+                  and refrain from using our data.
+                </p>
+                <p className="mb-4">
+                  ShinyPull does not provide any guarantee or warranty of the accuracy of any data. By using
+                  ShinyPull, you are certifying that you are over 13 years of age and have your legal guardian's
+                  permission if you are under 18.
+                </p>
                 <p>
-                  By accessing and using ShinyPull, you accept and agree to be bound by these Terms of Service.
-                  If you do not agree to these terms, please do not use our service.
+                  The data ShinyPull provides is public information. It is gathered by ShinyPull's proprietary
+                  software from 3rd party sources. The data is then collated, organized, manipulated, and displayed
+                  in unique ways by ShinyPull. This makes the data proprietary.
                 </p>
               </Section>
 
-              <Section title="2. Description of Service">
+              <Section title="Data Rights">
+                <p className="mb-4">
+                  Sharing ShinyPull's data, including screen shots or images of ShinyPull's website, is allowed
+                  providing you credit ShinyPull as the source of said data and/or images. The acceptable way to
+                  do this is to provide a link back to the source of the data, and clearly state in text that
+                  ShinyPull provides the data. This includes sharing our data on social media websites, on blogs,
+                  and in any sort of publication.
+                </p>
+                <p className="mb-4">
+                  Data that is shared from ShinyPull on YouTube videos should include a link in the description,
+                  and a verbal or written acknowledgement of ShinyPull as the source of the data in the video itself.
+                </p>
+                <p>
+                  <strong>Mass copying data from ShinyPull's website (to include botting, crawling, scraping, etc.)
+                  is not allowed</strong> and may result in you being blocked from ShinyPull's website and data.
+                  The only way you may gather large amounts of data is by requesting data directly from ShinyPull
+                  (email our staff at{' '}
+                  <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-700">
+                    shinypull@proton.me
+                  </a>
+                  ).
+                </p>
+              </Section>
+
+              <Section title="Data Policy - Creator Profile Removal">
+                <p className="mb-4">
+                  <strong>It is ShinyPull's policy to not delete data on our website.</strong> All the data on our
+                  website is gathered from public sources, and ShinyPull will continue to display said data. If you
+                  want us to stop displaying the statistics of your channel/account from a third party (e.g. YouTube,
+                  Twitch, Instagram, Kick), you will have to adjust your privacy settings on said third party website.
+                </p>
+                <p className="mb-4">
+                  Again just to reinstate, the data shown on ShinyPull is the same public data anyone could get by
+                  visiting your profile on various social media sites and writing it down. We do not display private
+                  data. If we were to delete or change any of the data shown it would ruin our journalistic/encyclopedic
+                  integrity.
+                </p>
+                <p>
+                  <strong>If you want a private social media profile simply mark it as private on that site and we
+                  won't collect its public data, otherwise we will.</strong>
+                </p>
+              </Section>
+
+              <Section title="Data Sources">
+                <p>
+                  In order to keep statistical data updated, ShinyPull utilizes API services of third parties
+                  including YouTube, Instagram, Twitch, and Kick. Unless specific access is asked for at time of
+                  use (i.e. to validate your identity), we are only gathering publicly available data from each of
+                  the API services, not anything private about your account. When private data is granted, collected
+                  data via the private token isn't being stored, it is just being used to verify various things. If
+                  you wish to revoke access you can do so via each platform's connected services page, or contact us
+                  at{' '}
+                  <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-700">
+                    shinypull@proton.me
+                  </a>{' '}
+                  and we will delete the token from our system. If you wish to delete your account entirely including
+                  all connected accounts, you can do so via the account settings page.
+                </p>
+              </Section>
+
+              <Section title="Description of Service">
                 <p>
                   ShinyPull provides social media analytics and statistics for content creators across multiple
-                  platforms including YouTube, Twitch, and Kick. We collect publicly available
-                  data from official platform APIs.
+                  platforms including YouTube, Twitch, Kick, and Instagram. We collect publicly available
+                  data from official platform APIs and web scraping of public pages.
                 </p>
               </Section>
 
-              <Section title="3. User Accounts">
+              <Section title="User Accounts">
                 <p className="mb-2">When creating an account, you agree to:</p>
                 <ul className="list-disc list-inside text-gray-600 space-y-1">
                   <li>Provide accurate and complete information</li>
@@ -45,7 +123,7 @@ export default function Terms() {
                 </ul>
               </Section>
 
-              <Section title="4. Data Accuracy">
+              <Section title="Data Accuracy">
                 <p>
                   While we strive to provide accurate statistics, we cannot guarantee 100% accuracy. Data is
                   collected from third-party APIs and may be subject to delays, errors, or inconsistencies.
@@ -54,7 +132,7 @@ export default function Terms() {
                 </p>
               </Section>
 
-              <Section title="5. Live Counter Estimates">
+              <Section title="Live Counter Estimates">
                 <p className="mb-4">
                   Our "Live Counter" feature displays <strong>estimated</strong> real-time subscriber and follower
                   counts. These numbers are simulations based on:
@@ -76,10 +154,10 @@ export default function Terms() {
                 </p>
               </Section>
 
-              <Section title="6. Acceptable Use">
+              <Section title="Acceptable Use">
                 <p className="mb-2">You agree NOT to:</p>
                 <ul className="list-disc list-inside text-gray-600 space-y-1">
-                  <li>Use automated tools to scrape or download data</li>
+                  <li>Use automated tools to scrape or download data without permission</li>
                   <li>Attempt to access unauthorized areas of the service</li>
                   <li>Interfere with or disrupt the service</li>
                   <li>Violate any applicable laws or regulations</li>
@@ -88,7 +166,7 @@ export default function Terms() {
                 </ul>
               </Section>
 
-              <Section title="7. Intellectual Property">
+              <Section title="Intellectual Property">
                 <p>
                   All content, features, and functionality of ShinyPull are owned by us and protected by
                   international copyright, trademark, and other intellectual property laws. Creator statistics
@@ -96,14 +174,14 @@ export default function Terms() {
                 </p>
               </Section>
 
-              <Section title="8. Third-Party Platforms">
+              <Section title="Third-Party Platforms">
                 <p>
-                  Our service relies on third-party platform APIs (YouTube, Twitch, etc.). We are not
-                  affiliated with these platforms. Changes to their APIs or terms may affect our service.
+                  Our service relies on third-party platform APIs (YouTube, Twitch, Instagram, Kick, etc.). We are
+                  not affiliated with these platforms. Changes to their APIs or terms may affect our service.
                 </p>
               </Section>
 
-              <Section title="9. Limitation of Liability">
+              <Section title="Limitation of Liability">
                 <p>
                   ShinyPull is provided "as is" without warranties of any kind. We shall not be liable
                   for any indirect, incidental, special, consequential, or punitive damages resulting from
@@ -111,21 +189,21 @@ export default function Terms() {
                 </p>
               </Section>
 
-              <Section title="10. Service Modifications">
+              <Section title="Service Modifications">
                 <p>
                   We reserve the right to modify, suspend, or discontinue any part of our service at any
                   time without notice. We may also update these Terms of Service periodically.
                 </p>
               </Section>
 
-              <Section title="11. Termination">
+              <Section title="Termination">
                 <p>
                   We may terminate or suspend your account and access to the service at our sole discretion,
                   without notice, for conduct that violates these Terms or is harmful to other users.
                 </p>
               </Section>
 
-              <Section title="12. Amazon Associates Disclosure">
+              <Section title="Amazon Associates Disclosure">
                 <p className="mb-4">
                   ShinyPull is a participant in the Amazon Services LLC Associates Program, an affiliate
                   advertising program designed to provide a means for sites to earn advertising fees by
@@ -141,7 +219,7 @@ export default function Terms() {
                 </p>
               </Section>
 
-              <Section title="13. Contact Information">
+              <Section title="Contact Information">
                 <p>
                   For questions about these Terms, please contact us at{' '}
                   <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-700">
@@ -149,7 +227,15 @@ export default function Terms() {
                   </a>
                 </p>
               </Section>
+
+              <p className="text-sm text-gray-500 mt-8">
+                This Document is Effective as of February 11, 2026.
+              </p>
             </div>
+          </div>
+
+          <div className="text-center text-sm text-gray-500 mt-8">
+            <p>Copyright ©2026 ShinyPull</p>
           </div>
         </div>
       </div>
