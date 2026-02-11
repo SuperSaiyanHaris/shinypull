@@ -8,6 +8,7 @@ import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChan
 import { searchChannels as searchTwitch, getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { searchChannels as searchKick, getChannelByUsername as getKickChannel } from '../services/kickService';
 import { searchCreators, getCreatorByUsername } from '../services/creatorService';
+import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
@@ -15,7 +16,7 @@ import logger from '../lib/logger';
 
 const platformConfig = {
   youtube: { icon: Youtube, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
-  instagram: { icon: InstagramIcon, color: 'text-pink-600', bg: 'bg-pink-50', border: 'border-pink-200' },
+  instagram: { icon: InstagramIcon, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
   twitch: { icon: Twitch, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
   kick: { icon: KickIcon, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
 };
@@ -410,17 +411,33 @@ function SearchableSlot({ onSelect, onRemove }) {
         results = await searchYouTube(searchQuery, 5);
       } else if (searchPlatform === 'instagram') {
         // Search Instagram from database
-        const dbResults = await searchCreators('instagram', searchQuery, 5);
-        results = dbResults.map(creator => ({
-          platform: 'instagram',
-          platformId: creator.platform_id,
-          username: creator.username,
-          displayName: creator.display_name || creator.username,
-          profileImage: creator.profile_image,
-          description: creator.description,
-          subscribers: creator.latest_stats?.followers || 0,
-          totalPosts: creator.latest_stats?.total_posts || 0,
-        }));
+        const dbResults = await searchCreators(searchQuery, 'instagram');
+
+        // Fetch stats for each creator
+        const withStats = await Promise.all(
+          dbResults.map(async (creator) => {
+            const { data: stats } = await supabase
+              .from('creator_stats')
+              .select('followers, total_posts')
+              .eq('creator_id', creator.id)
+              .order('recorded_at', { ascending: false })
+              .limit(1)
+              .single();
+
+            return {
+              platform: 'instagram',
+              platformId: creator.platform_id,
+              username: creator.username,
+              displayName: creator.display_name || creator.username,
+              profileImage: creator.profile_image,
+              description: creator.description,
+              subscribers: stats?.followers || 0,
+              totalPosts: stats?.total_posts || 0,
+            };
+          })
+        );
+
+        results = withStats.slice(0, 5);
       } else if (searchPlatform === 'twitch') {
         results = await searchTwitch(searchQuery, 5);
       } else if (searchPlatform === 'kick') {

@@ -8,6 +8,7 @@ import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import { searchChannels as searchKick } from '../services/kickService';
 import { upsertCreator, saveCreatorStats, searchCreators } from '../services/creatorService';
+import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
@@ -22,7 +23,7 @@ const platformIcons = {
 
 const platformColors = {
   youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600' },
-  instagram: { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-600' },
+  instagram: { bg: 'bg-gradient-to-br from-purple-600 to-pink-600', light: 'bg-purple-50', text: 'text-purple-600' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
   kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
 };
@@ -36,19 +37,35 @@ const platforms = [
 
 // Instagram search function - searches database
 async function searchInstagram(query, limit = 25) {
-  const results = await searchCreators('instagram', query, limit);
+  // searchCreators takes (query, platform) - NOT (platform, query)!
+  const results = await searchCreators(query, 'instagram');
 
-  // Transform to match expected format
-  return results.map(creator => ({
-    platform: 'instagram',
-    platformId: creator.platform_id,
-    username: creator.username,
-    displayName: creator.display_name || creator.username,
-    profileImage: creator.profile_image,
-    description: creator.description,
-    subscribers: creator.latest_stats?.followers || 0,
-    totalPosts: creator.latest_stats?.total_posts || 0,
-  }));
+  // Fetch stats for each creator
+  const withStats = await Promise.all(
+    results.map(async (creator) => {
+      // Get latest stats from creator_stats table
+      const { data: stats } = await supabase
+        .from('creator_stats')
+        .select('followers, total_posts')
+        .eq('creator_id', creator.id)
+        .order('recorded_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      return {
+        platform: 'instagram',
+        platformId: creator.platform_id,
+        username: creator.username,
+        displayName: creator.display_name || creator.username,
+        profileImage: creator.profile_image,
+        description: creator.description,
+        subscribers: stats?.followers || 0,
+        totalPosts: stats?.total_posts || 0,
+      };
+    })
+  );
+
+  return withStats.slice(0, limit);
 }
 
 export default function Search() {
