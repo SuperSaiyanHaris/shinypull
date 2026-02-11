@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2 } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
+import { CompareCardSkeleton } from '../components/Skeleton';
 import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { searchChannels as searchTwitch, getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { searchChannels as searchKick, getChannelByUsername as getKickChannel } from '../services/kickService';
@@ -147,9 +148,10 @@ export default function Compare() {
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Loading State */}
           {loadingFromUrl && (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mr-3" />
-              <span className="text-gray-600">Loading creators...</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <CompareCardSkeleton key={i} />
+              ))}
             </div>
           )}
 

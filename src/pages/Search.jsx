@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
+import { CreatorRowSkeleton } from '../components/Skeleton';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import { searchChannels as searchKick } from '../services/kickService';
@@ -197,9 +198,13 @@ export default function Search() {
 
           {/* Loading State */}
           {loading && (
-            <div className="text-center py-16">
-              <div className="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-500">Searching {currentPlatform?.name}...</p>
+            <div className="space-y-3">
+              <div className="text-center mb-6">
+                <p className="text-gray-500">Searching {currentPlatform?.name}...</p>
+              </div>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <CreatorRowSkeleton key={i} />
+              ))}
             </div>
           )}
 

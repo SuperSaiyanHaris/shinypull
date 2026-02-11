@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
+import { TableSkeleton } from '../components/Skeleton';
 import { getRankedCreators } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
@@ -160,9 +161,8 @@ export default function Rankings() {
 
             {/* Loading State */}
             {loading && (
-              <div className="px-6 py-16 text-center">
-                <div className="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-500">Loading rankings...</p>
+              <div className="px-6 py-4">
+                <TableSkeleton rows={10} />
               </div>
             )}
 
