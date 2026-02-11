@@ -2,5 +2,9 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /blog/admin
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /signin
+Disallow: /signup
 
 Sitemap: https://shinypull.com/sitemap.xml

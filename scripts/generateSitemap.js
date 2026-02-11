@@ -15,23 +15,24 @@ const supabase = createClient(
 );
 
 const SITE_URL = 'https://shinypull.com';
+const TODAY = new Date().toISOString().split('T')[0];
 
 // Static pages with their priority and change frequency
 const staticPages = [
-  { url: '/', changefreq: 'daily', priority: 1.0 },
-  { url: '/blog', changefreq: 'daily', priority: 0.9 },
-  { url: '/rankings', changefreq: 'daily', priority: 0.9 },
-  { url: '/rankings/youtube', changefreq: 'daily', priority: 0.85 },
-  { url: '/rankings/twitch', changefreq: 'daily', priority: 0.85 },
-  { url: '/rankings/kick', changefreq: 'daily', priority: 0.85 },
-  { url: '/compare', changefreq: 'weekly', priority: 0.8 },
-  { url: '/gear', changefreq: 'weekly', priority: 0.85 },
-  { url: '/youtube/money-calculator', changefreq: 'monthly', priority: 0.8 },
-  { url: '/search', changefreq: 'weekly', priority: 0.7 },
-  { url: '/about', changefreq: 'monthly', priority: 0.6 },
-  { url: '/contact', changefreq: 'monthly', priority: 0.5 },
-  { url: '/privacy', changefreq: 'monthly', priority: 0.3 },
-  { url: '/terms', changefreq: 'monthly', priority: 0.3 },
+  { url: '/', lastmod: TODAY, changefreq: 'daily', priority: 1.0 },
+  { url: '/blog', lastmod: TODAY, changefreq: 'daily', priority: 0.9 },
+  { url: '/rankings', lastmod: TODAY, changefreq: 'daily', priority: 0.9 },
+  { url: '/rankings/youtube', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
+  { url: '/rankings/twitch', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
+  { url: '/rankings/kick', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
+  { url: '/compare', lastmod: TODAY, changefreq: 'weekly', priority: 0.8 },
+  { url: '/gear', lastmod: TODAY, changefreq: 'weekly', priority: 0.85 },
+  { url: '/youtube/money-calculator', lastmod: TODAY, changefreq: 'monthly', priority: 0.8 },
+  { url: '/search', lastmod: TODAY, changefreq: 'weekly', priority: 0.7 },
+  { url: '/about', lastmod: TODAY, changefreq: 'monthly', priority: 0.6 },
+  { url: '/contact', lastmod: TODAY, changefreq: 'monthly', priority: 0.5 },
+  { url: '/privacy', lastmod: TODAY, changefreq: 'monthly', priority: 0.3 },
+  { url: '/terms', lastmod: TODAY, changefreq: 'monthly', priority: 0.3 },
 ];
 
 function formatDate(date) {
@@ -120,12 +121,6 @@ async function generateSitemap() {
         lastmod: creator.updated_at,
         changefreq: 'daily',
         priority: 0.7,
-      });
-      urls.push({
-        url: `/live/${creator.platform}/${creator.username}`,
-        lastmod: creator.updated_at,
-        changefreq: 'daily',
-        priority: 0.6,
       });
     });
   }
