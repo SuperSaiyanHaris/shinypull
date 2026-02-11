@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
+import InstagramIcon from '../components/InstagramIcon';
 import { CreatorRowSkeleton } from '../components/Skeleton';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import { searchChannels as searchKick } from '../services/kickService';
-import { upsertCreator, saveCreatorStats } from '../services/creatorService';
+import { upsertCreator, saveCreatorStats, searchCreators } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
@@ -14,21 +15,41 @@ import logger from '../lib/logger';
 
 const platformIcons = {
   youtube: Youtube,
+  instagram: InstagramIcon,
   twitch: Twitch,
   kick: KickIcon,
 };
 
 const platformColors = {
   youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600' },
+  instagram: { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-600' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
   kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
 };
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, available: true },
+  { id: 'instagram', name: 'Instagram', icon: InstagramIcon, available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, available: true },
 ];
+
+// Instagram search function - searches database
+async function searchInstagram(query, limit = 25) {
+  const results = await searchCreators('instagram', query, limit);
+
+  // Transform to match expected format
+  return results.map(creator => ({
+    platform: 'instagram',
+    platformId: creator.platform_id,
+    username: creator.username,
+    displayName: creator.display_name || creator.username,
+    profileImage: creator.profile_image,
+    description: creator.description,
+    subscribers: creator.latest_stats?.followers || 0,
+    totalPosts: creator.latest_stats?.total_posts || 0,
+  }));
+}
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -70,6 +91,9 @@ export default function Search() {
         if (channels.length > 0) {
           void persistYouTubeResults(channels);
         }
+      } else if (selectedPlatform === 'instagram') {
+        // Search Instagram creators from database
+        channels = await searchInstagram(searchQuery, 25);
       } else if (selectedPlatform === 'twitch') {
         channels = await searchTwitch(searchQuery, 25);
       } else if (selectedPlatform === 'kick') {
