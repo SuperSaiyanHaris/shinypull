@@ -4,9 +4,9 @@
 
 ## Project Overview
 
-ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube, Twitch, and Kick.
+ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube, Instagram, Twitch, and Kick.
 
-**Status:** YouTube, Twitch, and Kick integrations fully working. Live subscriber/follower counts, historical charts, and automated data collection operational.
+**Status:** YouTube, Instagram, Twitch, and Kick integrations fully working. Live subscriber/follower counts, historical charts, and automated data collection operational.
 
 ## Critical Rules
 
@@ -34,7 +34,7 @@ ShinyPull is a social media analytics platform (similar to SocialBlade) that tra
 - **Database:** Supabase (PostgreSQL)
 - **Hosting:** Vercel (auto-deploys on push to main)
 - **Icons:** Lucide React
-- **APIs:** YouTube Data API v3, Twitch Helix API, Kick API v1
+- **APIs:** YouTube Data API v3, Instagram Public API (manual seed), Twitch Helix API, Kick API v1
 
 ## Project Structure
 
@@ -144,6 +144,14 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
 - Batch up to 50 slugs per request
 - Custom `KickIcon` SVG component (no lucide-react icon available)
 
+**Instagram:**
+- No official public API for querying arbitrary profiles
+- Currently uses **manual seed** with top 64 creators (Cristiano 639M, Messi 505M, etc.)
+- Public API endpoints require authentication and rate-limit aggressively
+- Future: Could implement browser-based scraping with Puppeteer for expansion
+- Custom `InstagramIcon` component with official gradient styling
+- Displays: Followers, Posts (no views/earnings data available)
+
 ## Commands
 
 ```bash
@@ -176,9 +184,13 @@ Scripts use `dotenv` to load `.env` automatically.
 
 ## GitHub Actions
 
-- **Daily Stats Collection:** Runs 3x daily (6 AM, 2 PM, 10 PM UTC) — collects YouTube, Twitch, and Kick
-- **Twitch Stream Monitor:** Runs every 5 minutes
-- **Kick Stream Monitor:** Runs every 5 minutes
+**Optimized for 2,000 minutes/month budget:**
+- **Daily Stats Collection:** Runs 2x daily (6 AM, 6 PM UTC) — collects YouTube, Instagram, Twitch, and Kick stats
+- **Creator Discovery:** Runs 4x daily (every 6 hours) — discovers new creators across all platforms
+- **Twitch Stream Monitor:** Runs every 3 hours (8x daily) — tracks live streams and hours watched
+- **Kick Stream Monitor:** Runs every 3 hours (8x daily, offset) — tracks live streams and hours watched
+
+**Monthly usage:** ~1,440 minutes (within 2,000 min free tier)
 
 ## Conventions
 

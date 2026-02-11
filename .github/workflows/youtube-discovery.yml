@@ -2,19 +2,16 @@ name: Creator Discovery
 
 on:
   schedule:
-    # Run 6x daily (every 4 hours) to discover new creators faster
+    # Run 4x daily (every 6 hours) to discover new creators
+    # Optimized from 6x daily to stay within GitHub Actions budget
     # 00:00 UTC (6 PM CST)
     - cron: '0 0 * * *'
-    # 04:00 UTC (10 PM CST)
-    - cron: '0 4 * * *'
-    # 08:00 UTC (2 AM CST)
-    - cron: '0 8 * * *'
+    # 06:00 UTC (12 AM CST)
+    - cron: '0 6 * * *'
     # 12:00 UTC (6 AM CST)
     - cron: '0 12 * * *'
-    # 16:00 UTC (10 AM CST)
-    - cron: '0 16 * * *'
-    # 20:00 UTC (2 PM CST)
-    - cron: '0 20 * * *'
+    # 18:00 UTC (12 PM CST)
+    - cron: '0 18 * * *'
   workflow_dispatch: # Allow manual trigger from GitHub UI
 
 jobs:
