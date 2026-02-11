@@ -2,7 +2,41 @@ import { supabase } from '../lib/supabase';
 import { withErrorHandling } from '../lib/errorHandler';
 
 /**
+ * Get the current session token for authenticated API calls
+ */
+async function getAuthToken() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    throw new Error('Not authenticated');
+  }
+  return session.access_token;
+}
+
+/**
+ * Make an authenticated request to the blog admin API
+ */
+async function blogAdminRequest(action, id = null, data = null) {
+  const token = await getAuthToken();
+  const response = await fetch('/api/blog-admin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ action, id, data }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Request failed' }));
+    throw new Error(error.error || 'Blog admin request failed');
+  }
+
+  return response.json();
+}
+
+/**
  * Get all blog posts (including unpublished) for admin
+ * Reads still go directly to Supabase (SELECT is always allowed)
  */
 export const getAllPostsAdmin = withErrorHandling(
   async () => {
@@ -35,70 +69,45 @@ export const getPostById = withErrorHandling(
 );
 
 /**
- * Create a new blog post
+ * Create a new blog post (via authenticated API)
  */
 export const createPost = withErrorHandling(
   async (post) => {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .insert(post)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const result = await blogAdminRequest('create', null, post);
+    return result.data;
   },
   'blogAdminService.createPost'
 );
 
 /**
- * Update an existing blog post
+ * Update an existing blog post (via authenticated API)
  */
 export const updatePost = withErrorHandling(
   async (id, updates) => {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const result = await blogAdminRequest('update', id, updates);
+    return result.data;
   },
   'blogAdminService.updatePost'
 );
 
 /**
- * Delete a blog post
+ * Delete a blog post (via authenticated API)
  */
 export const deletePost = withErrorHandling(
   async (id) => {
-    const { error } = await supabase
-      .from('blog_posts')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    await blogAdminRequest('delete', id);
     return true;
   },
   'blogAdminService.deletePost'
 );
 
 /**
- * Toggle publish status
+ * Toggle publish status (via authenticated API)
  */
 export const togglePublish = withErrorHandling(
   async (id, isPublished) => {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .update({ is_published: isPublished })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const result = await blogAdminRequest('togglePublish', id, { is_published: isPublished });
+    return result.data;
   },
   'blogAdminService.togglePublish'
 );

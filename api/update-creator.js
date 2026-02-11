@@ -57,30 +57,74 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid creator data' });
       }
 
-      const { data: upsertedCreator, error: creatorError } = await supabase
-        .from('creators')
-        .upsert({
-          platform: creatorData.platform,
-          platform_id: creatorData.platformId,
-          username: creatorData.username,
-          display_name: creatorData.displayName,
-          profile_image: creatorData.profileImage,
-          description: creatorData.description,
-          country: creatorData.country,
-          category: creatorData.category,
-          updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'platform,platform_id',
-        })
-        .select()
-        .single();
-
-      if (creatorError) {
-        console.error('Creator upsert error:', creatorError);
-        return res.status(500).json({ error: 'Failed to save creator' });
+      // Validate platform is a known value
+      const validPlatforms = ['youtube', 'twitch', 'kick'];
+      if (!validPlatforms.includes(creatorData.platform)) {
+        return res.status(400).json({ error: 'Invalid platform' });
       }
 
-      creator = upsertedCreator;
+      // Validate field lengths
+      if (creatorData.displayName && creatorData.displayName.length > 200) {
+        return res.status(400).json({ error: 'Display name too long' });
+      }
+      if (creatorData.username && creatorData.username.length > 200) {
+        return res.status(400).json({ error: 'Username too long' });
+      }
+
+      // Check if creator already exists
+      const { data: existingCreator } = await supabase
+        .from('creators')
+        .select('id')
+        .eq('platform', creatorData.platform)
+        .eq('platform_id', creatorData.platformId)
+        .single();
+
+      if (existingCreator) {
+        // SECURITY: For existing creators, only update safe fields
+        // display_name and username are NOT updatable from the frontend
+        // They should only be changed by server-side collection scripts
+        const { data: updatedCreator, error: updateError } = await supabase
+          .from('creators')
+          .update({
+            profile_image: creatorData.profileImage,
+            description: creatorData.description,
+            country: creatorData.country,
+            category: creatorData.category,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingCreator.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error('Creator update error:', updateError);
+          return res.status(500).json({ error: 'Failed to update creator' });
+        }
+        creator = updatedCreator;
+      } else {
+        // New creator — allow full insert
+        const { data: newCreator, error: insertError } = await supabase
+          .from('creators')
+          .insert({
+            platform: creatorData.platform,
+            platform_id: creatorData.platformId,
+            username: creatorData.username,
+            display_name: creatorData.displayName,
+            profile_image: creatorData.profileImage,
+            description: creatorData.description,
+            country: creatorData.country,
+            category: creatorData.category,
+            updated_at: new Date().toISOString(),
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error('Creator insert error:', insertError);
+          return res.status(500).json({ error: 'Failed to save creator' });
+        }
+        creator = newCreator;
+      }
     }
 
     // If stats data provided, save it

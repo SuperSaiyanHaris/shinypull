@@ -2,6 +2,39 @@ import { supabase } from '../lib/supabase';
 import logger from '../lib/logger';
 
 /**
+ * Get the current session token for authenticated API calls
+ */
+async function getAuthToken() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    throw new Error('Not authenticated');
+  }
+  return session.access_token;
+}
+
+/**
+ * Make an authenticated request to the products admin API
+ */
+async function productsAdminRequest(action, id = null, data = null) {
+  const token = await getAuthToken();
+  const response = await fetch('/api/products-admin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ action, id, data }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Request failed' }));
+    throw new Error(error.error || 'Products admin request failed');
+  }
+
+  return response.json();
+}
+
+/**
  * Get a product by slug (for rendering in blog posts)
  */
 export async function getProduct(slug) {
@@ -40,6 +73,7 @@ export async function getActiveProducts() {
 
 /**
  * Get all products (for admin)
+ * Reads still go directly to Supabase (SELECT is always allowed)
  */
 export async function getAllProducts() {
   const { data, error } = await supabase
@@ -56,64 +90,35 @@ export async function getAllProducts() {
 }
 
 /**
- * Create a new product
+ * Create a new product (via authenticated API)
  */
 export async function createProduct(product) {
-  const { data, error } = await supabase
-    .from('products')
-    .insert(product)
-    .select()
-    .single();
-
-  if (error) {
-    logger.error('Error creating product:', error);
-    throw error;
-  }
-
-  return data;
+  const result = await productsAdminRequest('create', null, product);
+  return result.data;
 }
 
 /**
- * Update a product
+ * Update a product (via authenticated API)
  */
 export async function updateProduct(id, updates) {
-  const { data, error } = await supabase
-    .from('products')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) {
-    logger.error('Error updating product:', error);
-    throw error;
-  }
-
-  return data;
+  const result = await productsAdminRequest('update', id, updates);
+  return result.data;
 }
 
 /**
- * Delete a product
+ * Delete a product (via authenticated API)
  */
 export async function deleteProduct(id) {
-  const { error } = await supabase
-    .from('products')
-    .delete()
-    .eq('id', id);
-
-  if (error) {
-    logger.error('Error deleting product:', error);
-    throw error;
-  }
-
+  await productsAdminRequest('delete', id);
   return true;
 }
 
 /**
- * Toggle product active status
+ * Toggle product active status (via authenticated API)
  */
 export async function toggleProductActive(id, isActive) {
-  return updateProduct(id, { is_active: isActive });
+  const result = await productsAdminRequest('toggleActive', id, { is_active: isActive });
+  return result.data;
 }
 
 /**
