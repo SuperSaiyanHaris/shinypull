@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight } from 'lucide-react';
+import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight, Clock, CheckCircle } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
 import { CreatorRowSkeleton } from '../components/Skeleton';
@@ -9,6 +9,7 @@ import { searchChannels as searchTwitch } from '../services/twitchService';
 import { searchChannels as searchKick } from '../services/kickService';
 import { upsertCreator, saveCreatorStats, searchCreators } from '../services/creatorService';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
@@ -76,6 +77,9 @@ export default function Search() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
+  const [requestStatus, setRequestStatus] = useState(null); // null, 'requesting', 'success', 'error'
+  const [requestMessage, setRequestMessage] = useState('');
+  const { user } = useAuth();
 
   useEffect(() => {
     const q = searchParams.get('q');
@@ -145,6 +149,44 @@ export default function Search() {
       } catch (dbErr) {
         logger.warn('Failed to persist creator:', dbErr);
       }
+    }
+  };
+
+  const handleRequestCreator = async () => {
+    if (!query.trim()) return;
+
+    setRequestStatus('requesting');
+    setRequestMessage('');
+
+    try {
+      const response = await fetch('/api/request-creator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          platform: selectedPlatform,
+          username: query.trim().replace('@', ''), // Remove @ if present
+          userId: user?.id || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success || data.exists) {
+        setRequestStatus('success');
+        setRequestMessage(data.message);
+        // Track request event
+        analytics.event('request_creator', {
+          platform: selectedPlatform,
+          username: query.trim(),
+        });
+      } else {
+        setRequestStatus('error');
+        setRequestMessage(data.error || 'Failed to submit request');
+      }
+    } catch (err) {
+      logger.error('Request creator error:', err);
+      setRequestStatus('error');
+      setRequestMessage('Failed to submit request. Please try again.');
     }
   };
 
@@ -259,9 +301,65 @@ export default function Search() {
               <p className="text-gray-500 mb-4">
                 We couldn't find any {currentPlatform?.name} creators matching "{query}"
               </p>
-              <p className="text-sm text-gray-400">
-                Try searching for a different name or check the spelling
-              </p>
+
+              {/* Instagram-specific: Request Creator Button */}
+              {selectedPlatform === 'instagram' && (
+                <>
+                  {requestStatus === null && (
+                    <div className="mt-6 max-w-md mx-auto">
+                      <p className="text-sm text-gray-600 mb-4">
+                        Instagram creators are added by request. Want us to track this creator?
+                      </p>
+                      <button
+                        onClick={handleRequestCreator}
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                      >
+                        <Clock className="w-5 h-5" />
+                        Request This Creator
+                      </button>
+                      <p className="text-xs text-gray-400 mt-3">
+                        We'll add them within 24 hours
+                      </p>
+                    </div>
+                  )}
+
+                  {requestStatus === 'requesting' && (
+                    <div className="mt-6 max-w-md mx-auto p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
+                      <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                      <p className="text-sm text-indigo-700 font-medium">Submitting request...</p>
+                    </div>
+                  )}
+
+                  {requestStatus === 'success' && (
+                    <div className="mt-6 max-w-md mx-auto p-4 bg-green-50 border border-green-200 rounded-xl">
+                      <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                      <p className="text-sm text-green-800 font-medium mb-1">Request Submitted!</p>
+                      <p className="text-sm text-green-700">{requestMessage}</p>
+                    </div>
+                  )}
+
+                  {requestStatus === 'error' && (
+                    <div className="mt-6 max-w-md mx-auto p-4 bg-red-50 border border-red-200 rounded-xl">
+                      <AlertCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
+                      <p className="text-sm text-red-800 font-medium mb-1">Request Failed</p>
+                      <p className="text-sm text-red-700">{requestMessage}</p>
+                      <button
+                        onClick={handleRequestCreator}
+                        className="mt-3 text-sm text-red-700 hover:text-red-800 font-medium underline"
+                      >
+                        Try Again
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Non-Instagram: Standard message */}
+              {selectedPlatform !== 'instagram' && (
+                <p className="text-sm text-gray-400">
+                  Try searching for a different name or check the spelling
+                </p>
+              )}
             </div>
           )}
 
