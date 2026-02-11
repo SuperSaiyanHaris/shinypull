@@ -508,7 +508,7 @@ export default function CreatorProfile() {
               {/* Subscribers/Followers Card */}
               <StatCard
                 icon={Users}
-                label={platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subscribers' : 'Subscribers'}
+                label={platform === 'instagram' ? 'Followers' : platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subscribers' : 'Subscribers'}
                 value={formatNumber(creator.subscribers || creator.followers)}
                 sublabel={creator.hiddenSubscribers ? '(hidden)' : platform === 'youtube' ? '(rounded by YouTube)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
               />
@@ -678,7 +678,7 @@ export default function CreatorProfile() {
                 </div>
                 <div className="min-w-0">
                   <p className="font-semibold text-sm sm:text-base truncate">
-                    Live {platform === 'twitch' ? 'Follower' : platform === 'kick' ? 'Paid Subscriber' : 'Subscriber'} Count
+                    Live {platform === 'instagram' ? 'Follower' : platform === 'twitch' ? 'Follower' : platform === 'kick' ? 'Paid Subscriber' : 'Subscriber'} Count
                   </p>
                   <p className="text-xs sm:text-sm text-indigo-200 truncate">Watch the count update in real-time</p>
                 </div>
@@ -726,12 +726,12 @@ export default function CreatorProfile() {
                       <tr className="border-b border-gray-100 bg-gray-50 text-left">
                         <th className="px-6 py-4 font-semibold text-gray-600">Date</th>
                         <th className="px-6 py-4 font-semibold text-gray-600 text-right">
-                          {platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : 'Subscribers'}
+                          {platform === 'instagram' ? 'Followers' : platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : 'Subscribers'}
                         </th>
                         {platform === 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Watch Hours</th>}
-                        {platform !== 'twitch' && platform !== 'kick' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
-                        {platform !== 'twitch' && platform !== 'kick' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
-                        {platform !== 'twitch' && platform !== 'kick' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Est. Earnings</th>}
+                        {platform !== 'twitch' && platform !== 'kick' && platform !== 'instagram' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
+                        {platform !== 'twitch' && platform !== 'kick' && platform !== 'instagram' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
+                        {platform !== 'twitch' && platform !== 'kick' && platform !== 'instagram' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Est. Earnings</th>}
                       </tr>
                     </thead>
                     <tbody>
