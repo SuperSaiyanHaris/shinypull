@@ -8,6 +8,11 @@ export const trackEvent = (eventName, eventParams = {}) => {
 
 // Specific event trackers
 export const analytics = {
+  // Generic event tracker
+  event: (eventName, eventParams = {}) => {
+    trackEvent(eventName, eventParams);
+  },
+
   // Page view (automatically tracked, but can manually trigger)
   pageView: (pageName) => {
     trackEvent('page_view', {

@@ -60,7 +60,7 @@ async function searchInstagram(query, limit = 25) {
         displayName: creator.display_name || creator.username,
         profileImage: creator.profile_image,
         description: creator.description,
-        subscribers: stats?.followers || 0,
+        followers: stats?.followers || 0,
         totalPosts: stats?.total_posts || 0,
       };
     })
@@ -401,7 +401,11 @@ export default function Search() {
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-gray-900 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
-                        <p className="text-xs sm:text-sm text-gray-500">{creator.platform === 'twitch' ? 'followers' : creator.platform === 'kick' ? 'paid subs' : 'subscribers'}</p>
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          {creator.platform === 'twitch' ? 'followers' :
+                           creator.platform === 'instagram' ? 'followers' :
+                           creator.platform === 'kick' ? 'paid subs' : 'subscribers'}
+                        </p>
                       </div>
                       <ArrowRight className="hidden sm:block w-5 h-5 text-gray-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
                     </Link>
