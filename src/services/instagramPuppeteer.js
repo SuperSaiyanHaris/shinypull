@@ -132,7 +132,7 @@ export async function scrapeInstagramProfile(username) {
       platformId: username, // Use username as ID
       username: username,
       displayName: data.displayName || username,
-      profileImage: data.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&size=200&bold=true&background=e1306c&color=fff`,
+      profileImage: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName || username)}&size=200&bold=true&background=e1306c&color=fff`,
       description: data.bio || '',
       followers: data.followers,
       following: data.following,
