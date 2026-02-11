@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
+import InstagramIcon from '../components/InstagramIcon';
 import { TableSkeleton } from '../components/Skeleton';
 import { getRankedCreators } from '../services/creatorService';
 import SEO from '../components/SEO';
@@ -11,6 +12,7 @@ import logger from '../lib/logger';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', hoverColor: 'hover:bg-red-700', lightBg: 'bg-red-50', textColor: 'text-red-600', available: true },
+  { id: 'instagram', name: 'Instagram', icon: InstagramIcon, color: 'bg-pink-600', hoverColor: 'hover:bg-pink-700', lightBg: 'bg-pink-50', textColor: 'text-pink-600', available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', hoverColor: 'hover:bg-purple-700', lightBg: 'bg-purple-50', textColor: 'text-purple-600', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'bg-green-500', hoverColor: 'hover:bg-green-600', lightBg: 'bg-green-50', textColor: 'text-green-600', available: true },
 ];
@@ -25,9 +27,9 @@ export default function Rankings() {
   const [error, setError] = useState(null);
 
   const rankTypes = [
-    { id: 'subscribers', name: selectedPlatform === 'twitch' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
-    // Hide views for Kick since API doesn't provide view data
-    ...(selectedPlatform !== 'kick' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
+    { id: 'subscribers', name: selectedPlatform === 'instagram' ? 'Top Followers' : selectedPlatform === 'twitch' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
+    // Hide views for Kick and Instagram since APIs don't provide view data
+    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
     { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
   ];
 
@@ -63,7 +65,7 @@ export default function Rankings() {
     analytics.switchPlatform('rankings', platformId);
   };
 
-  const followerLabel = selectedPlatform === 'twitch' ? 'Followers' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
+  const followerLabel = selectedPlatform === 'instagram' ? 'Followers' : selectedPlatform === 'twitch' ? 'Followers' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
   const currentPlatform = platforms.find(p => p.id === selectedPlatform);
 
   return (
