@@ -14,6 +14,7 @@ import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
 import { addRecentlyViewed } from '../lib/recentlyViewed';
 import logger from '../lib/logger';
+import { supabase } from '../lib/supabase';
 
 const platformIcons = {
   youtube: Youtube,
@@ -80,6 +81,35 @@ export default function CreatorProfile() {
         channelData = await getTwitchChannel(username);
       } else if (platform === 'kick') {
         channelData = await getKickChannel(username);
+      } else if (platform === 'instagram') {
+        // Instagram: Load from database
+        const dbCreator = await getCreatorByUsername('instagram', username);
+        if (dbCreator) {
+          // Fetch latest stats
+          const { data: latestStats } = await supabase
+            .from('creator_stats')
+            .select('*')
+            .eq('creator_id', dbCreator.id)
+            .order('recorded_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          // Transform to expected format
+          channelData = {
+            platform: 'instagram',
+            platformId: dbCreator.platform_id,
+            username: dbCreator.username,
+            displayName: dbCreator.display_name || dbCreator.username,
+            profileImage: dbCreator.profile_image,
+            description: dbCreator.description,
+            subscribers: latestStats?.followers || 0,
+            followers: latestStats?.followers || 0,
+            totalPosts: latestStats?.total_posts || 0,
+            category: dbCreator.category,
+          };
+
+          setDbCreatorId(dbCreator.id);
+        }
       } else {
         const dbCreator = await getCreatorByUsername(platform, username);
         if (dbCreator) {
