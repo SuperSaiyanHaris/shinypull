@@ -117,6 +117,11 @@ export default function Footer() {
                   Terms of Service
                 </Link>
               </li>
+              <li>
+                <Link to="/support" className="text-gray-500 hover:text-indigo-600 transition-colors">
+                  Support Us
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

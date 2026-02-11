@@ -23,6 +23,7 @@ import BlogAdmin from './pages/BlogAdmin';
 import ResetPassword from './pages/ResetPassword';
 import Calculator from './pages/Calculator';
 import Gear from './pages/Gear';
+import Support from './pages/Support';
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/support" element={<Support />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/admin" element={<BlogAdmin />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
