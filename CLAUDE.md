@@ -146,11 +146,14 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
 
 **Instagram:**
 - No official public API for querying arbitrary profiles
-- Currently uses **manual seed** with top 64 creators (Cristiano 639M, Messi 505M, etc.)
+- Currently uses **manual seed** with top 100+ creators (Cristiano 639M, Messi 505M, etc.)
 - Public API endpoints require authentication and rate-limit aggressively
 - Future: Could implement browser-based scraping with Puppeteer for expansion
-- Custom `InstagramIcon` component with official gradient styling
-- Displays: Followers, Posts (no views/earnings data available)
+- Custom `InstagramIcon` component using `currentColor` pattern (like Lucide icons)
+- Profile displays: Followers, Posts (no views/earnings data available)
+- Profile stats grid shows 4 cards: Followers, Posts, Total Views (—), Engagement (—)
+- Growth summary shows: Followers and Posts growth (no earnings estimates)
+- Daily Metrics Table columns: Date, Followers (with changes), Posts (with changes)
 
 ## Commands
 
