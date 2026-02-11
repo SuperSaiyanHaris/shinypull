@@ -70,8 +70,8 @@ export default function Header() {
                 to={link.path}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive(link.path)
-                    ? 'bg-indigo-50 text-indigo-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                    : 'text-gray-600 hover:bg-indigo-50/50 hover:text-indigo-600 border border-transparent hover:border-indigo-100/50'
                 }`}
               >
                 <link.icon className="w-4 h-4" />
@@ -85,8 +85,8 @@ export default function Header() {
                 to="/dashboard"
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive('/dashboard')
-                    ? 'bg-indigo-50 text-indigo-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                    : 'text-gray-600 hover:bg-indigo-50/50 hover:text-indigo-600 border border-transparent hover:border-indigo-100/50'
                 }`}
               >
                 <LayoutDashboard className="w-4 h-4" />
@@ -100,7 +100,7 @@ export default function Header() {
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
                   >
                     <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-indigo-600" />
@@ -116,7 +116,7 @@ export default function Header() {
                             signOut();
                             setUserMenuOpen(false);
                           }}
-                          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50 w-full"
+                          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 w-full transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
                           Sign Out
@@ -140,7 +140,7 @@ export default function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -157,8 +157,8 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                     isActive(link.path)
-                      ? 'bg-indigo-50 text-indigo-600'
-                      : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                      : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 border border-transparent'
                   }`}
                 >
                   <link.icon className="w-5 h-5" />
@@ -173,7 +173,7 @@ export default function Header() {
                     <Link
                       to="/dashboard"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
                     >
                       <LayoutDashboard className="w-5 h-5" />
                       My Dashboard
@@ -183,7 +183,7 @@ export default function Header() {
                         signOut();
                         setMobileMenuOpen(false);
                       }}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50 w-full"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors w-full"
                     >
                       <LogOut className="w-5 h-5" />
                       Sign Out
