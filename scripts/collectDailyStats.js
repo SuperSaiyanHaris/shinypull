@@ -1,4 +1,7 @@
+import { config } from 'dotenv';
+config();
 import { createClient } from '@supabase/supabase-js';
+import { scrapeInstagramProfile, closeBrowser } from '../src/services/instagramPuppeteer.js';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
@@ -259,11 +262,13 @@ async function collectDailyStats() {
   const youtubeCreators = creators.filter((c) => c.platform === 'youtube');
   const twitchCreators = creators.filter((c) => c.platform === 'twitch');
   const kickCreators = creators.filter((c) => c.platform === 'kick');
+  const instagramCreators = creators.filter((c) => c.platform === 'instagram');
 
   console.log(`Found ${creators.length} creators to update`);
   console.log(`   YouTube: ${youtubeCreators.length}`);
   console.log(`   Twitch: ${twitchCreators.length}`);
-  console.log(`   Kick: ${kickCreators.length}\n`);
+  console.log(`   Kick: ${kickCreators.length}`);
+  console.log(`   Instagram: ${instagramCreators.length}\n`);
 
   let successCount = 0;
   let errorCount = 0;
@@ -424,6 +429,58 @@ async function collectDailyStats() {
     }
   }
 
+  // ========== INSTAGRAM (Puppeteer scraping, 1 at a time) ==========
+  if (instagramCreators.length > 0) {
+    console.log('\n📸 Processing Instagram creators...');
+    console.log(`   ${instagramCreators.length} profile(s) to scrape`);
+    console.log(`   ⚠️  Slow process (~8 seconds per profile)\n`);
+
+    for (let i = 0; i < instagramCreators.length; i++) {
+      const creator = instagramCreators[i];
+
+      try {
+        const profileData = await scrapeInstagramProfile(creator.username);
+
+        statsToUpsert.push({
+          creator_id: creator.id,
+          recorded_at: today,
+          subscribers: profileData.followers,
+          followers: profileData.followers,
+          total_views: 0, // Instagram doesn't expose view counts
+          total_posts: profileData.totalPosts,
+        });
+
+        console.log(`   ✅ [${i + 1}/${instagramCreators.length}] ${creator.display_name}: ${(profileData.followers / 1000000).toFixed(1)}M followers`);
+        successCount++;
+
+        // Update creator profile image if changed
+        if (profileData.profileImage && profileData.profileImage !== creator.profile_image) {
+          await supabase
+            .from('creators')
+            .update({
+              profile_image: profileData.profileImage,
+              description: profileData.description || creator.description,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', creator.id);
+        }
+
+        // Delay between requests to avoid rate limiting
+        if (i < instagramCreators.length - 1) {
+          const delay = 5000 + Math.random() * 3000; // 5-8 seconds random delay
+          await new Promise((r) => setTimeout(r, delay));
+        }
+      } catch (error) {
+        console.error(`   ❌ [${i + 1}/${instagramCreators.length}] ${creator.display_name}: ${error.message}`);
+        errorCount++;
+      }
+    }
+
+    // Close browser when done with Instagram
+    await closeBrowser();
+    console.log('   🌐 Browser closed');
+  }
+
   // ========== BULK UPSERT TO DATABASE ==========
   if (statsToUpsert.length > 0) {
     console.log(`\n💾 Saving ${statsToUpsert.length} stats entries to database...`);
@@ -455,12 +512,14 @@ async function collectDailyStats() {
     twitchUsers: Math.ceil(twitchCreators.length / TWITCH_BATCH_SIZE),
     twitchFollowers: twitchCreators.length,
     kick: Math.ceil(kickCreators.length / KICK_BATCH_SIZE),
+    instagram: instagramCreators.length,
   };
   console.log(`\n📡 API calls made:`);
   console.log(`   YouTube: ${apiCalls.youtube} (batched ${YOUTUBE_BATCH_SIZE}/request)`);
   console.log(`   Twitch Users: ${apiCalls.twitchUsers} (batched ${TWITCH_BATCH_SIZE}/request)`);
   console.log(`   Twitch Followers: ${apiCalls.twitchFollowers} (parallel ${TWITCH_PARALLEL_FOLLOWERS}x)`);
   console.log(`   Kick: ${apiCalls.kick} (batched ${KICK_BATCH_SIZE}/request)`);
+  console.log(`   Instagram: ${apiCalls.instagram} (Puppeteer scraping, ~8s each)`);
 }
 
 collectDailyStats().catch(console.error);
