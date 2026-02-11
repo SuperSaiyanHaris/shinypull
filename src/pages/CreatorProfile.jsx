@@ -542,7 +542,30 @@ export default function CreatorProfile() {
                 value={formatNumber(creator.subscribers || creator.followers)}
                 sublabel={creator.hiddenSubscribers ? '(hidden)' : platform === 'youtube' ? '(rounded by YouTube)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
               />
-              
+
+              {/* Instagram: Only show Followers and Posts (no views data available) */}
+              {platform === 'instagram' && (
+                <>
+                  <StatCard
+                    icon={Video}
+                    label="Posts"
+                    value={formatNumber(creator.totalPosts || 0)}
+                  />
+                  <StatCard
+                    icon={Eye}
+                    label="Total Views"
+                    value="—"
+                    sublabel="Not available publicly"
+                  />
+                  <StatCard
+                    icon={TrendingUp}
+                    label="Engagement"
+                    value="—"
+                    sublabel="Not available publicly"
+                  />
+                </>
+              )}
+
               {/* Followers Card for Kick (not available) */}
               {platform === 'kick' && (
                 <StatCard
@@ -552,8 +575,8 @@ export default function CreatorProfile() {
                   sublabel="Not available via Kick API"
                 />
               )}
-              
-              {/* Hours Watched / Total Views */}
+
+              {/* Hours Watched / Total Views - NOT for Instagram */}
               {platform === 'twitch' ? (
                 <StatCard
                   icon={Eye}
@@ -568,15 +591,15 @@ export default function CreatorProfile() {
                   value="—"
                   sublabel="Not available via Kick API"
                 />
-              ) : (
+              ) : platform === 'youtube' ? (
                 <StatCard
                   icon={Eye}
                   label="Total Views"
                   value={formatNumber(creator.totalViews)}
                 />
-              )}
-              
-              {/* Videos / Category */}
+              ) : null}
+
+              {/* Videos / Category - NOT for Instagram */}
               {platform === 'twitch' && creator.category && (
                 <StatCard
                   icon={Video}
@@ -591,16 +614,16 @@ export default function CreatorProfile() {
                   value={creator.category}
                 />
               )}
-              {platform !== 'twitch' && platform !== 'kick' && (
+              {platform === 'youtube' && (
                 <StatCard
                   icon={Video}
                   label="Videos"
                   value={formatNumber(creator.totalPosts)}
                 />
               )}
-              
-              {/* Avg Views/Video (not for Twitch or Kick) */}
-              {platform !== 'twitch' && platform !== 'kick' && (
+
+              {/* Avg Views/Video - Only for YouTube */}
+              {platform === 'youtube' && (
                 <StatCard
                   icon={TrendingUp}
                   label="Avg Views/Video"
@@ -633,11 +656,8 @@ export default function CreatorProfile() {
                         ? formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)
                         : creator.totalViews && creator.totalPosts > 0
                           ? (() => {
-                              // Estimate based on avg views per video × typical monthly uploads
-                              // Similar to calculator's formula: totalViews / (totalPosts * 30)
                               const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
                               const monthlyViews = estimatedDailyViews * 30;
-                              // Use RPM range: $0.25 - $4.00 (same as calculator)
                               return formatEarnings(monthlyViews / 1000 * 0.25, monthlyViews / 1000 * 4);
                             })()
                           : '--'
@@ -650,14 +670,27 @@ export default function CreatorProfile() {
                         ? formatEarnings(metrics.last30Days.views / 1000 * 2 * 12, metrics.last30Days.views / 1000 * 7 * 12)
                         : creator.totalViews && creator.totalPosts > 0
                           ? (() => {
-                              // Estimate based on avg views per video × typical yearly performance
                               const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
                               const yearlyViews = estimatedDailyViews * 365;
-                              // Use RPM range: $0.25 - $4.00 (same as calculator)
                               return formatEarnings(yearlyViews / 1000 * 0.25, yearlyViews / 1000 * 4);
                             })()
                           : '--'
                       }
+                    />
+                  </>
+                ) : platform === 'instagram' ? (
+                  <>
+                    {/* For Instagram, only show follower growth and posts */}
+                    <SummaryCard
+                      label="Followers"
+                      sublabel="Last 30 days"
+                      value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
+                      change={metrics?.last30Days.subs}
+                    />
+                    <SummaryCard
+                      label="Posts"
+                      sublabel="Last 30 days"
+                      value={metrics ? `${metrics.last30Days.videos >= 0 ? '+' : ''}${metrics.last30Days.videos}` : '--'}
                     />
                   </>
                 ) : platform === 'twitch' ? (
@@ -758,10 +791,11 @@ export default function CreatorProfile() {
                         <th className="px-6 py-4 font-semibold text-gray-600 text-right">
                           {platform === 'instagram' ? 'Followers' : platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : 'Subscribers'}
                         </th>
+                        {platform === 'instagram' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Posts</th>}
                         {platform === 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Watch Hours</th>}
-                        {platform !== 'twitch' && platform !== 'kick' && platform !== 'instagram' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
-                        {platform !== 'twitch' && platform !== 'kick' && platform !== 'instagram' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
-                        {platform !== 'twitch' && platform !== 'kick' && platform !== 'instagram' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Est. Earnings</th>}
+                        {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
+                        {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
+                        {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Est. Earnings</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -777,14 +811,26 @@ export default function CreatorProfile() {
                           <td className="px-6 py-4 text-right">
                             <div className="flex flex-col items-end">
                               <span className="font-medium text-gray-900">{formatNumber(stat.subscribers || stat.followers)}</span>
-                              {/* Only show subscriber changes for Twitch and Kick (YouTube rounds counts making changes unreliable) */}
-                              {(platform === 'twitch' || platform === 'kick') && stat.subsChange !== 0 && (
+                              {/* Show changes for Instagram, Twitch, and Kick */}
+                              {(platform === 'instagram' || platform === 'twitch' || platform === 'kick') && stat.subsChange !== 0 && (
                                 <span className={`text-xs ${stat.subsChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                                   {stat.subsChange > 0 ? '+' : ''}{formatNumber(stat.subsChange)}
                                 </span>
                               )}
                             </div>
                           </td>
+                          {platform === 'instagram' && (
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex flex-col items-end">
+                                <span className="font-medium text-gray-900">{formatNumber(stat.total_posts || 0)}</span>
+                                {stat.videosChange !== 0 && (
+                                  <span className={`text-xs ${stat.videosChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                    {stat.videosChange > 0 ? '+' : ''}{stat.videosChange}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                          )}
                           {platform === 'twitch' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex flex-col items-end">
@@ -794,20 +840,18 @@ export default function CreatorProfile() {
                               </div>
                             </td>
                           )}
-                          {platform !== 'twitch' && platform !== 'kick' && (
-                            <td className="px-6 py-4 text-right">
-                              <div className="flex flex-col items-end">
-                                <span className="font-medium text-gray-900">{formatNumber(stat.total_views)}</span>
-                                {stat.viewsChange !== 0 && (
-                                  <span className={`text-xs ${stat.viewsChange > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
-                                    {stat.viewsChange > 0 ? '+' : ''}{formatNumber(stat.viewsChange)}
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                          )}
-                          {platform !== 'twitch' && platform !== 'kick' && (
+                          {platform === 'youtube' && (
                             <>
+                              <td className="px-6 py-4 text-right">
+                                <div className="flex flex-col items-end">
+                                  <span className="font-medium text-gray-900">{formatNumber(stat.total_views)}</span>
+                                  {stat.viewsChange !== 0 && (
+                                    <span className={`text-xs ${stat.viewsChange > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
+                                      {stat.viewsChange > 0 ? '+' : ''}{formatNumber(stat.viewsChange)}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
                               <td className="px-6 py-4 text-right">
                                 <div className="flex flex-col items-end">
                                   <span className="font-medium text-gray-900">{formatNumber(stat.total_posts || 0)}</span>
@@ -823,7 +867,6 @@ export default function CreatorProfile() {
                                   ? formatEarnings(stat.viewsChange / 1000 * 2, stat.viewsChange / 1000 * 7)
                                   : creator.totalViews && creator.totalPosts > 0
                                     ? (() => {
-                                        // For mega-channels with no daily growth, estimate from lifetime avg
                                         const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
                                         return formatEarnings(estimatedDailyViews / 1000 * 0.25, estimatedDailyViews / 1000 * 4);
                                       })()
@@ -848,6 +891,9 @@ export default function CreatorProfile() {
                             </span>
                           )}
                         </td>
+                        {platform === 'instagram' && (
+                          <td className="px-6 py-4 text-right"></td>
+                        )}
                         {platform === 'twitch' && (
                           <td className="px-6 py-4 text-right text-indigo-900">
                             {metrics.dailyAverage?.hoursWatched > 0
@@ -856,7 +902,7 @@ export default function CreatorProfile() {
                             }
                           </td>
                         )}
-                        {platform !== 'twitch' && platform !== 'kick' && (
+                        {platform === 'youtube' && (
                           <>
                             <td className="px-6 py-4 text-right text-emerald-600">
                               {metrics.dailyAverage.views > 0
@@ -891,6 +937,9 @@ export default function CreatorProfile() {
                             </span>
                           )}
                         </td>
+                        {platform === 'instagram' && (
+                          <td className="px-6 py-4 text-right"></td>
+                        )}
                         {platform === 'twitch' && (
                           <td className="px-6 py-4 text-right text-indigo-900">
                             {metrics.weeklyAverage?.hoursWatched > 0
@@ -899,7 +948,7 @@ export default function CreatorProfile() {
                             }
                           </td>
                         )}
-                        {platform !== 'twitch' && platform !== 'kick' && (
+                        {platform === 'youtube' && (
                           <>
                             <td className="px-6 py-4 text-right text-emerald-600">
                               {metrics.weeklyAverage.views > 0
@@ -935,6 +984,11 @@ export default function CreatorProfile() {
                             </span>
                           )}
                         </td>
+                        {platform === 'instagram' && (
+                          <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                            {metrics.last30Days.videos >= 0 ? '+' : ''}{metrics.last30Days.videos}
+                          </td>
+                        )}
                         {platform === 'twitch' && (
                           <td className="px-6 py-4 text-right text-indigo-900">
                             {metrics.last30Days?.hoursWatched > 0
@@ -943,7 +997,7 @@ export default function CreatorProfile() {
                             }
                           </td>
                         )}
-                        {platform !== 'twitch' && platform !== 'kick' && (
+                        {platform === 'youtube' && (
                           <>
                             <td className="px-6 py-4 text-right text-emerald-600">
                               {metrics.last30Days.views > 0
