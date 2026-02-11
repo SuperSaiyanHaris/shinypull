@@ -298,20 +298,56 @@ When you need to update a blog post with large content changes:
 - Use Amazon product images: Right-click product image → "Open image in new tab" → Copy URL
 - Format: `https://m.media-amazon.com/images/I/[IMAGE_ID]._AC_SL1500_.jpg`
 
+## Database Management
+
+**NO local migrations folder.** All database changes are made directly against the live Supabase database.
+
+**How to make schema/RLS changes:**
+1. Use the Supabase Management API SQL endpoint via Node.js scripts
+2. Project ref: `ziiqqbfcncjdewjkbvyq`
+3. Access token is stored in Windows Credential Manager under `Supabase CLI:supabase`
+4. Endpoint: `POST https://api.supabase.com/v1/projects/{ref}/database/query` with `{ query: "SQL" }`
+5. The `service_role` key (in `.env` as `SUPABASE_SERVICE_ROLE_KEY`) bypasses RLS for data operations via PostgREST
+6. For DDL/policy changes, use the Management API SQL endpoint (requires the CLI access token)
+
+**NEVER use migration files** — they were deleted and should not be recreated. Always use direct database access.
+
+## RLS Policy Reference
+
+All tables have RLS enabled. Here are the current policies:
+
+**Read-only tables (frontend can SELECT, only service_role can write):**
+- `creators`, `creator_stats`, `blog_posts`, `products`, `stream_sessions`, `viewer_samples`
+- SELECT: `TO anon, authenticated USING (true)`
+- INSERT/UPDATE/DELETE: `TO anon, authenticated USING/WITH CHECK (false)`
+- Server-side scripts use `service_role` key which bypasses RLS
+
+**User-owned tables (authenticated users can manage their own data):**
+- `user_saved_creators`:
+  - SELECT own: `TO authenticated USING (auth.uid() = user_id)`
+  - INSERT own: `TO authenticated WITH CHECK (auth.uid() = user_id)`
+  - DELETE own: `TO authenticated USING (auth.uid() = user_id)`
+  - Anon blocked: `TO anon USING/WITH CHECK (false)`
+- `users`:
+  - SELECT own: `TO authenticated USING (auth.uid() = id)`
+  - INSERT own: `TO authenticated WITH CHECK (auth.uid() = id)`
+  - UPDATE own: `TO authenticated USING/WITH CHECK (auth.uid() = id)`
+  - Anon blocked: `TO anon USING/WITH CHECK (false)`
+
 ## Agent Instructions
 
 **Autonomy:**
 - Run commands directly - don't ask user to run them
 - Use `vercel` or `vercel --prod` for deployment
-- Use `supabase db push` for migrations
+- For database changes, use the Management API SQL endpoint (NOT migration files)
 
 **When to Update This File:**
 - Adding new pages, services, or major features
-- Changing database schema
+- Changing database schema or RLS policies
 - Adding new API integrations
 - Changing architectural patterns or conventions
 - Do NOT update for bug fixes, styling changes, or minor tweaks
 
 ---
 
-*Last updated: 2026-02-07*
+*Last updated: 2026-02-11*
