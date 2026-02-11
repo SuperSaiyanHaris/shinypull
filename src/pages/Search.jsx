@@ -146,7 +146,7 @@ export default function Search() {
                   key={platform.id}
                   onClick={() => platform.available && handlePlatformChange(platform.id)}
                   disabled={!platform.available}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-5 sm:py-2.5 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all duration-200 ${
                     isSelected
                       ? `${colors.bg} text-white shadow-lg`
                       : platform.available
@@ -154,8 +154,8 @@ export default function Search() {
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  {Icon && <Icon className="w-5 h-5" />}
-                  {platform.name}
+                  {Icon && <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  <span className="whitespace-nowrap">{platform.name}</span>
                   {!platform.available && <span className="text-xs opacity-75">(Soon)</span>}
                 </button>
               );
