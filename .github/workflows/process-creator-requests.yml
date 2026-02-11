@@ -1,0 +1,67 @@
+name: Process Creator Requests
+
+on:
+  schedule:
+    # Run every 6 hours to process pending creator requests
+    # 00:00 UTC (6 PM CST)
+    - cron: '0 0 * * *'
+    # 06:00 UTC (12 AM CST)
+    - cron: '0 6 * * *'
+    # 12:00 UTC (6 AM CST)
+    - cron: '0 12 * * *'
+    # 18:00 UTC (12 PM CST)
+    - cron: '0 18 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  process-requests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Puppeteer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            chromium-browser \
+            libx11-xcb1 \
+            libxcomposite1 \
+            libxcursor1 \
+            libxdamage1 \
+            libxi6 \
+            libxtst6 \
+            libnss3 \
+            libcups2 \
+            libxss1 \
+            libxrandr2 \
+            libasound2 \
+            libpangocairo-1.0-0 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libgtk-3-0
+
+      - name: Process creator requests
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
+        run: node scripts/processCreatorRequests.js
+
+      - name: Report completion
+        if: success()
+        run: echo "✅ Creator requests processed successfully"
+
+      - name: Report failure
+        if: failure()
+        run: echo "❌ Creator request processing failed"
