@@ -2,30 +2,38 @@ import { supabase } from '../lib/supabase';
 import { withErrorHandling } from '../lib/errorHandler';
 
 /**
- * Save or update a creator in the database
+ * Save or update a creator and stats via server-side API
+ * This calls /api/update-creator which uses service role key
  */
 export const upsertCreator = withErrorHandling(
   async (creatorData) => {
-    const { data, error } = await supabase
-      .from('creators')
-      .upsert({
-        platform: creatorData.platform,
-        platform_id: creatorData.platformId,
-        username: creatorData.username,
-        display_name: creatorData.displayName,
-        profile_image: creatorData.profileImage,
-        description: creatorData.description,
-        country: creatorData.country,
-        category: creatorData.category,
-        updated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'platform,platform_id',
-      })
-      .select()
-      .single();
+    // Call server-side API endpoint instead of direct database write
+    const response = await fetch('/api/update-creator', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        creatorData: {
+          platform: creatorData.platform,
+          platformId: creatorData.platformId,
+          username: creatorData.username,
+          displayName: creatorData.displayName,
+          profileImage: creatorData.profileImage,
+          description: creatorData.description,
+          country: creatorData.country,
+          category: creatorData.category,
+        }
+      }),
+    });
 
-    if (error) throw error;
-    return data;
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to save creator' }));
+      throw new Error(error.error || 'Failed to save creator');
+    }
+
+    const result = await response.json();
+    return result.creator;
   },
   'creatorService.upsertCreator'
 );
@@ -44,29 +52,47 @@ function getTodayLocal() {
 }
 
 /**
- * Save creator stats snapshot
+ * Save creator stats snapshot via server-side API
  */
 export const saveCreatorStats = withErrorHandling(
   async (creatorId, stats) => {
-    const today = getTodayLocal();
-
-    const { data, error } = await supabase
-      .from('creator_stats')
-      .upsert({
-        creator_id: creatorId,
-        recorded_at: today,
-        subscribers: stats.subscribers,
-        total_views: stats.totalViews,
-        total_posts: stats.totalPosts,
-        followers: stats.subscribers, // For YouTube, subscribers = followers
-      }, {
-        onConflict: 'creator_id,recorded_at',
-      })
-      .select()
+    // Get the creator first to pass required data to API
+    const { data: creator, error: getError } = await supabase
+      .from('creators')
+      .select('platform, platform_id, username, display_name')
+      .eq('id', creatorId)
       .single();
 
-    if (error) throw error;
-    return data;
+    if (getError) throw getError;
+
+    // Call server-side API with creator and stats data
+    const response = await fetch('/api/update-creator', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        creatorData: {
+          platform: creator.platform,
+          platformId: creator.platform_id,
+          username: creator.username,
+          displayName: creator.display_name,
+        },
+        statsData: {
+          subscribers: stats.subscribers,
+          totalViews: stats.totalViews,
+          totalPosts: stats.totalPosts,
+        }
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to save stats' }));
+      throw new Error(error.error || 'Failed to save stats');
+    }
+
+    const result = await response.json();
+    return result;
   },
   'creatorService.saveCreatorStats'
 );
