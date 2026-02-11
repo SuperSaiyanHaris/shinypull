@@ -730,24 +730,26 @@ export default function CreatorProfile() {
               </div>
             )}
 
-            {/* Live Counter Link */}
-            <Link
-              to={`/live/${platform}/${creator.username}`}
-              className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:from-indigo-700 hover:to-purple-700 transition-all group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Radio className="w-4 h-4 sm:w-5 sm:h-5" />
+            {/* Live Counter Link - Hidden for Instagram (no real-time updates) */}
+            {platform !== 'instagram' && (
+              <Link
+                to={`/live/${platform}/${creator.username}`}
+                className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:from-indigo-700 hover:to-purple-700 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Radio className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm sm:text-base truncate">
+                      Live {platform === 'twitch' ? 'Follower' : platform === 'kick' ? 'Paid Subscriber' : 'Subscriber'} Count
+                    </p>
+                    <p className="text-xs sm:text-sm text-indigo-200 truncate">Watch the count update in real-time</p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="font-semibold text-sm sm:text-base truncate">
-                    Live {platform === 'instagram' ? 'Follower' : platform === 'twitch' ? 'Follower' : platform === 'kick' ? 'Paid Subscriber' : 'Subscriber'} Count
-                  </p>
-                  <p className="text-xs sm:text-sm text-indigo-200 truncate">Watch the count update in real-time</p>
-                </div>
-              </div>
-              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform flex-shrink-0" />
-            </Link>
+                <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+              </Link>
+            )}
 
             {/* Milestone Predictions */}
             {metrics && (
