@@ -71,10 +71,8 @@ export default function About() {
             <p className="text-gray-600 mb-8 leading-relaxed">
               In order to keep statistical data updated, ShinyPull utilizes API services of third parties
               including YouTube, Instagram, Twitch, and Kick. We only gather publicly available data from
-              each of the API services, not anything private about your account. All data is collected directly
-              from official platform APIs including YouTube Data API v3, Twitch Helix API, and Kick API v1.
-              For Instagram, we collect publicly visible profile information through web scraping of public pages.
-              We collect statistics daily to provide accurate historical trends and growth analytics.
+              each of the API services, not anything private about your account. We collect statistics daily
+              to provide accurate historical trends and growth analytics.
             </p>
 
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Support</h2>
