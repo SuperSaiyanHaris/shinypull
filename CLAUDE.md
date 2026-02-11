@@ -83,16 +83,19 @@ scripts/
 ├── monitorTwitchStreams.js   # Twitch stream monitoring (every 5 min)
 ├── monitorKickStreams.js     # Kick stream monitoring (every 5 min)
 ├── aggregateHoursWatched.js  # Calculate Twitch/Kick hours watched
+├── processCreatorRequests.js # Process pending creator requests (runs 4x daily)
 ├── seedTopCreators.js        # Seed top 50 creators
 ├── seedTopCreatorsExpanded.js # Seed 200+ creators
 ├── seedTopKickCreators.js    # Seed top Kick creators
 ├── seedBlogPosts.js          # Seed initial blog posts
 ├── seedProducts.js           # Seed affiliate products
+├── generateSitemap.js        # Generate sitemap.xml dynamically
 └── updateBlogPost.js         # Update blog post content from temp files
 
 api/                              # Vercel serverless functions
 ├── twitch.js                 # Twitch API proxy (keeps secrets server-side)
 ├── kick.js                   # Kick API proxy (keeps secrets server-side)
+├── request-creator.js        # Creator request submission endpoint
 └── admin.js                  # Admin verification endpoint
 ```
 
@@ -118,6 +121,7 @@ api/                              # Vercel serverless functions
 ```sql
 creators (id, platform, platform_id, username, display_name, profile_image, description, country, category, created_at, updated_at)
 creator_stats (id, creator_id, recorded_at, subscribers, followers, total_views, total_posts, hours_watched_*, peak_viewers_*, avg_viewers_*, streams_count_*)
+creator_requests (id, platform, username, user_id, status, error_message, created_at, processed_at)
 stream_sessions (id, creator_id, stream_id, started_at, ended_at, peak_viewers, avg_viewers, hours_watched, game_name, title)
 viewer_samples (id, session_id, recorded_at, viewer_count, game_name)
 blog_posts (id, slug, title, description, content, category, author, image, read_time, published_at, is_published, created_at, updated_at)
@@ -160,6 +164,13 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
 - Growth summary shows: Followers and Posts growth (no earnings estimates)
 - Daily Metrics Table columns: Date, Followers (with changes), Posts (with changes)
 - Service: `src/services/instagramPuppeteer.js` (Puppeteer-based scraping)
+- **Creator Request System:** Users can request Instagram creators not in the database
+  - Request button appears on search page when no results found
+  - Backend validates username format and checks for duplicates
+  - Requests stored in `creator_requests` table with status tracking
+  - Processed automatically by GitHub Action (every 6 hours)
+  - Users notified that creator will be added within 24 hours
+  - Scalable queueing system prevents timeout issues
 
 ## Commands
 
@@ -196,6 +207,7 @@ Scripts use `dotenv` to load `.env` automatically.
 **Optimized for 2,000 minutes/month budget:**
 - **Daily Stats Collection:** Runs 2x daily (6 AM, 6 PM UTC) — collects YouTube, Instagram, Twitch, and Kick stats
 - **Creator Discovery:** Runs 4x daily (every 6 hours) — discovers new creators across all platforms
+- **Creator Request Processor:** Runs 4x daily (every 6 hours) — processes pending Instagram creator requests
 - **Twitch Stream Monitor:** Runs every 3 hours (8x daily) — tracks live streams and hours watched
 - **Kick Stream Monitor:** Runs every 3 hours (8x daily, offset) — tracks live streams and hours watched
 
