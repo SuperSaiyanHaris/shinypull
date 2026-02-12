@@ -100,10 +100,19 @@ export async function scrapeInstagramProfile(username) {
       }
     }
 
+    // Capture diagnostics before closing (used in error message if extraction failed)
+    const pageInfo = await page.evaluate(() => ({
+      url: window.location.href,
+      title: document.title,
+      ogDesc: document.querySelector('meta[property="og:description"]')?.getAttribute('content') || '',
+      bodySnippet: document.body?.innerText?.substring(0, 200) || '',
+    }));
+
     await page.close();
 
     if (!data || (data.followers === 0 && data.posts === 0)) {
-      throw new Error('Could not extract profile data from DOM or meta tags');
+      // Log diagnostics so we can see what Instagram served
+      throw new Error(`Could not extract profile data — URL: ${pageInfo.url}, title: "${pageInfo.title}", og:desc: "${pageInfo.ogDesc}", hasMain: ${hasMain}, bodySnippet: "${pageInfo.bodySnippet}"`);
     }
 
     return {
