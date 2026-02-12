@@ -98,6 +98,12 @@ async function refreshInstagramProfiles() {
       successCount++;
     } catch (err) {
       console.error(`   ❌ [${i + 1}/${creators.length}] ${creator.display_name}: ${err.message}`);
+
+      // If rate limited, stop — same IP will keep getting blocked
+      if (err.message.includes('429')) {
+        console.log(`\n   ⚠️  Rate limited — stopping early (will resume next run)`);
+        break;
+      }
     }
 
     // Delay between profiles

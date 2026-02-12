@@ -119,19 +119,29 @@ async function processRequest(request) {
     return { success: true, username: request.username };
 
   } catch (error) {
+    const isRateLimit = error.message.includes('429');
     console.error(`[${request.username}] ❌ Error:`, error.message);
 
-    // Mark request as failed
-    await supabase
-      .from('creator_requests')
-      .update({
-        status: 'failed',
-        error_message: error.message,
-        processed_at: new Date().toISOString()
-      })
-      .eq('id', request.id);
+    if (isRateLimit) {
+      // Rate limited — revert to pending so it retries on next run (fresh IP)
+      await supabase
+        .from('creator_requests')
+        .update({ status: 'pending' })
+        .eq('id', request.id);
+      console.log(`[${request.username}] ↩️  Reverted to pending (rate limited, will retry next run)`);
+    } else {
+      // Permanent failure — mark as failed
+      await supabase
+        .from('creator_requests')
+        .update({
+          status: 'failed',
+          error_message: error.message,
+          processed_at: new Date().toISOString()
+        })
+        .eq('id', request.id);
+    }
 
-    return { success: false, username: request.username, error: error.message };
+    return { success: false, username: request.username, error: error.message, rateLimited: isRateLimit };
   }
 }
 
@@ -170,6 +180,12 @@ async function main() {
       const request = pendingRequests[i];
       const result = await processRequest(request);
       results.push(result);
+
+      // If rate limited, stop processing — same IP will keep getting blocked
+      if (result.rateLimited) {
+        console.log(`\n⚠️  Rate limited — skipping remaining ${pendingRequests.length - i - 1} request(s) (will retry next run)`);
+        break;
+      }
 
       // Delay between requests (5-8 seconds randomized)
       if (i < pendingRequests.length - 1) {
