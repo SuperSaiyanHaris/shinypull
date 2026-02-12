@@ -6,6 +6,7 @@ Since GitHub Actions IPs are blocked by Instagram, we run Instagram data collect
 
 - **`refresh-instagram.bat`** - Refreshes 15 Instagram profiles (oldest first)
 - **`process-instagram-requests.bat`** - Processes pending creator requests
+- **`discover-instagram.bat`** - Discovers 10 new creators from curated list
 
 ## Setup Windows Task Scheduler
 
@@ -63,11 +64,28 @@ Click "New" for each trigger:
 
 **Same Conditions and Settings as above**
 
+### 4. Create Task for Creator Discovery (Optional - Weekly)
+
+**Basic Settings:**
+- Name: `Instagram Creator Discovery`
+- Description: `Discover new Instagram creators from curated list`
+- Same security settings as above
+
+**Trigger (weekly):**
+- Weekly on Sunday at 10:00 AM
+
+**Actions:**
+- Program/script: `d:\Claude\ShinyPull\scripts\local\discover-instagram.bat`
+- Start in: `d:\Claude\ShinyPull`
+
+**Same Conditions and Settings as above**
+
 ## Manual Running
 
 You can also run these scripts manually anytime:
 - Double-click `refresh-instagram.bat` to refresh profiles
 - Double-click `process-instagram-requests.bat` to process requests
+- Double-click `discover-instagram.bat` to discover new creators
 
 ## Monitoring
 
@@ -87,6 +105,20 @@ Check the Task Scheduler History tab to see run results:
 - Processes all pending requests (no limit)
 - Handles 429 errors gracefully (reverts to pending)
 - Stops batch on first 429 to avoid IP blacklisting
+
+**Creator Discovery:**
+- Discovers 10 new creators per run (weekly schedule)
+- **Guarantees 100% fresh creators every run** - NO DUPLICATES
+- Works through curated list of 110+ popular Instagram creators
+- Automatically tracks which creators are already in database
+- Each run adds the NEXT 10 from the list that aren't in the DB yet
+- Example progression:
+  - Week 1: Adds creators 1-10 from list
+  - Week 2: Adds creators 11-20 from list (skips 1-10 already in DB)
+  - Week 3: Adds creators 21-30 from list
+  - And so on...
+- When list is exhausted, you can add more usernames to the script
+- Rate-limited: 8 seconds between requests
 
 ## Troubleshooting
 

@@ -1,17 +1,26 @@
+/**
+ * Discover and add new Instagram creators from curated list
+ *
+ * Uses the bot user-agent scraper (instagramScraper.js) to fetch profile data.
+ * Smart progression: tracks how many creators exist and adds the NEXT batch from the list.
+ * Guarantees no duplicates - each run adds fresh creators until the list is exhausted.
+ *
+ * Usage: node scripts/discoverInstagramCreators.js [count]
+ *   count: number of creators to discover (default: 10)
+ */
 import { config } from 'dotenv';
 config();
 import { createClient } from '@supabase/supabase-js';
+import { scrapeInstagramProfile, closeBrowser } from '../src/services/instagramScraper.js';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-  throw new Error('Missing Supabase credentials');
-}
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
+
+const DELAY_BETWEEN_PROFILES = 8000; // 8 seconds
 
 function getTodayLocal() {
   return new Intl.DateTimeFormat('en-CA', {
@@ -23,21 +32,22 @@ function getTodayLocal() {
 }
 
 /**
- * Curated list of top Instagram creators to seed the database
- * Focus: mix of celebrities, influencers, brands, creators across niches
+ * Curated list of top Instagram creators
+ * As the database grows, the script automatically progresses through this list.
+ * Add more usernames to the end as needed - duplicates are prevented by the database.
  */
 const TOP_INSTAGRAM_USERNAMES = [
-  // Top accounts (500M+ followers)
+  // Mega accounts (400M+ followers)
   'instagram', 'cristiano', 'leomessi', 'selenagomez', 'kyliejenner',
-  'therock', 'arianagrande', 'kimkardashian', 'beyonce', 'khloekardashian',
+  'therock', 'arianagrande', 'kimkardashian', 'beyonce', 'justinbieber',
 
-  // Celebrities (100M+)
-  'kendalljenner', 'justinbieber', 'taylorswift', 'jenniferaniston', 'nickiminaj',
+  // Top celebrities (100M+)
+  'kendalljenner', 'taylorswift', 'jenniferaniston', 'nickiminaj', 'khloekardashian',
   'natgeo', 'neymarjr', 'mileycyrus', 'katyperry', 'kourtneykardash',
 
   // Athletes
   'virat.kohli', 'davidbeckham', 'lebronjames', 'ronaldinho', 'k.mbappe',
-  'paulpogba', 'sergioramos', 'marcosalonsooficial', 'kingjames', 'stephencurry30',
+  'paulpogba', 'sergioramos', 'kingjames', 'stephencurry30', 'tombrady',
 
   // Content Creators & Influencers
   'charlidamelio', 'addisonraeeee', 'brentrivera', 'lorengray', 'zachking',
@@ -45,7 +55,7 @@ const TOP_INSTAGRAM_USERNAMES = [
 
   // Fitness & Lifestyle
   'kayla_itsines', 'alexisren', 'sommer_ray', 'jen_selter', 'michelle_lewin',
-  'lazar_angelov_official', 'stevecook', 'danalinnbailey', 'whitneyysimmons', 'nikki_blackketter',
+  'simeonpanda', 'stevecook', 'danalinnbailey', 'whitneyysimmons', 'nikki_blackketter',
 
   // Beauty & Fashion
   'hudabeauty', 'chiaraferragni', 'gigihadid', 'bellahadid', 'caradelevingne',
@@ -53,202 +63,151 @@ const TOP_INSTAGRAM_USERNAMES = [
 
   // Gaming & Tech
   'ninja', 'pokimanelol', 'valkyrae', 'pewdiepie', 'loserfruit',
-  '典哒', 'rubius', 'willyrex', 'elrubiusomg', 'aveeplayer',
+  'rubius', 'willyrex', 'elrubiusomg', 'auronplay', 'ibai',
 
   // Musicians & Artists
   'billieeilish', 'dualipa', 'shawnmendes', 'camilacabello', 'edsheeran',
   'ddlovato', 'lizzo', 'postmalone', 'travisscott', 'cardib',
 
   // Comedy & Entertainment
-  'kevinhart4real', 'theellenshow', 'jimmyfallon', 'snoopdogg', '9gag',
-  'trevornoah', 'henrycavill', 'vindiesel', 'johnnydepp', 'robertdowneyjr',
+  'kevinhart4real', 'theellenshow', 'jimmyfallon', 'snoopdogg', 'trevornoah',
+  'henrycavill', 'vindiesel', 'johnnydepp', 'robertdowneyjr', 'prattprattpratt',
 
   // Brands & Media
-  'nike', 'natgeotravel', 'nasa', 'champions league', 'fcbarcelona',
-  'realmadrid', 'nba', 'nfl', 'fifa', 'espn',
+  'nike', 'natgeotravel', 'nasa', 'fcbarcelona', 'realmadrid',
+  'nba', 'nfl', 'fifa', 'espn', 'premierleague',
 
   // Food & Travel
-  'gordonramsayofficial', 'jamieoliver', 'ghanteluigi', 'buzzfeedtasty', 'foodnetwork',
-  'beautifuldestinations', 'discoverearth', 'earthpix', 'tourtheplanet', 'wonderful_places',
+  'gordonramsayofficial', 'jamieoliver', 'buzzfeedtasty', 'foodnetwork', 'tastemade',
+  'beautifuldestinations', 'earthpix', 'tourtheplanet', 'wonderful_places', 'travelandleisure',
+
+  // More creators - add more here
+  'mrbeast', 'ksi', 'loganpaul', 'jakepaul', 'ricegum',
+  'faze', 'tsm', 'optic', 'sommer', 'hannahstocking',
 ];
 
 /**
- * Fetch Instagram profile using public API
+ * Get existing Instagram creators from database
  */
-async function fetchInstagramProfile(username) {
-  try {
-    const url = `https://www.instagram.com/api/v1/users/web_profile_info/?username=${username}`;
-
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json',
-        'X-IG-App-ID': '936619743392459',
-      },
-    });
-
-    if (response.status === 404) {
-      return null;
-    }
-
-    if (!response.ok) {
-      throw new Error(`Instagram API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const user = data.data?.user;
-
-    if (!user) {
-      return null;
-    }
-
-    return {
-      platform: 'instagram',
-      platformId: user.id,
-      username: user.username,
-      displayName: user.full_name || user.username,
-      profileImage: user.profile_pic_url_hd || user.profile_pic_url,
-      description: user.biography || '',
-      isVerified: user.is_verified || false,
-      isPrivate: user.is_private || false,
-      followers: user.edge_followed_by?.count || 0,
-      following: user.edge_follow?.count || 0,
-      totalPosts: user.edge_owner_to_timeline_media?.count || 0,
-      category: user.category_name || null,
-    };
-  } catch (error) {
-    console.error(`   ✗ ${username}: ${error.message}`);
-    return null;
-  }
-}
-
-/**
- * Upsert creator to database
- */
-async function upsertCreator(creatorData) {
+async function getExistingCreators() {
   const { data, error } = await supabase
     .from('creators')
-    .upsert({
-      platform: creatorData.platform,
-      platform_id: creatorData.platformId,
-      username: creatorData.username,
-      display_name: creatorData.displayName,
-      profile_image: creatorData.profileImage,
-      description: creatorData.description,
-      category: creatorData.category,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'platform,platform_id' })
-    .select()
-    .single();
+    .select('username')
+    .eq('platform', 'instagram');
 
   if (error) throw error;
-  return data;
-}
-
-/**
- * Save creator stats
- */
-async function saveCreatorStats(creatorId, stats) {
-  const today = getTodayLocal();
-  const { error } = await supabase
-    .from('creator_stats')
-    .upsert({
-      creator_id: creatorId,
-      recorded_at: today,
-      followers: stats.followers,
-      total_posts: stats.totalPosts,
-      subscribers: stats.followers, // Instagram calls them followers
-    }, { onConflict: 'creator_id,recorded_at' });
-
-  if (error) throw error;
-}
-
-/**
- * Get creators that need updating (oldest first)
- */
-async function getCreatorsNeedingUpdate(limit = 20) {
-  const { data, error } = await supabase
-    .from('creators')
-    .select('username, updated_at')
-    .eq('platform', 'instagram')
-    .order('updated_at', { ascending: true })
-    .limit(limit);
-
-  if (error) throw error;
-  return data?.map(c => c.username) || [];
+  return data?.map(c => c.username.toLowerCase()) || [];
 }
 
 /**
  * Main discovery function
  */
 async function discoverInstagramCreators() {
+  const today = getTodayLocal();
+  const count = parseInt(process.argv[2]) || 10;
+
   console.log('🟣 Instagram Creator Discovery\n');
-  console.log('═'.repeat(60));
+  console.log('═══════════════════════════════════════════════════');
 
-  // Check how many Instagram creators we have
-  const { count: existingCount } = await supabase
-    .from('creators')
-    .select('*', { count: 'exact', head: true })
-    .eq('platform', 'instagram');
+  // Get existing creators
+  const existingUsernames = await getExistingCreators();
+  const existingCount = existingUsernames.length;
 
-  console.log(`Current Instagram creators: ${existingCount || 0}`);
+  console.log(`📊 Current Instagram creators in database: ${existingCount}`);
+  console.log(`📋 Total usernames in curated list: ${TOP_INSTAGRAM_USERNAMES.length}`);
 
-  // Decide strategy: new discoveries or updates
-  let usernamesToFetch = [];
+  // Find usernames NOT yet in database
+  const newUsernames = TOP_INSTAGRAM_USERNAMES.filter(
+    username => !existingUsernames.includes(username.toLowerCase())
+  );
 
-  if (existingCount < 50) {
-    // Still building initial database - prioritize new discoveries
-    const newUsernames = TOP_INSTAGRAM_USERNAMES.slice(0, 20);
-    console.log(`Strategy: Discovery mode (adding ${newUsernames.length} new creators)\n`);
-    usernamesToFetch = newUsernames;
-  } else {
-    // Update existing creators (oldest data first)
-    const updateUsernames = await getCreatorsNeedingUpdate(15);
-    // Plus some new discoveries
-    const newUsernames = TOP_INSTAGRAM_USERNAMES.slice(existingCount, existingCount + 5);
-    usernamesToFetch = [...updateUsernames, ...newUsernames];
-    console.log(`Strategy: Mixed mode (${updateUsernames.length} updates + ${newUsernames.length} new)\n`);
+  if (newUsernames.length === 0) {
+    console.log('\n✅ All usernames from the curated list are already in the database!');
+    console.log('💡 Tip: Add more usernames to TOP_INSTAGRAM_USERNAMES array to continue discovery.\n');
+    return;
   }
 
-  let success = 0;
-  let failed = 0;
+  console.log(`🎯 Fresh usernames available: ${newUsernames.length}`);
+  console.log(`📥 Discovering ${Math.min(count, newUsernames.length)} new creator(s)\n`);
+  console.log('═══════════════════════════════════════════════════\n');
 
-  for (const username of usernamesToFetch) {
+  // Take the first N fresh usernames
+  const usernamesToAdd = newUsernames.slice(0, count);
+
+  let successCount = 0;
+  let failedCount = 0;
+
+  for (let i = 0; i < usernamesToAdd.length; i++) {
+    const username = usernamesToAdd[i];
+
     try {
-      const profile = await fetchInstagramProfile(username);
+      console.log(`[${i + 1}/${usernamesToAdd.length}] Fetching ${username}...`);
 
-      if (!profile) {
-        console.log(`   ⊘ ${username}: Not found or private`);
-        failed++;
-        continue;
+      const profileData = await scrapeInstagramProfile(username);
+
+      // Insert creator
+      const { data: creator } = await supabase
+        .from('creators')
+        .upsert({
+          platform: 'instagram',
+          platform_id: profileData.platformId || username,
+          username: profileData.username,
+          display_name: profileData.displayName,
+          profile_image: profileData.profileImage,
+          description: profileData.description,
+          category: profileData.category,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'platform,platform_id' })
+        .select()
+        .single();
+
+      // Insert today's stats
+      await supabase
+        .from('creator_stats')
+        .upsert({
+          creator_id: creator.id,
+          recorded_at: today,
+          subscribers: profileData.followers,
+          followers: profileData.followers,
+          total_views: 0,
+          total_posts: profileData.totalPosts,
+        }, { onConflict: 'creator_id,recorded_at' });
+
+      const followers = (profileData.followers / 1000000).toFixed(1);
+      console.log(`   ✅ ${profileData.displayName}: ${followers}M followers\n`);
+      successCount++;
+
+    } catch (err) {
+      console.error(`   ❌ ${username}: ${err.message}\n`);
+      failedCount++;
+
+      // If rate limited, stop immediately
+      if (err.message.includes('429')) {
+        console.log('   ⚠️  Rate limited — stopping early (will resume next run)\n');
+        break;
       }
+    }
 
-      const dbCreator = await upsertCreator(profile);
-      await saveCreatorStats(dbCreator.id, {
-        followers: profile.followers,
-        totalPosts: profile.totalPosts,
-      });
-
-      success++;
-      const followers = (profile.followers / 1000000).toFixed(1);
-      console.log(`   ✓ ${username}: ${followers}M followers`);
-
-      // Rate limiting: 3 seconds between requests
-      if (usernamesToFetch.indexOf(username) < usernamesToFetch.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-    } catch (error) {
-      console.error(`   ✗ ${username}: ${error.message}`);
-      failed++;
+    // Delay between profiles
+    if (i < usernamesToAdd.length - 1) {
+      const delaySeconds = (DELAY_BETWEEN_PROFILES / 1000).toFixed(0);
+      process.stdout.write(`   ⏳ Waiting ${delaySeconds}s before next request...`);
+      await new Promise(r => setTimeout(r, DELAY_BETWEEN_PROFILES));
+      process.stdout.write('\r' + ' '.repeat(60) + '\r'); // Clear line
     }
   }
 
-  console.log('═'.repeat(60));
-  console.log(`✅ Complete: ${success} succeeded, ${failed} failed\n`);
+  await closeBrowser();
+
+  console.log('═══════════════════════════════════════════════════');
+  console.log(`\n📈 Discovery Summary:`);
+  console.log(`   ✅ Successful: ${successCount}`);
+  console.log(`   ❌ Failed: ${failedCount}`);
+  console.log(`   📊 Total in database now: ${existingCount + successCount}`);
+  console.log(`   🎯 Fresh usernames remaining: ${newUsernames.length - usernamesToAdd.length}\n`);
 }
 
-// Run discovery
 discoverInstagramCreators().catch(err => {
   console.error('Discovery failed:', err);
-  process.exit(1);
+  closeBrowser().then(() => process.exit(1));
 });
