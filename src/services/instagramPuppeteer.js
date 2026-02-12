@@ -31,6 +31,7 @@ async function getBrowser() {
     }
 
     browser = await puppeteer.launch(launchOptions);
+    browser.on('disconnected', () => { browser = null; });
   }
   return browser;
 }
@@ -77,7 +78,11 @@ export async function scrapeInstagramProfile(username) {
 
     // Navigate to profile
     const url = `https://www.instagram.com/${username}/`;
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+    const response = await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+
+    if (!response || response.status() >= 400) {
+      throw new Error(`HTTP ${response?.status() || 'no response'} for ${url}`);
+    }
 
     // Try DOM extraction first (most accurate), fall back to meta tags
     const hasMain = await page.$('main').then(el => !!el);
@@ -117,7 +122,7 @@ export async function scrapeInstagramProfile(username) {
     };
 
   } catch (error) {
-    await page.close();
+    try { await page.close(); } catch (_) { /* page already closed */ }
     throw new Error(`Failed to scrape ${username}: ${error.message}`);
   }
 }
