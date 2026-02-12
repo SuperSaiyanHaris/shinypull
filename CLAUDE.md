@@ -79,7 +79,8 @@ src/
 └── index.css             # Tailwind + custom styles
 
 scripts/
-├── collectDailyStats.js      # Daily stats collection (runs 3x daily)
+├── collectDailyStats.js      # Daily stats collection (runs 2x daily)
+├── refreshInstagramProfiles.js # Refresh N Instagram profiles (staleness order)
 ├── monitorTwitchStreams.js   # Twitch stream monitoring (every 5 min)
 ├── monitorKickStreams.js     # Kick stream monitoring (every 5 min)
 ├── aggregateHoursWatched.js  # Calculate Twitch/Kick hours watched
@@ -154,13 +155,14 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
 - Launches headless Chrome to fully render JavaScript-based pages
 - Collects: Followers, Posts, Profile Images, Bios, Verification status
 - Rate-limited scraping: 5-8 seconds between requests (randomized delays)
-- Integrated into daily stats collection (runs alongside YouTube/Twitch/Kick)
+- **Daily collection limited to 15 per run** — Instagram blocks after ~14 requests per IP
+- Processes least-recently-updated creators first so all cycle through over multiple runs
 - Expected success rate: ~60-70% (Instagram actively blocks automated scraping)
 - Failed requests are logged but don't break collection process
-- Profile images auto-update when changed
+- Profile images use `ui-avatars.com` (Instagram CDN blocks hotlinking)
 - Custom `InstagramIcon` component using `currentColor` pattern (like Lucide icons)
-- Profile displays: Followers, Posts (no views/earnings data available)
-- Profile stats grid shows 4 cards: Followers, Posts, Total Views (—), Engagement (—)
+- Profile displays: Followers, Posts only (no views/engagement data available from scraper)
+- Profile stats grid shows 2 cards: Followers, Posts
 - Growth summary shows: Followers and Posts growth (no earnings estimates)
 - Daily Metrics Table columns: Date, Followers (with changes), Posts (with changes)
 - Service: `src/services/instagramPuppeteer.js` (Puppeteer-based scraping)
@@ -205,11 +207,12 @@ Scripts use `dotenv` to load `.env` automatically.
 ## GitHub Actions
 
 **Optimized for 2,000 minutes/month budget:**
-- **Daily Stats Collection:** Runs 2x daily (6 AM, 6 PM UTC) — collects YouTube, Instagram, Twitch, and Kick stats
+- **Daily Stats Collection:** Runs 2x daily (6 AM, 6 PM UTC) — collects YouTube, Instagram (max 15/run), Twitch, and Kick stats
 - **Creator Discovery:** Runs 4x daily (every 6 hours) — discovers new creators across all platforms
 - **Creator Request Processor:** Runs 4x daily (every 6 hours) — processes pending Instagram creator requests
 - **Twitch Stream Monitor:** Runs every 3 hours (8x daily) — tracks live streams and hours watched
 - **Kick Stream Monitor:** Runs every 3 hours (8x daily, offset) — tracks live streams and hours watched
+- **Instagram Profile Refresh (TEMPORARY):** Runs every 20 min, 3 creators per run — delete after all profiles are refreshed
 
 **Monthly usage:** ~1,440 minutes (within 2,000 min free tier)
 

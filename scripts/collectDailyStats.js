@@ -438,13 +438,21 @@ async function collectDailyStats() {
   }
 
   // ========== INSTAGRAM (Puppeteer scraping, 1 at a time) ==========
+  // Instagram rate-limits after ~14 requests per IP, so limit to 15 per run
+  // and process least-recently-updated first so all creators cycle through
+  const INSTAGRAM_LIMIT = 15;
   if (instagramCreators.length > 0) {
+    const sortedInstagram = [...instagramCreators].sort(
+      (a, b) => new Date(a.updated_at) - new Date(b.updated_at)
+    );
+    const batch = sortedInstagram.slice(0, INSTAGRAM_LIMIT);
+
     console.log('\n📸 Processing Instagram creators...');
-    console.log(`   ${instagramCreators.length} profile(s) to scrape`);
+    console.log(`   ${batch.length} of ${instagramCreators.length} profile(s) to scrape (least recently updated first)`);
     console.log(`   ⚠️  Slow process (~8 seconds per profile)\n`);
 
-    for (let i = 0; i < instagramCreators.length; i++) {
-      const creator = instagramCreators[i];
+    for (let i = 0; i < batch.length; i++) {
+      const creator = batch[i];
 
       try {
         const profileData = await scrapeInstagramProfile(creator.username);
@@ -458,7 +466,7 @@ async function collectDailyStats() {
           total_posts: profileData.totalPosts,
         });
 
-        console.log(`   ✅ [${i + 1}/${instagramCreators.length}] ${creator.display_name}: ${(profileData.followers / 1000000).toFixed(1)}M followers`);
+        console.log(`   ✅ [${i + 1}/${batch.length}] ${creator.display_name}: ${(profileData.followers / 1000000).toFixed(1)}M followers`);
         successCount++;
 
         // Always update creator profile data on successful scrape
@@ -480,12 +488,12 @@ async function collectDailyStats() {
           .eq('id', creator.id);
 
         // Delay between requests to avoid rate limiting
-        if (i < instagramCreators.length - 1) {
+        if (i < batch.length - 1) {
           const delay = 5000 + Math.random() * 3000; // 5-8 seconds random delay
           await new Promise((r) => setTimeout(r, delay));
         }
       } catch (error) {
-        console.error(`   ❌ [${i + 1}/${instagramCreators.length}] ${creator.display_name}: ${error.message}`);
+        console.error(`   ❌ [${i + 1}/${batch.length}] ${creator.display_name}: ${error.message}`);
         errorCount++;
       }
     }

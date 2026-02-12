@@ -1,0 +1,33 @@
+## TEMPORARY — Delete this workflow once all Instagram profiles have accurate data
+## Expected: ~7 hours to cycle through all 63 creators (3 per run, every 20 min)
+## Budget: ~42 runs × 2 min = ~84 minutes of Actions time
+name: Instagram Profile Refresh (Temporary)
+
+on:
+  schedule:
+    - cron: '*/20 * * * *' # Every 20 minutes
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Refresh 3 Instagram profiles
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome-stable
+        run: node scripts/refreshInstagramProfiles.js 3
