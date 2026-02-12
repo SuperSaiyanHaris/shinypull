@@ -1,11 +1,15 @@
-## TEMPORARY — Delete this workflow once all Instagram profiles have accurate data
-## Expected: ~7 hours to cycle through all 63 creators (3 per run, every 20 min)
-## Budget: ~42 runs × 2 min = ~84 minutes of Actions time
-name: Instagram Profile Refresh (Temporary)
+name: Instagram Stats Collection
 
 on:
   schedule:
-    - cron: '*/20 * * * *' # Every 20 minutes
+    # Run 3x daily — each run processes 15 creators (rate limit ~14/IP)
+    # All ~63 creators cycle through every ~1.4 days
+    # 02:00 UTC (8 PM CST)
+    - cron: '0 2 * * *'
+    # 10:00 UTC (4 AM CST)
+    - cron: '0 10 * * *'
+    # 18:00 UTC (12 PM CST)
+    - cron: '0 18 * * *'
   workflow_dispatch:
 
 jobs:
@@ -25,9 +29,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Refresh 3 Instagram profiles
+      - name: Install Chrome dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libx11-xcb1 \
+            libxcomposite1 \
+            libxcursor1 \
+            libxdamage1 \
+            libxi6 \
+            libxtst6 \
+            libnss3 \
+            libcups2 \
+            libxss1 \
+            libxrandr2 \
+            libasound2t64 \
+            libpangocairo-1.0-0 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libgtk-3-0
+
+      - name: Refresh Instagram profiles
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome-stable
-        run: node scripts/refreshInstagramProfiles.js 3
+        run: node scripts/refreshInstagramProfiles.js 15

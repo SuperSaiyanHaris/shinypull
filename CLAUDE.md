@@ -155,8 +155,10 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
 - Launches headless Chrome to fully render JavaScript-based pages
 - Collects: Followers, Posts, Profile Images, Bios, Verification status
 - Rate-limited scraping: 5-8 seconds between requests (randomized delays)
-- **Daily collection limited to 15 per run** — Instagram blocks after ~14 requests per IP
+- **Separate workflow from other platforms** — uses Puppeteer/Chrome (heavy) vs lightweight API calls
+- Runs via `refreshInstagramProfiles.js` in its own GitHub Action (3x daily, 15 creators/run)
 - Processes least-recently-updated creators first so all cycle through over multiple runs
+- Instagram blocks after ~14 requests per IP, so 15/run stays within the safe window
 - Expected success rate: ~60-70% (Instagram actively blocks automated scraping)
 - Failed requests are logged but don't break collection process
 - Profile images use `ui-avatars.com` (Instagram CDN blocks hotlinking)
@@ -207,12 +209,12 @@ Scripts use `dotenv` to load `.env` automatically.
 ## GitHub Actions
 
 **Optimized for 2,000 minutes/month budget:**
-- **Daily Stats Collection:** Runs 2x daily (6 AM, 6 PM UTC) — collects YouTube, Instagram (max 15/run), Twitch, and Kick stats
+- **Daily Stats Collection:** Runs 2x daily (6 AM, 6 PM UTC) — collects YouTube, Twitch, and Kick stats (API-only, no Puppeteer)
+- **Instagram Stats Collection:** Runs 3x daily — refreshes 15 Instagram profiles per run via Puppeteer (separate workflow)
 - **Creator Discovery:** Runs 4x daily (every 6 hours) — discovers new creators across all platforms
-- **Creator Request Processor:** Runs 4x daily (every 6 hours) — processes pending Instagram creator requests
+- **Creator Request Processor:** Runs 4x daily (every 6 hours) — processes pending Instagram creator requests via Puppeteer
 - **Twitch Stream Monitor:** Runs every 3 hours (8x daily) — tracks live streams and hours watched
 - **Kick Stream Monitor:** Runs every 3 hours (8x daily, offset) — tracks live streams and hours watched
-- **Instagram Profile Refresh (TEMPORARY):** Runs every 20 min, 3 creators per run — delete after all profiles are refreshed
 
 **Monthly usage:** ~1,440 minutes (within 2,000 min free tier)
 
