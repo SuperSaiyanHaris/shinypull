@@ -11,7 +11,7 @@
 import { config } from 'dotenv';
 config();
 import { createClient } from '@supabase/supabase-js';
-import { scrapeInstagramProfile, closeBrowser } from '../src/services/instagramPuppeteer.js';
+import { scrapeInstagramProfile, closeBrowser } from '../src/services/instagramScraper.js';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;

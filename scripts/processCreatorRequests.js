@@ -2,7 +2,7 @@
  * Process Pending Creator Requests
  *
  * Fetches pending requests from creator_requests table and processes them:
- * 1. Scrapes Instagram profile data using Puppeteer
+ * 1. Fetches Instagram profile data via meta tags
  * 2. Inserts creator into creators table
  * 3. Creates initial stats entry
  * 4. Updates request status to completed/failed
@@ -10,7 +10,7 @@
 
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
-import { scrapeInstagramProfile, closeBrowser } from '../src/services/instagramPuppeteer.js';
+import { scrapeInstagramProfile, closeBrowser } from '../src/services/instagramScraper.js';
 
 dotenv.config();
 

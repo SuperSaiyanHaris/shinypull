@@ -2,7 +2,7 @@ name: Instagram Stats Collection
 
 on:
   schedule:
-    # Run 3x daily — each run processes 15 creators (rate limit ~14/IP)
+    # Run 3x daily — each run processes 15 creators
     # All ~63 creators cycle through every ~1.4 days
     # 02:00 UTC (8 PM CST)
     - cron: '0 2 * * *'
@@ -28,26 +28,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Install Chrome dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libx11-xcb1 \
-            libxcomposite1 \
-            libxcursor1 \
-            libxdamage1 \
-            libxi6 \
-            libxtst6 \
-            libnss3 \
-            libcups2 \
-            libxss1 \
-            libxrandr2 \
-            libasound2t64 \
-            libpangocairo-1.0-0 \
-            libatk1.0-0 \
-            libatk-bridge2.0-0 \
-            libgtk-3-0
 
       - name: Refresh Instagram profiles
         env:
