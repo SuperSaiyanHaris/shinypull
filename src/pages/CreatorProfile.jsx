@@ -543,27 +543,13 @@ export default function CreatorProfile() {
                 sublabel={creator.hiddenSubscribers ? '(hidden)' : platform === 'youtube' ? '(rounded by YouTube)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
               />
 
-              {/* Instagram: Only show Followers and Posts (no views data available) */}
+              {/* Instagram: Only show Posts (Followers already shown above) */}
               {platform === 'instagram' && (
-                <>
-                  <StatCard
-                    icon={Video}
-                    label="Posts"
-                    value={formatNumber(creator.totalPosts || 0)}
-                  />
-                  <StatCard
-                    icon={Eye}
-                    label="Total Views"
-                    value="—"
-                    sublabel="Not available publicly"
-                  />
-                  <StatCard
-                    icon={TrendingUp}
-                    label="Engagement"
-                    value="—"
-                    sublabel="Not available publicly"
-                  />
-                </>
+                <StatCard
+                  icon={Video}
+                  label="Posts"
+                  value={formatNumber(creator.totalPosts || 0)}
+                />
               )}
 
               {/* Followers Card for Kick (not available) */}

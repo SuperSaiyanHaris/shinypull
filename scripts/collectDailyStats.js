@@ -249,14 +249,22 @@ async function collectDailyStats() {
   console.log(`   Kick Client Secret: ${KICK_CLIENT_SECRET ? '✅ Set' : '❌ Missing'}`);
   console.log('');
 
-  // Get all creators from database
-  const { data: creators, error: fetchError } = await supabase
-    .from('creators')
-    .select('*');
-
-  if (fetchError) {
-    console.error('❌ Error fetching creators:', fetchError.message);
-    return;
+  // Get all creators from database (Supabase default limit is 1000, so paginate)
+  let creators = [];
+  let from = 0;
+  const pageSize = 1000;
+  while (true) {
+    const { data, error: fetchError } = await supabase
+      .from('creators')
+      .select('*')
+      .range(from, from + pageSize - 1);
+    if (fetchError) {
+      console.error('❌ Error fetching creators:', fetchError.message);
+      return;
+    }
+    creators = creators.concat(data);
+    if (data.length < pageSize) break;
+    from += pageSize;
   }
 
   const youtubeCreators = creators.filter((c) => c.platform === 'youtube');
@@ -453,17 +461,23 @@ async function collectDailyStats() {
         console.log(`   ✅ [${i + 1}/${instagramCreators.length}] ${creator.display_name}: ${(profileData.followers / 1000000).toFixed(1)}M followers`);
         successCount++;
 
-        // Update creator profile image if changed
-        if (profileData.profileImage && profileData.profileImage !== creator.profile_image) {
-          await supabase
-            .from('creators')
-            .update({
-              profile_image: profileData.profileImage,
-              description: profileData.description || creator.description,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', creator.id);
+        // Always update creator profile data on successful scrape
+        const profileUpdate = {
+          updated_at: new Date().toISOString(),
+        };
+        if (profileData.displayName && profileData.displayName !== creator.username) {
+          profileUpdate.display_name = profileData.displayName;
         }
+        if (profileData.profileImage) {
+          profileUpdate.profile_image = profileData.profileImage;
+        }
+        if (profileData.description) {
+          profileUpdate.description = profileData.description;
+        }
+        await supabase
+          .from('creators')
+          .update(profileUpdate)
+          .eq('id', creator.id);
 
         // Delay between requests to avoid rate limiting
         if (i < instagramCreators.length - 1) {
