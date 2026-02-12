@@ -93,6 +93,9 @@ export default function Search() {
     setSelectedPlatform(platformId);
     setResults([]);
     setSearched(false);
+    // Clear request status when switching platforms
+    setRequestStatus(null);
+    setRequestMessage('');
   };
 
   const performSearch = async (searchQuery) => {
@@ -104,6 +107,9 @@ export default function Search() {
     setLoading(true);
     setError(null);
     setSearched(true);
+    // Clear request status when searching for a new creator
+    setRequestStatus(null);
+    setRequestMessage('');
 
     try {
       let channels = [];
