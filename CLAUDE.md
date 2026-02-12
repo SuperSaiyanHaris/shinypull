@@ -34,7 +34,7 @@ ShinyPull is a social media analytics platform (similar to SocialBlade) that tra
 - **Database:** Supabase (PostgreSQL)
 - **Hosting:** Vercel (auto-deploys on push to main)
 - **Icons:** Lucide React
-- **APIs:** YouTube Data API v3, Instagram Public API (manual seed), Twitch Helix API, Kick API v1
+- **APIs:** YouTube Data API v3, Instagram (meta tag scraping via bot UA), Twitch Helix API, Kick API v1
 
 ## Project Structure
 
@@ -67,6 +67,7 @@ src/
 │   ├── youtubeService.js # YouTube Data API integration
 │   ├── twitchService.js  # Twitch Helix API integration
 │   ├── kickService.js    # Kick API integration
+│   ├── instagramScraper.js # Instagram scraper (fetch + bot UA, no Puppeteer)
 │   ├── creatorService.js # Supabase CRUD operations
 │   ├── blogService.js    # Blog posts CRUD
 │   ├── blogAdminService.js # Blog admin operations
@@ -151,29 +152,28 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
 
 **Instagram:**
 - No official public API for querying arbitrary profiles
-- Uses **Puppeteer browser automation** to scrape public profiles in real-time
-- Launches headless Chrome to fully render JavaScript-based pages
-- Collects: Followers, Posts, Profile Images, Bios, Verification status
-- Rate-limited scraping: 5-8 seconds between requests (randomized delays)
-- **Separate workflow from other platforms** — uses Puppeteer/Chrome (heavy) vs lightweight API calls
-- Runs via `refreshInstagramProfiles.js` in its own GitHub Action (3x daily, 15 creators/run)
+- Uses **HTTP fetch with bot user-agent** (`facebookexternalhit`) to scrape `og:description` meta tags
+- Instagram serves these meta tags to social media bots for link preview generation, even behind login walls
+- `og:description` format: `"1M Followers, 60 Following, 351 Posts - See Instagram photos and videos from Display Name (&#064;username)"`
+- **No Puppeteer/Chrome needed** — lightweight HTTP request only
+- Service: `src/services/instagramScraper.js`
+- **Separate workflow from other platforms** — Instagram has its own GitHub Action
+- Runs via `refreshInstagramProfiles.js` (3x daily, 15 creators/run)
 - Processes least-recently-updated creators first so all cycle through over multiple runs
-- Instagram blocks after ~14 requests per IP, so 15/run stays within the safe window
-- Expected success rate: ~60-70% (Instagram actively blocks automated scraping)
-- Failed requests are logged but don't break collection process
+- Rate-limited scraping: 8 seconds between requests
+- **GitHub Actions IP limitation:** Instagram returns 429 for Azure/cloud IPs; workflows may need to be supplemented with local runs
 - Profile images use `ui-avatars.com` (Instagram CDN blocks hotlinking)
 - Custom `InstagramIcon` component using `currentColor` pattern (like Lucide icons)
-- Profile displays: Followers, Posts only (no views/engagement data available from scraper)
+- Profile displays: Followers, Posts only (no views/engagement data available)
 - Profile stats grid shows 2 cards: Followers, Posts
 - Growth summary shows: Followers and Posts growth (no earnings estimates)
 - Daily Metrics Table columns: Date, Followers (with changes), Posts (with changes)
-- Service: `src/services/instagramPuppeteer.js` (Puppeteer-based scraping)
 - **Creator Request System:** Users can request Instagram creators not in the database
   - Request button appears on search page when no results found
   - Backend validates username format and checks for duplicates
   - Requests stored in `creator_requests` table with status tracking
-  - Processed automatically by GitHub Action (every 6 hours)
-  - Users notified that creator will be added within 24 hours
+  - Processed by GitHub Action (every 6 hours) or locally if Actions IPs are blocked
+  - 429 errors revert requests to `pending` (not `failed`) for retry on next run
   - Scalable queueing system prevents timeout issues
 
 ## Commands
@@ -209,10 +209,10 @@ Scripts use `dotenv` to load `.env` automatically.
 ## GitHub Actions
 
 **Optimized for 2,000 minutes/month budget:**
-- **Daily Stats Collection:** Runs 2x daily (6 AM, 6 PM UTC) — collects YouTube, Twitch, and Kick stats (API-only, no Puppeteer)
-- **Instagram Stats Collection:** Runs 3x daily — refreshes 15 Instagram profiles per run via Puppeteer (separate workflow)
+- **Daily Stats Collection:** Runs 2x daily (6 AM, 6 PM UTC) — collects YouTube, Twitch, and Kick stats (API-only)
+- **Instagram Stats Collection:** Runs 3x daily — refreshes 15 Instagram profiles per run via lightweight HTTP fetch (separate workflow)
 - **Creator Discovery:** Runs 4x daily (every 6 hours) — discovers new creators across all platforms
-- **Creator Request Processor:** Runs 4x daily (every 6 hours) — processes pending Instagram creator requests via Puppeteer
+- **Creator Request Processor:** Runs 4x daily (every 6 hours) — processes pending Instagram creator requests via HTTP fetch
 - **Twitch Stream Monitor:** Runs every 3 hours (8x daily) — tracks live streams and hours watched
 - **Kick Stream Monitor:** Runs every 3 hours (8x daily, offset) — tracks live streams and hours watched
 
