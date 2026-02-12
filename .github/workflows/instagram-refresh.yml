@@ -1,16 +1,13 @@
 name: Instagram Stats Collection
 
 on:
-  schedule:
-    # Run 3x daily — each run processes 15 creators
-    # All ~63 creators cycle through every ~1.4 days
-    # 02:00 UTC (8 PM CST)
-    - cron: '0 2 * * *'
-    # 10:00 UTC (4 AM CST)
-    - cron: '0 10 * * *'
-    # 18:00 UTC (12 PM CST)
-    - cron: '0 18 * * *'
-  workflow_dispatch:
+  # DISABLED: Instagram blocks GitHub Actions IPs with 429 errors
+  # Use local automation instead (see scripts/local/README.md)
+  # schedule:
+  #   - cron: '0 2 * * *'   # 02:00 UTC (8 PM CST)
+  #   - cron: '0 10 * * *'  # 10:00 UTC (4 AM CST)
+  #   - cron: '0 18 * * *'  # 18:00 UTC (12 PM CST)
+  workflow_dispatch:  # Keep manual trigger for testing
 
 jobs:
   refresh:

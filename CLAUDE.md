@@ -92,7 +92,11 @@ scripts/
 ├── seedBlogPosts.js          # Seed initial blog posts
 ├── seedProducts.js           # Seed affiliate products
 ├── generateSitemap.js        # Generate sitemap.xml dynamically
-└── updateBlogPost.js         # Update blog post content from temp files
+├── updateBlogPost.js         # Update blog post content from temp files
+└── local/                    # Local automation (Windows Task Scheduler)
+    ├── README.md             # Setup instructions for local tasks
+    ├── refresh-instagram.bat # Batch script for profile refresh
+    └── process-instagram-requests.bat # Batch script for creator requests
 
 api/                              # Vercel serverless functions
 ├── twitch.js                 # Twitch API proxy (keeps secrets server-side)
@@ -210,13 +214,31 @@ Scripts use `dotenv` to load `.env` automatically.
 
 **Optimized for 2,000 minutes/month budget:**
 - **Daily Stats Collection:** Runs 2x daily (6 AM, 6 PM UTC) — collects YouTube, Twitch, and Kick stats (API-only)
-- **Instagram Stats Collection:** Runs 3x daily — refreshes 15 Instagram profiles per run via lightweight HTTP fetch (separate workflow)
+- **~~Instagram Stats Collection:~~** DISABLED — Instagram blocks GitHub Actions IPs with 429 errors (use local automation instead)
+- **~~Creator Request Processor:~~** DISABLED — Instagram blocks GitHub Actions IPs with 429 errors (use local automation instead)
 - **Creator Discovery:** Runs 4x daily (every 6 hours) — discovers new creators across all platforms
-- **Creator Request Processor:** Runs 4x daily (every 6 hours) — processes pending Instagram creator requests via HTTP fetch
 - **Twitch Stream Monitor:** Runs every 3 hours (8x daily) — tracks live streams and hours watched
 - **Kick Stream Monitor:** Runs every 3 hours (8x daily, offset) — tracks live streams and hours watched
 
-**Monthly usage:** ~1,440 minutes (within 2,000 min free tier)
+**Monthly usage:** ~1,080 minutes (within 2,000 min free tier)
+
+## Local Instagram Automation
+
+Since Instagram blocks GitHub Actions IPs (Azure cloud), Instagram data collection runs locally via Windows Task Scheduler:
+
+**Setup:**
+- See `scripts/local/README.md` for complete setup instructions
+- Two batch scripts: `refresh-instagram.bat` and `process-instagram-requests.bat`
+- Windows Task Scheduler runs them automatically (3x and 4x daily respectively)
+
+**Schedule:**
+- **Profile Refresh:** 8 AM, 2 PM, 8 PM (15 profiles/run)
+- **Creator Requests:** 6 AM, 12 PM, 6 PM, 12 AM (all pending)
+
+**Coverage:**
+- ~63 Instagram creators cycle through every ~1.4 days
+- Processes oldest profiles first (`updated_at ASC`)
+- Works perfectly from residential IPs
 
 ## Conventions
 
