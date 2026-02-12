@@ -371,7 +371,7 @@ export default function Search() {
 
           {/* Results */}
           {results.length > 0 && (
-            <div>
+            <div className="mb-8">
               <p className="text-gray-500 mb-4">{results.length} creators found</p>
               <div className="space-y-3">
                 {results.map((creator) => {
@@ -419,6 +419,71 @@ export default function Search() {
                 })}
               </div>
             </div>
+          )}
+
+          {/* Instagram: Request Creator (when no exact username match) */}
+          {selectedPlatform === 'instagram' && searched && results.length > 0 && query && (
+            (() => {
+              // Check if any result has exact username match
+              const hasExactMatch = results.some(r => r.username.toLowerCase() === query.toLowerCase());
+
+              if (!hasExactMatch) {
+                return (
+                  <div className="text-center py-8 bg-white rounded-2xl border border-gray-100">
+                    <div className="max-w-md mx-auto">
+                      <p className="text-sm text-gray-600 mb-4">
+                        Can't find "@{query}"? Instagram creators are added by request.
+                      </p>
+
+                      {requestStatus === null && (
+                        <>
+                          <button
+                            onClick={handleRequestCreator}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                          >
+                            <Clock className="w-5 h-5" />
+                            Request @{query}
+                          </button>
+                          <p className="text-xs text-gray-400 mt-3">
+                            We'll add them within 24 hours
+                          </p>
+                        </>
+                      )}
+
+                      {requestStatus === 'requesting' && (
+                        <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
+                          <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                          <p className="text-sm text-indigo-700 font-medium">Submitting request...</p>
+                        </div>
+                      )}
+
+                      {requestStatus === 'success' && (
+                        <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                          <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                          <p className="text-sm text-green-800 font-medium mb-1">Request Submitted!</p>
+                          <p className="text-sm text-green-700">{requestMessage}</p>
+                        </div>
+                      )}
+
+                      {requestStatus === 'error' && (
+                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                          <AlertCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
+                          <p className="text-sm text-red-800 font-medium mb-1">Request Failed</p>
+                          <p className="text-sm text-red-700">{requestMessage}</p>
+                          <button
+                            onClick={handleRequestCreator}
+                            className="mt-3 text-sm text-red-700 hover:text-red-800 font-medium underline"
+                          >
+                            Try Again
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()
           )}
         </div>
       </div>
