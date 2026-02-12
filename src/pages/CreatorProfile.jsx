@@ -534,7 +534,7 @@ export default function CreatorProfile() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className={`grid gap-4 mb-6 ${platform === 'instagram' ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`}>
               {/* Subscribers/Followers Card */}
               <StatCard
                 icon={Users}
@@ -620,7 +620,7 @@ export default function CreatorProfile() {
 
             {/* Growth Summary */}
             {(creator.subscribers || creator.followers) && (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className={`grid gap-4 mb-6 ${platform === 'instagram' ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`}>
                 {platform === 'youtube' ? (
                   <>
                     {/* For YouTube, lead with Views (accurate) instead of Subscribers (rounded) */}
