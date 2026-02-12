@@ -53,5 +53,4 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome-stable
         run: node scripts/refreshInstagramProfiles.js 15
