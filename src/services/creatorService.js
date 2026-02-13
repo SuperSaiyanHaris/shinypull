@@ -327,6 +327,7 @@ export const getRankedCreators = withErrorHandling(
           latestStats: stats,
           subscribers,
           totalViews: views,
+          totalPosts: stats?.total_posts ?? 0,
           growth30d: growth,
           sortValue,
         };

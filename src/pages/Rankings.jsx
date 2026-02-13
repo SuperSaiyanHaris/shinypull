@@ -250,7 +250,11 @@ export default function Rankings() {
                   <span className="text-gray-500">
                     <span className="font-medium text-gray-900">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
                   </span>
-                  {selectedPlatform !== 'kick' && (
+                  {selectedPlatform === 'instagram' ? (
+                    <span className="text-gray-500">
+                      <span className="font-medium text-gray-900">{formatNumber(creator.totalPosts)}</span> posts
+                    </span>
+                  ) : selectedPlatform !== 'kick' && (
                     <span className="text-gray-500">
                       <span className="font-medium text-gray-900">{formatNumber(creator.totalViews)}</span> views
                     </span>
