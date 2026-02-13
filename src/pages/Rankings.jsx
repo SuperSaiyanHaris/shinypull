@@ -157,8 +157,11 @@ export default function Rankings() {
     if (sortColumn === column) {
       setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc');
     } else {
+      // Data is pre-sorted desc by the active rank type, so if clicking that
+      // same column with no custom sort active, start ascending for a visible change
+      const startDir = (!sortColumn && column === selectedRankType) ? 'asc' : 'desc';
       setSortColumn(column);
-      setSortDirection('desc');
+      setSortDirection(startDir);
     }
   };
 
