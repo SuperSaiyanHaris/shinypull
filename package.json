@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/generateSitemap.js && vite build",
     "preview": "vite preview",
     "seed:top-creators": "node scripts/seedTopCreators.js",
     "seed:expanded": "node scripts/seedTopCreatorsExpanded.js",

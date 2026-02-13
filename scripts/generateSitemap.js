@@ -26,6 +26,7 @@ const staticPages = [
   { url: '/rankings/instagram', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
   { url: '/rankings/twitch', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
   { url: '/rankings/kick', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
+  { url: '/rankings/tiktok', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
   { url: '/compare', lastmod: TODAY, changefreq: 'weekly', priority: 0.8 },
   { url: '/gear', lastmod: TODAY, changefreq: 'weekly', priority: 0.85 },
   { url: '/youtube/money-calculator', lastmod: TODAY, changefreq: 'monthly', priority: 0.8 },
@@ -99,21 +100,39 @@ async function generateSitemap() {
     });
   }
 
-  // Fetch creator profiles
+  // Fetch creator profiles (paginate to get all)
   console.log('👤 Fetching creator profiles...');
-  const { data: creators, error: creatorsError } = await supabase
-    .from('creators')
-    .select('platform, username, updated_at')
-    .not('username', 'is', null)
-    .order('updated_at', { ascending: false })
-    .limit(500);
+  let allCreators = [];
+  let creatorPage = 0;
+  const creatorPageSize = 1000;
+  let hasMoreCreators = true;
 
-  if (creatorsError) {
-    console.error('❌ Error fetching creators:', creatorsError);
-  } else {
-    console.log(`   Found ${creators.length} creator profiles`);
+  while (hasMoreCreators) {
+    const { data: creators, error: creatorsError } = await supabase
+      .from('creators')
+      .select('platform, username, updated_at')
+      .not('username', 'is', null)
+      .order('updated_at', { ascending: false })
+      .range(creatorPage * creatorPageSize, (creatorPage + 1) * creatorPageSize - 1);
+
+    if (creatorsError) {
+      console.error('❌ Error fetching creators:', creatorsError);
+      break;
+    }
+
+    if (creators && creators.length > 0) {
+      allCreators = allCreators.concat(creators);
+      creatorPage++;
+      hasMoreCreators = creators.length === creatorPageSize;
+    } else {
+      hasMoreCreators = false;
+    }
+  }
+
+  if (allCreators.length > 0) {
+    console.log(`   Found ${allCreators.length} creator profiles`);
     const seen = new Set();
-    creators.forEach(creator => {
+    allCreators.forEach(creator => {
       const key = `${creator.platform}/${creator.username.toLowerCase()}`;
       if (seen.has(key)) return;
       seen.add(key);
