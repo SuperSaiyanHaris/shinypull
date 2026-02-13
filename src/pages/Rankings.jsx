@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
+import TikTokIcon from '../components/TikTokIcon';
 import { TableSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
 import { getRankedCreators } from '../services/creatorService';
@@ -14,6 +15,7 @@ import logger from '../lib/logger';
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', hoverColor: 'hover:bg-red-700', lightBg: 'bg-red-50', textColor: 'text-red-600', available: true },
   { id: 'instagram', name: 'Instagram', icon: InstagramIcon, color: 'bg-pink-600', hoverColor: 'hover:bg-pink-700', lightBg: 'bg-pink-50', textColor: 'text-pink-600', available: true },
+  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'bg-gray-900', hoverColor: 'hover:bg-gray-800', lightBg: 'bg-pink-50', textColor: 'text-pink-600', available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', hoverColor: 'hover:bg-purple-700', lightBg: 'bg-purple-50', textColor: 'text-purple-600', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'bg-green-500', hoverColor: 'hover:bg-green-600', lightBg: 'bg-green-50', textColor: 'text-green-600', available: true },
 ];
@@ -28,9 +30,9 @@ export default function Rankings() {
   const [error, setError] = useState(null);
 
   const rankTypes = [
-    { id: 'subscribers', name: selectedPlatform === 'instagram' ? 'Top Followers' : selectedPlatform === 'twitch' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
-    // Hide views for Kick and Instagram since APIs don't provide view data
-    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
+    { id: 'subscribers', name: selectedPlatform === 'instagram' ? 'Top Followers' : selectedPlatform === 'tiktok' ? 'Top Followers' : selectedPlatform === 'twitch' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
+    // Hide views for Kick, Instagram, and TikTok since APIs don't provide view data
+    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
     { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
   ];
 
@@ -66,7 +68,7 @@ export default function Rankings() {
     analytics.switchPlatform('rankings', platformId);
   };
 
-  const followerLabel = selectedPlatform === 'instagram' ? 'Followers' : selectedPlatform === 'twitch' ? 'Followers' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
+  const followerLabel = selectedPlatform === 'instagram' ? 'Followers' : selectedPlatform === 'tiktok' ? 'Followers' : selectedPlatform === 'twitch' ? 'Followers' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
   const currentPlatform = platforms.find(p => p.id === selectedPlatform);
 
   return (
@@ -144,9 +146,9 @@ export default function Rankings() {
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-500 uppercase tracking-wider">
               <div className="col-span-1">Rank</div>
-              <div className={selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'col-span-7' : 'col-span-5'}>Creator</div>
+              <div className={selectedPlatform === 'kick' || selectedPlatform === 'instagram' || selectedPlatform === 'tiktok' ? 'col-span-7' : 'col-span-5'}>Creator</div>
               <div className="col-span-2 text-right">{followerLabel}</div>
-              {selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && <div className="col-span-2 text-right">Views</div>}
+              {selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' && <div className="col-span-2 text-right">Views</div>}
               <div className="col-span-2 text-right flex items-center justify-end gap-1 group">
                 <span>30-Day Growth</span>
                 <div className="relative">
@@ -158,6 +160,8 @@ export default function Rankings() {
                       ? 'Kick growth based on paid subscribers'
                       : selectedPlatform === 'instagram'
                       ? 'Instagram growth based on followers'
+                      : selectedPlatform === 'tiktok'
+                      ? 'TikTok growth based on followers'
                       : 'Twitch growth based on watch hours'}
                   </div>
                 </div>
@@ -212,7 +216,7 @@ export default function Rankings() {
                 </div>
 
                 {/* Creator Info */}
-                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'md:col-span-7' : 'md:col-span-5'}`}>
+                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'instagram' || selectedPlatform === 'tiktok' ? 'md:col-span-7' : 'md:col-span-5'}`}>
                   <img
                     src={creator.profile_image || '/placeholder-avatar.svg'}
                     alt={creator.display_name}
@@ -234,7 +238,7 @@ export default function Rankings() {
                 <div className="hidden md:block col-span-2 text-right">
                   <span className="font-semibold text-gray-900">{formatNumber(creator.subscribers)}</span>
                 </div>
-                {selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && (
+                {selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' && (
                   <div className="hidden md:block col-span-2 text-right">
                     <span className="text-gray-600">{formatNumber(creator.totalViews)}</span>
                   </div>
@@ -253,6 +257,10 @@ export default function Rankings() {
                   {selectedPlatform === 'instagram' ? (
                     <span className="text-gray-500">
                       <span className="font-medium text-gray-900">{formatNumber(creator.totalPosts)}</span> posts
+                    </span>
+                  ) : selectedPlatform === 'tiktok' ? (
+                    <span className="text-gray-500">
+                      <span className="font-medium text-gray-900">{formatNumber(creator.totalLikes || creator.totalViews)}</span> likes
                     </span>
                   ) : selectedPlatform !== 'kick' && (
                     <span className="text-gray-500">

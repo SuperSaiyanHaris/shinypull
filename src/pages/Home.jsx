@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Search, Youtube, Twitch, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, ShoppingBag, ExternalLink } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
+import TikTokIcon from '../components/TikTokIcon';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
@@ -11,6 +12,7 @@ import { getActiveProducts } from '../services/productsService';
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-600', stats: '72M+ channels', available: true },
   { id: 'instagram', name: 'Instagram', icon: InstagramIcon, color: 'from-pink-500 to-purple-600', bgColor: 'bg-gradient-to-br from-pink-50 to-purple-50', textColor: 'text-pink-600', stats: '2B+ accounts', available: true },
+  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'from-gray-900 to-gray-800', bgColor: 'bg-pink-50', textColor: 'text-pink-600', stats: '1B+ accounts', available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50', textColor: 'text-purple-600', stats: '7M+ channels', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50', textColor: 'text-green-600', stats: 'New!', available: true },
 ];
@@ -19,7 +21,7 @@ const features = [
   {
     icon: Search,
     title: 'Search Creators',
-    description: 'Find any creator across YouTube, Instagram, Twitch, and Kick with real-time data.',
+    description: 'Find any creator across YouTube, Instagram, TikTok, Twitch, and Kick with real-time data.',
     color: 'from-blue-500 to-indigo-600',
     bgColor: 'bg-blue-50',
     link: '/search',
@@ -130,8 +132,8 @@ export default function Home() {
     <>
       <SEO
         title="Home"
-        description="Track YouTube, Instagram, Twitch, and Kick statistics. View subscriber counts, follower growth, earnings estimates, rankings and analytics for your favorite creators."
-        keywords="youtube statistics, instagram statistics, twitch statistics, kick statistics, subscriber count, follower count, social blade alternative, creator analytics, earnings calculator"
+        description="Track YouTube, Instagram, TikTok, Twitch, and Kick statistics. View subscriber counts, follower growth, earnings estimates, rankings and analytics for your favorite creators."
+        keywords="youtube statistics, instagram statistics, tiktok statistics, twitch statistics, kick statistics, subscriber count, follower count, social blade alternative, creator analytics, earnings calculator"
       />
 
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -163,7 +165,7 @@ export default function Home() {
               </h1>
 
               <p className="text-base sm:text-lg lg:text-xl text-slate-300 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-4">
-                Track followers, views, and growth for your favorite YouTube, Instagram, Twitch, and Kick creators. Get detailed analytics and insights.
+                Track followers, views, and growth for your favorite YouTube, Instagram, TikTok, Twitch, and Kick creators. Get detailed analytics and insights.
               </p>
 
               {/* Search Bar - Modern Clean Design */}
@@ -192,7 +194,7 @@ export default function Home() {
               </form>
 
               {/* Platform Cards - Glass style */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 max-w-4xl mx-auto px-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 max-w-5xl mx-auto px-4">
                 {platforms.map((platform) => {
                   const Icon = platform.icon;
 
@@ -470,7 +472,7 @@ export default function Home() {
                 Start tracking your favorite creators
               </h2>
               <p className="text-slate-300 mb-8 max-w-xl mx-auto text-lg">
-                Search for any YouTube, Instagram, Twitch, or Kick creator and get detailed analytics instantly.
+                Search for any YouTube, Instagram, TikTok, Twitch, or Kick creator and get detailed analytics instantly.
               </p>
               <Link
                 to="/search"

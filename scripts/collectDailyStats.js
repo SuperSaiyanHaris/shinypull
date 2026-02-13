@@ -270,7 +270,8 @@ async function collectDailyStats() {
   const twitchCreators = creators.filter((c) => c.platform === 'twitch');
   const kickCreators = creators.filter((c) => c.platform === 'kick');
   // Instagram is handled by its own dedicated workflow (refreshInstagramProfiles.js)
-  // because it uses Puppeteer/Chrome which is a different runtime concern
+  // TikTok is handled by its own dedicated workflow (refreshTikTokProfiles.js)
+  // Both use HTTP scraping which requires separate refresh scripts
 
   console.log(`Found ${creators.length} creators to update`);
   console.log(`   YouTube: ${youtubeCreators.length}`);

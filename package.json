@@ -22,6 +22,8 @@
     "discover:youtube": "node scripts/discoverYouTubeCreators.js",
     "discover:twitch": "node scripts/discoverTwitchCreators.js",
     "discover:kick": "node scripts/discoverKickCreators.js",
+    "discover:tiktok": "node scripts/discoverTikTokCreators.js",
+    "refresh:tiktok": "node scripts/refreshTikTokProfiles.js",
     "seed:gear-blog": "node scripts/seedGearBlogPosts.js"
   },
   "dependencies": {

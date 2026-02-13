@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { BarChart3, Youtube, Instagram, Twitch } from 'lucide-react';
 import KickIcon from './KickIcon';
+import TikTokIcon from './TikTokIcon';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -20,7 +21,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Social media analytics and statistics for YouTube, Twitch, and more.
+              Social media analytics and statistics for YouTube, Instagram, TikTok, Twitch, and Kick.
             </p>
           </div>
 
@@ -65,6 +66,12 @@ export default function Footer() {
                 <Link to="/rankings/instagram" className="text-gray-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
                   <Instagram className="w-4 h-4" />
                   Instagram Stats
+                </Link>
+              </li>
+              <li>
+                <Link to="/rankings/tiktok" className="text-gray-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                  <TikTokIcon className="w-4 h-4" />
+                  TikTok Stats
                 </Link>
               </li>
               <li>

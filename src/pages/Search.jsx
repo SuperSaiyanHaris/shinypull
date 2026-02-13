@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight, Clock, CheckCircle } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
+import TikTokIcon from '../components/TikTokIcon';
 import { CreatorRowSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
@@ -19,6 +20,7 @@ import logger from '../lib/logger';
 const platformIcons = {
   youtube: Youtube,
   instagram: InstagramIcon,
+  tiktok: TikTokIcon,
   twitch: Twitch,
   kick: KickIcon,
 };
@@ -26,6 +28,7 @@ const platformIcons = {
 const platformColors = {
   youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600' },
   instagram: { bg: 'bg-gradient-to-br from-purple-600 to-pink-600', light: 'bg-purple-50', text: 'text-purple-600' },
+  tiktok: { bg: 'bg-gray-900', light: 'bg-pink-50', text: 'text-pink-600' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
   kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
 };
@@ -33,6 +36,7 @@ const platformColors = {
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, available: true },
   { id: 'instagram', name: 'Instagram', icon: InstagramIcon, available: true },
+  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, available: true },
 ];
@@ -62,6 +66,37 @@ async function searchInstagram(query, limit = 25) {
         profileImage: creator.profile_image,
         description: creator.description,
         followers: stats?.followers || 0,
+        totalPosts: stats?.total_posts || 0,
+      };
+    })
+  );
+
+  return withStats.slice(0, limit);
+}
+
+// TikTok search function - searches database (same pattern as Instagram)
+async function searchTikTok(query, limit = 25) {
+  const results = await searchCreators(query, 'tiktok');
+
+  const withStats = await Promise.all(
+    results.map(async (creator) => {
+      const { data: stats } = await supabase
+        .from('creator_stats')
+        .select('followers, total_views, total_posts')
+        .eq('creator_id', creator.id)
+        .order('recorded_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      return {
+        platform: 'tiktok',
+        platformId: creator.platform_id,
+        username: creator.username,
+        displayName: creator.display_name || creator.username,
+        profileImage: creator.profile_image,
+        description: creator.description,
+        followers: stats?.followers || 0,
+        totalLikes: stats?.total_views || 0,
         totalPosts: stats?.total_posts || 0,
       };
     })
@@ -122,6 +157,9 @@ export default function Search() {
       } else if (selectedPlatform === 'instagram') {
         // Search Instagram creators from database
         channels = await searchInstagram(searchQuery, 25);
+      } else if (selectedPlatform === 'tiktok') {
+        // Search TikTok creators from database
+        channels = await searchTikTok(searchQuery, 25);
       } else if (selectedPlatform === 'twitch') {
         channels = await searchTwitch(searchQuery, 25);
       } else if (selectedPlatform === 'kick') {
@@ -311,13 +349,13 @@ export default function Search() {
                 We couldn't find any {currentPlatform?.name} creators matching "{query}"
               </p>
 
-              {/* Instagram-specific: Request Creator Button */}
-              {selectedPlatform === 'instagram' && (
+              {/* Instagram/TikTok: Request Creator Button */}
+              {(selectedPlatform === 'instagram' || selectedPlatform === 'tiktok') && (
                 <>
                   {requestStatus === null && (
                     <div className="mt-6 max-w-md mx-auto">
                       <p className="text-sm text-gray-600 mb-4">
-                        Instagram creators are added by request. Want us to track this creator?
+                        {selectedPlatform === 'instagram' ? 'Instagram' : 'TikTok'} creators are added by request. Want us to track this creator?
                       </p>
                       <button
                         onClick={handleRequestCreator}
@@ -363,8 +401,8 @@ export default function Search() {
                 </>
               )}
 
-              {/* Non-Instagram: Standard message */}
-              {selectedPlatform !== 'instagram' && (
+              {/* Standard platforms: Standard message */}
+              {selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' && (
                 <p className="text-sm text-gray-400">
                   Try searching for a different name or check the spelling
                 </p>
@@ -413,6 +451,7 @@ export default function Search() {
                         <p className="text-xs sm:text-sm text-gray-500">
                           {creator.platform === 'twitch' ? 'followers' :
                            creator.platform === 'instagram' ? 'followers' :
+                           creator.platform === 'tiktok' ? 'followers' :
                            creator.platform === 'kick' ? 'paid subs' : 'subscribers'}
                         </p>
                       </div>
@@ -424,8 +463,8 @@ export default function Search() {
             </div>
           )}
 
-          {/* Instagram: Request Creator (when no exact username match) */}
-          {selectedPlatform === 'instagram' && searched && results.length > 0 && query && (
+          {/* Instagram/TikTok: Request Creator (when no exact username match) */}
+          {(selectedPlatform === 'instagram' || selectedPlatform === 'tiktok') && searched && results.length > 0 && query && (
             (() => {
               // Check if any result has exact username match
               const hasExactMatch = results.some(r => r.username.toLowerCase() === query.toLowerCase());
@@ -435,7 +474,7 @@ export default function Search() {
                   <div className="text-center py-8 bg-white rounded-2xl border border-gray-100">
                     <div className="max-w-md mx-auto">
                       <p className="text-sm text-gray-600 mb-4">
-                        Can't find "@{query}"? Instagram creators are added by request.
+                        Can't find "@{query}"? {selectedPlatform === 'instagram' ? 'Instagram' : 'TikTok'} creators are added by request.
                       </p>
 
                       {requestStatus === null && (

@@ -10,7 +10,8 @@
 
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
-import { scrapeInstagramProfile, closeBrowser } from '../src/services/instagramScraper.js';
+import { scrapeInstagramProfile, closeBrowser as closeInstagramBrowser } from '../src/services/instagramScraper.js';
+import { scrapeTikTokProfile, closeBrowser as closeTikTokBrowser } from '../src/services/tiktokScraper.js';
 
 dotenv.config();
 
@@ -35,7 +36,7 @@ function getTodayLocal() {
  * Process a single creator request
  */
 async function processRequest(request) {
-  console.log(`\n[${request.username}] Processing request...`);
+  console.log(`\n[${request.platform}/${request.username}] Processing request...`);
 
   try {
     // Mark as processing
@@ -44,16 +45,21 @@ async function processRequest(request) {
       .update({ status: 'processing' })
       .eq('id', request.id);
 
-    // Scrape profile data
-    console.log(`[${request.username}] Scraping profile...`);
-    const profileData = await scrapeInstagramProfile(request.username);
+    // Scrape profile data based on platform
+    console.log(`[${request.username}] Scraping ${request.platform} profile...`);
+    let profileData;
+    if (request.platform === 'tiktok') {
+      profileData = await scrapeTikTokProfile(request.username);
+    } else {
+      profileData = await scrapeInstagramProfile(request.username);
+    }
     console.log(`[${request.username}] ✓ Scraped: ${profileData.displayName} (${profileData.followers.toLocaleString()} followers)`);
 
     // Check if creator already exists (in case it was added elsewhere)
     const { data: existingCreator } = await supabase
       .from('creators')
       .select('id')
-      .eq('platform', 'instagram')
+      .eq('platform', request.platform)
       .ilike('username', request.username)
       .single();
 
@@ -90,15 +96,20 @@ async function processRequest(request) {
 
     // Create initial stats entry
     const today = getTodayLocal();
+    const statsInsert = {
+      creator_id: creatorId,
+      recorded_at: today,
+      followers: profileData.followers,
+      total_posts: profileData.totalPosts,
+      created_at: new Date().toISOString()
+    };
+    // TikTok also has totalLikes — store in total_views field
+    if (request.platform === 'tiktok' && profileData.totalLikes) {
+      statsInsert.total_views = profileData.totalLikes;
+    }
     const { error: statsError } = await supabase
       .from('creator_stats')
-      .insert({
-        creator_id: creatorId,
-        recorded_at: today,
-        followers: profileData.followers,
-        total_posts: profileData.totalPosts,
-        created_at: new Date().toISOString()
-      });
+      .insert(statsInsert);
 
     if (statsError && !statsError.message.includes('duplicate key')) {
       console.warn(`[${request.username}] Warning: Failed to create stats entry: ${statsError.message}`);
@@ -218,8 +229,9 @@ async function main() {
     console.error('Fatal error:', error.message);
     process.exit(1);
   } finally {
-    // Close browser
-    await closeBrowser();
+    // Close browsers
+    await closeInstagramBrowser();
+    await closeTikTokBrowser();
   }
 }
 

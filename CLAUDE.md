@@ -4,9 +4,9 @@
 
 ## Project Overview
 
-ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube, Instagram, Twitch, and Kick.
+ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube, Instagram, TikTok, Twitch, and Kick.
 
-**Status:** YouTube, Instagram, Twitch, and Kick integrations fully working. Live subscriber/follower counts, historical charts, and automated data collection operational.
+**Status:** YouTube, Instagram, TikTok, Twitch, and Kick integrations fully working. Live subscriber/follower counts, historical charts, and automated data collection operational.
 
 ## Critical Rules
 
@@ -34,7 +34,7 @@ ShinyPull is a social media analytics platform (similar to SocialBlade) that tra
 - **Database:** Supabase (PostgreSQL)
 - **Hosting:** Vercel (auto-deploys on push to main)
 - **Icons:** Lucide React
-- **APIs:** YouTube Data API v3, Instagram (meta tag scraping via bot UA), Twitch Helix API, Kick API v1
+- **APIs:** YouTube Data API v3, Instagram (meta tag scraping via bot UA), TikTok (embedded JSON scraping), Twitch Helix API, Kick API v1
 
 ## Project Structure
 
@@ -46,6 +46,7 @@ src/
 │   ├── SEO.jsx           # Meta tags for pages
 │   ├── Odometer.jsx      # Animated number counter
 │   ├── KickIcon.jsx      # Custom Kick platform SVG icon
+│   ├── TikTokIcon.jsx    # Custom TikTok platform SVG icon
 │   ├── ProductCard.jsx   # Full-size affiliate product card
 │   └── MiniProductCard.jsx # Compact product card + grid
 ├── pages/
@@ -68,6 +69,7 @@ src/
 │   ├── twitchService.js  # Twitch Helix API integration
 │   ├── kickService.js    # Kick API integration
 │   ├── instagramScraper.js # Instagram scraper (fetch + bot UA, no Puppeteer)
+│   ├── tiktokScraper.js  # TikTok scraper (fetch + embedded JSON, no Puppeteer)
 │   ├── creatorService.js # Supabase CRUD operations
 │   ├── blogService.js    # Blog posts CRUD
 │   ├── blogAdminService.js # Blog admin operations
@@ -82,6 +84,8 @@ src/
 scripts/
 ├── collectDailyStats.js      # Daily stats collection (runs 2x daily)
 ├── refreshInstagramProfiles.js # Refresh N Instagram profiles (staleness order)
+├── refreshTikTokProfiles.js  # Refresh N TikTok profiles (staleness order)
+├── discoverTikTokCreators.js  # Discover new TikTok creators from curated list
 ├── monitorTwitchStreams.js   # Twitch stream monitoring (every 5 min)
 ├── monitorKickStreams.js     # Kick stream monitoring (every 5 min)
 ├── aggregateHoursWatched.js  # Calculate Twitch/Kick hours watched
@@ -95,8 +99,10 @@ scripts/
 ├── updateBlogPost.js         # Update blog post content from temp files
 └── local/                    # Local automation (Windows Task Scheduler)
     ├── README.md             # Setup instructions for local tasks
-    ├── refresh-instagram.bat # Batch script for profile refresh
-    └── process-instagram-requests.bat # Batch script for creator requests
+    ├── refresh-instagram.bat # Batch script for Instagram profile refresh
+    ├── process-instagram-requests.bat # Batch script for creator requests
+    ├── refresh-tiktok.bat    # Batch script for TikTok profile refresh
+    └── discover-tiktok.bat   # Batch script for TikTok creator discovery
 
 api/                              # Vercel serverless functions
 ├── twitch.js                 # Twitch API proxy (keeps secrets server-side)
@@ -180,6 +186,23 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
   - 429 errors revert requests to `pending` (not `failed`) for retry on next run
   - Scalable queueing system prevents timeout issues
 
+**TikTok:**
+- No official public API for querying arbitrary profiles
+- Uses **HTTP fetch with browser user-agent** to scrape `__UNIVERSAL_DATA_FOR_REHYDRATION__` embedded JSON
+- TikTok embeds all profile data (followers, likes, videos) in a script tag as structured JSON
+- **No Puppeteer/Chrome needed** — lightweight HTTP request only
+- Service: `src/services/tiktokScraper.js`
+- Runs via `refreshTikTokProfiles.js` (3x daily, 15 creators/run)
+- Discovery via `discoverTikTokCreators.js` (curated list of top creators)
+- Rate-limited scraping: 3 seconds between requests
+- Custom `TikTokIcon` component using `currentColor` pattern (like Lucide icons)
+- Profile displays: Followers, Likes, Videos (3-card stats grid)
+- Growth summary shows: Followers and Posts growth
+- Daily Metrics Table columns: Date, Followers (with changes), Likes (with changes), Videos (with changes)
+- `total_views` field stores TikTok likes count (repurposed since TikTok doesn't have "views" per profile)
+- **Creator Request System:** Same as Instagram — users can request TikTok creators
+  - `processCreatorRequests.js` handles both Instagram and TikTok requests
+
 ## Commands
 
 ```bash
@@ -193,6 +216,8 @@ npm run collect:daily          # Collect daily stats (YouTube, Twitch, Kick)
 npm run monitor:twitch         # Monitor Twitch streams
 npm run monitor:kick           # Monitor Kick streams
 npm run aggregate:hours-watched # Aggregate hours watched
+npm run discover:tiktok         # Discover new TikTok creators
+npm run refresh:tiktok           # Refresh TikTok profile data
 ```
 
 ## Environment Variables
@@ -222,21 +247,26 @@ Scripts use `dotenv` to load `.env` automatically.
 
 **Monthly usage:** ~1,080 minutes (within 2,000 min free tier)
 
-## Local Instagram Automation
+## Local Instagram & TikTok Automation
 
-Since Instagram blocks GitHub Actions IPs (Azure cloud), Instagram data collection runs locally via Windows Task Scheduler:
+Since Instagram blocks GitHub Actions IPs (Azure cloud), Instagram and TikTok data collection runs locally via Windows Task Scheduler:
 
 **Setup:**
 - See `scripts/local/README.md` for complete setup instructions
-- Two batch scripts: `refresh-instagram.bat` and `process-instagram-requests.bat`
-- Windows Task Scheduler runs them automatically (3x and 4x daily respectively)
+- Batch scripts: `refresh-instagram.bat`, `process-instagram-requests.bat`, `refresh-tiktok.bat`, `discover-tiktok.bat`
+- Windows Task Scheduler runs them automatically
 
-**Schedule:**
+**Instagram Schedule:**
 - **Profile Refresh:** 8 AM, 2 PM, 8 PM (15 profiles/run)
 - **Creator Requests:** 6 AM, 12 PM, 6 PM, 12 AM (all pending)
 
+**TikTok Schedule:**
+- **Profile Refresh:** 9 AM, 3 PM, 9 PM (15 profiles/run)
+- **Creator Discovery:** Run manually or schedule as needed
+
 **Coverage:**
 - ~63 Instagram creators cycle through every ~1.4 days
+- TikTok creators cycle through based on database size
 - Processes oldest profiles first (`updated_at ASC`)
 - Works perfectly from residential IPs
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
+import TikTokIcon from '../components/TikTokIcon';
 import FunErrorState from '../components/FunErrorState';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel, getChannelById as getYouTubeChannelById } from '../services/youtubeService';
@@ -22,6 +23,7 @@ const platformIcons = {
   twitch: Twitch,
   kick: KickIcon,
   instagram: Instagram,
+  tiktok: TikTokIcon,
 };
 
 const platformColors = {
@@ -105,6 +107,34 @@ export default function CreatorProfile() {
             description: dbCreator.description,
             subscribers: latestStats?.followers || 0,
             followers: latestStats?.followers || 0,
+            totalPosts: latestStats?.total_posts || 0,
+            category: dbCreator.category,
+          };
+
+          setDbCreatorId(dbCreator.id);
+        }
+      } else if (platform === 'tiktok') {
+        // TikTok: Load from database (same pattern as Instagram)
+        const dbCreator = await getCreatorByUsername('tiktok', username);
+        if (dbCreator) {
+          const { data: latestStats } = await supabase
+            .from('creator_stats')
+            .select('*')
+            .eq('creator_id', dbCreator.id)
+            .order('recorded_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          channelData = {
+            platform: 'tiktok',
+            platformId: dbCreator.platform_id,
+            username: dbCreator.username,
+            displayName: dbCreator.display_name || dbCreator.username,
+            profileImage: dbCreator.profile_image,
+            description: dbCreator.description,
+            subscribers: latestStats?.followers || 0,
+            followers: latestStats?.followers || 0,
+            totalViews: latestStats?.total_views || 0,
             totalPosts: latestStats?.total_posts || 0,
             category: dbCreator.category,
           };
@@ -530,11 +560,11 @@ export default function CreatorProfile() {
             </div>
 
             {/* Stats Grid */}
-            <div className={`grid gap-4 mb-6 ${platform === 'instagram' ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`}>
+            <div className={`grid gap-4 mb-6 ${platform === 'instagram' ? 'grid-cols-2' : platform === 'tiktok' ? 'grid-cols-3' : 'grid-cols-2 lg:grid-cols-4'}`}>
               {/* Subscribers/Followers Card */}
               <StatCard
                 icon={Users}
-                label={platform === 'instagram' ? 'Followers' : platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subscribers' : 'Subscribers'}
+                label={platform === 'instagram' ? 'Followers' : platform === 'tiktok' ? 'Followers' : platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subscribers' : 'Subscribers'}
                 value={formatNumber(creator.subscribers || creator.followers)}
                 sublabel={creator.hiddenSubscribers ? '(hidden)' : platform === 'youtube' ? '(rounded by YouTube)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
               />
@@ -546,6 +576,22 @@ export default function CreatorProfile() {
                   label="Posts"
                   value={formatNumber(creator.totalPosts || 0)}
                 />
+              )}
+
+              {/* TikTok: Show Likes and Videos */}
+              {platform === 'tiktok' && (
+                <>
+                  <StatCard
+                    icon={Eye}
+                    label="Total Likes"
+                    value={formatNumber(creator.totalViews || 0)}
+                  />
+                  <StatCard
+                    icon={Video}
+                    label="Videos"
+                    value={formatNumber(creator.totalPosts || 0)}
+                  />
+                </>
               )}
 
               {/* Followers Card for Kick (not available) */}
@@ -616,7 +662,7 @@ export default function CreatorProfile() {
 
             {/* Growth Summary */}
             {(creator.subscribers || creator.followers) && (
-              <div className={`grid gap-4 mb-6 ${platform === 'instagram' ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`}>
+              <div className={`grid gap-4 mb-6 ${platform === 'instagram' || platform === 'tiktok' ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`}>
                 {platform === 'youtube' ? (
                   <>
                     {/* For YouTube, lead with Views (accurate) instead of Subscribers (rounded) */}
@@ -675,6 +721,21 @@ export default function CreatorProfile() {
                       value={metrics ? `${metrics.last30Days.videos >= 0 ? '+' : ''}${metrics.last30Days.videos}` : '--'}
                     />
                   </>
+                ) : platform === 'tiktok' ? (
+                  <>
+                    <SummaryCard
+                      label="Followers"
+                      sublabel="Last 30 days"
+                      value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
+                      change={metrics?.last30Days.subs}
+                    />
+                    <SummaryCard
+                      label="Likes"
+                      sublabel="Last 30 days"
+                      value={metrics ? formatNumber(metrics.last30Days.views) : '--'}
+                      change={metrics?.last30Days.views}
+                    />
+                  </>
                 ) : platform === 'twitch' ? (
                   <>
                     <SummaryCard
@@ -712,8 +773,8 @@ export default function CreatorProfile() {
               </div>
             )}
 
-            {/* Live Counter Link - Hidden for Instagram (no real-time updates) */}
-            {platform !== 'instagram' && (
+            {/* Live Counter Link - Hidden for Instagram/TikTok (no real-time updates) */}
+            {platform !== 'instagram' && platform !== 'tiktok' && (
               <Link
                 to={`/live/${platform}/${creator.username}`}
                 className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:from-indigo-700 hover:to-purple-700 transition-all group"
@@ -773,9 +834,11 @@ export default function CreatorProfile() {
                       <tr className="border-b border-gray-100 bg-gray-50 text-left">
                         <th className="px-6 py-4 font-semibold text-gray-600">Date</th>
                         <th className="px-6 py-4 font-semibold text-gray-600 text-right">
-                          {platform === 'instagram' ? 'Followers' : platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : 'Subscribers'}
+                          {platform === 'instagram' ? 'Followers' : platform === 'tiktok' ? 'Followers' : platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : 'Subscribers'}
                         </th>
                         {platform === 'instagram' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Posts</th>}
+                        {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Likes</th>}
+                        {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
                         {platform === 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Watch Hours</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
@@ -795,8 +858,8 @@ export default function CreatorProfile() {
                           <td className="px-6 py-4 text-right">
                             <div className="flex flex-col items-end">
                               <span className="font-medium text-gray-900">{formatNumber(stat.subscribers || stat.followers)}</span>
-                              {/* Show changes for Instagram, Twitch, and Kick */}
-                              {(platform === 'instagram' || platform === 'twitch' || platform === 'kick') && stat.subsChange !== 0 && (
+                              {/* Show changes for Instagram, TikTok, Twitch, and Kick */}
+                              {(platform === 'instagram' || platform === 'tiktok' || platform === 'twitch' || platform === 'kick') && stat.subsChange !== 0 && (
                                 <span className={`text-xs ${stat.subsChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                                   {stat.subsChange > 0 ? '+' : ''}{formatNumber(stat.subsChange)}
                                 </span>
@@ -814,6 +877,30 @@ export default function CreatorProfile() {
                                 )}
                               </div>
                             </td>
+                          )}
+                          {platform === 'tiktok' && (
+                            <>
+                              <td className="px-6 py-4 text-right">
+                                <div className="flex flex-col items-end">
+                                  <span className="font-medium text-gray-900">{formatNumber(stat.total_views || 0)}</span>
+                                  {stat.viewsChange !== 0 && (
+                                    <span className={`text-xs ${stat.viewsChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                      {stat.viewsChange > 0 ? '+' : ''}{formatNumber(stat.viewsChange)}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <div className="flex flex-col items-end">
+                                  <span className="font-medium text-gray-900">{formatNumber(stat.total_posts || 0)}</span>
+                                  {stat.videosChange !== 0 && (
+                                    <span className={`text-xs ${stat.videosChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                      {stat.videosChange > 0 ? '+' : ''}{stat.videosChange}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                            </>
                           )}
                           {platform === 'twitch' && (
                             <td className="px-6 py-4 text-right">
@@ -878,6 +965,16 @@ export default function CreatorProfile() {
                         {platform === 'instagram' && (
                           <td className="px-6 py-4 text-right"></td>
                         )}
+                        {platform === 'tiktok' && (
+                          <>
+                            <td className="px-6 py-4 text-right">
+                              <span className={metrics.dailyAverage.views >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                                {metrics.dailyAverage.views > 0 ? `+${formatNumber(metrics.dailyAverage.views)}` : '—'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-right"></td>
+                          </>
+                        )}
                         {platform === 'twitch' && (
                           <td className="px-6 py-4 text-right text-indigo-900">
                             {metrics.dailyAverage?.hoursWatched > 0
@@ -923,6 +1020,16 @@ export default function CreatorProfile() {
                         </td>
                         {platform === 'instagram' && (
                           <td className="px-6 py-4 text-right"></td>
+                        )}
+                        {platform === 'tiktok' && (
+                          <>
+                            <td className="px-6 py-4 text-right">
+                              <span className={metrics.weeklyAverage.views >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                                {metrics.weeklyAverage.views > 0 ? `+${formatNumber(metrics.weeklyAverage.views)}` : '—'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-right"></td>
+                          </>
                         )}
                         {platform === 'twitch' && (
                           <td className="px-6 py-4 text-right text-indigo-900">
@@ -972,6 +1079,16 @@ export default function CreatorProfile() {
                           <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                             {metrics.last30Days.videos >= 0 ? '+' : ''}{metrics.last30Days.videos}
                           </td>
+                        )}
+                        {platform === 'tiktok' && (
+                          <>
+                            <td className={`px-6 py-4 text-right ${metrics.last30Days.views >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                              {metrics.last30Days.views >= 0 ? '+' : ''}{formatNumber(metrics.last30Days.views)}
+                            </td>
+                            <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                              {metrics.last30Days.videos >= 0 ? '+' : ''}{metrics.last30Days.videos}
+                            </td>
+                          </>
                         )}
                         {platform === 'twitch' && (
                           <td className="px-6 py-4 text-right text-indigo-900">
@@ -1251,6 +1368,28 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       label: 'Video Count',
       dataKey: 'videos',
       color: '#f59e0b'
+    });
+  } else if (platform === 'instagram') {
+    // Instagram: Follower Growth only (no views data)
+    metrics.push({
+      value: 'subscribers',
+      label: 'Follower Growth',
+      dataKey: 'subscribers',
+      color: '#6366f1'
+    });
+  } else if (platform === 'tiktok') {
+    // TikTok: Follower Growth + Likes Growth
+    metrics.push({
+      value: 'subscribers',
+      label: 'Follower Growth',
+      dataKey: 'subscribers',
+      color: '#6366f1'
+    });
+    metrics.push({
+      value: 'views',
+      label: 'Likes Growth',
+      dataKey: 'views',
+      color: '#ec4899'
     });
   } else if (platform === 'twitch') {
     // Twitch: only follower growth (views deprecated)
