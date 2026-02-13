@@ -271,8 +271,9 @@ export default function Rankings() {
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-500 uppercase tracking-wider">
               <div className="col-span-1">Rank</div>
-              <div className={selectedPlatform === 'kick' || selectedPlatform === 'instagram' || selectedPlatform === 'tiktok' ? 'col-span-7' : 'col-span-5'}>Creator</div>
+              <div className={selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'col-span-7' : 'col-span-5'}>Creator</div>
               <div className="col-span-2 text-right">{followerLabel}</div>
+              {selectedPlatform === 'tiktok' && <div className="col-span-2 text-right">Likes</div>}
               {selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' && <div className="col-span-2 text-right">Views</div>}
               <div className="col-span-2 text-right flex items-center justify-end gap-1 group">
                 <span>30-Day Growth</span>
@@ -341,7 +342,7 @@ export default function Rankings() {
                 </div>
 
                 {/* Creator Info */}
-                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'instagram' || selectedPlatform === 'tiktok' ? 'md:col-span-7' : 'md:col-span-5'}`}>
+                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'md:col-span-7' : 'md:col-span-5'}`}>
                   <img
                     src={creator.profile_image || '/placeholder-avatar.svg'}
                     alt={creator.display_name}
@@ -363,6 +364,11 @@ export default function Rankings() {
                 <div className="hidden md:block col-span-2 text-right">
                   <span className="font-semibold text-gray-900">{formatNumber(creator.subscribers)}</span>
                 </div>
+                {selectedPlatform === 'tiktok' && (
+                  <div className="hidden md:block col-span-2 text-right">
+                    <span className="text-gray-600">{formatNumber(creator.totalViews)}</span>
+                  </div>
+                )}
                 {selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' && (
                   <div className="hidden md:block col-span-2 text-right">
                     <span className="text-gray-600">{formatNumber(creator.totalViews)}</span>
