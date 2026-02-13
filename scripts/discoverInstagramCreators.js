@@ -39,10 +39,10 @@ function getTodayLocal() {
 const TOP_INSTAGRAM_USERNAMES = [
   // Mega accounts (400M+ followers)
   'instagram', 'cristiano', 'leomessi', 'selenagomez', 'kyliejenner',
-  'therock', 'arianagrande', 'kimkardashian', 'beyonce', 'justinbieber',
+  'therock', 'arianagrande', 'kimkardashian', 'beyonce', 'lilbieber',
 
   // Top celebrities (100M+)
-  'kendalljenner', 'taylorswift', 'jenniferaniston', 'nickiminaj', 'khloekardashian',
+  'kendalljenner', 'taylorswift', 'jenniferaniston', 'khloekardashian',
   'natgeo', 'neymarjr', 'mileycyrus', 'katyperry', 'kourtneykardash',
 
   // Athletes
@@ -50,7 +50,7 @@ const TOP_INSTAGRAM_USERNAMES = [
   'paulpogba', 'sergioramos', 'kingjames', 'stephencurry30', 'tombrady',
 
   // Content Creators & Influencers
-  'charlidamelio', 'addisonraeeee', 'brentrivera', 'lorengray', 'zachking',
+  'charlidamelio', 'addisonraee', 'brentrivera', 'zachking',
   'camerondallas', 'nashgrier', 'jamescharles', 'emmachamberlain', 'daviddobrik',
 
   // Fitness & Lifestyle
@@ -59,7 +59,7 @@ const TOP_INSTAGRAM_USERNAMES = [
 
   // Beauty & Fashion
   'hudabeauty', 'chiaraferragni', 'gigihadid', 'bellahadid', 'caradelevingne',
-  'victoriabeckham', 'zendaya', 'badgalriri', 'jlo', 'priyankachopra',
+  'victoriabeckham', 'zendaya', 'badgalriri', 'jlo', 'priyankachopra', 'zlatan',
 
   // Gaming & Tech
   'ninja', 'pokimanelol', 'valkyrae', 'pewdiepie', 'loserfruit',
@@ -78,7 +78,7 @@ const TOP_INSTAGRAM_USERNAMES = [
   'nba', 'nfl', 'fifa', 'espn', 'premierleague',
 
   // Food & Travel
-  'gordonramsayofficial', 'jamieoliver', 'buzzfeedtasty', 'foodnetwork', 'tastemade',
+  'gordongram', 'jamieoliver', 'buzzfeedtasty', 'foodnetwork', 'tastemade',
   'beautifuldestinations', 'earthpix', 'tourtheplanet', 'wonderful_places', 'travelandleisure',
 
   // More creators - add more here

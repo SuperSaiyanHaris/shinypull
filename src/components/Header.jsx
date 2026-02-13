@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, ShoppingBag, Heart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,11 +11,28 @@ export default function Header() {
   const [authPanelMessage, setAuthPanelMessage] = useState('');
   const location = useLocation();
   const { user, signOut, isAuthenticated } = useAuth();
+  const mobileMenuRef = useRef(null);
 
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    function handleClick(e) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
+        setMobileMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('touchstart', handleClick);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('touchstart', handleClick);
+    };
+  }, [mobileMenuOpen]);
 
   // Listen for custom event to open auth panel
   useEffect(() => {
@@ -55,7 +72,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+    <header ref={mobileMenuRef} className="bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}

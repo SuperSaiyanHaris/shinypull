@@ -42,10 +42,10 @@ const TOP_INSTAGRAM_CREATORS = [
 
   // 250M-300M
   { username: 'kendalljenner', displayName: 'Kendall Jenner', followers: 295000000, posts: 6800, image: 'https://ui-avatars.com/api/?name=Kendall+Jenner&size=200&bold=true&background=e1306c&color=fff', bio: 'Model', category: 'Fashion' },
-  { username: 'justinbieber', displayName: 'Justin Bieber', followers: 294000000, posts: 7200, image: 'https://ui-avatars.com/api/?name=Justin+Bieber&size=200&bold=true&background=fd1d1d&color=fff', bio: 'Artist', category: 'Music' },
+  { username: 'lilbieber', displayName: 'Justin Bieber', followers: 294000000, posts: 7200, image: 'https://ui-avatars.com/api/?name=Justin+Bieber&size=200&bold=true&background=fd1d1d&color=fff', bio: 'Artist', category: 'Music' },
   { username: 'taylorswift', displayName: 'Taylor Swift', followers: 283000000, posts: 900, image: 'https://ui-avatars.com/api/?name=Taylor+Swift&size=200&bold=true&background=f77737&color=fff', bio: 'Songwriter', category: 'Music' },
   { username: 'jenniferaniston', displayName: 'Jennifer Aniston', followers: 280000000, posts: 560, image: 'https://ui-avatars.com/api/?name=Jennifer+Aniston&size=200&bold=true&background=fcaf45&color=fff', bio: 'Actress', category: 'Entertainment' },
-  { username: 'nickiminaj', displayName: 'Nicki Minaj', followers: 277000000, posts: 6500, image: 'https://ui-avatars.com/api/?name=Nicki+Minaj&size=200&bold=true&background=833ab4&color=fff', bio: 'Rapper', category: 'Music' },
+  // nickiminaj - REMOVED (deactivated profile)
 
   // 200M-250M
   { username: 'natgeo', displayName: 'National Geographic', followers: 283000000, posts: 24000, image: 'https://ui-avatars.com/api/?name=National+Geographic&size=200&bold=true&background=c13584&color=fff', bio: 'Experience the world through the eyes of National Geographic', category: 'Media' },
@@ -89,15 +89,15 @@ const TOP_INSTAGRAM_CREATORS = [
   { username: 'dualipa', displayName: 'DUA LIPA', followers: 90000000, posts: 2900, image: 'https://ui-avatars.com/api/?name=DUA+LIPA&size=200&bold=true&background=fcaf45&color=fff', bio: 'Singer', category: 'Music' },
   { username: 'k.mbappe', displayName: 'Kylian Mbappé', followers: 121000000, posts: 900, image: 'https://ui-avatars.com/api/?name=Priyanka+Chopra+Jonas&size=200&bold=true&background=833ab4&color=fff', bio: 'Footballer', category: 'Sports' },
   { username: 'lebronjames', displayName: 'LeBron James', followers: 159000000, posts: 2200, image: 'https://ui-avatars.com/api/?name=LeBron+James&size=200&bold=true&background=c13584&color=fff', bio: '🏀', category: 'Sports' },
-  { username: 'addisonraeeee', displayName: 'Addison Rae', followers: 40000000, posts: 1200, image: 'https://ui-avatars.com/api/?name=Addison+Rae&size=200&bold=true&background=d62976&color=fff', bio: 'Creator', category: 'Content Creator' },
+  { username: 'addisonraee', displayName: 'Addison Rae', followers: 40000000, posts: 1200, image: 'https://ui-avatars.com/api/?name=Addison+Rae&size=200&bold=true&background=d62976&color=fff', bio: 'Creator', category: 'Content Creator' },
   { username: '9gag', displayName: '9GAG', followers: 58000000, posts: 78000, image: 'https://ui-avatars.com/api/?name=9GAG&size=200&bold=true&background=fa7e1e&color=fff', bio: 'Memes & Entertainment', category: 'Entertainment' },
 
   // More creators 30M-40M
   { username: 'zachking', displayName: 'Zach King', followers: 27000000, posts: 1100, image: 'https://ui-avatars.com/api/?name=Zach+King&size=200&bold=true&background=e1306c&color=fff', bio: 'Digital magician', category: 'Content Creator' },
-  { username: 'gordonramsayofficial', displayName: 'Gordon Ramsay', followers: 17000000, posts: 5400, image: 'https://ui-avatars.com/api/?name=LeBron+James&size=200&bold=true&background=fd1d1d&color=fff', bio: 'Chef', category: 'Food' },
+  { username: 'gordongram', displayName: 'Gordon Ramsay', followers: 17000000, posts: 5400, image: 'https://ui-avatars.com/api/?name=Gordon+Ramsay&size=200&bold=true&background=fd1d1d&color=fff', bio: 'Chef', category: 'Food' },
   { username: 'victoriabeckham', displayName: 'Victoria Beckham', followers: 32000000, posts: 5900, image: 'https://ui-avatars.com/api/?name=Victoria+Beckham&size=200&bold=true&background=f77737&color=fff', bio: 'Fashion designer', category: 'Fashion' },
   { username: 'kingjames', displayName: 'LeBron James', followers: 159000000, posts: 2200, image: 'https://ui-avatars.com/api/?name=LeBron+James&size=200&bold=true&background=fcaf45&color=fff', bio: '🏀', category: 'Sports' },
-  { username: 'iamzlatanibrahimovic', displayName: 'Zlatan Ibrahimović', followers: 63000000, posts: 5100, image: 'https://ui-avatars.com/api/?name=Zlatan+Ibrahimović&size=200&bold=true&background=833ab4&color=fff', bio: 'Footballer', category: 'Sports' },
+  { username: 'zlatan', displayName: 'Zlatan Ibrahimović', followers: 63000000, posts: 5100, image: 'https://ui-avatars.com/api/?name=Zlatan+Ibrahimović&size=200&bold=true&background=833ab4&color=fff', bio: 'Footballer', category: 'Sports' },
 
   // Gaming & Tech creators
   { username: 'ninja', displayName: 'Ninja', followers: 24000000, posts: 3700, image: 'https://ui-avatars.com/api/?name=Ninja&size=200&bold=true&background=c13584&color=fff', bio: 'Gamer', category: 'Gaming' },
@@ -149,32 +149,11 @@ async function saveCreatorStats(creatorId, stats) {
 }
 
 async function seedInstagram() {
-  console.log('\n🟣 Seeding Top Instagram Creators\n');
-  console.log('═'.repeat(60));
-  console.log(`Total creators to seed: ${TOP_INSTAGRAM_CREATORS.length}\n`);
-
-  let success = 0;
-  let failed = 0;
-
-  for (const creator of TOP_INSTAGRAM_CREATORS) {
-    try {
-      const dbCreator = await upsertCreator(creator);
-      await saveCreatorStats(dbCreator.id, {
-        followers: creator.followers,
-        posts: creator.posts,
-      });
-
-      success++;
-      const followers = (creator.followers / 1000000).toFixed(1);
-      console.log(`   ✓ ${creator.username.padEnd(25)} ${followers.padStart(6)}M`);
-    } catch (error) {
-      failed++;
-      console.error(`   ✗ ${creator.username}: ${error.message}`);
-    }
-  }
-
-  console.log('═'.repeat(60));
-  console.log(`✅ COMPLETE: ${success} succeeded, ${failed} failed\n`);
+  console.log('\n⚠️  DEPRECATED: This script uses hardcoded/mock data!');
+  console.log('   Use "node scripts/discoverInstagramCreators.js [count]" instead.');
+  console.log('   That script live-scrapes real data from Instagram.\n');
+  console.log('   Exiting without changes.');
+  process.exit(0);
 }
 
 seedInstagram().catch(err => {
