@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft, Check, X } from 'lucide-react';
+import { Youtube, Twitch, Instagram, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft, Check, X } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
+import TikTokIcon from '../components/TikTokIcon';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { getFollowedCreators } from '../services/followService';
@@ -14,14 +15,18 @@ import logger from '../lib/logger';
 
 const platformIcons = {
   youtube: Youtube,
+  instagram: Instagram,
+  tiktok: TikTokIcon,
   twitch: Twitch,
   kick: KickIcon,
 };
 
 const platformColors = {
-  youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600' },
-  twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
-  kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
+  youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600', border: 'border-red-500', ring: 'ring-red-200', bgLight: 'bg-red-100' },
+  instagram: { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-600', border: 'border-pink-500', ring: 'ring-pink-200', bgLight: 'bg-pink-100' },
+  tiktok: { bg: 'bg-gray-900', light: 'bg-gray-100', text: 'text-gray-900', border: 'border-gray-700', ring: 'ring-gray-300', bgLight: 'bg-gray-100' },
+  twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-500', ring: 'ring-purple-200', bgLight: 'bg-purple-100' },
+  kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600', border: 'border-green-500', ring: 'ring-green-200', bgLight: 'bg-green-100' },
 };
 
 export default function Dashboard() {
@@ -152,7 +157,7 @@ export default function Dashboard() {
 
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Stats Summary */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
             <button
               onClick={() => setPlatformFilter(null)}
               className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
@@ -169,42 +174,31 @@ export default function Dashboard() {
                 </div>
               </div>
             </button>
-            <button
-              onClick={() => setPlatformFilter(platformFilter === 'youtube' ? null : 'youtube')}
-              className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
-                platformFilter === 'youtube' ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 sm:p-3 bg-red-100 rounded-lg">
-                  <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                    {followedCreators.filter(c => c.platform === 'youtube').length}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500">YouTube</p>
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={() => setPlatformFilter(platformFilter === 'twitch' ? null : 'twitch')}
-              className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
-                platformFilter === 'twitch' ? 'border-purple-500 ring-2 ring-purple-200' : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
-                  <Twitch className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                    {followedCreators.filter(c => c.platform === 'twitch').length}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500">Twitch</p>
-                </div>
-              </div>
-            </button>
+            {['youtube', 'instagram', 'tiktok', 'twitch', 'kick'].map(platform => {
+              const Icon = platformIcons[platform];
+              const colors = platformColors[platform];
+              const count = followedCreators.filter(c => c.platform === platform).length;
+              const label = platform === 'youtube' ? 'YouTube' : platform === 'instagram' ? 'Instagram' : platform === 'tiktok' ? 'TikTok' : platform === 'twitch' ? 'Twitch' : 'Kick';
+              return (
+                <button
+                  key={platform}
+                  onClick={() => setPlatformFilter(platformFilter === platform ? null : platform)}
+                  className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
+                    platformFilter === platform ? `${colors.border} ring-2 ${colors.ring}` : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 sm:p-3 ${colors.bgLight} rounded-lg`}>
+                      <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${colors.text}`} />
+                    </div>
+                    <div>
+                      <p className="text-xl sm:text-2xl font-bold text-gray-900">{count}</p>
+                      <p className="text-xs sm:text-sm text-gray-500">{label}</p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
             {/* Live Now Card */}
             <button
               onClick={() => setPlatformFilter(platformFilter === 'live' ? null : 'live')}
@@ -284,7 +278,10 @@ export default function Dashboard() {
                 {platformFilter === 'live' ? <Radio className="w-5 h-5 text-red-500" /> : <Star className="w-5 h-5 text-yellow-500" />}
                 {platformFilter === 'live' ? 'Live Now' :
                  platformFilter === 'youtube' ? 'YouTube Creators' :
+                 platformFilter === 'instagram' ? 'Instagram Creators' :
+                 platformFilter === 'tiktok' ? 'TikTok Creators' :
                  platformFilter === 'twitch' ? 'Twitch Streamers' :
+                 platformFilter === 'kick' ? 'Kick Streamers' :
                  'Creators You Follow'}
               </h2>
               {liveCount > 0 && !platformFilter && (
@@ -308,11 +305,11 @@ export default function Dashboard() {
                 )}
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
                   {platformFilter === 'live' ? 'No one is live right now' :
-                   platformFilter ? `No ${platformFilter === 'youtube' ? 'YouTube creators' : 'Twitch streamers'} followed yet` : 'No creators followed yet'}
+                   platformFilter ? `No ${platformFilter === 'youtube' ? 'YouTube' : platformFilter === 'instagram' ? 'Instagram' : platformFilter === 'tiktok' ? 'TikTok' : platformFilter === 'twitch' ? 'Twitch' : 'Kick'} creators followed yet` : 'No creators followed yet'}
                 </h3>
                 <p className="text-gray-500 mb-6">
                   {platformFilter === 'live'
-                    ? 'Check back later to see when your followed Twitch streamers go live.'
+                    ? 'Check back later to see when your followed streamers go live.'
                     : 'Start following creators to track their statistics here.'}
                 </p>
                 {platformFilter !== 'live' && (
@@ -330,7 +327,7 @@ export default function Dashboard() {
                   const PlatformIcon = platformIcons[creator.platform] || Users;
                   const colors = platformColors[creator.platform] || { bg: 'bg-gray-600', light: 'bg-gray-50', text: 'text-gray-600' };
                   const stats = creatorStats[creator.id];
-                  const isLive = creator.platform === 'twitch' && liveStreamers.has(creator.username.toLowerCase());
+                  const isLive = (creator.platform === 'twitch' || creator.platform === 'kick') && liveStreamers.has(creator.username.toLowerCase());
                   const growth = getGrowth(creator.id, creator.platform === 'youtube' ? 'subscribers' : 'followers');
 
                   const isSelected = selectedForCompare.includes(creator.id);
