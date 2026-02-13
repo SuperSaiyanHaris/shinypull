@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown } from 'lucide-react';
+import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -112,6 +112,8 @@ export default function Rankings() {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('desc');
 
   const rankTypes = [
     { id: 'subscribers', name: selectedPlatform === 'instagram' ? 'Top Followers' : selectedPlatform === 'tiktok' ? 'Top Followers' : selectedPlatform === 'twitch' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
@@ -143,6 +145,45 @@ export default function Rankings() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Reset column sort when rank type or platform changes
+  useEffect(() => {
+    setSortColumn(null);
+    setSortDirection('desc');
+  }, [selectedRankType, selectedPlatform]);
+
+  const handleSort = (column) => {
+    if (sortColumn === column) {
+      setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+
+  const sortedRankings = useMemo(() => {
+    if (!sortColumn) return rankings;
+    const getValue = (creator) => {
+      switch (sortColumn) {
+        case 'subscribers': return creator.subscribers || 0;
+        case 'views': return creator.totalViews || 0;
+        case 'growth': return creator.growth30d || 0;
+        default: return 0;
+      }
+    };
+    return [...rankings].sort((a, b) => {
+      const aVal = getValue(a);
+      const bVal = getValue(b);
+      return sortDirection === 'desc' ? bVal - aVal : aVal - bVal;
+    });
+  }, [rankings, sortColumn, sortDirection]);
+
+  const SortIcon = ({ column }) => {
+    if (sortColumn !== column) return <ArrowUpDown className="w-3.5 h-3.5 text-gray-300" />;
+    return sortDirection === 'desc'
+      ? <ArrowDown className="w-3.5 h-3.5 text-indigo-500" />
+      : <ArrowUp className="w-3.5 h-3.5 text-indigo-500" />;
   };
 
   const handlePlatformChange = (platformId) => {
@@ -272,11 +313,37 @@ export default function Rankings() {
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-500 uppercase tracking-wider">
               <div className="col-span-1">Rank</div>
               <div className={selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'col-span-7' : 'col-span-5'}>Creator</div>
-              <div className="col-span-2 text-right">{followerLabel}</div>
-              {selectedPlatform === 'tiktok' && <div className="col-span-2 text-right">Likes</div>}
-              {selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' && <div className="col-span-2 text-right">Views</div>}
-              <div className="col-span-2 text-right flex items-center justify-end gap-1 group">
+              <button
+                onClick={() => handleSort('subscribers')}
+                className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-700 transition-colors cursor-pointer"
+              >
+                <span>{followerLabel}</span>
+                <SortIcon column="subscribers" />
+              </button>
+              {selectedPlatform === 'tiktok' && (
+                <button
+                  onClick={() => handleSort('views')}
+                  className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-700 transition-colors cursor-pointer"
+                >
+                  <span>Likes</span>
+                  <SortIcon column="views" />
+                </button>
+              )}
+              {selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' && (
+                <button
+                  onClick={() => handleSort('views')}
+                  className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-700 transition-colors cursor-pointer"
+                >
+                  <span>Views</span>
+                  <SortIcon column="views" />
+                </button>
+              )}
+              <button
+                onClick={() => handleSort('growth')}
+                className="col-span-2 flex items-center justify-end gap-1.5 text-right hover:text-gray-700 transition-colors cursor-pointer group"
+              >
                 <span>30-Day Growth</span>
+                <SortIcon column="growth" />
                 <div className="relative">
                   <Info className="w-3.5 h-3.5 text-gray-400 cursor-help" />
                   <div className="absolute right-0 top-6 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none">
@@ -291,7 +358,7 @@ export default function Rankings() {
                       : 'Twitch growth based on watch hours'}
                   </div>
                 </div>
-              </div>
+              </button>
             </div>
 
             {/* Loading State */}
@@ -323,7 +390,7 @@ export default function Rankings() {
             )}
 
             {/* Rankings List */}
-            {!loading && !error && rankings.map((creator, index) => (
+            {!loading && !error && sortedRankings.map((creator, index) => (
               <Link
                 key={creator.id}
                 to={`/${creator.platform}/${creator.username}`}
