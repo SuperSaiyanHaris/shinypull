@@ -163,7 +163,8 @@ export default function Rankings() {
   };
 
   const sortedRankings = useMemo(() => {
-    if (!sortColumn) return rankings;
+    const withRank = rankings.map((c, i) => ({ ...c, originalRank: i + 1 }));
+    if (!sortColumn) return withRank;
     const getValue = (creator) => {
       switch (sortColumn) {
         case 'subscribers': return creator.subscribers || 0;
@@ -172,7 +173,7 @@ export default function Rankings() {
         default: return 0;
       }
     };
-    return [...rankings].sort((a, b) => {
+    return [...withRank].sort((a, b) => {
       const aVal = getValue(a);
       const bVal = getValue(b);
       return sortDirection === 'desc' ? bVal - aVal : aVal - bVal;
@@ -399,12 +400,12 @@ export default function Rankings() {
                 {/* Rank */}
                 <div className="col-span-2 md:col-span-1">
                   <span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm ${
-                    index === 0 ? 'bg-yellow-100 text-yellow-700' :
-                    index === 1 ? 'bg-gray-100 text-gray-600' :
-                    index === 2 ? 'bg-orange-100 text-orange-700' :
+                    creator.originalRank === 1 ? 'bg-yellow-100 text-yellow-700' :
+                    creator.originalRank === 2 ? 'bg-gray-100 text-gray-600' :
+                    creator.originalRank === 3 ? 'bg-orange-100 text-orange-700' :
                     'bg-gray-50 text-gray-500'
                   }`}>
-                    {index + 1}
+                    {creator.originalRank}
                   </span>
                 </div>
 
