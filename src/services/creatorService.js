@@ -177,9 +177,11 @@ export const getHoursWatched = withErrorHandling(
 export const searchCreators = withErrorHandling(
   async (query, platform = null) => {
     // Build OR conditions: match on raw query + normalized (spaces/special chars stripped)
-    const normalized = query.replace(/[^a-zA-Z0-9._]/g, '').toLowerCase();
-    const conditions = [`username.ilike.%${query}%,display_name.ilike.%${query}%`];
-    if (normalized && normalized !== query.toLowerCase()) {
+    // Sanitize query to prevent PostgREST filter injection
+    const sanitized = query.replace(/[,%()\\]/g, '');
+    const normalized = sanitized.replace(/[^a-zA-Z0-9._]/g, '').toLowerCase();
+    const conditions = [`username.ilike.%${sanitized}%,display_name.ilike.%${sanitized}%`];
+    if (normalized && normalized !== sanitized.toLowerCase()) {
       conditions[0] += `,username.ilike.%${normalized}%`;
     }
 

@@ -4,8 +4,10 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const CONTACT_EMAIL = 'shinypull@proton.me';
 
+import { checkRateLimit, getClientIdentifier } from './_ratelimit.js';
+
 export default async function handler(req, res) {
-  // Enable CORS - Allow production and localhost
+  // Enable CORS
   const allowedOrigins = [
     'https://shinypull.com',
     'https://www.shinypull.com',
@@ -27,11 +29,29 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Rate limiting: 3 requests per minute per IP
+  const clientId = getClientIdentifier(req);
+  const rateLimit = checkRateLimit(`contact:${clientId}`, 3, 60000);
+  if (!rateLimit.allowed) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+
   const { name, email, message } = req.body;
 
   // Validate required fields
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Missing required fields: name, email, message' });
+  }
+
+  // Input length validation
+  if (name.length > 100) {
+    return res.status(400).json({ error: 'Name is too long (max 100 characters)' });
+  }
+  if (message.length > 5000) {
+    return res.status(400).json({ error: 'Message is too long (max 5000 characters)' });
+  }
+  if (email.length > 254) {
+    return res.status(400).json({ error: 'Email is too long' });
   }
 
   // Basic email validation
@@ -56,7 +76,7 @@ export default async function handler(req, res) {
         from: 'ShinyPull <contact@shinypull.com>',
         to: CONTACT_EMAIL,
         reply_to: email,
-        subject: `Contact Form: ${name}`,
+        subject: `Contact Form: ${name.replace(/[\r\n]/g, '')}`,
         html: `
           <h2>New Contact Form Submission</h2>
           <p><strong>Name:</strong> ${escapeHtml(name)}</p>

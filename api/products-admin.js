@@ -76,9 +76,20 @@ export default async function handler(req, res) {
     switch (action) {
       case 'create': {
         if (!productData) return res.status(400).json({ error: 'Missing product data' });
+        const safeProduct = {
+          slug: productData.slug,
+          name: productData.name,
+          price: productData.price,
+          badge: productData.badge,
+          description: productData.description,
+          features: productData.features,
+          image: productData.image,
+          affiliate_link: productData.affiliate_link,
+          is_active: productData.is_active ?? true,
+        };
         const { data, error } = await supabase
           .from('products')
-          .insert(productData)
+          .insert(safeProduct)
           .select()
           .single();
         if (error) throw error;
@@ -87,9 +98,15 @@ export default async function handler(req, res) {
 
       case 'update': {
         if (!id || !productData) return res.status(400).json({ error: 'Missing id or product data' });
+        const safeUpdate = {};
+        const allowedFields = ['slug', 'name', 'price', 'badge', 'description', 'features', 'image', 'affiliate_link', 'is_active'];
+        for (const key of allowedFields) {
+          if (productData[key] !== undefined) safeUpdate[key] = productData[key];
+        }
+        safeUpdate.updated_at = new Date().toISOString();
         const { data, error } = await supabase
           .from('products')
-          .update(productData)
+          .update(safeUpdate)
           .eq('id', id)
           .select()
           .single();

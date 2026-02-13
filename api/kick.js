@@ -106,7 +106,7 @@ async function searchChannels(query, maxResults = 25) {
   // If nothing found, fallback to direct API lookup by slug
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
   
-  const searchTerm = query.toLowerCase().trim();
+  const searchTerm = query.toLowerCase().trim().replace(/[,%()\\]/g, '');
   
   // Step 1: Search for creators in database with matching usernames
   const { data: creators, error } = await supabase
@@ -243,11 +243,7 @@ export default async function handler(req, res) {
 
   // Rate limiting: 60 requests per minute
   const clientId = getClientIdentifier(req);
-  const rateLimit = checkRateLimit(clientId, 60, 60000);
-
-  res.setHeader('X-RateLimit-Limit', '60');
-  res.setHeader('X-RateLimit-Remaining', String(rateLimit.remaining));
-  res.setHeader('X-RateLimit-Reset', String(Math.ceil(rateLimit.resetTime / 1000)));
+  const rateLimit = checkRateLimit(`kick:${clientId}`, 60, 60000);
 
   if (!rateLimit.allowed) {
     return res.status(429).json({ error: 'Too many requests. Please try again later.' });

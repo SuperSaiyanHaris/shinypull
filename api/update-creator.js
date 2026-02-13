@@ -26,13 +26,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Rate limiting: 120 requests per minute (2 per second)
-  const clientId = getClientIdentifier(req);
-  const rateLimit = checkRateLimit(clientId, 120, 60000);
+  // Server-side origin validation — reject requests not from our frontend
+  if (!allowedOrigins.includes(origin)) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
 
-  res.setHeader('X-RateLimit-Limit', '120');
-  res.setHeader('X-RateLimit-Remaining', String(rateLimit.remaining));
-  res.setHeader('X-RateLimit-Reset', String(Math.ceil(rateLimit.resetTime / 1000)));
+  // Rate limiting: 60 requests per minute
+  const clientId = getClientIdentifier(req);
+  const rateLimit = checkRateLimit(`update-creator:${clientId}`, 60, 60000);
 
   if (!rateLimit.allowed) {
     return res.status(429).json({ error: 'Too many requests. Please try again later.' });
@@ -58,7 +59,7 @@ export default async function handler(req, res) {
       }
 
       // Validate platform is a known value
-      const validPlatforms = ['youtube', 'twitch', 'kick', 'instagram'];
+      const validPlatforms = ['youtube', 'twitch', 'kick', 'instagram', 'tiktok'];
       if (!validPlatforms.includes(creatorData.platform)) {
         return res.status(400).json({ error: 'Invalid platform' });
       }

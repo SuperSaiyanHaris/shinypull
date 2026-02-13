@@ -76,9 +76,20 @@ export default async function handler(req, res) {
     switch (action) {
       case 'create': {
         if (!postData) return res.status(400).json({ error: 'Missing post data' });
+        const safePost = {
+          slug: postData.slug,
+          title: postData.title,
+          description: postData.description,
+          content: postData.content,
+          category: postData.category,
+          author: postData.author,
+          image: postData.image,
+          read_time: postData.read_time,
+          is_published: postData.is_published ?? false,
+        };
         const { data, error } = await supabase
           .from('blog_posts')
-          .insert(postData)
+          .insert(safePost)
           .select()
           .single();
         if (error) throw error;
@@ -87,9 +98,15 @@ export default async function handler(req, res) {
 
       case 'update': {
         if (!id || !postData) return res.status(400).json({ error: 'Missing id or post data' });
+        const safeUpdate = {};
+        const allowedFields = ['slug', 'title', 'description', 'content', 'category', 'author', 'image', 'read_time', 'is_published'];
+        for (const key of allowedFields) {
+          if (postData[key] !== undefined) safeUpdate[key] = postData[key];
+        }
+        safeUpdate.updated_at = new Date().toISOString();
         const { data, error } = await supabase
           .from('blog_posts')
-          .update(postData)
+          .update(safeUpdate)
           .eq('id', id)
           .select()
           .single();

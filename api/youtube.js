@@ -1,6 +1,8 @@
 // Vercel Serverless Function for YouTube API
 // Keeps API key secure on server-side
 
+import { checkRateLimit, getClientIdentifier } from './_ratelimit.js';
+
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
 /**
@@ -221,6 +223,13 @@ export default async function handler(req, res) {
 
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting: 30 requests per minute (protect YouTube API quota)
+  const clientId = getClientIdentifier(req);
+  const rateLimit = checkRateLimit(`youtube:${clientId}`, 30, 60000);
+  if (!rateLimit.allowed) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
   try {

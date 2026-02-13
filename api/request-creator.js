@@ -20,7 +20,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { platform, username, userId } = req.body;
+    const { platform, username } = req.body;
+    // userId intentionally not accepted from client — prevents spoofing
 
     // Validate required fields
     if (!platform || !username) {
@@ -109,7 +110,7 @@ export default async function handler(req, res) {
       .insert({
         platform,
         username: normalized,
-        user_id: userId || null,
+        user_id: null,
         status: 'pending',
         created_at: new Date().toISOString()
       })
