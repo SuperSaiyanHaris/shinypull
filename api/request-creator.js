@@ -4,11 +4,19 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, getClientIdentifier } from './_ratelimit.js';
 
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limit: max 5 requests per minute per IP
+  const clientIP = getClientIdentifier(req);
+  const rateCheck = checkRateLimit(`creator-req:${clientIP}`, 5, 60000);
+  if (!rateCheck.allowed) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
   try {
@@ -80,6 +88,18 @@ export default async function handler(req, res) {
         exists: true,
         message: `This creator was already requested ${hoursAgo} hours ago and is being processed.`,
         username: existingRequest.username
+      });
+    }
+
+    // Cap total pending requests to prevent table flooding
+    const { count: pendingCount } = await supabase
+      .from('creator_requests')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending');
+
+    if (pendingCount >= 100) {
+      return res.status(429).json({
+        error: 'We have a lot of requests in the queue right now. Please try again later.'
       });
     }
 
