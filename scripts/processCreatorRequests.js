@@ -47,7 +47,7 @@ async function resolveHandleWithAI(query, platform) {
   try {
     console.log(`[${query}] 🤖 Asking AI to resolve ${platform} handle...`);
     const platformName = platform === 'tiktok' ? 'TikTok' : 'Instagram';
-    const prompt = `What is the exact ${platformName} username/handle for "${query}"? Reply with ONLY the username (no @ symbol, no explanation, no punctuation). If you are not sure or the person does not have a ${platformName} account, reply with exactly "UNKNOWN".`;
+    const prompt = `I tried to look up the ${platformName} profile "${query}" but it was not found. The input may be a display name, a misspelled handle, or missing special characters like underscores or dots. What is the correct, official ${platformName} username for this person? Reply with ONLY the exact username (no @ symbol, no explanation, no punctuation). If you cannot determine who this is or they don't have a ${platformName} account, reply with exactly "UNKNOWN".`;
 
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -62,6 +62,36 @@ async function resolveHandleWithAI(query, platform) {
     );
 
     if (!res.ok) {
+      // Retry once after 10s on rate limit
+      if (res.status === 429) {
+        console.log(`[${query}] 🤖 Rate limited, retrying in 10s...`);
+        await new Promise(r => setTimeout(r, 10000));
+        const retry = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { temperature: 0, maxOutputTokens: 50 }
+            })
+          }
+        );
+        if (!retry.ok) {
+          console.warn(`[${query}] AI API still returned ${retry.status} after retry`);
+          return null;
+        }
+        const retryData = await retry.json();
+        const retryAnswer = retryData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if (retryAnswer && retryAnswer !== 'UNKNOWN') {
+          const cleaned = retryAnswer.replace(/^@/, '').replace(/["'`.]/g, '').trim().toLowerCase();
+          if (cleaned && /^[a-zA-Z0-9._]{1,30}$/.test(cleaned) && cleaned !== query.toLowerCase().replace(/[^a-z0-9._]/g, '')) {
+            console.log(`[${query}] 🤖 AI resolved handle → @${cleaned}`);
+            return cleaned;
+          }
+        }
+        return null;
+      }
       console.warn(`[${query}] AI API returned ${res.status}`);
       return null;
     }
