@@ -349,6 +349,28 @@ All search interfaces (Home, Search, Compare) follow this pattern:
 2. Content starts with intro paragraph (no H1)
 3. First heading in content should be H2 (##)
 4. Intro paragraph gets automatic gradient box styling
+5. Always set `published_at` to the publish date (never leave it null or posts sort incorrectly)
+
+**Writing Style (MANDATORY):**
+- Write like a real person, not a language model. Conversational, direct, opinionated.
+- **NEVER use em dashes (—).** Use commas, periods, or rewrite the sentence instead.
+- **NEVER use these AI cliché patterns:**
+  - "isn't just X — it's Y" / "not just X, it's Y"
+  - "Here's what it signals:" / "Here's the math:"
+  - "seismic shift," "game-changer," "landscape," "paradigm"
+  - "beautifully [adjective]," "spectacularly [adverb]"
+  - "borderline absurd," "sheer audacity," "genuinely [anything]"
+  - "it's worth noting," "it bears mentioning," "importantly"
+  - "in an era where," "in a world where"
+  - "the question isn't X — it's Y"
+  - "And that's [exactly/precisely] the point"
+  - "Let that sink in"
+  - Semicolons used for dramatic effect
+- **DO** use short sentences. Fragments are fine. Contractions are good.
+- **DO** use casual language: "nah," "basically," "pretty much," "kind of," "a ton of"
+- **DO** state opinions directly instead of hedging with qualifiers
+- **DO** vary sentence length. Mix punchy one-liners with longer explanations.
+- Read the final draft out loud. If it sounds like a press release or a college essay, rewrite it.
 
 ## Blog & Products System
 
