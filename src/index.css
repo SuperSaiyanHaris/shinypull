@@ -18,6 +18,15 @@ body {
 
 /* Platform colors */
 .platform-youtube { @apply bg-red-600; }
+
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
 .platform-twitch { @apply bg-purple-600; }
 .platform-tiktok { @apply bg-pink-500; }
 .platform-instagram { @apply bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500; }

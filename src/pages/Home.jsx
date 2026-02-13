@@ -193,8 +193,31 @@ export default function Home() {
                 </div>
               </form>
 
-              {/* Platform Cards - Glass style */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 max-w-5xl mx-auto px-4">
+              {/* Platform Cards - Horizontal pills on mobile, grid on desktop */}
+              {/* Mobile: scrollable horizontal pills */}
+              <div className="flex sm:hidden gap-2 overflow-x-auto px-4 pb-2 -mx-4 scrollbar-hide justify-center flex-wrap">
+                {platforms.map((platform) => {
+                  const Icon = platform.icon;
+                  if (platform.available) {
+                    return (
+                      <Link
+                        key={platform.id}
+                        to={`/rankings/${platform.id}`}
+                        className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2.5 border border-white/10 hover:bg-white/20 active:bg-white/25 transition-all shrink-0"
+                      >
+                        <div className={`w-7 h-7 ${platform.bgColor} rounded-full flex items-center justify-center`}>
+                          {Icon && <Icon className={`w-3.5 h-3.5 ${platform.textColor}`} />}
+                        </div>
+                        <span className="text-sm font-medium text-white whitespace-nowrap">{platform.name}</span>
+                      </Link>
+                    );
+                  }
+                  return null;
+                })}
+              </div>
+
+              {/* Desktop: 5-column grid cards */}
+              <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto px-4">
                 {platforms.map((platform) => {
                   const Icon = platform.icon;
 
@@ -203,19 +226,19 @@ export default function Home() {
                       <Link
                         key={platform.id}
                         to={`/rankings/${platform.id}`}
-                        className="group relative bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 border border-white/10 hover:bg-white/20 hover:border-white/20 transition-all duration-300 hover:-translate-y-1"
+                        className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/20 hover:border-white/20 transition-all duration-300 hover:-translate-y-1"
                       >
-                        <div className={`w-10 h-10 sm:w-14 sm:h-14 ${platform.bgColor} rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                        <div className={`w-14 h-14 ${platform.bgColor} rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
                           {Icon ? (
-                            <Icon className={`w-5 h-5 sm:w-7 sm:h-7 ${platform.textColor}`} />
+                            <Icon className={`w-7 h-7 ${platform.textColor}`} />
                           ) : (
-                            <span className={`${platform.textColor} font-bold text-sm sm:text-lg`}>{platform.name.slice(0, 2)}</span>
+                            <span className={`${platform.textColor} font-bold text-lg`}>{platform.name.slice(0, 2)}</span>
                           )}
                         </div>
-                        <h3 className="text-sm sm:text-base font-semibold text-white mb-0.5 sm:mb-1 group-hover:text-indigo-300 transition-colors">
+                        <h3 className="text-base font-semibold text-white mb-1 group-hover:text-indigo-300 transition-colors">
                           {platform.name}
                         </h3>
-                        <p className="text-xs sm:text-sm text-slate-400">{platform.stats}</p>
+                        <p className="text-sm text-slate-400">{platform.stats}</p>
                       </Link>
                     );
                   }
@@ -223,17 +246,17 @@ export default function Home() {
                   return (
                     <div
                       key={platform.id}
-                      className="relative bg-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-6 border border-white/5 opacity-50 cursor-not-allowed"
+                      className="relative bg-white/5 rounded-2xl p-6 border border-white/5 opacity-50 cursor-not-allowed"
                     >
-                      <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white/10 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-4">
+                      <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center mx-auto mb-4">
                         {Icon ? (
-                          <Icon className="w-5 h-5 sm:w-7 sm:h-7 text-slate-500" />
+                          <Icon className="w-7 h-7 text-slate-500" />
                         ) : (
-                          <span className="text-slate-500 font-bold text-sm sm:text-lg">{platform.name.slice(0, 2)}</span>
+                          <span className="text-slate-500 font-bold text-lg">{platform.name.slice(0, 2)}</span>
                         )}
                       </div>
-                      <h3 className="text-sm sm:text-base font-semibold text-slate-500 mb-0.5 sm:mb-1">{platform.name}</h3>
-                      <p className="text-xs sm:text-sm text-slate-600">{platform.stats}</p>
+                      <h3 className="text-base font-semibold text-slate-500 mb-1">{platform.name}</h3>
+                      <p className="text-sm text-slate-600">{platform.stats}</p>
                     </div>
                   );
                 })}
