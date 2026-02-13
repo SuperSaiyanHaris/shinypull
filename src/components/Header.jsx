@@ -160,13 +160,23 @@ export default function Header() {
             </div>
           </nav>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-indigo-200 hover:text-indigo-600 transition-colors"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile action buttons */}
+          <div className="md:hidden flex items-center gap-1">
+            <Link
+              to="/search"
+              className="p-2 rounded-lg text-gray-600 hover:bg-indigo-200 hover:text-indigo-600 transition-colors"
+              aria-label="Search"
+            >
+              <Search className="w-6 h-6" />
+            </Link>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg text-gray-600 hover:bg-indigo-200 hover:text-indigo-600 transition-colors"
+              aria-label="Menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Nav */}
