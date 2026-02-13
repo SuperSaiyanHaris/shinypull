@@ -4,6 +4,7 @@ import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight, C
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
 import { CreatorRowSkeleton } from '../components/Skeleton';
+import FunErrorState from '../components/FunErrorState';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import { searchChannels as searchKick } from '../services/kickService';
@@ -277,12 +278,14 @@ export default function Search() {
             </div>
           </form>
 
-          {/* Error State */}
+          {/* Error State - Fun Version */}
           {error && (
-            <div className="flex items-center gap-3 p-4 mb-6 bg-red-50 border border-red-100 rounded-xl text-red-600">
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              <p>{error}</p>
-            </div>
+            <FunErrorState
+              type={error.includes('fetch') ? 'server' : 'network'}
+              message={error}
+              onRetry={() => window.location.reload()}
+              retryText="Reload Page"
+            />
           )}
 
           {/* Loading State */}

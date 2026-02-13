@@ -4,6 +4,7 @@ import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info } from 'lucide-re
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
 import { TableSkeleton } from '../components/Skeleton';
+import FunErrorState from '../components/FunErrorState';
 import { getRankedCreators } from '../services/creatorService';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
@@ -170,17 +171,14 @@ export default function Rankings() {
               </div>
             )}
 
-            {/* Error State */}
+            {/* Error State - Fun Version */}
             {!loading && error && (
-              <div className="px-6 py-16 text-center">
-                <p className="text-red-500 mb-4">{error}</p>
-                <button
-                  onClick={loadRankings}
-                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-xl text-white font-medium transition-colors"
-                >
-                  Retry
-                </button>
-              </div>
+              <FunErrorState
+                type={error.includes('fetch') ? 'server' : 'network'}
+                message={error}
+                onRetry={loadRankings}
+                retryText="Retry"
+              />
             )}
 
             {/* Empty State */}

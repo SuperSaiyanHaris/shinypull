@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
+import FunErrorState from '../components/FunErrorState';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel, getChannelById as getYouTubeChannelById } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel, getLiveStreams as getTwitchLiveStreams } from '../services/twitchService';
@@ -307,17 +308,12 @@ export default function CreatorProfile() {
     return (
       <div className="min-h-screen bg-gray-50 px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-red-50 border border-red-100 rounded-2xl p-8 text-center">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Creator</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <button
-              onClick={loadCreator}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-xl text-white font-medium transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
+          <FunErrorState
+            type={error.includes('fetch') || error.includes('Failed to load') ? 'server' : 'notfound'}
+            message={error}
+            onRetry={loadCreator}
+            retryText="Try Again"
+          />
         </div>
       </div>
     );
