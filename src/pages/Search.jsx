@@ -507,12 +507,26 @@ export default function Search() {
 
                       {requestStatus === null && (
                         <>
+                          <p className="text-sm text-gray-600 mb-3">
+                            If you know the exact handle, enter it below — otherwise leave as-is and our smart search will find the right match.
+                          </p>
+                          <div className="flex items-center gap-2 mb-4">
+                            <span className="text-gray-400 text-lg font-medium">@</span>
+                            <input
+                              type="text"
+                              value={normalizedUsername}
+                              onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
+                              placeholder={`e.g. ${selectedPlatform === 'instagram' ? 'barackobama' : 'charlidamelio'}`}
+                              className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            />
+                          </div>
                           <button
                             onClick={() => handleRequestCreator()}
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                            disabled={!normalizedUsername}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Clock className="w-5 h-5" />
-                            Request @{query}
+                            Request @{normalizedUsername || '...'}
                           </button>
                           <p className="text-xs text-gray-400 mt-3">
                             We'll add them within 24 hours
