@@ -1,10 +1,13 @@
-# Local Instagram Automation
+# Local Instagram & TikTok Automation
 
-Since GitHub Actions IPs are blocked by Instagram, we run Instagram data collection locally using Windows Task Scheduler.
+Since GitHub Actions IPs are blocked by Instagram/TikTok, we run data collection locally using Windows Task Scheduler.
+
+Both scripts default to processing ALL creators when run without arguments. This ensures every creator gets fresh daily stats, just like YouTube/Twitch/Kick.
 
 ## Scripts
 
-- **`refresh-instagram.bat`** - Refreshes 15 Instagram profiles (oldest first)
+- **`refresh-instagram.bat`** - Refreshes ALL Instagram profiles (~12 min for 140 creators)
+- **`refresh-tiktok.bat`** - Refreshes ALL TikTok profiles (~4 min for 114 creators)
 - **`process-instagram-requests.bat`** - Processes pending creator requests
 - **`discover-instagram.bat`** - Discovers 10 new creators from curated list
 
@@ -15,20 +18,19 @@ Since GitHub Actions IPs are blocked by Instagram, we run Instagram data collect
 - Type `taskschd.msc`
 - Press Enter
 
-### 2. Create Task for Profile Refresh
+### 2. Create Task for Instagram Profile Refresh
 
 **Basic Settings:**
 - Click "Create Task" (right sidebar)
 - Name: `Instagram Profile Refresh`
-- Description: `Refresh 15 Instagram creator profiles`
+- Description: `Refresh ALL Instagram creator profiles`
 - Security: Run whether user is logged on or not
 - Configure for: Windows 10
 
-**Triggers (3x daily):**
+**Triggers (2x daily):**
 Click "New" for each trigger:
 1. Daily at 8:00 AM
-2. Daily at 2:00 PM
-3. Daily at 8:00 PM
+2. Daily at 8:00 PM
 
 **Actions:**
 - Click "New"
@@ -45,11 +47,28 @@ Click "New" for each trigger:
 - Check "Run task as soon as possible after a scheduled start is missed"
 - If task fails, restart every: 15 minutes, up to 3 times
 
-### 3. Create Task for Creator Requests
+### 3. Create Task for TikTok Profile Refresh
 
 **Basic Settings:**
-- Name: `Instagram Creator Requests`
-- Description: `Process pending Instagram creator requests`
+- Name: `TikTok Profile Refresh`
+- Description: `Refresh ALL TikTok creator profiles`
+- Same security settings as above
+
+**Triggers (2x daily):**
+1. Daily at 9:00 AM
+2. Daily at 9:00 PM
+
+**Actions:**
+- Program/script: `d:\Claude\ShinyPull\scripts\local\refresh-tiktok.bat`
+- Start in: `d:\Claude\ShinyPull`
+
+**Same Conditions and Settings as above**
+
+### 4. Create Task for Creator Requests
+
+**Basic Settings:**
+- Name: `Creator Requests`
+- Description: `Process pending Instagram & TikTok creator requests`
 - Same security settings as above
 
 **Triggers (4x daily - every 6 hours):**
@@ -64,7 +83,7 @@ Click "New" for each trigger:
 
 **Same Conditions and Settings as above**
 
-### 4. Create Task for Creator Discovery (Optional - Weekly)
+### 5. Create Task for Creator Discovery (Optional - Weekly)
 
 **Basic Settings:**
 - Name: `Instagram Creator Discovery`
@@ -96,10 +115,12 @@ Check the Task Scheduler History tab to see run results:
 
 ## Coverage
 
-**Profile Refresh:**
-- 15 profiles per run × 3 runs/day = 45 profiles/day
-- With ~63 Instagram creators, all cycle through every ~1.4 days
-- Sorted by `updated_at` ASC so least-recently-updated go first
+**Profile Refresh (ALL creators, daily):**
+- Instagram: ALL ~141 creators refreshed per run, 2x daily (~12 min/run)
+- TikTok: ALL ~114 creators refreshed per run, 2x daily (~4 min/run)
+- Every creator gets fresh daily stats — same coverage as YouTube/Twitch/Kick
+- Sorted by `updated_at` ASC so if rate-limited, stale profiles go first
+- Second daily run is insurance — catches anything missed by the first
 
 **Creator Requests:**
 - Processes all pending requests (no limit)

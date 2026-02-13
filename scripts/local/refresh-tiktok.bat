@@ -1,15 +1,16 @@
 @echo off
 REM TikTok Profile Refresh - Local Automation
-REM Run this 3x daily to keep TikTok data fresh
+REM Run 2x daily to keep ALL TikTok creators updated with daily stats
 
 cd /d "d:\Claude\ShinyPull"
 
 echo ========================================
-echo TikTok Profile Refresh
+echo TikTok Profile Refresh (ALL creators)
 echo Time: %date% %time%
 echo ========================================
 
-node scripts/refreshTikTokProfiles.js 15
+REM No count argument = process ALL creators (~4 min for 114 creators)
+node scripts/refreshTikTokProfiles.js
 
 echo.
 echo Refresh complete!

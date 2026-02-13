@@ -1,15 +1,16 @@
 @echo off
 REM Instagram Profile Refresh - Local Automation
-REM Run this 3x daily to keep Instagram data fresh
+REM Run 2x daily to keep ALL Instagram creators updated with daily stats
 
 cd /d "d:\Claude\ShinyPull"
 
 echo ========================================
-echo Instagram Profile Refresh
+echo Instagram Profile Refresh (ALL creators)
 echo Time: %date% %time%
 echo ========================================
 
-node scripts/refreshInstagramProfiles.js 15
+REM No count argument = process ALL creators (~12 min for 140 creators)
+node scripts/refreshInstagramProfiles.js
 
 echo.
 echo Refresh complete!

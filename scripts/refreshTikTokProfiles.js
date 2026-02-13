@@ -1,12 +1,15 @@
 /**
- * Refresh TikTok profile data for N least-recently-updated creators
+ * Refresh TikTok profile data
  *
- * Usage: node scripts/refreshTikTokProfiles.js [count]
- *   count: number of creators to process (default: 15)
+ * Usage: node scripts/refreshTikTokProfiles.js [count|all]
+ *   count: number of creators to process (default: all)
+ *   all:   process ALL creators (same as omitting count)
  *
  * Uses the TikTok scraper (tiktokScraper.js) to fetch profile data
- * from TikTok's embedded JSON. Orders by updated_at ascending so
+ * from TikTok's embedded JSON. Processes ALL creators by default to
+ * ensure daily stats coverage. Orders by updated_at ascending so
  * stale profiles are refreshed first.
+ * Rate limited to 2 seconds between requests (~4 min for 114 creators).
  */
 import { config } from 'dotenv';
 config();
@@ -20,7 +23,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
 
-const DELAY_BETWEEN_PROFILES = 3000; // 3 seconds
+const DELAY_BETWEEN_PROFILES = 2000; // 2 seconds — safe for residential IPs
 
 function getTodayLocal() {
   return new Intl.DateTimeFormat('en-CA', {
@@ -33,9 +36,20 @@ function getTodayLocal() {
 
 async function refreshTikTokProfiles() {
   const today = getTodayLocal();
-  const count = parseInt(process.argv[2]) || 15;
+  const arg = process.argv[2];
+  const processAll = !arg || arg.toLowerCase() === 'all';
+  const count = processAll ? 10000 : parseInt(arg);
 
-  console.log(`🎵 TikTok Refresh — ${count} creators, date: ${today}\n`);
+  // Count total TikTok creators
+  const { count: totalCreators } = await supabase
+    .from('creators')
+    .select('*', { count: 'exact', head: true })
+    .eq('platform', 'tiktok');
+
+  const target = processAll ? totalCreators : Math.min(count, totalCreators);
+  const estimatedMinutes = Math.round((target * DELAY_BETWEEN_PROFILES / 1000) / 60);
+  console.log(`🎥 TikTok Refresh — ${target} of ${totalCreators} creators, date: ${today}`);
+  console.log(`   Estimated time: ~${estimatedMinutes} minutes\n`);
 
   // Fetch the N least-recently-updated TikTok creators
   const { data: creators, error } = await supabase
@@ -115,7 +129,11 @@ async function refreshTikTokProfiles() {
   }
 
   await closeBrowser();
-  console.log(`\n📊 Done: ${successCount}/${creators.length} succeeded`);
+  const failCount = creators.length - successCount;
+  console.log(`\n📊 Done: ${successCount}/${creators.length} succeeded` + (failCount > 0 ? `, ${failCount} failed` : ''));
+  if (successCount === creators.length) {
+    console.log(`✅ All ${totalCreators} TikTok creators have fresh daily stats!`);
+  }
 }
 
 refreshTikTokProfiles().catch(err => {

@@ -81,6 +81,52 @@ const TOP_TIKTOK_USERNAMES = [
   // Education & Science
   'billnye', 'mrsdowjones', 'habortstudies', 'tiktokscience', 'doctorjesss',
   'underthedesknews', 'finance.unfolded', 'mndiaye97', 'mathandscience', 'tylastanford',
+
+  // === EXPANDED LIST: Top TikTokers not yet in database ===
+
+  // Massive followings (50M+)
+  'wifreo', 'kingjafi_rock', 'cznburak', 'bts_official_bighit', 'iamtyla',
+  'thalia', 'xobrooklynne', 'maboroshi_japan', 'anifrendo', 'jojo_asmr',
+
+  // Major creators (20M-50M)
+  'landonbarker', 'ameliezilber', 'michaelle.wandji', 'benoftheweek',
+  'tryguys', 'acaboricua', 'emilymariko', 'paaboricua', 'maaboricua',
+  'theellenshow', 'daviddobrik', 'hannahstocking', 'rikimaravilla',
+  'tatemcrae', 'ajr', 'lilnasx', 'tylerthecreatorbest', 'icespice',
+  'wifreo', 'enkyboys', 'demibagby', 'jungikook', 'noen.eubanks',
+
+  // Popular influencers (10M-20M)
+  'rickygervais', 'jessicaalba', 'katyperry', 'djkhaled', 'eminem',
+  'vindiesel', 'kevinhart4real', 'snoopdogg', 'mileycyrus', 'badgirlriri',
+  'thereallukecombs', 'timothechalamet', 'demilovato', 'niallhoran', 'shakira',
+  'charlieputh', 'meghantrainor', 'maluma', 'ozuna', 'anuel',
+
+  // Top gaming/content creators
+  'valkyrae', 'sykkuno', 'itsloganbrett', 'typical_gamer', 'sssniperwolf',
+  'jakewebber', 'courtneyshott', 'the.nba', 'paigeniemann', 'maddison',
+  'aubreyhuff', 'domelipa', 'sofiawylie', 'madisonbeer', 'denisemercado',
+
+  // Top comedy/skit creators
+  'iamtabithabrown', 'blogilates', 'whoisjimmy', 'zhcyt', 'jongraz',
+  'giannakiefer', 'alixearle', 'amelie.zilber', 'summermckeen', 'jordihewitt',
+
+  // Fashion & lifestyle
+  'wisdm8', 'madelyncline', 'emmachamberlain', 'jamesandoliver', 'halleybham',
+  'codyko', 'noellemiller', 'kelseaballerini', 'trevorwallace', 'pfreddyp',
+
+  // Music artists on TikTok
+  'edsheeran', 'taylorswift', 'badgalriri', 'cardib', 'nickiminaj',
+  'brunomars', 'samsmith', 'harrystyles', 'sza', 'kendricklamar',
+
+  // Sports personalities
+  'alexmorgan', 'serenwilliams', 'tonyhawk', 'simonebilesowens', 'kylian.mbappe',
+  'paulpogba', 'mohamedhenni', 'lewishamilton', 'maxverstappen1',
+
+  // Top fitness & health
+  'blogilates', 'whitneyysimmons', 'demibagby', 'pamela_rf', 'natacha.oceane',
+
+  // Top art & creative
+  'jamesllewis', 'zhcyt', 'vexx', 'tikkiwatercolors', 'leticia_gomes',
 ];
 
 /**

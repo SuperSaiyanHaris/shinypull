@@ -168,9 +168,9 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
 - **No Puppeteer/Chrome needed** — lightweight HTTP request only
 - Service: `src/services/instagramScraper.js`
 - **Separate workflow from other platforms** — Instagram has its own GitHub Action
-- Runs via `refreshInstagramProfiles.js` (3x daily, 15 creators/run)
+- Runs via `refreshInstagramProfiles.js` (2x daily, ALL creators per run)
 - Processes least-recently-updated creators first so all cycle through over multiple runs
-- Rate-limited scraping: 8 seconds between requests
+- Rate-limited scraping: 5 seconds between requests
 - **GitHub Actions IP limitation:** Instagram returns 429 for Azure/cloud IPs; workflows may need to be supplemented with local runs
 - Profile images use `ui-avatars.com` (Instagram CDN blocks hotlinking)
 - Custom `InstagramIcon` component using `currentColor` pattern (like Lucide icons)
@@ -192,9 +192,9 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
 - TikTok embeds all profile data (followers, likes, videos) in a script tag as structured JSON
 - **No Puppeteer/Chrome needed** — lightweight HTTP request only
 - Service: `src/services/tiktokScraper.js`
-- Runs via `refreshTikTokProfiles.js` (3x daily, 15 creators/run)
+- Runs via `refreshTikTokProfiles.js` (2x daily, ALL creators per run)
 - Discovery via `discoverTikTokCreators.js` (curated list of top creators)
-- Rate-limited scraping: 3 seconds between requests
+- Rate-limited scraping: 2 seconds between requests
 - Custom `TikTokIcon` component using `currentColor` pattern (like Lucide icons)
 - Profile displays: Followers, Likes, Videos (3-card stats grid)
 - Growth summary shows: Followers and Posts growth
@@ -249,25 +249,26 @@ Scripts use `dotenv` to load `.env` automatically.
 
 ## Local Instagram & TikTok Automation
 
-Since Instagram blocks GitHub Actions IPs (Azure cloud), Instagram and TikTok data collection runs locally via Windows Task Scheduler:
+Since Instagram and TikTok block GitHub Actions IPs (Azure cloud), data collection runs locally via Windows Task Scheduler:
 
 **Setup:**
 - See `scripts/local/README.md` for complete setup instructions
-- Batch scripts: `refresh-instagram.bat`, `process-instagram-requests.bat`, `refresh-tiktok.bat`, `discover-tiktok.bat`
+- Batch scripts: `refresh-instagram.bat`, `refresh-tiktok.bat`, `process-instagram-requests.bat`, `discover-tiktok.bat`
 - Windows Task Scheduler runs them automatically
+- Scripts default to ALL creators when run without arguments
 
 **Instagram Schedule:**
-- **Profile Refresh:** 8 AM, 2 PM, 8 PM (15 profiles/run)
+- **Profile Refresh:** 8 AM, 8 PM (ALL creators, ~12 min/run at 5s delay)
 - **Creator Requests:** 6 AM, 12 PM, 6 PM, 12 AM (all pending)
 
 **TikTok Schedule:**
-- **Profile Refresh:** 9 AM, 3 PM, 9 PM (15 profiles/run)
+- **Profile Refresh:** 9 AM, 9 PM (ALL creators, ~4 min/run at 2s delay)
 - **Creator Discovery:** Run manually or schedule as needed
 
 **Coverage:**
-- ~63 Instagram creators cycle through every ~1.4 days
-- TikTok creators cycle through based on database size
-- Processes oldest profiles first (`updated_at ASC`)
+- ALL Instagram and TikTok creators get daily stats — same as YouTube/Twitch/Kick
+- Second daily run is insurance in case first run hits rate limits
+- Processes oldest profiles first (`updated_at ASC`) so rate-limited runs prioritize stale data
 - Works perfectly from residential IPs
 
 ## Conventions

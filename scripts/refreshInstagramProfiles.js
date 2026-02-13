@@ -1,12 +1,14 @@
 /**
- * Refresh Instagram profile data for N least-recently-updated creators
+ * Refresh Instagram profile data
  *
- * Usage: node scripts/refreshInstagramProfiles.js [count]
- *   count: number of creators to process (default: 3)
+ * Usage: node scripts/refreshInstagramProfiles.js [count|all]
+ *   count: number of creators to process (default: all)
+ *   all:   process ALL creators (same as omitting count)
  *
- * Designed to run in short GitHub Action runs with a fresh IP each time.
- * Each run processes just a few creators, avoiding Instagram rate limits.
+ * Designed to run locally from a residential IP.
+ * Processes ALL creators by default to ensure daily stats coverage.
  * Orders by updated_at ascending so stale profiles are refreshed first.
+ * Rate limited to 5 seconds between requests (~12 min for 140 creators).
  */
 import { config } from 'dotenv';
 config();
@@ -20,7 +22,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
 
-const DELAY_BETWEEN_PROFILES = 8000; // 8 seconds
+const DELAY_BETWEEN_PROFILES = 5000; // 5 seconds — safe for residential IPs
 
 function getTodayLocal() {
   return new Intl.DateTimeFormat('en-CA', {
@@ -33,9 +35,20 @@ function getTodayLocal() {
 
 async function refreshInstagramProfiles() {
   const today = getTodayLocal();
-  const count = parseInt(process.argv[2]) || 3;
+  const arg = process.argv[2];
+  const processAll = !arg || arg.toLowerCase() === 'all';
+  const count = processAll ? 10000 : parseInt(arg);
 
-  console.log(`📸 Instagram Refresh — ${count} creators, date: ${today}\n`);
+  // Count total Instagram creators
+  const { count: totalCreators } = await supabase
+    .from('creators')
+    .select('*', { count: 'exact', head: true })
+    .eq('platform', 'instagram');
+
+  const target = processAll ? totalCreators : Math.min(count, totalCreators);
+  const estimatedMinutes = Math.round((target * DELAY_BETWEEN_PROFILES / 1000) / 60);
+  console.log(`📸 Instagram Refresh — ${target} of ${totalCreators} creators, date: ${today}`);
+  console.log(`   Estimated time: ~${estimatedMinutes} minutes\n`);
 
   // Fetch the N least-recently-updated Instagram creators
   const { data: creators, error } = await supabase
@@ -113,7 +126,11 @@ async function refreshInstagramProfiles() {
   }
 
   await closeBrowser();
-  console.log(`\n📊 Done: ${successCount}/${creators.length} succeeded`);
+  const failCount = creators.length - successCount;
+  console.log(`\n📊 Done: ${successCount}/${creators.length} succeeded` + (failCount > 0 ? `, ${failCount} failed` : ''));
+  if (successCount === creators.length) {
+    console.log(`✅ All ${totalCreators} Instagram creators have fresh daily stats!`);
+  }
 }
 
 refreshInstagramProfiles().catch(err => {

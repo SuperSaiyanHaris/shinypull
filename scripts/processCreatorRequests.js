@@ -340,12 +340,13 @@ async function main() {
 
     // Fetch pending requests
     console.log('Fetching pending requests...');
+    const maxRequests = parseInt(process.argv[2]) || 100; // default: 100 per run
     const { data: pendingRequests, error: fetchError } = await supabase
       .from('creator_requests')
       .select('*')
       .eq('status', 'pending')
       .order('created_at', { ascending: true })
-      .limit(10); // Process max 10 at a time
+      .limit(maxRequests);
 
     if (fetchError) {
       throw new Error(`Failed to fetch requests: ${fetchError.message}`);
