@@ -15,6 +15,8 @@ import { scrapeTikTokProfile, closeBrowser as closeTikTokBrowser } from '../src/
 
 dotenv.config();
 
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -30,6 +32,67 @@ function getTodayLocal() {
   const month = String(nyDate.getMonth() + 1).padStart(2, '0');
   const day = String(nyDate.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Use Gemini AI to resolve a display name / guess to an actual handle
+ * Returns the resolved username or null if it can't determine one
+ */
+async function resolveHandleWithAI(query, platform) {
+  if (!GEMINI_API_KEY) {
+    console.log(`[${query}] ⏭️  No GEMINI_API_KEY set, skipping AI handle resolution`);
+    return null;
+  }
+
+  try {
+    console.log(`[${query}] 🤖 Asking AI to resolve ${platform} handle...`);
+    const platformName = platform === 'tiktok' ? 'TikTok' : 'Instagram';
+    const prompt = `What is the exact ${platformName} username/handle for "${query}"? Reply with ONLY the username (no @ symbol, no explanation, no punctuation). If you are not sure or the person does not have a ${platformName} account, reply with exactly "UNKNOWN".`;
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0, maxOutputTokens: 50 }
+        })
+      }
+    );
+
+    if (!res.ok) {
+      console.warn(`[${query}] AI API returned ${res.status}`);
+      return null;
+    }
+
+    const data = await res.json();
+    const answer = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+    if (!answer || answer === 'UNKNOWN' || answer.length > 30) {
+      console.log(`[${query}] 🤖 AI could not determine the handle`);
+      return null;
+    }
+
+    // Clean the response — strip @, quotes, period at end
+    const cleaned = answer.replace(/^@/, '').replace(/["'`.]/g, '').trim().toLowerCase();
+    if (!cleaned || !/^[a-zA-Z0-9._]{1,30}$/.test(cleaned)) {
+      console.log(`[${query}] 🤖 AI response wasn't a valid username: "${answer}"`);
+      return null;
+    }
+
+    // Don't bother if AI returned the same thing we already tried
+    if (cleaned === query.toLowerCase().replace(/[^a-z0-9._]/g, '')) {
+      console.log(`[${query}] 🤖 AI returned same username we already tried`);
+      return null;
+    }
+
+    console.log(`[${query}] 🤖 AI resolved handle → @${cleaned}`);
+    return cleaned;
+  } catch (err) {
+    console.warn(`[${query}] AI resolution failed:`, err.message);
+    return null;
+  }
 }
 
 /**
@@ -117,16 +180,13 @@ async function processRequest(request) {
       console.log(`[${request.username}] ✓ Initial stats created`);
     }
 
-    // Mark request as completed
+    // Delete the completed request (creator is now in the database)
     await supabase
       .from('creator_requests')
-      .update({
-        status: 'completed',
-        processed_at: new Date().toISOString()
-      })
+      .delete()
       .eq('id', request.id);
 
-    console.log(`[${request.username}] ✅ Request completed successfully`);
+    console.log(`[${request.username}] ✅ Request completed successfully (record deleted)`);
     return { success: true, username: request.username };
 
   } catch (error) {
@@ -140,19 +200,90 @@ async function processRequest(request) {
         .update({ status: 'pending' })
         .eq('id', request.id);
       console.log(`[${request.username}] ↩️  Reverted to pending (rate limited, will retry next run)`);
-    } else {
-      // Permanent failure — mark as failed
-      await supabase
-        .from('creator_requests')
-        .update({
-          status: 'failed',
-          error_message: error.message,
-          processed_at: new Date().toISOString()
-        })
-        .eq('id', request.id);
+      return { success: false, username: request.username, error: error.message, rateLimited: true };
     }
 
-    return { success: false, username: request.username, error: error.message, rateLimited: isRateLimit };
+    // --- AI Fallback: try to resolve the correct handle ---
+    const aiHandle = await resolveHandleWithAI(request.username, request.platform);
+
+    if (aiHandle) {
+      try {
+        console.log(`[${request.username}] 🔄 Retrying with AI-resolved handle: @${aiHandle}`);
+        let profileData;
+        if (request.platform === 'tiktok') {
+          profileData = await scrapeTikTokProfile(aiHandle);
+        } else {
+          profileData = await scrapeInstagramProfile(aiHandle);
+        }
+        console.log(`[${aiHandle}] ✓ Scraped: ${profileData.displayName} (${profileData.followers.toLocaleString()} followers)`);
+
+        // Check if this creator already exists under the corrected handle
+        const { data: existingCreator } = await supabase
+          .from('creators')
+          .select('id')
+          .eq('platform', request.platform)
+          .ilike('username', aiHandle)
+          .single();
+
+        let creatorId;
+        if (existingCreator) {
+          creatorId = existingCreator.id;
+          console.log(`[${aiHandle}] Creator already exists, using existing ID`);
+        } else {
+          const { data: newCreator, error: creatorError } = await supabase
+            .from('creators')
+            .insert({
+              platform: profileData.platform,
+              platform_id: profileData.platformId,
+              username: profileData.username,
+              display_name: profileData.displayName,
+              profile_image: profileData.profileImage,
+              description: profileData.description,
+              category: profileData.category,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .select()
+            .single();
+
+          if (creatorError) throw new Error(`Failed to insert creator: ${creatorError.message}`);
+          creatorId = newCreator.id;
+          console.log(`[${aiHandle}] ✓ Creator inserted into database`);
+        }
+
+        // Create initial stats entry
+        const today = getTodayLocal();
+        const statsInsert = {
+          creator_id: creatorId,
+          recorded_at: today,
+          followers: profileData.followers,
+          total_posts: profileData.totalPosts,
+          created_at: new Date().toISOString()
+        };
+        if (request.platform === 'tiktok' && profileData.totalLikes) {
+          statsInsert.total_views = profileData.totalLikes;
+        }
+        const { error: statsError } = await supabase
+          .from('creator_stats')
+          .insert(statsInsert);
+
+        if (statsError && !statsError.message.includes('duplicate key')) {
+          console.warn(`[${aiHandle}] Warning: Failed to create stats entry: ${statsError.message}`);
+        }
+
+        // Success via AI — delete the request
+        await supabase.from('creator_requests').delete().eq('id', request.id);
+        console.log(`[${request.username}] ✅ Completed via AI resolve → @${aiHandle} (record deleted)`);
+        return { success: true, username: aiHandle };
+      } catch (aiRetryError) {
+        console.error(`[${request.username}] 🤖 AI-resolved handle @${aiHandle} also failed:`, aiRetryError.message);
+      }
+    }
+
+    // All attempts exhausted — delete the request (no valid profile found)
+    await supabase.from('creator_requests').delete().eq('id', request.id);
+    console.log(`[${request.username}] 🗑️  Request deleted (no valid profile found after all attempts)`);
+    return { success: false, username: request.username, error: error.message, rateLimited: false };
   }
 }
 
@@ -165,6 +296,18 @@ async function main() {
   console.log('==========================================\n');
 
   try {
+    // Clean up old completed/failed requests
+    const { data: staleRequests, error: cleanupFetchError } = await supabase
+      .from('creator_requests')
+      .select('id')
+      .in('status', ['completed', 'failed']);
+
+    if (!cleanupFetchError && staleRequests && staleRequests.length > 0) {
+      const ids = staleRequests.map(r => r.id);
+      await supabase.from('creator_requests').delete().in('id', ids);
+      console.log(`🧹 Cleaned up ${staleRequests.length} old completed/failed request(s)\n`);
+    }
+
     // Fetch pending requests
     console.log('Fetching pending requests...');
     const { data: pendingRequests, error: fetchError } = await supabase

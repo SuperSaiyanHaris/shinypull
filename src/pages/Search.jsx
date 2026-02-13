@@ -115,7 +115,19 @@ export default function Search() {
   const [searched, setSearched] = useState(false);
   const [requestStatus, setRequestStatus] = useState(null); // null, 'requesting', 'success', 'error'
   const [requestMessage, setRequestMessage] = useState('');
+  const [normalizedUsername, setNormalizedUsername] = useState('');
   const { user } = useAuth();
+
+  // Normalize a display name / search query to a likely Instagram/TikTok username
+  const normalizeToUsername = (input) => {
+    return input
+      .trim()
+      .toLowerCase()
+      .replace(/^@/, '')             // strip leading @
+      .replace(/[^a-z0-9._]/g, '')   // remove everything except allowed chars
+      .replace(/^\.+|\.+$/g, '')     // trim leading/trailing dots
+      .slice(0, 30);                 // max 30 chars
+  };
 
   useEffect(() => {
     const q = searchParams.get('q');
@@ -166,6 +178,10 @@ export default function Search() {
         channels = await searchKick(searchQuery, 25);
       }
       setResults(channels);
+      // Pre-fill normalized username when no results found for IG/TikTok
+      if (channels.length === 0 && (selectedPlatform === 'instagram' || selectedPlatform === 'tiktok')) {
+        setNormalizedUsername(normalizeToUsername(searchQuery));
+      }
     } catch (err) {
       logger.error('Search error:', err);
       setError(err.message || 'Failed to search. Please try again.');
@@ -197,8 +213,9 @@ export default function Search() {
     }
   };
 
-  const handleRequestCreator = async () => {
-    if (!query.trim()) return;
+  const handleRequestCreator = async (usernameOverride) => {
+    const username = usernameOverride || normalizedUsername;
+    if (!username) return;
 
     setRequestStatus('requesting');
     setRequestMessage('');
@@ -209,7 +226,7 @@ export default function Search() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           platform: selectedPlatform,
-          username: query.trim().replace('@', ''), // Remove @ if present
+          username,
           userId: user?.id || null,
         }),
       });
@@ -354,15 +371,26 @@ export default function Search() {
                 <>
                   {requestStatus === null && (
                     <div className="mt-6 max-w-md mx-auto">
-                      <p className="text-sm text-gray-600 mb-4">
-                        {selectedPlatform === 'instagram' ? 'Instagram' : 'TikTok'} creators are added by request. Want us to track this creator?
+                      <p className="text-sm text-gray-600 mb-3">
+                        If you know the exact handle, enter it below — otherwise leave as-is and our smart search will find the right match.
                       </p>
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="text-gray-400 text-lg font-medium">@</span>
+                        <input
+                          type="text"
+                          value={normalizedUsername}
+                          onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
+                          placeholder={`e.g. ${selectedPlatform === 'instagram' ? 'barackobama' : 'charlidamelio'}`}
+                          className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        />
+                      </div>
                       <button
-                        onClick={handleRequestCreator}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                        onClick={() => handleRequestCreator()}
+                        disabled={!normalizedUsername}
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Clock className="w-5 h-5" />
-                        Request This Creator
+                        Request @{normalizedUsername || '...'}
                       </button>
                       <p className="text-xs text-gray-400 mt-3">
                         We'll add them within 24 hours

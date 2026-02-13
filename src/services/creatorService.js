@@ -176,10 +176,17 @@ export const getHoursWatched = withErrorHandling(
  */
 export const searchCreators = withErrorHandling(
   async (query, platform = null) => {
+    // Build OR conditions: match on raw query + normalized (spaces/special chars stripped)
+    const normalized = query.replace(/[^a-zA-Z0-9._]/g, '').toLowerCase();
+    const conditions = [`username.ilike.%${query}%,display_name.ilike.%${query}%`];
+    if (normalized && normalized !== query.toLowerCase()) {
+      conditions[0] += `,username.ilike.%${normalized}%`;
+    }
+
     let dbQuery = supabase
       .from('creators')
       .select('*')
-      .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`);
+      .or(conditions[0]);
 
     if (platform) {
       dbQuery = dbQuery.eq('platform', platform);

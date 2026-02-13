@@ -25,9 +25,17 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid platform' });
     }
 
-    // Validate username format (alphanumeric, underscores, dots, max 30 chars)
+    // Normalize username: strip @, remove spaces/special chars, lowercase
+    const normalized = username
+      .replace(/^@/, '')
+      .replace(/[^a-zA-Z0-9._]/g, '')
+      .replace(/^\.+|\.+$/g, '')
+      .toLowerCase()
+      .slice(0, 30);
+
+    // Validate normalized username format
     const usernameRegex = /^[a-zA-Z0-9._]{1,30}$/;
-    if (!usernameRegex.test(username)) {
+    if (!normalized || !usernameRegex.test(normalized)) {
       return res.status(400).json({
         error: 'Invalid username format. Only letters, numbers, dots, and underscores allowed.'
       });
@@ -44,7 +52,7 @@ export default async function handler(req, res) {
       .from('creators')
       .select('id, username')
       .eq('platform', platform)
-      .ilike('username', username)
+      .ilike('username', normalized)
       .single();
 
     if (existingCreator) {
@@ -60,7 +68,7 @@ export default async function handler(req, res) {
       .from('creator_requests')
       .select('id, username, status, created_at')
       .eq('platform', platform)
-      .ilike('username', username)
+      .ilike('username', normalized)
       .eq('status', 'pending')
       .single();
 
@@ -80,7 +88,7 @@ export default async function handler(req, res) {
       .from('creator_requests')
       .insert({
         platform,
-        username: username.toLowerCase(),
+        username: normalized,
         user_id: userId || null,
         status: 'pending',
         created_at: new Date().toISOString()
@@ -95,7 +103,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: `Request submitted! We'll add @${username} within 24 hours.`,
+      message: `Request submitted! We'll add @${normalized} within 24 hours.`,
       username: newRequest.username
     });
 
