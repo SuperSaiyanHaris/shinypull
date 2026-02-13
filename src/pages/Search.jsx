@@ -419,7 +419,7 @@ export default function Search() {
                       <p className="text-sm text-red-800 font-medium mb-1">Request Failed</p>
                       <p className="text-sm text-red-700">{requestMessage}</p>
                       <button
-                        onClick={handleRequestCreator}
+                        onClick={() => handleRequestCreator()}
                         className="mt-3 text-sm text-red-700 hover:text-red-800 font-medium underline"
                       >
                         Try Again
@@ -508,7 +508,7 @@ export default function Search() {
                       {requestStatus === null && (
                         <>
                           <button
-                            onClick={handleRequestCreator}
+                            onClick={() => handleRequestCreator()}
                             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
                           >
                             <Clock className="w-5 h-5" />
@@ -541,7 +541,7 @@ export default function Search() {
                           <p className="text-sm text-red-800 font-medium mb-1">Request Failed</p>
                           <p className="text-sm text-red-700">{requestMessage}</p>
                           <button
-                            onClick={handleRequestCreator}
+                            onClick={() => handleRequestCreator()}
                             className="mt-3 text-sm text-red-700 hover:text-red-800 font-medium underline"
                           >
                             Try Again
