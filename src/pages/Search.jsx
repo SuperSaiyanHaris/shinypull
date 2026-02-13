@@ -178,8 +178,8 @@ export default function Search() {
         channels = await searchKick(searchQuery, 25);
       }
       setResults(channels);
-      // Pre-fill normalized username when no results found for IG/TikTok
-      if (channels.length === 0 && (selectedPlatform === 'instagram' || selectedPlatform === 'tiktok')) {
+      // Pre-fill normalized username for IG/TikTok request flow
+      if (selectedPlatform === 'instagram' || selectedPlatform === 'tiktok') {
         setNormalizedUsername(normalizeToUsername(searchQuery));
       }
     } catch (err) {
