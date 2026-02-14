@@ -72,11 +72,14 @@ export default function CreatorProfile() {
 
       if (platform === 'youtube') {
         // Check database first — the stored platform_id gives an exact lookup
-        // This prevents the search fallback from matching wrong channels
-        // (e.g., "music" matching "@musictravellove" instead of YouTube Music)
         const knownCreator = await getCreatorByUsername('youtube', username);
         if (knownCreator?.platform_id) {
           channelData = await getYouTubeChannelById(knownCreator.platform_id);
+          // Verify the DB record points to the right channel — the stored username
+          // must match what was requested (prevents stale/wrong DB mappings)
+          if (channelData && channelData.username?.toLowerCase() !== username.toLowerCase()) {
+            channelData = null;
+          }
         }
         if (!channelData) {
           channelData = await getYouTubeChannel(username);

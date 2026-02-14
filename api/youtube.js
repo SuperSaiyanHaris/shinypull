@@ -74,7 +74,7 @@ async function searchChannels(query, maxResults = 25) {
       platform: 'youtube',
       platformId: item.snippet.channelId,
       id: item.snippet.channelId,
-      username: stats.customUrl?.replace('@', '') || item.snippet.channelTitle.toLowerCase().replace(/\s+/g, ''),
+      username: (stats.customUrl?.replace('@', '') || item.snippet.channelTitle.replace(/\s+/g, '')).toLowerCase(),
       displayName: item.snippet.channelTitle,
       profileImage: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
       description: item.snippet.description,
@@ -118,7 +118,7 @@ async function getChannel(channelId) {
     platform: 'youtube',
     platformId: channel.id,
     id: channel.id,
-    username: snippet.customUrl?.replace('@', '') || snippet.title.toLowerCase().replace(/\s+/g, ''),
+    username: (snippet.customUrl?.replace('@', '') || snippet.title.replace(/\s+/g, '')).toLowerCase(),
     displayName: snippet.title,
     profileImage: snippet.thumbnails.high?.url || snippet.thumbnails.default?.url,
     bannerImage: branding?.image?.bannerExternalUrl,
@@ -161,7 +161,7 @@ async function getChannelByUsername(username) {
         platform: 'youtube',
         platformId: channel.id,
         id: channel.id,
-        username: snippet.customUrl?.replace('@', '') || snippet.title.toLowerCase().replace(/\s+/g, ''),
+        username: (snippet.customUrl?.replace('@', '') || snippet.title.replace(/\s+/g, '')).toLowerCase(),
         displayName: snippet.title,
         profileImage: snippet.thumbnails.high?.url || snippet.thumbnails.default?.url,
         bannerImage: branding?.image?.bannerExternalUrl,
@@ -188,10 +188,10 @@ async function getChannelByUsername(username) {
   // Get full details of the first result
   const topResult = await getChannel(searchResults[0].id);
 
-  // Verify the result actually matches — check customUrl/username
+  // Verify the result actually matches — exact username match only
   const resultUsername = (topResult.username || '').toLowerCase();
   const requestedUsername = username.toLowerCase();
-  if (resultUsername === requestedUsername || resultUsername.includes(requestedUsername)) {
+  if (resultUsername === requestedUsername) {
     return topResult;
   }
 
