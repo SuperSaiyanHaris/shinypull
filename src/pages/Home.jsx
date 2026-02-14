@@ -21,7 +21,7 @@ const features = [
   {
     icon: Search,
     title: 'Search Creators',
-    description: 'Find any creator across YouTube, Instagram, TikTok, Twitch, and Kick with real-time data.',
+    description: 'Find any creator across all major platforms with real-time data.',
     color: 'from-blue-500 to-indigo-600',
     bgColor: 'bg-blue-50',
     link: '/search',
@@ -495,7 +495,7 @@ export default function Home() {
                 Start tracking your favorite creators
               </h2>
               <p className="text-slate-300 mb-8 max-w-xl mx-auto text-lg">
-                Search for any YouTube, Instagram, TikTok, Twitch, or Kick creator and get detailed analytics instantly.
+                Search for any creator and get detailed analytics instantly.
               </p>
               <Link
                 to="/search"

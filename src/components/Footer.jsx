@@ -21,7 +21,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Social media analytics and statistics for YouTube, Instagram, TikTok, Twitch, and Kick.
+              Social media analytics and statistics for content creators.
             </p>
           </div>
 

@@ -258,7 +258,7 @@ export default function Search() {
     <>
       <SEO
         title="Search Creators"
-        description="Search for YouTube, Twitch, and other social media creators to view their statistics and analytics."
+        description="Search for social media creators to view their statistics and analytics."
       />
 
       <div className="min-h-screen bg-gray-50">

@@ -162,7 +162,7 @@ export default function Compare() {
     <>
       <SEO
         title="Compare Creators"
-        description="Compare YouTube, Instagram, TikTok, Twitch, and Kick creators side-by-side. See subscriber counts, follower counts, views, and growth metrics."
+        description="Compare social media creators side-by-side. See subscriber counts, follower counts, views, and growth metrics."
       />
 
       <div className="min-h-screen bg-gray-50">
@@ -180,7 +180,7 @@ export default function Compare() {
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Compare Creators</h1>
               </div>
               <p className="text-base sm:text-lg text-slate-400">
-                Side-by-side comparison of YouTube, Instagram, TikTok, Twitch, and Kick channels
+                Side-by-side comparison across all platforms
               </p>
             </div>
           </div>

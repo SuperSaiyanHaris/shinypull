@@ -17,7 +17,7 @@ const supportReasons = [
   {
     icon: Zap,
     title: 'API Costs',
-    description: 'Cover the costs of pulling real-time data from YouTube, Twitch, and Kick.',
+    description: 'Cover the costs of pulling real-time data across all supported platforms.',
   },
 ];
 
