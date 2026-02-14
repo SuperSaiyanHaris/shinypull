@@ -381,13 +381,13 @@ export default function Search() {
                           value={normalizedUsername}
                           onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
                           placeholder={`e.g. ${selectedPlatform === 'instagram' ? 'barackobama' : 'charlidamelio'}`}
-                          className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className={`flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent ${selectedPlatform === 'tiktok' ? 'focus:ring-gray-900' : 'focus:ring-purple-500'}`}
                         />
                       </div>
                       <button
                         onClick={() => handleRequestCreator()}
                         disabled={!normalizedUsername}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        className={`inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlatform === 'tiktok' ? 'bg-gray-900 hover:bg-gray-800' : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'}`}
                       >
                         <Clock className="w-5 h-5" />
                         Request @{normalizedUsername || '...'}
@@ -517,13 +517,13 @@ export default function Search() {
                               value={normalizedUsername}
                               onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
                               placeholder={`e.g. ${selectedPlatform === 'instagram' ? 'barackobama' : 'charlidamelio'}`}
-                              className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                              className={`flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent ${selectedPlatform === 'tiktok' ? 'focus:ring-gray-900' : 'focus:ring-purple-500'}`}
                             />
                           </div>
                           <button
                             onClick={() => handleRequestCreator()}
                             disabled={!normalizedUsername}
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                            className={`inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlatform === 'tiktok' ? 'bg-gray-900 hover:bg-gray-800' : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'}`}
                           >
                             <Clock className="w-5 h-5" />
                             Request @{normalizedUsername || '...'}
