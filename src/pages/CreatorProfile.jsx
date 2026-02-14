@@ -682,13 +682,7 @@ export default function CreatorProfile() {
                       sublabel="Based on avg CPM"
                       value={metrics && metrics.last30Days.views > 0
                         ? formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)
-                        : creator.totalViews && creator.totalPosts > 0
-                          ? (() => {
-                              const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
-                              const monthlyViews = estimatedDailyViews * 30;
-                              return formatEarnings(monthlyViews / 1000 * 0.25, monthlyViews / 1000 * 4);
-                            })()
-                          : '--'
+                        : '--'
                       }
                     />
                     <SummaryCard
@@ -696,13 +690,7 @@ export default function CreatorProfile() {
                       sublabel="Based on avg CPM"
                       value={metrics && metrics.last30Days.views > 0
                         ? formatEarnings(metrics.last30Days.views / 1000 * 2 * 12, metrics.last30Days.views / 1000 * 7 * 12)
-                        : creator.totalViews && creator.totalPosts > 0
-                          ? (() => {
-                              const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
-                              const yearlyViews = estimatedDailyViews * 365;
-                              return formatEarnings(yearlyViews / 1000 * 0.25, yearlyViews / 1000 * 4);
-                            })()
-                          : '--'
+                        : '--'
                       }
                     />
                   </>
@@ -936,12 +924,7 @@ export default function CreatorProfile() {
                               <td className="px-6 py-4 text-right text-gray-600">
                                 {stat.viewsChange > 0
                                   ? formatEarnings(stat.viewsChange / 1000 * 2, stat.viewsChange / 1000 * 7)
-                                  : creator.totalViews && creator.totalPosts > 0
-                                    ? (() => {
-                                        const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
-                                        return formatEarnings(estimatedDailyViews / 1000 * 0.25, estimatedDailyViews / 1000 * 4);
-                                      })()
-                                    : '$0'
+                                  : '—'
                                 }
                               </td>
                             </>
@@ -995,12 +978,7 @@ export default function CreatorProfile() {
                             <td className="px-6 py-4 text-right text-indigo-900">
                               {metrics.dailyAverage.views > 0
                                 ? formatEarnings(metrics.dailyAverage.views / 1000 * 2, metrics.dailyAverage.views / 1000 * 7)
-                                : creator.totalViews && creator.totalPosts > 0
-                                  ? (() => {
-                                      const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
-                                      return formatEarnings(estimatedDailyViews / 1000 * 0.25, estimatedDailyViews / 1000 * 4);
-                                    })()
-                                  : '—'
+                                : '—'
                               }
                             </td>
                           </>
@@ -1051,13 +1029,7 @@ export default function CreatorProfile() {
                             <td className="px-6 py-4 text-right text-indigo-900">
                               {metrics.weeklyAverage.views > 0
                                 ? formatEarnings(metrics.weeklyAverage.views / 1000 * 2, metrics.weeklyAverage.views / 1000 * 7)
-                                : creator.totalViews && creator.totalPosts > 0
-                                  ? (() => {
-                                      const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
-                                      const weeklyViews = estimatedDailyViews * 7;
-                                      return formatEarnings(weeklyViews / 1000 * 0.25, weeklyViews / 1000 * 4);
-                                    })()
-                                  : '—'
+                                : '—'
                               }
                             </td>
                           </>
@@ -1103,13 +1075,7 @@ export default function CreatorProfile() {
                             <td className="px-6 py-4 text-right text-emerald-600">
                               {metrics.last30Days.views > 0
                                 ? `+${formatNumber(metrics.last30Days.views)}`
-                                : creator.totalViews && creator.totalPosts > 0
-                                  ? (() => {
-                                      const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
-                                      const estimated30DayViews = estimatedDailyViews * 30;
-                                      return `~${formatNumber(Math.round(estimated30DayViews))}`;
-                                    })()
-                                  : '—'
+                                : '—'
                               }
                             </td>
                             <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
@@ -1118,13 +1084,7 @@ export default function CreatorProfile() {
                             <td className="px-6 py-4 text-right text-indigo-900">
                               {metrics.last30Days.views > 0
                                 ? formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)
-                                : creator.totalViews && creator.totalPosts > 0
-                                  ? (() => {
-                                      const estimatedDailyViews = creator.totalViews / (creator.totalPosts * 30);
-                                      const estimated30DayViews = estimatedDailyViews * 30;
-                                      return formatEarnings(estimated30DayViews / 1000 * 0.25, estimated30DayViews / 1000 * 4);
-                                    })()
-                                  : '—'
+                                : '—'
                               }
                             </td>
                           </>
