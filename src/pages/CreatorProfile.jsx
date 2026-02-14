@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star } from 'lucide-react';
+import { Youtube, Twitch, Instagram, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star, Play, ThumbsUp, MessageCircle } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import FunErrorState from '../components/FunErrorState';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
-import { getChannelByUsername as getYouTubeChannel, getChannelById as getYouTubeChannelById } from '../services/youtubeService';
+import { getChannelByUsername as getYouTubeChannel, getChannelById as getYouTubeChannelById, getLatestVideo as getYouTubeLatestVideo } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel, getLiveStreams as getTwitchLiveStreams } from '../services/twitchService';
 import { getChannelByUsername as getKickChannel, getLiveStreams as getKickLiveStreams } from '../services/kickService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
@@ -57,6 +57,7 @@ export default function CreatorProfile() {
   const [dbCreatorId, setDbCreatorId] = useState(null); // Store database UUID
   const [isLive, setIsLive] = useState(false);
   const [liveStreamInfo, setLiveStreamInfo] = useState(null);
+  const [latestVideo, setLatestVideo] = useState(null);
 
   useEffect(() => {
     loadCreator();
@@ -214,6 +215,13 @@ export default function CreatorProfile() {
           } catch (liveErr) {
             logger.warn('Failed to check live status:', liveErr);
           }
+        }
+
+        // Fetch latest video for YouTube channels (non-blocking)
+        if (platform === 'youtube' && channelData.platformId) {
+          getYouTubeLatestVideo(channelData.platformId).then(video => {
+            if (video) setLatestVideo(video);
+          });
         }
       }
     } catch (err) {
@@ -759,6 +767,66 @@ export default function CreatorProfile() {
                   </>
                 )}
               </div>
+            )}
+
+            {/* Latest Video Card - YouTube only */}
+            {platform === 'youtube' && latestVideo && (
+              <a
+                href={`https://youtube.com/watch?v=${latestVideo.videoId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6 hover:shadow-md hover:border-gray-200 transition-all group"
+              >
+                <div className="flex flex-col sm:flex-row">
+                  <div className="relative sm:w-72 flex-shrink-0">
+                    <img
+                      src={latestVideo.thumbnail}
+                      alt={latestVideo.title}
+                      className="w-full h-44 sm:h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                      <div className="w-12 h-12 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-5 flex flex-col justify-between flex-1 min-w-0">
+                    <div>
+                      <p className="text-xs font-medium text-indigo-600 mb-1.5">Latest Video</p>
+                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                        {latestVideo.title}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Uploaded {(() => {
+                          const published = new Date(latestVideo.publishedAt);
+                          const now = new Date();
+                          const diffDays = Math.floor((now - published) / (1000 * 60 * 60 * 24));
+                          if (diffDays === 0) return 'today';
+                          if (diffDays === 1) return 'yesterday';
+                          if (diffDays < 7) return `${diffDays} days ago`;
+                          if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
+                          if (diffDays < 365) return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''} ago`;
+                          return `${Math.floor(diffDays / 365)} year${Math.floor(diffDays / 365) > 1 ? 's' : ''} ago`;
+                        })()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-5 mt-3 text-sm text-gray-600">
+                      <span className="flex items-center gap-1.5">
+                        <Eye className="w-4 h-4 text-gray-400" />
+                        {formatNumber(latestVideo.views)}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <ThumbsUp className="w-4 h-4 text-gray-400" />
+                        {formatNumber(latestVideo.likes)}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <MessageCircle className="w-4 h-4 text-gray-400" />
+                        {formatNumber(latestVideo.comments)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </a>
             )}
 
             {/* Live Counter Link - Hidden for Instagram/TikTok (no real-time updates) */}

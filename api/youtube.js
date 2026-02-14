@@ -200,6 +200,59 @@ async function getChannelByUsername(username) {
 }
 
 /**
+ * Get the latest video for a channel
+ */
+async function getLatestVideo(channelId) {
+  if (!YOUTUBE_API_KEY) {
+    throw new Error('Missing YouTube API key');
+  }
+
+  // The uploads playlist ID is the channel ID with "UC" replaced by "UU"
+  const uploadsPlaylistId = 'UU' + channelId.slice(2);
+
+  const playlistResponse = await fetch(
+    `https://www.googleapis.com/youtube/v3/playlistItems?` +
+    `part=snippet&playlistId=${uploadsPlaylistId}&maxResults=1&key=${YOUTUBE_API_KEY}`
+  );
+
+  if (!playlistResponse.ok) {
+    return null;
+  }
+
+  const playlistData = await playlistResponse.json();
+  if (!playlistData.items || playlistData.items.length === 0) {
+    return null;
+  }
+
+  const videoId = playlistData.items[0].snippet.resourceId.videoId;
+  const snippet = playlistData.items[0].snippet;
+
+  // Fetch video statistics
+  const videoResponse = await fetch(
+    `https://www.googleapis.com/youtube/v3/videos?` +
+    `part=statistics&id=${videoId}&key=${YOUTUBE_API_KEY}`
+  );
+
+  let stats = {};
+  if (videoResponse.ok) {
+    const videoData = await videoResponse.json();
+    if (videoData.items && videoData.items.length > 0) {
+      stats = videoData.items[0].statistics;
+    }
+  }
+
+  return {
+    videoId,
+    title: snippet.title,
+    thumbnail: snippet.thumbnails.high?.url || snippet.thumbnails.medium?.url || snippet.thumbnails.default?.url,
+    publishedAt: snippet.publishedAt,
+    views: parseInt(stats.viewCount || 0),
+    likes: parseInt(stats.likeCount || 0),
+    comments: parseInt(stats.commentCount || 0),
+  };
+}
+
+/**
  * Main handler for Vercel serverless function
  */
 export default async function handler(req, res) {
@@ -233,7 +286,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { action, id, username, query, maxResults } = req.query;
+    const { action, id, username, query, maxResults, channelId } = req.query;
 
     if (!action) {
       return res.status(400).json({ error: 'Missing action parameter' });
@@ -261,6 +314,13 @@ export default async function handler(req, res) {
           return res.status(400).json({ error: 'Missing username parameter' });
         }
         result = await getChannelByUsername(username);
+        break;
+
+      case 'getLatestVideo':
+        if (!channelId) {
+          return res.status(400).json({ error: 'Missing channelId parameter' });
+        }
+        result = await getLatestVideo(channelId);
         break;
 
       default:

@@ -67,6 +67,21 @@ export const getChannelById = withErrorHandling(
 );
 
 /**
+ * Get the latest video for a channel
+ */
+export const getLatestVideo = async (channelId) => {
+  try {
+    const response = await fetch(
+      `${API_URL}?action=getLatestVideo&channelId=${encodeURIComponent(channelId)}`
+    );
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+};
+
+/**
  * Format subscriber count for display (handles YouTube's rounding)
  */
 export function formatCount(count) {
