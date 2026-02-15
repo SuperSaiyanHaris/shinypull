@@ -154,7 +154,7 @@ export default function Header() {
                   className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
                 >
                   <User className="w-4 h-4" />
-                  Sign In
+                  Sign Up / Sign In
                 </button>
               )}
             </div>
@@ -231,7 +231,7 @@ export default function Header() {
                     className="flex items-center justify-center gap-2 py-3 px-6 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors w-full"
                   >
                     <User className="w-5 h-5" />
-                    Sign In
+                    Sign Up / Sign In
                   </button>
                 )}
               </div>

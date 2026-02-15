@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { Mail, Lock, User, X, Star, Scale, Clock, BarChart3 } from 'lucide-react';
+import { Mail, Lock, X, Star, Scale, Clock, BarChart3 } from 'lucide-react';
 
 export default function AuthPanel({ isOpen, onClose, message: contextMessage }) {
   const { isAuthenticated } = useAuth();
   const [mode, setMode] = useState('signup'); // signin, signup, or reset (default to signup for new user acquisition)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -78,13 +77,8 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            data: {
-              display_name: name,
-            },
-          },
         });
-        
+
         if (error) throw error;
         setMessage('Check your email for the confirmation link!');
       } else {
@@ -255,23 +249,6 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
 
           {/* Email/Password Form */}
           <form onSubmit={mode === 'reset' ? handleResetPassword : handleEmailAuth} className="space-y-4">
-            {mode === 'signup' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-white border border-gray-300 rounded-lg py-3 px-10 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="Your name"
-                    required
-                  />
-                </div>
-              </div>
-            )}
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
               <div className="relative">
