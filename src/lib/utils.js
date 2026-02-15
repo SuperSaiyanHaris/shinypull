@@ -7,10 +7,3 @@ export function formatNumber(num) {
   if (Math.abs(num) >= NUMBER_THRESHOLDS.THOUSAND) return (num / NUMBER_THRESHOLDS.THOUSAND).toFixed(1) + 'K';
   return num.toLocaleString();
 }
-
-export function formatEngagementRate(rate) {
-  if (rate === null || rate === undefined || rate === 0) return '—';
-  if (rate >= 100) return Math.round(rate) + '%';
-  if (rate >= 10) return rate.toFixed(1) + '%';
-  return rate.toFixed(2) + '%';
-}

@@ -13,7 +13,7 @@ import { followCreator, unfollowCreator, isFollowing as checkIsFollowing } from 
 import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
-import { formatNumber, formatEngagementRate } from '../lib/utils';
+import { formatNumber } from '../lib/utils';
 import { addRecentlyViewed } from '../lib/recentlyViewed';
 import logger from '../lib/logger';
 import { supabase } from '../lib/supabase';
@@ -446,24 +446,6 @@ export default function CreatorProfile() {
                       {Icon && <Icon className="w-3 h-3 sm:w-4 sm:h-4" />}
                       {platform}
                     </span>
-                    {(() => {
-                      let engRate = null;
-                      const subs = creator.subscribers || creator.followers || 0;
-                      const posts = creator.totalPosts || 0;
-                      const views = creator.totalViews || 0;
-                      if (platform === 'youtube' && subs > 0 && posts > 0) {
-                        engRate = ((views / posts) / subs) * 100;
-                      } else if (platform === 'tiktok' && subs > 0 && posts > 0) {
-                        engRate = ((views / posts) / subs) * 100;
-                      } else if (platform === 'twitch' && subs > 0 && creator.avgViewersDay > 0) {
-                        engRate = (creator.avgViewersDay / subs) * 100;
-                      }
-                      return engRate != null ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm bg-indigo-50 text-indigo-700 font-medium">
-                          {formatEngagementRate(engRate)} Eng. Rate
-                        </span>
-                      ) : null;
-                    })()}
                     {isLive && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm bg-red-500 text-white animate-pulse">
                         <Radio className="w-3 h-3 sm:w-4 sm:h-4" />
