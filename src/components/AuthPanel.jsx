@@ -5,7 +5,7 @@ import { Mail, Lock, User, X, Star, Scale, Clock, BarChart3 } from 'lucide-react
 
 export default function AuthPanel({ isOpen, onClose, message: contextMessage }) {
   const { isAuthenticated } = useAuth();
-  const [mode, setMode] = useState('signin'); // signin, signup, or reset
+  const [mode, setMode] = useState('signup'); // signin, signup, or reset (default to signup for new user acquisition)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
