@@ -105,8 +105,8 @@ export default function Support() {
               <h2 className="text-2xl font-bold text-gray-900">Our Mission</h2>
             </div>
             <p className="text-gray-700 text-center max-w-2xl mx-auto mb-8">
-              ShinyPull exists to provide free, transparent analytics for social media creators and their audiences.
-              We track real growth metrics across YouTube, Twitch, Kick, Instagram, and TikTok — no paywalls, no sign-up required for basic features.
+              ShinyPull provides free analytics for social media creators and their audiences.
+              We track growth metrics across YouTube, Twitch, Kick, Instagram, and TikTok. No paywalls, no sign-up required for basic features.
             </p>
 
             <div className="grid md:grid-cols-2 gap-6">
@@ -114,10 +114,10 @@ export default function Support() {
                 <div className="flex items-start gap-3">
                   <Database className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Real Data Only</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2">Real Data</h3>
                     <p className="text-sm text-gray-600">
-                      We use official platform APIs and verified scraping methods. No fake data, no estimates — every stat comes from real sources.
-                      Historical data builds naturally from daily snapshots starting from when we add a creator.
+                      We collect statistics from social media platforms. No fake data or generated numbers.
+                      Historical data builds from daily snapshots starting when we add a creator to the database.
                     </p>
                   </div>
                 </div>
@@ -129,8 +129,8 @@ export default function Support() {
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">Daily Updates</h3>
                     <p className="text-sm text-gray-600">
-                      All creator stats are refreshed twice daily (6 AM & 6 PM EST). YouTube, Twitch, and Kick use official APIs.
-                      Instagram and TikTok are updated via automated scraping to provide the same coverage.
+                      Creator statistics are refreshed twice daily at 6 AM and 6 PM EST.
+                      This keeps the data current and allows you to track day-over-day changes.
                     </p>
                   </div>
                 </div>
@@ -139,8 +139,8 @@ export default function Support() {
 
             <div className="mt-6 p-4 bg-white/60 rounded-xl border border-indigo-200/50">
               <p className="text-sm text-gray-700 text-center">
-                <strong>Transparency matters.</strong> We don't hide our methods or inflate numbers.
-                If a metric isn't available from a platform's API (like Instagram follower counts or Kick free followers), we find alternative solutions or clearly mark it as unavailable.
+                We don't inflate numbers or hide limitations.
+                If a metric isn't available from a platform, we clearly mark it as unavailable rather than making up data.
               </p>
             </div>
           </div>
