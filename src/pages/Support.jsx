@@ -129,19 +129,11 @@ export default function Support() {
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">Daily Updates</h3>
                     <p className="text-sm text-gray-600">
-                      Creator statistics are refreshed twice daily at 6 AM and 6 PM EST.
-                      This keeps the data current and allows you to track day-over-day changes.
+                      Creator statistics are refreshed daily to keep the data current and allow you to track growth over time.
                     </p>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="mt-6 p-4 bg-white/60 rounded-xl border border-indigo-200/50">
-              <p className="text-sm text-gray-700 text-center">
-                We don't inflate numbers or hide limitations.
-                If a metric isn't available from a platform, we clearly mark it as unavailable rather than making up data.
-              </p>
             </div>
           </div>
         </div>
