@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown, Activity } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -10,7 +10,7 @@ import { getRankedCreators } from '../services/creatorService';
 import SEO from '../components/SEO';
 import StructuredData from '../components/StructuredData';
 import { analytics } from '../lib/analytics';
-import { formatNumber } from '../lib/utils';
+import { formatNumber, formatEngagementRate } from '../lib/utils';
 import logger from '../lib/logger';
 
 const platforms = [
@@ -120,6 +120,8 @@ export default function Rankings() {
     // Hide views for Kick, Instagram, and TikTok since APIs don't provide view data
     ...(selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
     { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
+    // Engagement rate only for platforms with engagement data
+    ...(selectedPlatform !== 'instagram' && selectedPlatform !== 'kick' ? [{ id: 'engagement', name: 'Engagement', icon: Activity }] : []),
   ];
 
   useEffect(() => {
@@ -173,6 +175,7 @@ export default function Rankings() {
         case 'subscribers': return creator.subscribers || 0;
         case 'views': return creator.totalViews || 0;
         case 'growth': return creator.growth30d || 0;
+        case 'engagement': return creator.engagementRate || 0;
         default: return 0;
       }
     };
@@ -193,11 +196,17 @@ export default function Rankings() {
   const handlePlatformChange = (platformId) => {
     if (!platformId) return;
     setSelectedPlatform(platformId);
+    // Reset rank type if switching to a platform that doesn't support it
+    const noEngagement = platformId === 'instagram' || platformId === 'kick';
+    const noViews = platformId === 'kick' || platformId === 'instagram' || platformId === 'tiktok';
+    if (selectedRankType === 'engagement' && noEngagement) setSelectedRankType('subscribers');
+    if (selectedRankType === 'views' && noViews) setSelectedRankType('subscribers');
     navigate(`/rankings/${platformId}`);
     analytics.switchPlatform('rankings', platformId);
   };
 
   const followerLabel = selectedPlatform === 'instagram' ? 'Followers' : selectedPlatform === 'tiktok' ? 'Followers' : selectedPlatform === 'twitch' ? 'Followers' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
+  const hasEngagement = selectedPlatform !== 'instagram' && selectedPlatform !== 'kick';
   const currentPlatform = platforms.find(p => p.id === selectedPlatform);
   const seoData = getSeoData(currentPlatform, selectedRankType, topCount);
   const listSchema = createRankingListSchema(rankings, currentPlatform, topCount);
@@ -316,7 +325,7 @@ export default function Rankings() {
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-500 uppercase tracking-wider">
               <div className="col-span-1">Rank</div>
-              <div className={selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'col-span-7' : 'col-span-5'}>Creator</div>
+              <div className={hasEngagement ? 'col-span-4' : selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'col-span-7' : 'col-span-5'}>Creator</div>
               <button
                 onClick={() => handleSort('subscribers')}
                 className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-700 transition-colors cursor-pointer"
@@ -342,6 +351,25 @@ export default function Rankings() {
                   <SortIcon column="views" />
                 </button>
               )}
+              {hasEngagement && (
+                <button
+                  onClick={() => handleSort('engagement')}
+                  className="col-span-1 flex items-center justify-end gap-1 text-right hover:text-gray-700 transition-colors cursor-pointer group"
+                >
+                  <span>Eng.</span>
+                  <SortIcon column="engagement" />
+                  <div className="relative">
+                    <Info className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                    <div className="absolute right-0 top-6 w-52 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none normal-case tracking-normal font-normal">
+                      {selectedPlatform === 'youtube'
+                        ? 'Avg views per video as % of subscribers'
+                        : selectedPlatform === 'tiktok'
+                        ? 'Avg likes per video as % of followers'
+                        : 'Avg concurrent viewers as % of followers'}
+                    </div>
+                  </div>
+                </button>
+              )}
               <button
                 onClick={() => handleSort('growth')}
                 className="col-span-2 flex items-center justify-end gap-1.5 text-right hover:text-gray-700 transition-colors cursor-pointer group"
@@ -350,7 +378,7 @@ export default function Rankings() {
                 <SortIcon column="growth" />
                 <div className="relative">
                   <Info className="w-3.5 h-3.5 text-gray-400 cursor-help" />
-                  <div className="absolute right-0 top-6 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none">
+                  <div className="absolute right-0 top-6 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none normal-case tracking-normal font-normal">
                     {selectedPlatform === 'youtube'
                       ? 'YouTube growth based on total views'
                       : selectedPlatform === 'kick'
@@ -413,7 +441,7 @@ export default function Rankings() {
                 </div>
 
                 {/* Creator Info */}
-                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'md:col-span-7' : 'md:col-span-5'}`}>
+                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${hasEngagement ? 'md:col-span-4' : selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'md:col-span-7' : 'md:col-span-5'}`}>
                   <img
                     src={creator.profile_image || '/placeholder-avatar.svg'}
                     alt={creator.display_name}
@@ -445,6 +473,11 @@ export default function Rankings() {
                     <span className="text-gray-600">{formatNumber(creator.totalViews)}</span>
                   </div>
                 )}
+                {hasEngagement && (
+                  <div className="hidden md:block col-span-1 text-right">
+                    <span className="font-medium text-indigo-600">{formatEngagementRate(creator.engagementRate)}</span>
+                  </div>
+                )}
                 <div className="hidden md:block col-span-2 text-right">
                   <span className={`font-medium ${creator.growth30d > 0 ? 'text-emerald-600' : creator.growth30d < 0 ? 'text-red-500' : 'text-gray-400'}`}>
                     {creator.growth30d > 0 ? '+' : ''}{formatNumber(creator.growth30d)}
@@ -452,7 +485,7 @@ export default function Rankings() {
                 </div>
 
                 {/* Stats - Mobile */}
-                <div className="col-span-12 md:hidden flex gap-4 text-sm pl-11">
+                <div className="col-span-12 md:hidden flex flex-wrap gap-4 text-sm pl-11">
                   <span className="text-gray-500">
                     <span className="font-medium text-gray-900">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
                   </span>
@@ -467,6 +500,11 @@ export default function Rankings() {
                   ) : selectedPlatform !== 'kick' && (
                     <span className="text-gray-500">
                       <span className="font-medium text-gray-900">{formatNumber(creator.totalViews)}</span> views
+                    </span>
+                  )}
+                  {hasEngagement && creator.engagementRate != null && (
+                    <span className="text-gray-500">
+                      <span className="font-medium text-indigo-600">{formatEngagementRate(creator.engagementRate)}</span> eng.
                     </span>
                   )}
                 </div>

@@ -252,7 +252,8 @@ export const getRankedCreators = withErrorHandling(
             views_gained_month,
             hours_watched_day,
             hours_watched_week,
-            hours_watched_month
+            hours_watched_month,
+            avg_viewers_day
           )
         `)
         .eq('platform', platform)
@@ -324,23 +325,39 @@ export const getRankedCreators = withErrorHandling(
         const stats = creator.latestStats;
         const subscribers = stats?.subscribers ?? stats?.followers ?? 0;
         const views = stats?.total_views ?? 0;
-        
+        const posts = stats?.total_posts ?? 0;
+
         // Use calculated growth, or fall back to pre-calculated field
-        const growth = creator.calculatedGrowth > 0 
-          ? creator.calculatedGrowth 
+        const growth = creator.calculatedGrowth > 0
+          ? creator.calculatedGrowth
           : (platform === 'youtube' ? (stats?.views_gained_month ?? 0) : (stats?.followers_gained_month ?? 0));
+
+        // Calculate engagement rate proxy per platform
+        let engagementRate = null;
+        if (platform === 'youtube' && subscribers > 0 && posts > 0) {
+          // Avg views per video as % of subscribers
+          engagementRate = ((views / posts) / subscribers) * 100;
+        } else if (platform === 'tiktok' && subscribers > 0 && posts > 0) {
+          // Avg likes per video as % of followers (total_views stores likes for TikTok)
+          engagementRate = ((views / posts) / subscribers) * 100;
+        } else if (platform === 'twitch' && subscribers > 0 && stats?.avg_viewers_day > 0) {
+          // Avg concurrent viewers as % of followers
+          engagementRate = (stats.avg_viewers_day / subscribers) * 100;
+        }
 
         let sortValue = subscribers;
         if (rankType === 'views') sortValue = views;
         if (rankType === 'growth') sortValue = growth;
+        if (rankType === 'engagement') sortValue = engagementRate ?? 0;
 
         return {
           ...creator,
           latestStats: stats,
           subscribers,
           totalViews: views,
-          totalPosts: stats?.total_posts ?? 0,
+          totalPosts: posts,
           growth30d: growth,
+          engagementRate,
           sortValue,
         };
       })
