@@ -183,7 +183,7 @@ export default function Calculator() {
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Input Section */}
-            <div className="space-y-6">
+            <div className="space-y-6 order-2 lg:order-1">
               {/* Creator Search - Only in Creator Mode */}
               {mode === 'creator' && (
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -353,7 +353,7 @@ export default function Calculator() {
             </div>
 
             {/* Results Section */}
-            <div className="space-y-4">
+            <div className="space-y-4 order-1 lg:order-2">
               {/* Creator Mode Helper */}
               {mode === 'creator' && !selectedCreator && (
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6">
