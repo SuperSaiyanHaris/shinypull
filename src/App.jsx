@@ -11,7 +11,6 @@ import Search from './pages/Search';
 import Rankings from './pages/Rankings';
 import Compare from './pages/Compare';
 import LiveCount from './pages/LiveCount';
-import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -44,10 +43,7 @@ function App() {
             <Route path="/gear" element={<Gear />} />
             <Route path="/live/:platform/:username" element={<LiveCount />} />
             <Route path="/:platform/:username" element={<CreatorProfile />} />
-            <Route path="/auth" element={<Auth />} />
             <Route path="/auth/reset" element={<ResetPassword />} />
-            <Route path="/signin" element={<Auth />} />
-            <Route path="/signup" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />

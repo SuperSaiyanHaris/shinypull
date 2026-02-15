@@ -59,7 +59,6 @@ src/
 │   ├── Blog.jsx          # Blog listing page
 │   ├── BlogPost.jsx      # Individual blog post viewer
 │   ├── BlogAdmin.jsx     # Blog & products admin panel
-│   ├── Auth.jsx          # Sign in/up
 │   ├── About.jsx         # About page
 │   ├── Contact.jsx       # Contact page
 │   ├── Privacy.jsx       # Privacy policy
@@ -125,7 +124,6 @@ api/                              # Vercel serverless functions
 | `/blog` | Blog | Blog listing page |
 | `/blog/:slug` | BlogPost | Individual blog post |
 | `/blog/admin` | BlogAdmin | Blog & products admin panel |
-| `/auth`, `/signin`, `/signup` | Auth | Authentication |
 | `/about`, `/contact`, `/privacy`, `/terms` | Static | Info pages |
 
 ## Database Schema
@@ -280,20 +278,21 @@ Since Instagram and TikTok block GitHub Actions IPs (Azure cloud), data collecti
 
 ## Authentication & Follow System
 
-**AuthPanel Component (ALWAYS use this — NEVER `navigate('/auth')`):**
-- Slide-out panel from the right side (not a separate page)
+**AuthPanel Component (ONLY way to sign in/up):**
+- Slide-out panel from the right side (component: `src/components/AuthPanel.jsx`)
 - Controlled by custom events: `openAuthPanel` and `closeAuthPanel`
 - Supports contextual messages (e.g., "Sign in to follow creators")
 - Smooth animations: `translate-x-full` → `translate-x-0` with transition
 - Input fields have visible text (text-gray-900) and placeholders
 - Integrated into Header component with event listeners
-- **NEVER use `navigate('/auth')` or `<Link to="/auth">` to send users to sign in.** Always dispatch the `openAuthPanel` event instead:
+- Shows benefits section when in signup mode (Follow creators, Dashboard, Compare, Recently viewed)
+- **To open the auth panel, always dispatch the custom event:**
   ```jsx
   window.dispatchEvent(new CustomEvent('openAuthPanel', {
     detail: { message: 'Sign in to access this feature' }
   }));
   ```
-- The `/auth` page route exists only as a direct-URL fallback, not for programmatic navigation
+- **There is NO `/auth` page route** - AuthPanel is the only authentication UI
 
 **Follow Button Integration:**
 - Follow/unfollow buttons dispatch `openAuthPanel` event when user not authenticated

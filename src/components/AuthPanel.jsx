@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { Mail, Lock, User, X } from 'lucide-react';
+import { Mail, Lock, User, X, Star, Scale, Clock, BarChart3 } from 'lucide-react';
 
 export default function AuthPanel({ isOpen, onClose, message: contextMessage }) {
   const { isAuthenticated } = useAuth();
@@ -168,13 +168,50 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
             </div>
           )}
           
-          <p className="text-gray-600 mb-8">
+          <p className="text-gray-600 mb-6">
             {mode === 'signup'
               ? 'Sign up to start tracking your favorite creators'
               : mode === 'reset'
               ? 'Enter your email to receive a password reset link'
               : 'Sign in to your Shiny Pull account'}
           </p>
+
+          {/* Benefits Section - Only show on signup */}
+          {mode === 'signup' && (
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-200 p-5 mb-6">
+              <h3 className="font-semibold text-gray-900 mb-4 text-sm">Why Create an Account?</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <Star className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-900 font-medium">Follow Your Favorite Creators</p>
+                    <p className="text-xs text-gray-600">Never miss updates from the creators you love</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <BarChart3 className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-900 font-medium">Track Growth in Your Dashboard</p>
+                    <p className="text-xs text-gray-600">See daily stats and growth trends in one place</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Scale className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-900 font-medium">Save and Compare Creators</p>
+                    <p className="text-xs text-gray-600">Compare stats side-by-side across platforms</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Clock className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-900 font-medium">View Your Recently Browsed Profiles</p>
+                    <p className="text-xs text-gray-600">Quick access to creators you've checked out</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Google Sign In - hidden for reset mode */}
           {mode !== 'reset' && (
