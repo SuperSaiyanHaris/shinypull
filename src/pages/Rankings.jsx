@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown, Activity } from 'lucide-react';
+import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -120,8 +120,6 @@ export default function Rankings() {
     // Hide views for Kick, Instagram, and TikTok since APIs don't provide view data
     ...(selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
     { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
-    // Engagement rate only for platforms with engagement data
-    ...(selectedPlatform !== 'instagram' && selectedPlatform !== 'kick' ? [{ id: 'engagement', name: 'Engagement', icon: Activity }] : []),
   ];
 
   useEffect(() => {
@@ -197,9 +195,7 @@ export default function Rankings() {
     if (!platformId) return;
     setSelectedPlatform(platformId);
     // Reset rank type if switching to a platform that doesn't support it
-    const noEngagement = platformId === 'instagram' || platformId === 'kick';
     const noViews = platformId === 'kick' || platformId === 'instagram' || platformId === 'tiktok';
-    if (selectedRankType === 'engagement' && noEngagement) setSelectedRankType('subscribers');
     if (selectedRankType === 'views' && noViews) setSelectedRankType('subscribers');
     navigate(`/rankings/${platformId}`);
     analytics.switchPlatform('rankings', platformId);
@@ -356,7 +352,7 @@ export default function Rankings() {
                   onClick={() => handleSort('engagement')}
                   className="col-span-1 flex items-center justify-end gap-1 text-right hover:text-gray-700 transition-colors cursor-pointer group"
                 >
-                  <span>Eng.</span>
+                  <span>Eng. Rate</span>
                   <SortIcon column="engagement" />
                   <div className="relative">
                     <Info className="w-3.5 h-3.5 text-gray-400 cursor-help" />

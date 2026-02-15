@@ -348,7 +348,6 @@ export const getRankedCreators = withErrorHandling(
         let sortValue = subscribers;
         if (rankType === 'views') sortValue = views;
         if (rankType === 'growth') sortValue = growth;
-        if (rankType === 'engagement') sortValue = engagementRate ?? 0;
 
         return {
           ...creator,
