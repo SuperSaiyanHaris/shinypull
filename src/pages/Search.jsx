@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight, Clock, CheckCircle } from 'lucide-react';
+import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight, Clock, CheckCircle, X } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -135,7 +135,7 @@ export default function Search() {
       setQuery(q);
       performSearch(q);
     }
-  }, [searchParams, selectedPlatform]);
+  }, [searchParams]);
 
   const handlePlatformChange = (platformId) => {
     setSelectedPlatform(platformId);
@@ -144,9 +144,13 @@ export default function Search() {
     // Clear request status when switching platforms
     setRequestStatus(null);
     setRequestMessage('');
+    // Re-search with current typed query on the new platform
+    if (query.trim()) {
+      performSearch(query, platformId);
+    }
   };
 
-  const performSearch = async (searchQuery) => {
+  const performSearch = async (searchQuery, platform = selectedPlatform) => {
     if (!searchQuery.trim()) return;
 
     // Track search
@@ -161,25 +165,25 @@ export default function Search() {
 
     try {
       let channels = [];
-      if (selectedPlatform === 'youtube') {
+      if (platform === 'youtube') {
         channels = await searchYouTube(searchQuery, 25);
         if (channels.length > 0) {
           void persistYouTubeResults(channels);
         }
-      } else if (selectedPlatform === 'instagram') {
+      } else if (platform === 'instagram') {
         // Search Instagram creators from database
         channels = await searchInstagram(searchQuery, 25);
-      } else if (selectedPlatform === 'tiktok') {
+      } else if (platform === 'tiktok') {
         // Search TikTok creators from database
         channels = await searchTikTok(searchQuery, 25);
-      } else if (selectedPlatform === 'twitch') {
+      } else if (platform === 'twitch') {
         channels = await searchTwitch(searchQuery, 25);
-      } else if (selectedPlatform === 'kick') {
+      } else if (platform === 'kick') {
         channels = await searchKick(searchQuery, 25);
       }
       setResults(channels);
       // Pre-fill normalized username for IG/TikTok request flow
-      if (selectedPlatform === 'instagram' || selectedPlatform === 'tiktok') {
+      if (platform === 'instagram' || platform === 'tiktok') {
         setNormalizedUsername(normalizeToUsername(searchQuery));
       }
     } catch (err) {
@@ -319,8 +323,17 @@ export default function Search() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={`Search ${currentPlatform?.name || ''} creators...`}
-                    className="w-full pl-14 pr-6 py-4 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl font-medium"
+                    className="w-full pl-14 pr-12 py-4 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl font-medium"
                   />
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => { setQuery(''); setResults([]); setSearched(false); }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  )}
                 </div>
               </div>
               <button
