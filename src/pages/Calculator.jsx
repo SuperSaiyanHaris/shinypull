@@ -182,8 +182,26 @@ export default function Calculator() {
 
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Creator Mode Helper - Shows at top on mobile, in right column on desktop */}
+            {mode === 'creator' && !selectedCreator && (
+              <div className="order-1 lg:col-start-2 lg:row-start-1">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6">
+                  <div className="flex items-start gap-3">
+                    <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-blue-900 mb-1">Search for a Creator</h4>
+                      <p className="text-sm text-blue-700">
+                        Select a YouTube creator to see earnings estimates based on their real channel data.
+                        We'll auto-populate daily views and RPM ranges based on their category and performance.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Input Section */}
-            <div className="space-y-6 order-2 lg:order-1">
+            <div className="space-y-6 order-2 lg:col-start-1 lg:row-start-1">
               {/* Creator Search - Only in Creator Mode */}
               {mode === 'creator' && (
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -353,23 +371,7 @@ export default function Calculator() {
             </div>
 
             {/* Results Section */}
-            <div className="space-y-4 order-1 lg:order-2">
-              {/* Creator Mode Helper */}
-              {mode === 'creator' && !selectedCreator && (
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6">
-                  <div className="flex items-start gap-3">
-                    <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-blue-900 mb-1">Search for a Creator</h4>
-                      <p className="text-sm text-blue-700">
-                        Select a YouTube creator to see earnings estimates based on their real channel data.
-                        We'll auto-populate daily views and RPM ranges based on their category and performance.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
+            <div className="space-y-4 order-3 lg:col-start-2 lg:row-start-2">
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-emerald-500" />
