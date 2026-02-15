@@ -1,5 +1,5 @@
 import SEO from '../components/SEO';
-import { Heart, Server, Code, Zap, Coffee } from 'lucide-react';
+import { Heart, Server, Code, Zap, Coffee, Target, Database, RefreshCw } from 'lucide-react';
 
 const BUYMEACOFFEE_URL = 'https://buymeacoffee.com/shinypull';
 
@@ -78,7 +78,7 @@ export default function Support() {
           </div>
 
           {/* Other ways to support */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Other Ways to Help</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
@@ -95,6 +95,53 @@ export default function Support() {
                   <p className="text-sm text-gray-600">Suggest features or report bugs to help us improve.</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Mission Statement & Data Transparency */}
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 p-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Target className="w-6 h-6 text-indigo-600" />
+              <h2 className="text-2xl font-bold text-gray-900">Our Mission</h2>
+            </div>
+            <p className="text-gray-700 text-center max-w-2xl mx-auto mb-8">
+              ShinyPull exists to provide free, transparent analytics for social media creators and their audiences.
+              We track real growth metrics across YouTube, Twitch, Kick, Instagram, and TikTok — no paywalls, no sign-up required for basic features.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl p-6">
+                <div className="flex items-start gap-3">
+                  <Database className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Real Data Only</h3>
+                    <p className="text-sm text-gray-600">
+                      We use official platform APIs and verified scraping methods. No fake data, no estimates — every stat comes from real sources.
+                      Historical data builds naturally from daily snapshots starting from when we add a creator.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-6">
+                <div className="flex items-start gap-3">
+                  <RefreshCw className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Daily Updates</h3>
+                    <p className="text-sm text-gray-600">
+                      All creator stats are refreshed twice daily (6 AM & 6 PM EST). YouTube, Twitch, and Kick use official APIs.
+                      Instagram and TikTok are updated via automated scraping to provide the same coverage.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-white/60 rounded-xl border border-indigo-200/50">
+              <p className="text-sm text-gray-700 text-center">
+                <strong>Transparency matters.</strong> We don't hide our methods or inflate numbers.
+                If a metric isn't available from a platform's API (like Instagram follower counts or Kick free followers), we find alternative solutions or clearly mark it as unavailable.
+              </p>
             </div>
           </div>
         </div>

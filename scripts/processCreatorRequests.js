@@ -221,16 +221,18 @@ async function processRequest(request) {
 
   } catch (error) {
     const isRateLimit = error.message.includes('429');
+    const isScrapeBlocked = error.message.includes('No og:description') || error.message.includes('No __UNIVERSAL_DATA');
     console.error(`[${request.username}] ❌ Error:`, error.message);
 
-    if (isRateLimit) {
-      // Rate limited — revert to pending so it retries on next run (fresh IP)
+    if (isRateLimit || isScrapeBlocked) {
+      // Rate limited or platform blocking us — revert to pending for next run
       await supabase
         .from('creator_requests')
         .update({ status: 'pending' })
         .eq('id', request.id);
-      console.log(`[${request.username}] ↩️  Reverted to pending (rate limited, will retry next run)`);
-      return { success: false, username: request.username, error: error.message, rateLimited: true };
+      const reason = isRateLimit ? 'rate limited' : 'scrape blocked (no meta tags)';
+      console.log(`[${request.username}] ↩️  Reverted to pending (${reason}, will retry next run)`);
+      return { success: false, username: request.username, error: error.message, rateLimited: isRateLimit, scrapeBlocked: isScrapeBlocked };
     }
 
     // --- AI Fallback: try to resolve the correct handle ---
@@ -313,7 +315,7 @@ async function processRequest(request) {
     // All attempts exhausted — delete the request (no valid profile found)
     await supabase.from('creator_requests').delete().eq('id', request.id);
     console.log(`[${request.username}] 🗑️  Request deleted (no valid profile found after all attempts)`);
-    return { success: false, username: request.username, error: error.message, rateLimited: false };
+    return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: false };
   }
 }
 
@@ -340,13 +342,22 @@ async function main() {
 
     // Fetch pending requests
     console.log('Fetching pending requests...');
-    const maxRequests = parseInt(process.argv[2]) || 100; // default: 100 per run
-    const { data: pendingRequests, error: fetchError } = await supabase
+    const maxRequests = parseInt(process.argv[2]) || 50; // default: 50 per run
+    const platformFilter = process.argv[3] || null; // optional: 'tiktok', 'instagram'
+    
+    let query = supabase
       .from('creator_requests')
       .select('*')
       .eq('status', 'pending')
       .order('created_at', { ascending: true })
       .limit(maxRequests);
+    
+    if (platformFilter) {
+      query = query.eq('platform', platformFilter.toLowerCase());
+      console.log(`Platform filter: ${platformFilter.toLowerCase()} only`);
+    }
+    
+    const { data: pendingRequests, error: fetchError } = await query;
 
     if (fetchError) {
       throw new Error(`Failed to fetch requests: ${fetchError.message}`);
@@ -361,20 +372,43 @@ async function main() {
 
     // Process requests one by one with delays
     const results = [];
+    let consecutiveScrapeFailures = 0;
+    const BLOCK_THRESHOLD = 3; // 3 consecutive scrape failures = likely IP block
+
     for (let i = 0; i < pendingRequests.length; i++) {
       const request = pendingRequests[i];
       const result = await processRequest(request);
       results.push(result);
 
-      // If rate limited, stop processing — same IP will keep getting blocked
+      // Track consecutive scrape failures (og:description missing = likely IP block)
+      if (result.scrapeBlocked) {
+        consecutiveScrapeFailures++;
+      } else {
+        consecutiveScrapeFailures = 0;
+      }
+
+      // If rate limited or likely IP-blocked, stop processing
       if (result.rateLimited) {
         console.log(`\n⚠️  Rate limited — skipping remaining ${pendingRequests.length - i - 1} request(s) (will retry next run)`);
         break;
       }
 
-      // Delay between requests (5-8 seconds randomized)
+      if (consecutiveScrapeFailures >= BLOCK_THRESHOLD) {
+        console.log(`\n⚠️  ${BLOCK_THRESHOLD} consecutive scrape failures — likely IP-blocked by ${request.platform}`);
+        console.log(`    Reverting remaining ${pendingRequests.length - i - 1} request(s) to pending...`);
+        // Revert any requests that were marked processing back to pending
+        for (let j = i + 1; j < pendingRequests.length; j++) {
+          await supabase
+            .from('creator_requests')
+            .update({ status: 'pending' })
+            .eq('id', pendingRequests[j].id);
+        }
+        break;
+      }
+
+      // Delay between requests (10-15 seconds randomized for safety)
       if (i < pendingRequests.length - 1) {
-        const delay = 5000 + Math.random() * 3000;
+        const delay = 10000 + Math.random() * 5000;
         console.log(`\nWaiting ${(delay / 1000).toFixed(1)}s before next request...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }

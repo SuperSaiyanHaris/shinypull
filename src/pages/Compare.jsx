@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2 } from 'lucide-react';
+import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2, DollarSign, TrendingDown, Minus } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import InstagramIcon from '../components/InstagramIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -8,7 +8,7 @@ import { CompareCardSkeleton } from '../components/Skeleton';
 import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { searchChannels as searchTwitch, getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { searchChannels as searchKick, getChannelByUsername as getKickChannel } from '../services/kickService';
-import { searchCreators, getCreatorByUsername } from '../services/creatorService';
+import { searchCreators, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
 import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
@@ -26,6 +26,8 @@ const platformConfig = {
 export default function Compare() {
   const [creators, setCreators] = useState([null, null]);
   const [loadingFromUrl, setLoadingFromUrl] = useState(false);
+  const [growthData, setGrowthData] = useState({});
+  const [loadingGrowth, setLoadingGrowth] = useState(false);
   const location = useLocation();
 
   // Parse ?creators=platform:username,platform:username from URL
@@ -156,7 +158,91 @@ export default function Compare() {
     }
   };
 
+  // Fetch growth data for creators
+  useEffect(() => {
+    const fetchGrowthData = async () => {
+      const filled = creators.filter(Boolean);
+      if (filled.length === 0) return;
+
+      setLoadingGrowth(true);
+      const growth = {};
+
+      for (const creator of filled) {
+        try {
+          // Get creator from database to get UUID
+          const dbCreator = await getCreatorByUsername(creator.platform, creator.username);
+          if (!dbCreator) continue;
+
+          // Fetch last 30 days of stats
+          const stats = await getCreatorStats(dbCreator.id, 30);
+          if (!stats || stats.length < 2) continue;
+
+          const latest = stats[0];
+          const sevenDaysAgo = stats[Math.min(7, stats.length - 1)];
+          const thirtyDaysAgo = stats[stats.length - 1];
+
+          // Calculate growth percentages
+          const calc7Day = sevenDaysAgo ? ((latest.subscribers - sevenDaysAgo.subscribers) / sevenDaysAgo.subscribers * 100) : 0;
+          const calc30Day = thirtyDaysAgo ? ((latest.subscribers - thirtyDaysAgo.subscribers) / thirtyDaysAgo.subscribers * 100) : 0;
+
+          // Calculate estimated daily views for YouTube (for earnings)
+          let dailyViews = 0;
+          if (creator.platform === 'youtube' && creator.totalViews && creator.totalPosts > 0) {
+            dailyViews = Math.round(creator.totalViews / (creator.totalPosts * 30));
+          }
+
+          growth[creator.platformId] = {
+            growth7Day: calc7Day,
+            growth30Day: calc30Day,
+            dailyViews: dailyViews,
+          };
+        } catch (err) {
+          logger.warn(`Failed to fetch growth data for ${creator.username}:`, err);
+        }
+      }
+
+      setGrowthData(growth);
+      setLoadingGrowth(false);
+    };
+
+    fetchGrowthData();
+  }, [creators]);
+
   const filledCreators = creators.filter(Boolean);
+
+  // Helper: Format growth percentage
+  const formatGrowth = (percentage) => {
+    if (!percentage || isNaN(percentage)) return '—';
+    const sign = percentage > 0 ? '+' : '';
+    return `${sign}${percentage.toFixed(1)}%`;
+  };
+
+  // Helper: Get growth icon
+  const getGrowthIcon = (percentage) => {
+    if (!percentage || isNaN(percentage)) return Minus;
+    return percentage > 0 ? TrendingUp : TrendingDown;
+  };
+
+  // Helper: Get growth color
+  const getGrowthColor = (percentage) => {
+    if (!percentage || isNaN(percentage)) return 'text-gray-400';
+    return percentage > 0 ? 'text-emerald-600' : 'text-red-500';
+  };
+
+  // Helper: Format earnings estimate (YouTube only)
+  const formatEarnings = (dailyViews) => {
+    if (!dailyViews || dailyViews === 0) return '—';
+    const monthlyLow = (dailyViews / 1000) * 0.25 * 30;
+    const monthlyHigh = (dailyViews / 1000) * 4.00 * 30;
+
+    const formatCurrency = (amount) => {
+      if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
+      if (amount >= 1000) return `$${(amount / 1000).toFixed(1)}K`;
+      return `$${amount.toFixed(0)}`;
+    };
+
+    return `${formatCurrency(monthlyLow)} - ${formatCurrency(monthlyHigh)}`;
+  };
 
   return (
     <>
@@ -286,6 +372,49 @@ export default function Compare() {
                         highlight={filledCreators.every(c => c.platform !== 'twitch') ?
                           getWinner(filledCreators.map(c => c.totalPosts > 0 ? c.totalViews / c.totalPosts : 0)) : null}
                       />
+                      {/* Growth Rates */}
+                      <ComparisonRow
+                        label="7-Day Growth"
+                        values={filledCreators.map(c => {
+                          const data = growthData[c.platformId];
+                          const percentage = data?.growth7Day || 0;
+                          const GrowthIcon = getGrowthIcon(percentage);
+                          return (
+                            <span className={`inline-flex items-center gap-1 ${getGrowthColor(percentage)}`}>
+                              <GrowthIcon className="w-4 h-4" />
+                              {formatGrowth(percentage)}
+                            </span>
+                          );
+                        })}
+                        highlight={getWinner(filledCreators.map(c => growthData[c.platformId]?.growth7Day || 0))}
+                      />
+                      <ComparisonRow
+                        label="30-Day Growth"
+                        values={filledCreators.map(c => {
+                          const data = growthData[c.platformId];
+                          const percentage = data?.growth30Day || 0;
+                          const GrowthIcon = getGrowthIcon(percentage);
+                          return (
+                            <span className={`inline-flex items-center gap-1 ${getGrowthColor(percentage)}`}>
+                              <GrowthIcon className="w-4 h-4" />
+                              {formatGrowth(percentage)}
+                            </span>
+                          );
+                        })}
+                        highlight={getWinner(filledCreators.map(c => growthData[c.platformId]?.growth30Day || 0))}
+                      />
+                      {/* Earnings Estimate (YouTube only) */}
+                      {filledCreators.some(c => c.platform === 'youtube') && (
+                        <ComparisonRow
+                          label="Est. Monthly Earnings"
+                          icon={DollarSign}
+                          values={filledCreators.map(c => {
+                            if (c.platform !== 'youtube') return '—';
+                            const data = growthData[c.platformId];
+                            return formatEarnings(data?.dailyViews || 0);
+                          })}
+                        />
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -339,6 +468,30 @@ export default function Compare() {
                   formatValue={(v) => formatNumber(Math.round(v))}
                   hideIfEmpty
                 />
+                <MobileComparisonCard
+                  label="7-Day Growth"
+                  icon={TrendingUp}
+                  creators={filledCreators}
+                  getValue={(c) => growthData[c.platformId]?.growth7Day || 0}
+                  formatValue={(v) => formatGrowth(v)}
+                />
+                <MobileComparisonCard
+                  label="30-Day Growth"
+                  icon={TrendingUp}
+                  creators={filledCreators}
+                  getValue={(c) => growthData[c.platformId]?.growth30Day || 0}
+                  formatValue={(v) => formatGrowth(v)}
+                />
+                {filledCreators.some(c => c.platform === 'youtube') && (
+                  <MobileComparisonCard
+                    label="Est. Monthly Earnings"
+                    icon={DollarSign}
+                    creators={filledCreators.filter(c => c.platform === 'youtube')}
+                    getValue={(c) => growthData[c.platformId]?.dailyViews || 0}
+                    formatValue={(v) => formatEarnings(v)}
+                    hideIfEmpty
+                  />
+                )}
 
                 {/* View Full Profiles - Mobile */}
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">

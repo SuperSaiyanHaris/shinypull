@@ -323,10 +323,22 @@ export default function CreatorProfile() {
     const last14Subs = last14Days.length > 1 ? (latest.subscribers || latest.followers) - (last14First.subscribers || last14First.followers) : 0;
     const last14Views = last14Days.length > 1 ? latest.total_views - last14First.total_views : 0;
 
+    // Calculate 7-day and 30-day growth percentages
+    const last7Days = sortedStats.slice(0, Math.min(7, sortedStats.length));
+    const last7First = last7Days[last7Days.length - 1];
+    const growth7DayPercent = last7Days.length > 1 && last7First.subscribers
+      ? ((latest.subscribers || latest.followers) - (last7First.subscribers || last7First.followers)) / (last7First.subscribers || last7First.followers) * 100
+      : 0;
+
+    const growth30DayPercent = oldest.subscribers || oldest.followers
+      ? subsGrowth / (oldest.subscribers || oldest.followers) * 100
+      : 0;
+
     return {
       dailyStats: dailyStats.slice(0, 14),
       last30Days: { subs: subsGrowth, views: viewsGrowth, videos: videosGrowth, hoursWatched: totalHoursWatched30Days },
       last14Days: { subs: last14Subs, views: last14Views },
+      growthRates: { sevenDay: growth7DayPercent, thirtyDay: growth30DayPercent },
       dailyAverage: { subs: dailyAvgSubs, views: dailyAvgViews, hoursWatched: avgHoursWatchedDay },
       weeklyAverage: { subs: weeklyAvgSubs, views: weeklyAvgViews, hoursWatched: avgHoursWatchedWeek },
     };
@@ -458,8 +470,28 @@ export default function CreatorProfile() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm sm:text-base text-gray-500 mb-3">@{creator.username}</p>
-                  
+                  <p className="text-sm sm:text-base text-gray-500 mb-1">@{creator.username}</p>
+
+                  {/* Data Freshness Indicator */}
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-3">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>
+                      Updated {(() => {
+                        if (!creator.updated_at) return 'recently';
+                        const updated = new Date(creator.updated_at);
+                        const now = new Date();
+                        const diffHours = Math.floor((now - updated) / (1000 * 60 * 60));
+                        if (diffHours < 1) return 'less than an hour ago';
+                        if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                        const diffDays = Math.floor(diffHours / 24);
+                        if (diffDays === 1) return 'yesterday';
+                        return `${diffDays} days ago`;
+                      })()}
+                    </span>
+                    <span className="text-gray-300">•</span>
+                    <span className="text-gray-500">Refreshed daily at 6 AM & 6 PM EST</span>
+                  </div>
+
                   {/* Social Links */}
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <a
@@ -670,6 +702,59 @@ export default function CreatorProfile() {
                 />
               )}
             </div>
+
+            {/* Growth Rate Cards */}
+            {metrics && metrics.growthRates && statsHistory.length >= 7 && (
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200 p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-600">7-Day Growth</span>
+                    {metrics.growthRates.sevenDay > 0 ? (
+                      <TrendingUp className="w-5 h-5 text-emerald-600" />
+                    ) : metrics.growthRates.sevenDay < 0 ? (
+                      <TrendingUp className="w-5 h-5 text-red-500 rotate-180" />
+                    ) : (
+                      <TrendingUp className="w-5 h-5 text-gray-400" />
+                    )}
+                  </div>
+                  <div className={`text-2xl font-bold ${
+                    metrics.growthRates.sevenDay > 0 ? 'text-emerald-600' :
+                    metrics.growthRates.sevenDay < 0 ? 'text-red-500' :
+                    'text-gray-500'
+                  }`}>
+                    {metrics.growthRates.sevenDay > 0 ? '+' : ''}
+                    {metrics.growthRates.sevenDay.toFixed(2)}%
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {platform === 'instagram' || platform === 'tiktok' || platform === 'twitch' || platform === 'kick' ? 'Followers' : 'Subscribers'} growth rate
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-600">30-Day Growth</span>
+                    {metrics.growthRates.thirtyDay > 0 ? (
+                      <TrendingUp className="w-5 h-5 text-blue-600" />
+                    ) : metrics.growthRates.thirtyDay < 0 ? (
+                      <TrendingUp className="w-5 h-5 text-red-500 rotate-180" />
+                    ) : (
+                      <TrendingUp className="w-5 h-5 text-gray-400" />
+                    )}
+                  </div>
+                  <div className={`text-2xl font-bold ${
+                    metrics.growthRates.thirtyDay > 0 ? 'text-blue-600' :
+                    metrics.growthRates.thirtyDay < 0 ? 'text-red-500' :
+                    'text-gray-500'
+                  }`}>
+                    {metrics.growthRates.thirtyDay > 0 ? '+' : ''}
+                    {metrics.growthRates.thirtyDay.toFixed(2)}%
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {platform === 'instagram' || platform === 'tiktok' || platform === 'twitch' || platform === 'kick' ? 'Followers' : 'Subscribers'} growth rate
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Growth Summary */}
             {(creator.subscribers || creator.followers) && (

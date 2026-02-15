@@ -28,6 +28,7 @@ const DEFAULT_RPM_LOW = 0.25;
 const DEFAULT_RPM_HIGH = 4.00;
 
 export default function Calculator() {
+  const [mode, setMode] = useState('creator'); // 'creator' or 'personal'
   const [dailyViews, setDailyViews] = useState(10000);
   const [rpmLow, setRpmLow] = useState(DEFAULT_RPM_LOW);
   const [rpmHigh, setRpmHigh] = useState(DEFAULT_RPM_HIGH);
@@ -88,17 +89,45 @@ export default function Calculator() {
       const estimatedDailyViews = Math.round(creator.totalViews / (creator.totalPosts * 30));
       setDailyViews(Math.max(1000, Math.min(10000000, estimatedDailyViews)));
     }
+
+    // Set RPM based on category/niche (estimated ranges)
+    const category = creator.category?.toLowerCase() || '';
+    if (category.includes('gaming') || category.includes('entertainment')) {
+      setRpmLow(0.25);
+      setRpmHigh(2.00);
+    } else if (category.includes('finance') || category.includes('tech') || category.includes('business')) {
+      setRpmLow(3.00);
+      setRpmHigh(7.00);
+    } else if (category.includes('education') || category.includes('how-to')) {
+      setRpmLow(1.50);
+      setRpmHigh(5.00);
+    } else {
+      // Default/general content
+      setRpmLow(1.00);
+      setRpmHigh(4.00);
+    }
   };
 
   const clearCreator = () => {
     setSelectedCreator(null);
+    setDailyViews(10000);
+    setRpmLow(DEFAULT_RPM_LOW);
+    setRpmHigh(DEFAULT_RPM_HIGH);
+  };
+
+  const switchMode = (newMode) => {
+    setMode(newMode);
+    if (newMode === 'personal') {
+      // Clear creator when switching to personal mode
+      clearCreator();
+    }
   };
 
   return (
     <>
       <SEO
-        title="YouTube Money Calculator - Estimate YouTuber Earnings"
-        description="Estimate YouTube earnings based on daily views and RPM. Calculate how much YouTubers make from ad revenue. Free YouTube income calculator with 16 currencies."
+        title="YouTube Money Calculator - Estimate Creator Earnings & Project Your Own"
+        description="Estimate YouTube creator earnings from real data or project your own potential income. Calculate how much YouTubers make from ad revenue. Free YouTube income calculator with 16 currencies."
         keywords="youtube money calculator, youtube earnings calculator, how much do youtubers make, youtube income estimator, youtube revenue calculator, youtuber salary, youtube ad revenue, RPM calculator"
       />
 
@@ -116,9 +145,37 @@ export default function Calculator() {
                 <CalcIcon className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-400" />
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">YouTube Money Calculator</h1>
               </div>
-              <p className="text-base sm:text-lg text-slate-400">
-                Estimate earnings based on views and RPM
+              <p className="text-base sm:text-lg text-slate-400 mb-6">
+                {mode === 'creator'
+                  ? 'Estimate a creator\'s earnings based on real data'
+                  : 'Project your own potential earnings'}
               </p>
+
+              {/* Mode Toggle */}
+              <div className="inline-flex items-center gap-2 p-1 bg-slate-800/50 border border-slate-700 rounded-xl backdrop-blur-sm">
+                <button
+                  onClick={() => switchMode('creator')}
+                  className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all ${
+                    mode === 'creator'
+                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span className="hidden sm:inline">Estimate a Creator</span>
+                  <span className="sm:hidden">Creator</span>
+                </button>
+                <button
+                  onClick={() => switchMode('personal')}
+                  className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all ${
+                    mode === 'personal'
+                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span className="hidden sm:inline">Project My Earnings</span>
+                  <span className="sm:hidden">Personal</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -127,13 +184,14 @@ export default function Calculator() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Input Section */}
             <div className="space-y-6">
-              {/* Creator Search (Optional) */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Import YouTube Creator (Optional)
-                </label>
+              {/* Creator Search - Only in Creator Mode */}
+              {mode === 'creator' && (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Select YouTube Creator {selectedCreator && <span className="text-emerald-600 text-xs">(Data auto-populated)</span>}
+                  </label>
 
-                {selectedCreator ? (
+                  {selectedCreator ? (
                   <div className="flex items-center gap-3 p-3 bg-red-50 border border-red-100 rounded-xl">
                     <img
                       src={selectedCreator.profileImage}
@@ -193,18 +251,25 @@ export default function Calculator() {
                     )}
                   </div>
                 )}
-              </div>
+                </div>
+              )}
 
               {/* Daily Views */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Daily Views
+                  {mode === 'creator' && selectedCreator && (
+                    <span className="ml-2 text-xs text-emerald-600">(Estimated from channel data)</span>
+                  )}
                 </label>
                 <input
                   type="number"
                   value={dailyViews}
                   onChange={(e) => setDailyViews(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-semibold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent mb-3"
+                  disabled={mode === 'creator' && selectedCreator}
+                  className={`w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 font-semibold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent mb-3 ${
+                    mode === 'creator' && selectedCreator ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-50'
+                  }`}
                 />
                 <input
                   type="range"
@@ -226,6 +291,9 @@ export default function Calculator() {
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Estimated RPM (Revenue per 1000 views)
+                  {mode === 'creator' && selectedCreator && (
+                    <span className="ml-2 text-xs text-emerald-600">(Based on category)</span>
+                  )}
                 </label>
                 <div className="grid grid-cols-2 gap-4 mb-3">
                   <div>
@@ -235,7 +303,10 @@ export default function Calculator() {
                       step="0.01"
                       value={rpmLow}
                       onChange={(e) => setRpmLow(Math.max(0, parseFloat(e.target.value) || 0))}
-                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      disabled={mode === 'creator' && selectedCreator}
+                      className={`w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                        mode === 'creator' && selectedCreator ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-50'
+                      }`}
                     />
                   </div>
                   <div>
@@ -245,14 +316,19 @@ export default function Calculator() {
                       step="0.01"
                       value={rpmHigh}
                       onChange={(e) => setRpmHigh(Math.max(rpmLow, parseFloat(e.target.value) || 0))}
-                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      disabled={mode === 'creator' && selectedCreator}
+                      className={`w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                        mode === 'creator' && selectedCreator ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-50'
+                      }`}
                     />
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl">
                   <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-amber-700">
-                    RPM varies by niche, country, and ad engagement. The default range ($0.25 - $4.00) covers most creators. Gaming/entertainment tend to be lower, finance/tech higher.
+                    {mode === 'creator' && selectedCreator
+                      ? 'RPM estimated based on content category. Actual earnings vary by audience location and ad engagement.'
+                      : 'RPM varies by niche, country, and ad engagement. The default range ($0.25 - $4.00) covers most creators. Gaming/entertainment tend to be lower, finance/tech higher.'}
                   </p>
                 </div>
               </div>
@@ -278,6 +354,22 @@ export default function Calculator() {
 
             {/* Results Section */}
             <div className="space-y-4">
+              {/* Creator Mode Helper */}
+              {mode === 'creator' && !selectedCreator && (
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6">
+                  <div className="flex items-start gap-3">
+                    <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-blue-900 mb-1">Search for a Creator</h4>
+                      <p className="text-sm text-blue-700">
+                        Select a YouTube creator to see earnings estimates based on their real channel data.
+                        We'll auto-populate daily views and RPM ranges based on their category and performance.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-emerald-500" />
@@ -323,10 +415,22 @@ export default function Calculator() {
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>RPM (Revenue Per Mille) varies based on content type, audience location, and ad rates</span>
                   </li>
+                  {mode === 'creator' && (
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-500 mt-1">•</span>
+                      <span>Daily views estimated from channel's total views divided by video count and average video lifespan</span>
+                    </li>
+                  )}
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>These are estimates only. Actual earnings depend on many factors including watch time and ad engagement</span>
                   </li>
+                  {mode === 'personal' && (
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-500 mt-1">•</span>
+                      <span className="font-medium">Adjust daily views and RPM to match your niche and expected performance</span>
+                    </li>
+                  )}
                 </ul>
               </div>
 
