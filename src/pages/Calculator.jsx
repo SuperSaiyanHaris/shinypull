@@ -148,7 +148,7 @@ export default function Calculator() {
               <p className="text-base sm:text-lg text-slate-400 mb-6">
                 {mode === 'creator'
                   ? 'Estimate a creator\'s earnings based on real data'
-                  : 'Project your own potential earnings'}
+                  : 'Estimate your own potential earnings'}
               </p>
 
               {/* Mode Toggle */}
@@ -172,7 +172,7 @@ export default function Calculator() {
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  <span className="hidden sm:inline">Project My Earnings</span>
+                  <span className="hidden sm:inline">Estimate My Earnings</span>
                   <span className="sm:hidden">Personal</span>
                 </button>
               </div>
@@ -184,7 +184,7 @@ export default function Calculator() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Creator Mode Helper - Shows at top on mobile, in right column on desktop */}
             {mode === 'creator' && !selectedCreator && (
-              <div className="order-1 lg:col-start-2 lg:row-start-1">
+              <div className="order-1 lg:col-start-2">
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6">
                   <div className="flex items-start gap-3">
                     <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -201,7 +201,7 @@ export default function Calculator() {
             )}
 
             {/* Input Section */}
-            <div className="space-y-6 order-2 lg:col-start-1 lg:row-start-1">
+            <div className="space-y-6 order-2 lg:col-start-1">
               {/* Creator Search - Only in Creator Mode */}
               {mode === 'creator' && (
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
