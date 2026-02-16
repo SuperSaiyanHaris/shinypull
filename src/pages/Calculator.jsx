@@ -371,7 +371,7 @@ export default function Calculator() {
             </div>
 
             {/* Results Section */}
-            <div className="space-y-4 order-3 lg:col-start-2 lg:row-start-2">
+            <div className="space-y-4 order-3 lg:col-start-2">
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-emerald-500" />
