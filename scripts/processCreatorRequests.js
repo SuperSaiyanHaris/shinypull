@@ -224,18 +224,18 @@ async function processRequest(request) {
     const isScrapeBlocked = error.message.includes('No og:description') || error.message.includes('No __UNIVERSAL_DATA');
     console.error(`[${request.username}] ❌ Error:`, error.message);
 
-    if (isRateLimit || isScrapeBlocked) {
-      // Rate limited or platform blocking us — revert to pending for next run
+    // If rate limited, revert to pending immediately (no AI resolution needed)
+    if (isRateLimit) {
       await supabase
         .from('creator_requests')
         .update({ status: 'pending' })
         .eq('id', request.id);
-      const reason = isRateLimit ? 'rate limited' : 'scrape blocked (no meta tags)';
-      console.log(`[${request.username}] ↩️  Reverted to pending (${reason}, will retry next run)`);
-      return { success: false, username: request.username, error: error.message, rateLimited: isRateLimit, scrapeBlocked: isScrapeBlocked };
+      console.log(`[${request.username}] ↩️  Reverted to pending (rate limited, will retry next run)`);
+      return { success: false, username: request.username, error: error.message, rateLimited: true, scrapeBlocked: false };
     }
 
     // --- AI Fallback: try to resolve the correct handle ---
+    // This runs for scrape blocks (wrong username?) and other errors
     const aiHandle = await resolveHandleWithAI(request.username, request.platform);
 
     if (aiHandle) {
@@ -309,13 +309,29 @@ async function processRequest(request) {
         return { success: true, username: aiHandle };
       } catch (aiRetryError) {
         console.error(`[${request.username}] 🤖 AI-resolved handle @${aiHandle} also failed:`, aiRetryError.message);
+        // Check if AI retry also hit scrape block
+        const aiRetryScrapeBlocked = aiRetryError.message.includes('No og:description') || aiRetryError.message.includes('No __UNIVERSAL_DATA');
+        if (aiRetryScrapeBlocked) {
+          // Both original and AI-resolved handle failed with scrape block — likely IP block, revert to pending
+          await supabase.from('creator_requests').update({ status: 'pending' }).eq('id', request.id);
+          console.log(`[${request.username}] ↩️  Reverted to pending (AI retry also blocked, likely IP block)`);
+          return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: true };
+        }
       }
     }
 
-    // All attempts exhausted — delete the request (no valid profile found)
-    await supabase.from('creator_requests').delete().eq('id', request.id);
-    console.log(`[${request.username}] 🗑️  Request deleted (no valid profile found after all attempts)`);
-    return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: false };
+    // All attempts exhausted
+    if (isScrapeBlocked && !aiHandle) {
+      // Scrape blocked and AI couldn't help — likely IP block, revert to pending
+      await supabase.from('creator_requests').update({ status: 'pending' }).eq('id', request.id);
+      console.log(`[${request.username}] ↩️  Reverted to pending (scrape blocked, will retry next run)`);
+      return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: true };
+    } else {
+      // Not a scrape block or AI tried and failed for other reasons — delete request (invalid username)
+      await supabase.from('creator_requests').delete().eq('id', request.id);
+      console.log(`[${request.username}] 🗑️  Request deleted (no valid profile found after all attempts)`);
+      return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: false };
+    }
   }
 }
 
