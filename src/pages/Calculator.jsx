@@ -182,9 +182,9 @@ export default function Calculator() {
 
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Creator Mode Helper - Shows at top on mobile, in right column on desktop */}
+            {/* Creator Mode Helper - Shows at top on both mobile and desktop */}
             {mode === 'creator' && !selectedCreator && (
-              <div className="order-1 lg:col-start-2">
+              <div className="order-1 lg:col-span-2">
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6">
                   <div className="flex items-start gap-3">
                     <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
