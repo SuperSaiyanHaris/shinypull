@@ -322,12 +322,13 @@ async function processRequest(request) {
 
     // All attempts exhausted
     if (isScrapeBlocked && !aiHandle) {
-      // Scrape blocked and AI couldn't help — likely IP block, revert to pending
-      await supabase.from('creator_requests').update({ status: 'pending' }).eq('id', request.id);
-      console.log(`[${request.username}] ↩️  Reverted to pending (scrape blocked, will retry next run)`);
+      // Scrape blocked and AI couldn't help (no AI key, or AI returned null/same username)
+      // This is likely an invalid username, not an IP block - delete it
+      await supabase.from('creator_requests').delete().eq('id', request.id);
+      console.log(`[${request.username}] 🗑️  Request deleted (AI could not resolve handle, likely invalid username)`);
       return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: true };
     } else {
-      // Not a scrape block or AI tried and failed for other reasons — delete request (invalid username)
+      // Not a scrape block or AI tried and failed for other reasons — delete request
       await supabase.from('creator_requests').delete().eq('id', request.id);
       console.log(`[${request.username}] 🗑️  Request deleted (no valid profile found after all attempts)`);
       return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: false };
