@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, ChevronRight, Loader2, BookOpen, Filter, X, Tag } from 'lucide-react';
+import { Calendar, Clock, ChevronRight, Loader2, BookOpen, Filter, X, Tag, Check } from 'lucide-react';
 import SEO from '../components/SEO';
 import { getAllPosts, getAllCategories } from '../services/blogService';
 
 export default function Blog() {
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategories, setSelectedCategories] = useState(['all']);
   const [loading, setLoading] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -24,10 +24,32 @@ export default function Blog() {
     fetchData();
   }, []);
 
-  // Filter posts by selected category
-  const filteredPosts = selectedCategory === 'all' 
-    ? posts 
-    : posts.filter(post => post.category === selectedCategory);
+  // Toggle category selection
+  const toggleCategory = (category) => {
+    if (category === 'all') {
+      // If "All" is clicked, clear all other selections
+      setSelectedCategories(['all']);
+    } else {
+      setSelectedCategories(prev => {
+        // Remove "all" if it's currently selected
+        const withoutAll = prev.filter(c => c !== 'all');
+
+        // Toggle the clicked category
+        if (prev.includes(category)) {
+          const updated = withoutAll.filter(c => c !== category);
+          // If no categories left, default to "all"
+          return updated.length === 0 ? ['all'] : updated;
+        } else {
+          return [...withoutAll, category];
+        }
+      });
+    }
+  };
+
+  // Filter posts by selected categories (OR logic - match ANY selected category)
+  const filteredPosts = selectedCategories.includes('all')
+    ? posts
+    : posts.filter(post => selectedCategories.includes(post.category));
 
   // Count posts per category
   const categoryCounts = {};
@@ -51,24 +73,30 @@ export default function Blog() {
       <button
         onClick={() => onSelect('all')}
         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-          selectedCategory === 'all'
+          selectedCategories.includes('all')
             ? 'bg-indigo-600 text-white shadow-md'
             : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
         }`}
       >
         <div className="flex items-center gap-3">
-          <BookOpen className="w-5 h-5" />
+          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+            selectedCategories.includes('all')
+              ? 'bg-white border-white'
+              : 'border-gray-300'
+          }`}>
+            {selectedCategories.includes('all') && <Check className="w-3 h-3 text-indigo-600" />}
+          </div>
           <span>All Posts</span>
         </div>
         <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-          selectedCategory === 'all' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+          selectedCategories.includes('all') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
         }`}>
           {posts.length}
         </span>
       </button>
       {categories.map(category => {
         const count = categoryCounts[category] || 0;
-        const isActive = selectedCategory === category;
+        const isActive = selectedCategories.includes(category);
 
         return (
           <button
@@ -81,7 +109,13 @@ export default function Blog() {
             }`}
           >
             <div className="flex items-center gap-3">
-              <Tag className="w-5 h-5" />
+              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                isActive
+                  ? 'bg-white border-white'
+                  : 'border-gray-300'
+              }`}>
+                {isActive && <Check className="w-3 h-3 text-indigo-600" />}
+              </div>
               <span>{category}</span>
             </div>
             <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
@@ -133,7 +167,7 @@ export default function Blog() {
                   <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">
                     Categories
                   </h3>
-                  {renderCategoryButtons((cat) => setSelectedCategory(cat))}
+                  {renderCategoryButtons(toggleCategory)}
                 </div>
               </aside>
 
@@ -171,8 +205,7 @@ export default function Blog() {
                       </div>
 
                       {renderCategoryButtons((cat) => {
-                        setSelectedCategory(cat);
-                        setMobileFiltersOpen(false);
+                        toggleCategory(cat);
                       })}
                     </div>
                   </div>

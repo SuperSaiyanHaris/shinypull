@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft, Check, X } from 'lucide-react';
+import { Youtube, Twitch, Instagram, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft, Check, X, Filter } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import SEO from '../components/SEO';
@@ -34,12 +34,13 @@ export default function Dashboard() {
   const [followedCreators, setFollowedCreators] = useState([]);
   const [creatorStats, setCreatorStats] = useState({});
   const [loading, setLoading] = useState(true);
-  const [platformFilter, setPlatformFilter] = useState(null);
+  const [selectedPlatforms, setSelectedPlatforms] = useState(['all']);
   const [liveStreamers, setLiveStreamers] = useState(new Set());
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const [recentlyViewedIndex, setRecentlyViewedIndex] = useState(0);
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState([]);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -105,6 +106,28 @@ export default function Dashboard() {
     }
   }
 
+  // Toggle platform selection
+  const togglePlatform = (platform) => {
+    if (platform === 'all') {
+      // If "All" is clicked, clear all other selections
+      setSelectedPlatforms(['all']);
+    } else {
+      setSelectedPlatforms(prev => {
+        // Remove "all" if it's currently selected
+        const withoutAll = prev.filter(p => p !== 'all');
+
+        // Toggle the clicked platform
+        if (prev.includes(platform)) {
+          const updated = withoutAll.filter(p => p !== platform);
+          // If no platforms left, default to "all"
+          return updated.length === 0 ? ['all'] : updated;
+        } else {
+          return [...withoutAll, platform];
+        }
+      });
+    }
+  };
+
   // Calculate growth (difference between current and previous stats)
   const getGrowth = (creatorId, field) => {
     const stat = creatorStats[creatorId];
@@ -128,12 +151,25 @@ export default function Dashboard() {
 
   const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User';
   const liveCount = followedCreators.filter(c => (c.platform === 'twitch' || c.platform === 'kick') && liveStreamers.has(c.username.toLowerCase())).length;
-  const filteredCreators = followedCreators.filter(c => {
-    if (platformFilter === 'live') {
-      return (c.platform === 'twitch' || c.platform === 'kick') && liveStreamers.has(c.username.toLowerCase());
-    }
-    return !platformFilter || c.platform === platformFilter;
-  });
+
+  // Platform counts
+  const platformCounts = {
+    youtube: followedCreators.filter(c => c.platform === 'youtube').length,
+    instagram: followedCreators.filter(c => c.platform === 'instagram').length,
+    tiktok: followedCreators.filter(c => c.platform === 'tiktok').length,
+    twitch: followedCreators.filter(c => c.platform === 'twitch').length,
+    kick: followedCreators.filter(c => c.platform === 'kick').length,
+  };
+
+  // Filter creators by selected platforms (OR logic - match ANY selected platform)
+  const filteredCreators = selectedPlatforms.includes('all')
+    ? followedCreators
+    : followedCreators.filter(c => {
+        if (selectedPlatforms.includes('live')) {
+          return (c.platform === 'twitch' || c.platform === 'kick') && liveStreamers.has(c.username.toLowerCase());
+        }
+        return selectedPlatforms.includes(c.platform);
+      });
 
   return (
     <>
@@ -155,72 +191,243 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          {/* Stats Summary */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-            <button
-              onClick={() => setPlatformFilter(null)}
-              className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
-                platformFilter === null ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 sm:p-3 bg-indigo-100 rounded-lg">
-                  <Star className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{followedCreators.length}</p>
-                  <p className="text-xs sm:text-sm text-gray-500">Following</p>
-                </div>
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex gap-8">
+            {/* Desktop Sidebar */}
+            <aside className="hidden lg:block w-64 flex-shrink-0">
+              <div className="sticky top-24">
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">
+                  Platforms
+                </h3>
+                <nav className="space-y-1">
+                  {/* All Following */}
+                  <button
+                    onClick={() => togglePlatform('all')}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      selectedPlatforms.includes('all')
+                        ? 'bg-indigo-600 text-white shadow-md'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                        selectedPlatforms.includes('all')
+                          ? 'bg-white border-white'
+                          : 'border-gray-300'
+                      }`}>
+                        {selectedPlatforms.includes('all') && <Check className="w-3 h-3 text-indigo-600" />}
+                      </div>
+                      <span>All Following</span>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                      selectedPlatforms.includes('all') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {followedCreators.length}
+                    </span>
+                  </button>
+
+                  {/* Platform Filters */}
+                  {['youtube', 'instagram', 'tiktok', 'twitch', 'kick'].map(platform => {
+                    const Icon = platformIcons[platform];
+                    const count = platformCounts[platform];
+                    const label = platform === 'youtube' ? 'YouTube' : platform === 'instagram' ? 'Instagram' : platform === 'tiktok' ? 'TikTok' : platform === 'twitch' ? 'Twitch' : 'Kick';
+                    const isActive = selectedPlatforms.includes(platform);
+
+                    return (
+                      <button
+                        key={platform}
+                        onClick={() => togglePlatform(platform)}
+                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                          isActive
+                            ? 'bg-indigo-600 text-white shadow-md'
+                            : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                            isActive
+                              ? 'bg-white border-white'
+                              : 'border-gray-300'
+                          }`}>
+                            {isActive && <Check className="w-3 h-3 text-indigo-600" />}
+                          </div>
+                          <span>{label}</span>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                          isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+
+                  {/* Live Now Filter */}
+                  <button
+                    onClick={() => togglePlatform('live')}
+                    disabled={liveCount === 0}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      selectedPlatforms.includes('live')
+                        ? 'bg-indigo-600 text-white shadow-md'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                    } ${liveCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center relative ${
+                        selectedPlatforms.includes('live')
+                          ? 'bg-white border-white'
+                          : 'border-gray-300'
+                      }`}>
+                        {selectedPlatforms.includes('live') && <Check className="w-3 h-3 text-indigo-600" />}
+                        {liveCount > 0 && !selectedPlatforms.includes('live') && (
+                          <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                        )}
+                      </div>
+                      <span>Live Now</span>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                      selectedPlatforms.includes('live') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {liveCount}
+                    </span>
+                  </button>
+                </nav>
               </div>
-            </button>
-            {['youtube', 'instagram', 'tiktok', 'twitch', 'kick'].map(platform => {
-              const Icon = platformIcons[platform];
-              const colors = platformColors[platform];
-              const count = followedCreators.filter(c => c.platform === platform).length;
-              const label = platform === 'youtube' ? 'YouTube' : platform === 'instagram' ? 'Instagram' : platform === 'tiktok' ? 'TikTok' : platform === 'twitch' ? 'Twitch' : 'Kick';
-              return (
-                <button
-                  key={platform}
-                  onClick={() => setPlatformFilter(platformFilter === platform ? null : platform)}
-                  className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
-                    platformFilter === platform ? `${colors.border} ring-2 ${colors.ring}` : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 sm:p-3 ${colors.bgLight} rounded-lg`}>
-                      <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${colors.text}`} />
+            </aside>
+
+            {/* Mobile Filter Button */}
+            <div className="lg:hidden fixed bottom-6 left-6 z-40">
+              <button
+                onClick={() => setMobileFiltersOpen(true)}
+                className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full shadow-lg transition-colors"
+              >
+                <Filter className="w-5 h-5" />
+                Filters
+              </button>
+            </div>
+
+            {/* Mobile Slide Panel */}
+            {mobileFiltersOpen && (
+              <>
+                {/* Backdrop */}
+                <div
+                  className="lg:hidden fixed inset-0 bg-black/50 z-50 animate-fade-in"
+                  onClick={() => setMobileFiltersOpen(false)}
+                />
+
+                {/* Slide Panel */}
+                <div className="lg:hidden fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl animate-slide-in-left overflow-y-auto">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-bold text-gray-900">Filter by Platform</h3>
+                      <button
+                        onClick={() => setMobileFiltersOpen(false)}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <X className="w-5 h-5 text-gray-500" />
+                      </button>
                     </div>
-                    <div>
-                      <p className="text-xl sm:text-2xl font-bold text-gray-900">{count}</p>
-                      <p className="text-xs sm:text-sm text-gray-500">{label}</p>
-                    </div>
+
+                    <nav className="space-y-1">
+                      {/* All Following */}
+                      <button
+                        onClick={() => togglePlatform('all')}
+                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                          selectedPlatforms.includes('all')
+                            ? 'bg-indigo-600 text-white shadow-md'
+                            : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                            selectedPlatforms.includes('all')
+                              ? 'bg-white border-white'
+                              : 'border-gray-300'
+                          }`}>
+                            {selectedPlatforms.includes('all') && <Check className="w-3 h-3 text-indigo-600" />}
+                          </div>
+                          <span>All Following</span>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                          selectedPlatforms.includes('all') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          {followedCreators.length}
+                        </span>
+                      </button>
+
+                      {/* Platform Filters */}
+                      {['youtube', 'instagram', 'tiktok', 'twitch', 'kick'].map(platform => {
+                        const Icon = platformIcons[platform];
+                        const count = platformCounts[platform];
+                        const label = platform === 'youtube' ? 'YouTube' : platform === 'instagram' ? 'Instagram' : platform === 'tiktok' ? 'TikTok' : platform === 'twitch' ? 'Twitch' : 'Kick';
+                        const isActive = selectedPlatforms.includes(platform);
+
+                        return (
+                          <button
+                            key={platform}
+                            onClick={() => togglePlatform(platform)}
+                            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                              isActive
+                                ? 'bg-indigo-600 text-white shadow-md'
+                                : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                                isActive
+                                  ? 'bg-white border-white'
+                                  : 'border-gray-300'
+                              }`}>
+                                {isActive && <Check className="w-3 h-3 text-indigo-600" />}
+                              </div>
+                              <span>{label}</span>
+                            </div>
+                            <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                              isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                            }`}>
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+
+                      {/* Live Now Filter */}
+                      <button
+                        onClick={() => togglePlatform('live')}
+                        disabled={liveCount === 0}
+                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                          selectedPlatforms.includes('live')
+                            ? 'bg-indigo-600 text-white shadow-md'
+                            : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                        } ${liveCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center relative ${
+                            selectedPlatforms.includes('live')
+                              ? 'bg-white border-white'
+                              : 'border-gray-300'
+                          }`}>
+                            {selectedPlatforms.includes('live') && <Check className="w-3 h-3 text-indigo-600" />}
+                            {liveCount > 0 && !selectedPlatforms.includes('live') && (
+                              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                            )}
+                          </div>
+                          <span>Live Now</span>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                          selectedPlatforms.includes('live') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          {liveCount}
+                        </span>
+                      </button>
+                    </nav>
                   </div>
-                </button>
-              );
-            })}
-            {/* Live Now Card */}
-            <button
-              onClick={() => setPlatformFilter(platformFilter === 'live' ? null : 'live')}
-              disabled={liveCount === 0}
-              className={`bg-white rounded-xl border p-4 sm:p-6 text-left transition-all ${
-                platformFilter === 'live' ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200 hover:border-gray-300'
-              } ${liveCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 sm:p-3 bg-red-100 rounded-lg relative">
-                  <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-                  {liveCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-                  )}
                 </div>
-                <div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{liveCount}</p>
-                  <p className="text-xs sm:text-sm text-gray-500">Live Now</p>
-                </div>
-              </div>
-            </button>
-          </div>
+              </>
+            )}
+
+            {/* Main Content */}
+            <div className="flex-1 min-w-0">
 
           {/* Quick Actions */}
           {followedCreators.length >= 2 && (
@@ -275,16 +482,19 @@ export default function Dashboard() {
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                {platformFilter === 'live' ? <Radio className="w-5 h-5 text-red-500" /> : <Star className="w-5 h-5 text-yellow-500" />}
-                {platformFilter === 'live' ? 'Live Now' :
-                 platformFilter === 'youtube' ? 'YouTube Creators' :
-                 platformFilter === 'instagram' ? 'Instagram Creators' :
-                 platformFilter === 'tiktok' ? 'TikTok Creators' :
-                 platformFilter === 'twitch' ? 'Twitch Streamers' :
-                 platformFilter === 'kick' ? 'Kick Streamers' :
-                 'Creators You Follow'}
+                <Star className="w-5 h-5 text-yellow-500" />
+                {selectedPlatforms.includes('all') ? 'Creators You Follow' :
+                 selectedPlatforms.includes('live') ? 'Live Now' :
+                 selectedPlatforms.length === 1 ? (
+                   selectedPlatforms[0] === 'youtube' ? 'YouTube Creators' :
+                   selectedPlatforms[0] === 'instagram' ? 'Instagram Creators' :
+                   selectedPlatforms[0] === 'tiktok' ? 'TikTok Creators' :
+                   selectedPlatforms[0] === 'twitch' ? 'Twitch Streamers' :
+                   selectedPlatforms[0] === 'kick' ? 'Kick Streamers' :
+                   'Creators You Follow'
+                 ) : 'Selected Creators'}
               </h2>
-              {liveCount > 0 && !platformFilter && (
+              {liveCount > 0 && selectedPlatforms.includes('all') && (
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1">
                   <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                   {liveCount} live
@@ -298,21 +508,16 @@ export default function Dashboard() {
               </div>
             ) : filteredCreators.length === 0 ? (
               <div className="text-center p-12">
-                {platformFilter === 'live' ? (
-                  <Radio className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                ) : (
-                  <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                )}
+                <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {platformFilter === 'live' ? 'No one is live right now' :
-                   platformFilter ? `No ${platformFilter === 'youtube' ? 'YouTube' : platformFilter === 'instagram' ? 'Instagram' : platformFilter === 'tiktok' ? 'TikTok' : platformFilter === 'twitch' ? 'Twitch' : 'Kick'} creators followed yet` : 'No creators followed yet'}
+                  {selectedPlatforms.includes('live') ? 'No one is live right now' : 'No creators found'}
                 </h3>
                 <p className="text-gray-500 mb-6">
-                  {platformFilter === 'live'
+                  {selectedPlatforms.includes('live')
                     ? 'Check back later to see when your followed streamers go live.'
                     : 'Start following creators to track their statistics here.'}
                 </p>
-                {platformFilter !== 'live' && (
+                {!selectedPlatforms.includes('live') && (
                   <Link
                     to="/search"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
@@ -487,6 +692,8 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+            </div>
+          </div>
         </div>
       </div>
     </>

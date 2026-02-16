@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, ShoppingBag, Mic, Camera, Lightbulb, Headphones, Monitor, Package, Filter, X } from 'lucide-react';
+import { ExternalLink, ShoppingBag, Mic, Camera, Lightbulb, Headphones, Monitor, Package, Filter, X, Check } from 'lucide-react';
 import SEO from '../components/SEO';
 import { getActiveProducts } from '../services/productsService';
 
@@ -39,7 +39,7 @@ function categorizeProduct(product) {
 export default function Gear() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedCategories, setSelectedCategories] = useState(['all']);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
@@ -49,9 +49,32 @@ export default function Gear() {
     });
   }, []);
 
-  const filtered = activeCategory === 'all'
+  // Toggle category selection
+  const toggleCategory = (categoryId) => {
+    if (categoryId === 'all') {
+      // If "All" is clicked, clear all other selections
+      setSelectedCategories(['all']);
+    } else {
+      setSelectedCategories(prev => {
+        // Remove "all" if it's currently selected
+        const withoutAll = prev.filter(c => c !== 'all');
+
+        // Toggle the clicked category
+        if (prev.includes(categoryId)) {
+          const updated = withoutAll.filter(c => c !== categoryId);
+          // If no categories left, default to "all"
+          return updated.length === 0 ? ['all'] : updated;
+        } else {
+          return [...withoutAll, categoryId];
+        }
+      });
+    }
+  };
+
+  // Filter products (OR logic - match ANY selected category)
+  const filtered = selectedCategories.includes('all')
     ? products
-    : products.filter(p => categorizeProduct(p) === activeCategory);
+    : products.filter(p => selectedCategories.includes(categorizeProduct(p)));
 
   const categoryCounts = {};
   products.forEach(p => {
@@ -110,12 +133,12 @@ export default function Gear() {
                     {categories.map(cat => {
                       const Icon = cat.icon;
                       const count = cat.id === 'all' ? products.length : (categoryCounts[cat.id] || 0);
-                      const isActive = activeCategory === cat.id;
+                      const isActive = selectedCategories.includes(cat.id);
 
                       return (
                         <button
                           key={cat.id}
-                          onClick={() => setActiveCategory(cat.id)}
+                          onClick={() => toggleCategory(cat.id)}
                           className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                             isActive
                               ? 'bg-indigo-600 text-white shadow-md'
@@ -123,7 +146,13 @@ export default function Gear() {
                           }`}
                         >
                           <div className="flex items-center gap-3">
-                            <Icon className="w-5 h-5" />
+                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                              isActive
+                                ? 'bg-white border-white'
+                                : 'border-gray-300'
+                            }`}>
+                              {isActive && <Check className="w-3 h-3 text-indigo-600" />}
+                            </div>
                             <span>{cat.label}</span>
                           </div>
                           <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
@@ -175,15 +204,12 @@ export default function Gear() {
                         {categories.map(cat => {
                           const Icon = cat.icon;
                           const count = cat.id === 'all' ? products.length : (categoryCounts[cat.id] || 0);
-                          const isActive = activeCategory === cat.id;
+                          const isActive = selectedCategories.includes(cat.id);
 
                           return (
                             <button
                               key={cat.id}
-                              onClick={() => {
-                                setActiveCategory(cat.id);
-                                setMobileFiltersOpen(false);
-                              }}
+                              onClick={() => toggleCategory(cat.id)}
                               className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                                 isActive
                                   ? 'bg-indigo-600 text-white shadow-md'
@@ -191,7 +217,13 @@ export default function Gear() {
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                <Icon className="w-5 h-5" />
+                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                                  isActive
+                                    ? 'bg-white border-white'
+                                    : 'border-gray-300'
+                                }`}>
+                                  {isActive && <Check className="w-3 h-3 text-indigo-600" />}
+                                </div>
                                 <span>{cat.label}</span>
                               </div>
                               <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
