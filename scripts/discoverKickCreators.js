@@ -42,27 +42,49 @@ function getTodayLocal() {
 }
 
 /**
- * Get Kick OAuth token
+ * Get Kick OAuth token with retry logic
  */
-async function getKickAccessToken() {
+async function getKickAccessToken(retryCount = 0) {
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 5000; // 5 seconds
+
   if (kickAccessToken) return kickAccessToken;
 
-  const response = await fetch(KICK_AUTH_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: KICK_CLIENT_ID,
-      client_secret: KICK_CLIENT_SECRET,
-      grant_type: 'client_credentials',
-    }),
-  });
+  try {
+    const response = await fetch(KICK_AUTH_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: KICK_CLIENT_ID,
+        client_secret: KICK_CLIENT_SECRET,
+        grant_type: 'client_credentials',
+      }),
+    });
 
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(`Kick auth failed: ${JSON.stringify(data)}`);
+    const data = await response.json();
+    if (!response.ok) {
+      // Check if it's a temporary database issue from Kick
+      const isTemporaryError = data.error?.includes('read-only transaction') ||
+                               data.error?.includes('SQLSTATE');
+
+      if (isTemporaryError && retryCount < MAX_RETRIES) {
+        console.log(`⚠️  Kick auth temporarily unavailable (attempt ${retryCount + 1}/${MAX_RETRIES}). Retrying in ${RETRY_DELAY/1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        return getKickAccessToken(retryCount + 1);
+      }
+
+      throw new Error(`Kick auth failed: ${JSON.stringify(data)}`);
+    }
+    kickAccessToken = data.access_token;
+    return kickAccessToken;
+  } catch (error) {
+    if (retryCount < MAX_RETRIES) {
+      console.log(`⚠️  Network error during Kick auth (attempt ${retryCount + 1}/${MAX_RETRIES}). Retrying in ${RETRY_DELAY/1000}s...`);
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      return getKickAccessToken(retryCount + 1);
+    }
+    throw error;
   }
-  kickAccessToken = data.access_token;
-  return kickAccessToken;
 }
 
 /**

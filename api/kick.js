@@ -15,7 +15,10 @@ const KICK_AUTH_URL = 'https://id.kick.com/oauth/token';
 let cachedToken = null;
 let tokenExpiry = 0;
 
-async function getAccessToken() {
+async function getAccessToken(retryCount = 0) {
+  const MAX_RETRIES = 2;
+  const RETRY_DELAY = 3000; // 3 seconds
+
   if (cachedToken && Date.now() < tokenExpiry) {
     return cachedToken;
   }
@@ -24,27 +27,47 @@ async function getAccessToken() {
     throw new Error(`Missing Kick credentials: CLIENT_ID=${!!KICK_CLIENT_ID}, SECRET=${!!KICK_CLIENT_SECRET}`);
   }
 
-  const response = await fetch(KICK_AUTH_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: KICK_CLIENT_ID,
-      client_secret: KICK_CLIENT_SECRET,
-      grant_type: 'client_credentials',
-    }),
-  });
+  try {
+    const response = await fetch(KICK_AUTH_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: KICK_CLIENT_ID,
+        client_secret: KICK_CLIENT_SECRET,
+        grant_type: 'client_credentials',
+      }),
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Failed to get Kick access token: ${response.status} - ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+
+      // Check if it's a temporary database issue from Kick
+      const isTemporaryError = errorText.includes('read-only transaction') ||
+                               errorText.includes('SQLSTATE');
+
+      if (isTemporaryError && retryCount < MAX_RETRIES) {
+        console.log(`Kick auth temporarily unavailable. Retrying... (${retryCount + 1}/${MAX_RETRIES})`);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        return getAccessToken(retryCount + 1);
+      }
+
+      throw new Error(`Failed to get Kick access token: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    cachedToken = data.access_token;
+    // Set expiry 5 minutes before actual expiry for safety
+    tokenExpiry = Date.now() + (data.expires_in - 300) * 1000;
+
+    return cachedToken;
+  } catch (error) {
+    if (retryCount < MAX_RETRIES) {
+      console.log(`Network error during Kick auth. Retrying... (${retryCount + 1}/${MAX_RETRIES})`);
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      return getAccessToken(retryCount + 1);
+    }
+    throw error;
   }
-
-  const data = await response.json();
-  cachedToken = data.access_token;
-  // Set expiry 5 minutes before actual expiry for safety
-  tokenExpiry = Date.now() + (data.expires_in - 300) * 1000;
-
-  return cachedToken;
 }
 
 async function kickFetch(endpoint) {
