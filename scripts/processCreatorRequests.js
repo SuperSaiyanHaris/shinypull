@@ -309,30 +309,13 @@ async function processRequest(request) {
         return { success: true, username: aiHandle };
       } catch (aiRetryError) {
         console.error(`[${request.username}] 🤖 AI-resolved handle @${aiHandle} also failed:`, aiRetryError.message);
-        // Check if AI retry also hit scrape block
-        const aiRetryScrapeBlocked = aiRetryError.message.includes('No og:description') || aiRetryError.message.includes('No __UNIVERSAL_DATA');
-        if (aiRetryScrapeBlocked) {
-          // Both original and AI-resolved handle failed with scrape block — likely IP block, revert to pending
-          await supabase.from('creator_requests').update({ status: 'pending' }).eq('id', request.id);
-          console.log(`[${request.username}] ↩️  Reverted to pending (AI retry also blocked, likely IP block)`);
-          return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: true };
-        }
       }
     }
 
-    // All attempts exhausted
-    if (isScrapeBlocked && !aiHandle) {
-      // Scrape blocked and AI couldn't help (no AI key, or AI returned null/same username)
-      // This is likely an invalid username, not an IP block - delete it
-      await supabase.from('creator_requests').delete().eq('id', request.id);
-      console.log(`[${request.username}] 🗑️  Request deleted (AI could not resolve handle, likely invalid username)`);
-      return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: true };
-    } else {
-      // Not a scrape block or AI tried and failed for other reasons — delete request
-      await supabase.from('creator_requests').delete().eq('id', request.id);
-      console.log(`[${request.username}] 🗑️  Request deleted (no valid profile found after all attempts)`);
-      return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: false };
-    }
+    // All attempts exhausted — delete the request (username doesn't exist)
+    await supabase.from('creator_requests').delete().eq('id', request.id);
+    console.log(`[${request.username}] 🗑️  Request deleted (no valid profile found after all attempts)`);
+    return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: false };
   }
 }
 
