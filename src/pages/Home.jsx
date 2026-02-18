@@ -223,8 +223,8 @@ export default function Home() {
                 })}
               </div>
 
-              {/* Desktop: 5-column grid cards */}
-              <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto px-4">
+              {/* Desktop: 4-column bold gradient tiles */}
+              <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto px-4">
                 {platforms.map((platform) => {
                   const Icon = platform.icon;
 
@@ -233,50 +233,30 @@ export default function Home() {
                       <Link
                         key={platform.id}
                         to={`/rankings/${platform.id}`}
-                        className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/20 hover:border-white/20 transition-all duration-300 hover:-translate-y-1"
+                        className={`group flex flex-col items-center gap-3 py-6 rounded-2xl bg-gradient-to-br ${platform.color} shadow-lg shadow-black/20 hover:scale-105 hover:-translate-y-1 active:scale-95 transition-all duration-200`}
                       >
-                        <div className={`w-14 h-14 ${platform.bgColor} rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                          {Icon ? (
-                            <Icon className={`w-7 h-7 ${platform.textColor}`} />
-                          ) : (
-                            <span className={`${platform.textColor} font-bold text-lg`}>{platform.name.slice(0, 2)}</span>
-                          )}
+                        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                          {Icon && <Icon className="w-6 h-6 text-white" />}
                         </div>
-                        <h2 className="text-base font-semibold text-white mb-1 group-hover:text-indigo-300 transition-colors">
-                          {platform.name}
-                        </h2>
-                        <p className="text-sm text-slate-400">{platform.stats}</p>
+                        <div className="text-center">
+                          <h2 className="text-sm font-bold text-white">{platform.name}</h2>
+                          <p className="text-xs text-white/60 mt-0.5">{platform.stats}</p>
+                        </div>
                       </Link>
                     );
                   }
-
-                  return (
-                    <div
-                      key={platform.id}
-                      className="relative bg-white/5 rounded-2xl p-6 border border-white/5 opacity-50 cursor-not-allowed"
-                    >
-                      <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                        {Icon ? (
-                          <Icon className="w-7 h-7 text-slate-500" />
-                        ) : (
-                          <span className="text-slate-500 font-bold text-lg">{platform.name.slice(0, 2)}</span>
-                        )}
-                      </div>
-                      <h2 className="text-base font-semibold text-slate-500 mb-1">{platform.name}</h2>
-                      <p className="text-sm text-slate-600">{platform.stats}</p>
-                    </div>
-                  );
+                  return null;
                 })}
               </div>
             </div>
           </div>
 
           {/* Bottom fade to white */}
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-gray-50 to-transparent"></div>
         </section>
 
         {/* Features Section */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-24 bg-white">
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-20 bg-gray-50">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -306,7 +286,7 @@ export default function Home() {
         </section>
 
         {/* Calculator Promo Banner */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-r from-emerald-500 to-teal-600">
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-14 bg-gradient-to-r from-emerald-500 to-teal-600">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex items-center gap-6">
@@ -336,7 +316,7 @@ export default function Home() {
 
         {/* Recommended Gear */}
         {featuredProducts.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-24 bg-white">
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-20 bg-white">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center justify-between mb-12">
                 <div>
@@ -416,7 +396,7 @@ export default function Home() {
 
         {/* Latest Blog Posts */}
         {latestPosts.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-24 bg-gray-50">
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-20 bg-gray-50">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center justify-between mb-12">
                 <div>
@@ -493,10 +473,10 @@ export default function Home() {
             <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
           </div>
 
-          {/* Top fade from white */}
-          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white to-transparent"></div>
+          {/* Top fade from content */}
+          <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-gray-50 to-transparent"></div>
 
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+          <div className="relative w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
                 Start tracking your favorite creators
