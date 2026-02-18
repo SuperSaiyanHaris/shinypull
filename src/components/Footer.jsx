@@ -133,7 +133,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-100 pt-8 text-center text-sm text-gray-400">
+        <div className="border-t border-gray-100 pt-8 text-center text-sm text-gray-500">
           <p>&copy; {currentYear} ShinyPull. All rights reserved.</p>
           <p className="mt-2">
             Statistics are provided for informational purposes only.

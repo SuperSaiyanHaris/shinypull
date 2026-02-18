@@ -242,9 +242,9 @@ export default function Home() {
                             <span className={`${platform.textColor} font-bold text-lg`}>{platform.name.slice(0, 2)}</span>
                           )}
                         </div>
-                        <h3 className="text-base font-semibold text-white mb-1 group-hover:text-indigo-300 transition-colors">
+                        <h2 className="text-base font-semibold text-white mb-1 group-hover:text-indigo-300 transition-colors">
                           {platform.name}
-                        </h3>
+                        </h2>
                         <p className="text-sm text-slate-400">{platform.stats}</p>
                       </Link>
                     );
@@ -262,7 +262,7 @@ export default function Home() {
                           <span className="text-slate-500 font-bold text-lg">{platform.name.slice(0, 2)}</span>
                         )}
                       </div>
-                      <h3 className="text-base font-semibold text-slate-500 mb-1">{platform.name}</h3>
+                      <h2 className="text-base font-semibold text-slate-500 mb-1">{platform.name}</h2>
                       <p className="text-sm text-slate-600">{platform.stats}</p>
                     </div>
                   );
@@ -324,7 +324,7 @@ export default function Home() {
               </div>
               <Link
                 to="/youtube/money-calculator"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-emerald-600 font-bold rounded-xl hover:bg-emerald-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-emerald-700 font-bold rounded-xl hover:bg-emerald-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 <Calculator className="w-5 h-5" />
                 Try Calculator
