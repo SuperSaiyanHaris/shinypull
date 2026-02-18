@@ -86,16 +86,22 @@ export default function CreatorProfile() {
       } else if (platform === 'kick') {
         channelData = await getKickChannel(username);
       } else if (platform === 'tiktok') {
-        // TikTok: Load from database
+        // TikTok: Load creator and latest stats from database in parallel
         const dbCreator = await getCreatorByUsername('tiktok', username);
         if (dbCreator) {
-          const { data: latestStats } = await supabase
-            .from('creator_stats')
-            .select('*')
-            .eq('creator_id', dbCreator.id)
-            .order('recorded_at', { ascending: false })
-            .limit(1)
-            .single();
+          // Start stats history fetch in parallel with latest stats
+          const [latestStatsResult, history] = await Promise.all([
+            supabase
+              .from('creator_stats')
+              .select('*')
+              .eq('creator_id', dbCreator.id)
+              .order('recorded_at', { ascending: false })
+              .limit(1)
+              .single(),
+            getCreatorStats(dbCreator.id, 90),
+          ]);
+
+          const latestStats = latestStatsResult.data;
 
           channelData = {
             platform: 'tiktok',
@@ -112,6 +118,7 @@ export default function CreatorProfile() {
           };
 
           setDbCreatorId(dbCreator.id);
+          setStatsHistory(history || []);
         }
       } else {
         const dbCreator = await getCreatorByUsername(platform, username);
@@ -123,43 +130,12 @@ export default function CreatorProfile() {
       }
 
       if (channelData) {
+        // Show profile immediately — don't wait for DB writes
+        setCreator(channelData);
+        setLoading(false);
+
         // Track profile view
         analytics.viewProfile(platform, username, channelData.displayName);
-
-        try {
-          // Skip saving YouTube channels without a public page (e.g., topic channels)
-          if (platform === 'youtube' && channelData.hasPublicPage === false) {
-            logger.info('Skipping DB save for YouTube channel without public page:', username);
-          } else {
-            const dbCreator = await upsertCreator(channelData);
-            setDbCreatorId(dbCreator.id); // Store the database UUID
-
-            await saveCreatorStats(dbCreator.id, {
-              subscribers: channelData.subscribers || channelData.followers,
-              totalViews: channelData.totalViews,
-              totalPosts: channelData.totalPosts,
-            });
-
-            const history = await getCreatorStats(dbCreator.id, 90);
-            setStatsHistory(history || []);
-
-            // For Twitch/Kick, fetch hours watched data
-            if (platform === 'twitch' || platform === 'kick') {
-              const hoursWatchedData = await getHoursWatched(dbCreator.id);
-              if (hoursWatchedData) {
-                channelData.hoursWatchedDay = hoursWatchedData.hours_watched_day;
-                channelData.hoursWatchedWeek = hoursWatchedData.hours_watched_week;
-                channelData.hoursWatchedMonth = hoursWatchedData.hours_watched_month;
-                channelData.peakViewersDay = hoursWatchedData.peak_viewers_day;
-                channelData.avgViewersDay = hoursWatchedData.avg_viewers_day;
-              }
-            }
-          }
-        } catch (dbErr) {
-          logger.warn('Failed to save to database:', dbErr);
-        }
-
-        setCreator(channelData);
 
         // Track recently viewed
         addRecentlyViewed({
@@ -171,28 +147,70 @@ export default function CreatorProfile() {
           followers: channelData.followers,
         });
 
-        // Check if streamer is live (Twitch or Kick)
-        if (platform === 'twitch' || platform === 'kick') {
-          try {
-            const liveStreamFn = platform === 'twitch' ? getTwitchLiveStreams : getKickLiveStreams;
-            const liveData = await liveStreamFn([channelData.username || username]);
-            if (liveData && liveData.length > 0) {
-              setIsLive(true);
-              setLiveStreamInfo(liveData[0]);
-            } else {
-              setIsLive(false);
-              setLiveStreamInfo(null);
-            }
-          } catch (liveErr) {
-            logger.warn('Failed to check live status:', liveErr);
-          }
-        }
-
         // Fetch latest video for YouTube channels (non-blocking)
         if (platform === 'youtube' && channelData.platformId) {
           getYouTubeLatestVideo(channelData.platformId).then(video => {
             if (video) setLatestVideo(video);
           });
+        }
+
+        // Check if streamer is live (non-blocking)
+        if (platform === 'twitch' || platform === 'kick') {
+          const liveStreamFn = platform === 'twitch' ? getTwitchLiveStreams : getKickLiveStreams;
+          liveStreamFn([channelData.username || username]).then(liveData => {
+            if (liveData && liveData.length > 0) {
+              setIsLive(true);
+              setLiveStreamInfo(liveData[0]);
+            }
+          }).catch(liveErr => {
+            logger.warn('Failed to check live status:', liveErr);
+          });
+        }
+
+        // DB operations in background — upsert, save stats, fetch history in parallel
+        try {
+          if (platform === 'youtube' && channelData.hasPublicPage === false) {
+            logger.info('Skipping DB save for YouTube channel without public page:', username);
+          } else if (platform !== 'tiktok') {
+            // TikTok already fetched history above; other platforms do it here
+            const dbCreator = await upsertCreator(channelData);
+            setDbCreatorId(dbCreator.id);
+
+            // Run save + history fetch + hours watched in parallel
+            const backgroundOps = [
+              saveCreatorStats(dbCreator.id, {
+                subscribers: channelData.subscribers || channelData.followers,
+                totalViews: channelData.totalViews,
+                totalPosts: channelData.totalPosts,
+              }),
+              getCreatorStats(dbCreator.id, 90),
+            ];
+
+            if (platform === 'twitch' || platform === 'kick') {
+              backgroundOps.push(getHoursWatched(dbCreator.id));
+            }
+
+            const results = await Promise.all(backgroundOps);
+
+            // Update stats history
+            const history = results[1];
+            setStatsHistory(history || []);
+
+            // Update hours watched data for Twitch/Kick
+            if ((platform === 'twitch' || platform === 'kick') && results[2]) {
+              const hoursWatchedData = results[2];
+              setCreator(prev => ({
+                ...prev,
+                hoursWatchedDay: hoursWatchedData.hours_watched_day,
+                hoursWatchedWeek: hoursWatchedData.hours_watched_week,
+                hoursWatchedMonth: hoursWatchedData.hours_watched_month,
+                peakViewersDay: hoursWatchedData.peak_viewers_day,
+                avgViewersDay: hoursWatchedData.avg_viewers_day,
+              }));
+            }
+          }
+        } catch (dbErr) {
+          logger.warn('Failed to save to database:', dbErr);
         }
       }
     } catch (err) {

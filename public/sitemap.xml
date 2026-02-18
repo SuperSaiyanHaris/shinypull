@@ -205,6 +205,30 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://shinypull.com/kick/drb7h</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kaicenat</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeast</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/tseries</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://shinypull.com/youtube/drdisrespect</loc>
     <lastmod>2026-02-18</lastmod>
     <changefreq>daily</changefreq>
@@ -4285,12 +4309,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/kick/drb7h</loc>
-    <lastmod>2026-02-18</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/twitch/xqc</loc>
     <lastmod>2026-02-18</lastmod>
     <changefreq>daily</changefreq>
@@ -4646,12 +4664,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/youtube/willtennyson</loc>
-    <lastmod>2026-02-18</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/tseries</loc>
     <lastmod>2026-02-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -7107,12 +7119,6 @@
   <url>
     <loc>https://shinypull.com/youtube/sneakcoot</loc>
     <lastmod>2026-02-16</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeast</loc>
-    <lastmod>2026-02-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -36926,12 +36932,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/youtube/gafigaming</loc>
-    <lastmod>2026-02-07</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/twitch/kaicenat</loc>
     <lastmod>2026-02-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
