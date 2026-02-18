@@ -200,9 +200,9 @@ export default function Home() {
                 </div>
               </form>
 
-              {/* Platform Cards - Horizontal pills on mobile, grid on desktop */}
-              {/* Mobile: centered flex pills */}
-              <div className="flex flex-wrap justify-center sm:hidden gap-2.5">
+              {/* Platform Cards - Bold tiles on mobile, grid on desktop */}
+              {/* Mobile: 2x2 bold gradient tiles */}
+              <div className="grid grid-cols-4 sm:hidden gap-3 px-2">
                 {platforms.map((platform) => {
                   const Icon = platform.icon;
                   if (platform.available) {
@@ -210,12 +210,12 @@ export default function Home() {
                       <Link
                         key={platform.id}
                         to={`/rankings/${platform.id}`}
-                        className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2.5 border border-white/10 hover:bg-white/20 active:bg-white/25 transition-all"
+                        className={`group flex flex-col items-center gap-2 py-4 rounded-2xl bg-gradient-to-br ${platform.color} shadow-lg shadow-black/20 hover:scale-105 active:scale-95 transition-all duration-200`}
                       >
-                        <div className={`w-7 h-7 ${platform.bgColor} rounded-full flex items-center justify-center`}>
-                          {Icon && <Icon className={`w-3.5 h-3.5 ${platform.textColor}`} />}
+                        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                          {Icon && <Icon className="w-5 h-5 text-white" />}
                         </div>
-                        <span className="text-sm font-medium text-white whitespace-nowrap">{platform.name}</span>
+                        <span className="text-xs font-semibold text-white/90 tracking-wide">{platform.name}</span>
                       </Link>
                     );
                   }
