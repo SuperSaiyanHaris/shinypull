@@ -20,8 +20,10 @@ import {
   ShoppingBag,
   Copy,
   ShieldAlert,
+  X,
 } from 'lucide-react';
 import SEO from '../components/SEO';
+import BlogContent from '../components/BlogContent';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { TIMEOUTS, BLOG_CATEGORIES } from '../lib/constants';
@@ -91,6 +93,9 @@ export default function BlogAdmin() {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [productFormData, setProductFormData] = useState(emptyProduct);
   const [featuresInput, setFeaturesInput] = useState('');
+
+  // Preview
+  const [showPreview, setShowPreview] = useState(false);
 
   // Delete confirmation
   const [deleteConfirm, setDeleteConfirm] = useState({ type: null, id: null });
@@ -545,6 +550,14 @@ export default function BlogAdmin() {
                     <button onClick={handleCancelPostEdit} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                       Cancel
                     </button>
+                    <button
+                      onClick={() => setShowPreview(true)}
+                      disabled={!postFormData.content}
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-40"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Preview
+                    </button>
                     <button onClick={handleSavePost} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">
                       {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                       Save
@@ -840,6 +853,63 @@ export default function BlogAdmin() {
           )}
         </div>
       </div>
+
+      {/* PREVIEW OVERLAY */}
+      {showPreview && (
+        <div className="fixed inset-0 z-50 bg-gray-50 overflow-y-auto">
+          {/* Preview toolbar */}
+          <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-700">Preview</span>
+              <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">Draft</span>
+            </div>
+            <button
+              onClick={() => setShowPreview(false)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
+            >
+              <X className="w-4 h-4" />
+              Close Preview
+            </button>
+          </div>
+
+          {/* Simulated hero */}
+          {postFormData.image && (
+            <div className="relative h-64 md:h-96 bg-gray-900">
+              <img src={postFormData.image} alt="" className="w-full h-full object-cover opacity-60" />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
+            </div>
+          )}
+
+          {/* Article body */}
+          <div className={`max-w-4xl mx-auto px-4 ${postFormData.image ? '-mt-32 relative z-10' : 'mt-8'}`}>
+            <article className="bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
+              <div className="p-8 md:p-12">
+                {postFormData.category && (
+                  <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-sm font-medium mb-4">
+                    {postFormData.category}
+                  </span>
+                )}
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                  {postFormData.title || 'Untitled Post'}
+                </h1>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-8 pb-8 border-b border-gray-100">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {postFormData.read_time || '5 min read'}
+                  </span>
+                  <span>By {postFormData.author || 'ShinyPull Team'}</span>
+                </div>
+                <BlogContent content={postFormData.content} />
+              </div>
+            </article>
+            <div className="h-12" />
+          </div>
+        </div>
+      )}
     </>
   );
 }
