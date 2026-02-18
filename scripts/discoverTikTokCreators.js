@@ -127,6 +127,69 @@ const TOP_TIKTOK_USERNAMES = [
 
   // Top art & creative
   'jamesllewis', 'zhcyt', 'vexx', 'tikkiwatercolors', 'leticia_gomes',
+
+  // === BATCH 2: More top creators ===
+
+  // Viral/trending creators
+  'younggravy', 'ryantrahan', 'nicklucido', 'kallmekris', 'alexclark',
+  'anthpo', 'scottthewoz', 'brandontv', 'mattdoesfitness', 'austinmcbroom',
+  'jasonpaul', 'chasehhudson', 'griffinjohnson', 'joshrichards', 'bryce.hall',
+  'kioandjeremiah', 'anthonypadilla', 'ianpaget', 'laurdiy', 'tmartn2',
+
+  // More musicians & artists
+  'dualipa', 'dojacatofficial', 'lizzobeeating', 'normaniofficial', 'jackharloww',
+  'liltecca', 'tyga', 'nle_choppa', 'jackharlow', '24kgoldn',
+  'iann.dior', 'powfu', 'benplatt', 'conan.gray', 'powfuofficial',
+  'gracie.abrams', 'clairo', 'ruel', 'finneas', 'joshuabasset',
+
+  // Reality TV & media personalities
+  'jamescharles', 'jeffreestar', 'tanamongeauofficial', 'nikita.dragun', 'bretmanrock',
+  'louistheroux', 'kardashian', 'kyliejenner', 'kendalljenner', 'kourtneykardash',
+  'kimkardashian', 'krisjenner', 'robkardashian', 'caitlynjenner', 'scottdisick',
+
+  // YouTube-to-TikTok crossovers
+  'mrbeast6000', 'airrack', 'yes.theory', 'klementieff', 'sidemenofficial',
+  'thecreatorclash', 'jessiesmiles', 'mango', 'feastables', 'beastphilanthropy',
+  'imjaystation', 'ricegum', 'itsalexclark', 'domicsanimations', 'theodd1sout',
+  'jaiden_animations', 'somethingelseyt', 'tabbes', 'rebeccaparham', 'lylasfive',
+
+  // Comedy / viral
+  'dannyduncan', 'nelkboys', 'fullsend', 'steiny', 'bradmundo',
+  'jake.webber', 'dududuarte', 'juanpa.zurita', 'sebastianmoy', 'fazerug',
+  'fazeadapt', 'faze.clan', 'nickeh30', 'blazendary', 'swaggron',
+
+  // Cooking / food viral
+  'saltbae', 'nusretemre', 'tabitha.brown', 'moribyan', 'carlosmadethis',
+  'grilledcheesesocial', 'joshuaweissman', 'bingingwithbabish', 'mealsbymiri', 'noms',
+  'maangchi', 'emmymade', 'brad.leone', 'ethan.chlebowski', 'proHomechef',
+
+  // Fitness & wellness
+  'chrisheria', 'brendanercioli', 'laurendrainfit', 'gracefituk', 'krissy.cela',
+  'sydneycummings', 'growingannanas', 'ericalodon', 'brittne.babe', 'natacha.oceane',
+  'kelsey.wells', 'brittanyperille', 'alexia.clark', 'ashleykfit', 'kayla.itsines',
+
+  // Travel & adventure
+  'kara.and.nate', 'noel.philipps', 'lost.leblancs', 'sorelle.amore', 'onebag',
+  'chrisburkard', 'jackmorris', 'lernertwinz', 'geobeats', 'dianaplays',
+  'beeisforbeekeeper', 'abroadinJapan', 'tokidoki.traveller', 'nikkiphillippi',
+
+  // Sports & athletes
+  'bronny', 'juansorondo', 'overtime', 'dude.perfect', 'nightvision_bball',
+  'house_of_highlights', 'bleacherreport', 'espn', 'nhl', 'nfl',
+  'pgatour', 'ufc', 'worldstarhiphop', 'boxingking', 'sneakerheadhq',
+
+  // News & commentary
+  'hasanabi', 'thedailyshow', 'colbertlateshow', 'jimjefferies', 'trevornoah',
+  'johnoliver', 'ronnychieng', 'reidmiller', 'theyoungturks', 'secondthought',
+  'answerswithjoe', 'kurzgesagt', 'vox', 'businessinsider', 'wired',
+
+  // Pets & animals
+  'jiffpom', 'noodleandbean', 'smoothiethecat', 'potatojet', 'tika.the.iggy',
+  'itsdougthepug', 'lil.bub', 'realgrumpycat', 'marniethedog', 'juniperfoxx',
+
+  // DIY & crafts
+  'moriah.elizabeth', 'simonscat', 'itsalexclarkart', 'bayashi.tiktok2', 'craftingeek',
+  'primitivebuilding', 'nickdissel', '5minutecrafts', 'diyjoy', 'hacksaholic',
 ];
 
 /**

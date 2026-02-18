@@ -1,0 +1,40 @@
+name: Update Sitemap
+
+on:
+  schedule:
+    # Run once daily at 3 AM UTC (10 PM EST) — after daily stats collection
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  update-sitemap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Need write access to commit back the updated sitemap
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate sitemap
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: node scripts/generateSitemap.js
+
+      - name: Commit and push if sitemap changed
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add public/sitemap.xml
+          git diff --staged --quiet && echo "No changes to sitemap" || (git commit -m "chore: auto-update sitemap.xml" && git push)
