@@ -74,13 +74,24 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
 
     try {
       if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
 
         if (error) throw error;
-        setMessage('Check your email for the confirmation link!');
+
+        // Supabase returns a user with no identities when the email already exists
+        // (it doesn't send a confirmation email in this case)
+        if (data?.user && data.user.identities?.length === 0) {
+          // Switch to sign-in mode with email pre-populated
+          setMode('signin');
+          setError('');
+          setMessage('An account with this email already exists. Sign in below.');
+          setPassword('');
+        } else {
+          setMessage('Check your email for the confirmation link!');
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
