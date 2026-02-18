@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     }
 
     // Validate platform
-    const validPlatforms = ['instagram', 'tiktok', 'youtube', 'twitch', 'kick'];
+    const validPlatforms = ['tiktok', 'youtube', 'twitch', 'kick'];
     if (!validPlatforms.includes(platform)) {
       return res.status(400).json({ error: 'Invalid platform' });
     }

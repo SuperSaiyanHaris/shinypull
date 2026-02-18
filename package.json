@@ -1,7 +1,7 @@
 {
   "name": "shinypull",
   "version": "0.1.0",
-  "description": "Social media statistics tracker for YouTube, Twitch, TikTok, Instagram, and Twitter",
+  "description": "Social media statistics tracker for YouTube, TikTok, Twitch, and Kick",
   "type": "module",
   "scripts": {
     "dev": "vite",

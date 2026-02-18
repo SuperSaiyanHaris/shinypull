@@ -224,7 +224,7 @@ export default function Home() {
               </div>
 
               {/* Desktop: 5-column grid cards */}
-              <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto px-4">
+              <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto px-4">
                 {platforms.map((platform) => {
                   const Icon = platform.icon;
 
