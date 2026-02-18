@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2, DollarSign, TrendingDown, Minus } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
-import InstagramIcon from '../components/InstagramIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import { CompareCardSkeleton } from '../components/Skeleton';
 import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
@@ -17,7 +16,6 @@ import logger from '../lib/logger';
 
 const platformConfig = {
   youtube: { icon: Youtube, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
-  instagram: { icon: InstagramIcon, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
   tiktok: { icon: TikTokIcon, color: 'text-pink-600', bg: 'bg-pink-50', border: 'border-pink-200' },
   twitch: { icon: Twitch, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
   kick: { icon: KickIcon, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
@@ -51,20 +49,6 @@ export default function Compare() {
           try {
             if (platform === 'youtube') {
               return await getYouTubeChannel(username);
-            } else if (platform === 'instagram') {
-              const result = await getCreatorByUsername('instagram', username);
-              if (!result) return null;
-              // Transform to expected format
-              return {
-                platform: 'instagram',
-                platformId: result.platform_id,
-                username: result.username,
-                displayName: result.display_name || result.username,
-                profileImage: result.profile_image,
-                description: result.description,
-                subscribers: result.latest_stats?.followers || 0,
-                totalPosts: result.latest_stats?.total_posts || 0,
-              };
             } else if (platform === 'tiktok') {
               const result = await getCreatorByUsername('tiktok', username);
               if (!result) return null;
@@ -558,12 +542,12 @@ function CreatorCard({ creator, onRemove }) {
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-gray-50 rounded-xl p-3">
-          <p className="text-xs text-gray-500 mb-1">{creator.platform === 'twitch' || creator.platform === 'instagram' || creator.platform === 'tiktok' ? 'Followers' : 'Subs'}</p>
+          <p className="text-xs text-gray-500 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' ? 'Followers' : 'Subs'}</p>
           <p className="font-bold text-gray-900">{formatNumber(creator.subscribers || creator.followers)}</p>
         </div>
         <div className="bg-gray-50 rounded-xl p-3">
-          <p className="text-xs text-gray-500 mb-1">{creator.platform === 'tiktok' ? 'Likes' : creator.platform === 'instagram' ? 'Posts' : 'Views'}</p>
-          <p className="font-bold text-gray-900">{formatNumber(creator.platform === 'instagram' ? creator.totalPosts : creator.totalViews)}</p>
+          <p className="text-xs text-gray-500 mb-1">{creator.platform === 'tiktok' ? 'Likes' : 'Views'}</p>
+          <p className="font-bold text-gray-900">{formatNumber(creator.totalViews)}</p>
         </div>
       </div>
     </div>
@@ -585,35 +569,6 @@ function SearchableSlot({ onSelect, onRemove }) {
       let results = [];
       if (searchPlatform === 'youtube') {
         results = await searchYouTube(searchQuery, 5);
-      } else if (searchPlatform === 'instagram') {
-        // Search Instagram from database
-        const dbResults = await searchCreators(searchQuery, 'instagram');
-
-        // Fetch stats for each creator
-        const withStats = await Promise.all(
-          dbResults.map(async (creator) => {
-            const { data: stats } = await supabase
-              .from('creator_stats')
-              .select('followers, total_posts')
-              .eq('creator_id', creator.id)
-              .order('recorded_at', { ascending: false })
-              .limit(1)
-              .single();
-
-            return {
-              platform: 'instagram',
-              platformId: creator.platform_id,
-              username: creator.username,
-              displayName: creator.display_name || creator.username,
-              profileImage: creator.profile_image,
-              description: creator.description,
-              subscribers: stats?.followers || 0,
-              totalPosts: stats?.total_posts || 0,
-            };
-          })
-        );
-
-        results = withStats.slice(0, 5);
       } else if (searchPlatform === 'tiktok') {
         // Search TikTok from database
         const dbResults = await searchCreators(searchQuery, 'tiktok');
@@ -678,7 +633,6 @@ function SearchableSlot({ onSelect, onRemove }) {
             className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           >
             <option value="youtube">YouTube</option>
-            <option value="instagram">Instagram</option>
             <option value="tiktok">TikTok</option>
             <option value="twitch">Twitch</option>
             <option value="kick">Kick</option>

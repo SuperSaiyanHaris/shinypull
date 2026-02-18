@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BarChart3, Youtube, Instagram, Twitch } from 'lucide-react';
+import { BarChart3, Youtube, Twitch } from 'lucide-react';
 import KickIcon from './KickIcon';
 import TikTokIcon from './TikTokIcon';
 
@@ -60,12 +60,6 @@ export default function Footer() {
                 <Link to="/rankings/youtube" className="text-gray-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
                   <Youtube className="w-4 h-4" />
                   YouTube Stats
-                </Link>
-              </li>
-              <li>
-                <Link to="/rankings/instagram" className="text-gray-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
-                  <Instagram className="w-4 h-4" />
-                  Instagram Stats
                 </Link>
               </li>
               <li>

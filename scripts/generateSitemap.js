@@ -23,7 +23,6 @@ const staticPages = [
   { url: '/blog', lastmod: TODAY, changefreq: 'daily', priority: 0.9 },
   { url: '/rankings', lastmod: TODAY, changefreq: 'daily', priority: 0.9 },
   { url: '/rankings/youtube', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
-  { url: '/rankings/instagram', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
   { url: '/rankings/twitch', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
   { url: '/rankings/kick', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },
   { url: '/rankings/tiktok', lastmod: TODAY, changefreq: 'daily', priority: 0.85 },

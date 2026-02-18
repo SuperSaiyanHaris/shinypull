@@ -1,16 +1,15 @@
 /**
  * Process Pending Creator Requests
  *
- * Fetches pending requests from creator_requests table and processes them:
- * 1. Fetches Instagram profile data via meta tags
+ * Fetches pending TikTok requests from creator_requests table and processes them:
+ * 1. Fetches TikTok profile data via scraper
  * 2. Inserts creator into creators table
  * 3. Creates initial stats entry
- * 4. Updates request status to completed/failed
+ * 4. Deletes the request on success
  */
 
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
-import { scrapeInstagramProfile, closeBrowser as closeInstagramBrowser } from '../src/services/instagramScraper.js';
 import { scrapeTikTokProfile, closeBrowser as closeTikTokBrowser } from '../src/services/tiktokScraper.js';
 
 dotenv.config();
@@ -46,7 +45,7 @@ async function resolveHandleWithAI(query, platform) {
 
   try {
     console.log(`[${query}] 🤖 Asking AI to resolve ${platform} handle...`);
-    const platformName = platform === 'tiktok' ? 'TikTok' : 'Instagram';
+    const platformName = 'TikTok';
     const prompt = `I tried to look up the ${platformName} profile "${query}" but it was not found. The input may be a display name, a misspelled handle, or missing special characters like underscores or dots. What is the correct, official ${platformName} username for this person? Reply with ONLY the exact username (no @ symbol, no explanation, no punctuation). If you cannot determine who this is or they don't have a ${platformName} account, reply with exactly "UNKNOWN".`;
 
     const res = await fetch(
@@ -140,12 +139,7 @@ async function processRequest(request) {
 
     // Scrape profile data based on platform
     console.log(`[${request.username}] Scraping ${request.platform} profile...`);
-    let profileData;
-    if (request.platform === 'tiktok') {
-      profileData = await scrapeTikTokProfile(request.username);
-    } else {
-      profileData = await scrapeInstagramProfile(request.username);
-    }
+    const profileData = await scrapeTikTokProfile(request.username);
     console.log(`[${request.username}] ✓ Scraped: ${profileData.displayName} (${profileData.followers.toLocaleString()} followers)`);
 
     // Check if creator already exists (in case it was added elsewhere)
@@ -221,7 +215,7 @@ async function processRequest(request) {
 
   } catch (error) {
     const isRateLimit = error.message.includes('429');
-    const isScrapeBlocked = error.message.includes('No og:description') || error.message.includes('No __UNIVERSAL_DATA');
+    const isScrapeBlocked = error.message.includes('No __UNIVERSAL_DATA');
     console.error(`[${request.username}] ❌ Error:`, error.message);
 
     // If rate limited, revert to pending immediately (no AI resolution needed)
@@ -241,12 +235,7 @@ async function processRequest(request) {
     if (aiHandle) {
       try {
         console.log(`[${request.username}] 🔄 Retrying with AI-resolved handle: @${aiHandle}`);
-        let profileData;
-        if (request.platform === 'tiktok') {
-          profileData = await scrapeTikTokProfile(aiHandle);
-        } else {
-          profileData = await scrapeInstagramProfile(aiHandle);
-        }
+        const profileData = await scrapeTikTokProfile(aiHandle);
         console.log(`[${aiHandle}] ✓ Scraped: ${profileData.displayName} (${profileData.followers.toLocaleString()} followers)`);
 
         // Check if this creator already exists under the corrected handle
@@ -343,7 +332,7 @@ async function main() {
     // Fetch pending requests
     console.log('Fetching pending requests...');
     const maxRequests = parseInt(process.argv[2]) || 50; // default: 50 per run
-    const platformFilter = process.argv[3] || null; // optional: 'tiktok', 'instagram'
+    const platformFilter = process.argv[3] || null; // optional: 'tiktok'
     
     let query = supabase
       .from('creator_requests')
@@ -437,8 +426,6 @@ async function main() {
     console.error('Fatal error:', error.message);
     process.exit(1);
   } finally {
-    // Close browsers
-    await closeInstagramBrowser();
     await closeTikTokBrowser();
   }
 }

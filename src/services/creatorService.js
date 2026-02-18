@@ -300,8 +300,8 @@ export const getRankedCreators = withErrorHandling(
           } else if (platform === 'kick') {
             // For Kick, use paid subscriber growth (followers field stores paid subs for Kick)
             calculatedGrowth = (newestStat?.subscribers || newestStat?.followers || 0) - (oldestStat?.subscribers || oldestStat?.followers || 0);
-          } else if (platform === 'instagram' || platform === 'tiktok') {
-            // For Instagram/TikTok, use follower growth
+          } else if (platform === 'tiktok') {
+            // For TikTok, use follower growth
             calculatedGrowth = (newestStat?.followers || newestStat?.subscribers || 0) - (oldestStat?.followers || oldestStat?.subscribers || 0);
           } else {
             // For Twitch, use watch hours growth

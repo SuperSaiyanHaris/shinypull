@@ -1,17 +1,17 @@
 ## Using Mobile Hotspot as Fallback IP
 
-If your home IP gets rate-limited by Instagram, you can use your phone's hotspot:
+If your home IP gets rate-limited by TikTok, you can use your phone's hotspot:
 
 ### Quick Setup:
 1. Enable mobile hotspot on your phone
 2. Connect your computer to the hotspot
-3. Run the Instagram scripts manually
+3. Run the TikTok scripts manually
 4. You now have a completely different IP (mobile network)
 
 ### Why This Works:
 - Mobile IPs rotate frequently
-- Mobile networks have high trust scores with Instagram
-- Instagram can't block entire mobile networks (too many real users)
+- Mobile networks have high trust scores with platforms
+- TikTok can't block entire mobile networks (too many real users)
 
 ### When to Use:
 - Only if your home IP gets 429 errors

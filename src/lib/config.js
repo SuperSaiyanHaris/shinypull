@@ -40,9 +40,6 @@ export const PLATFORM_URLS = {
     schedule: (username) => `https://twitch.tv/${username}/schedule`,
     about: (username) => `https://twitch.tv/${username}/about`,
   },
-  instagram: {
-    profile: (username) => `https://instagram.com/${username}`,
-  },
   tiktok: {
     profile: (username) => `https://tiktok.com/@${username}`,
   },

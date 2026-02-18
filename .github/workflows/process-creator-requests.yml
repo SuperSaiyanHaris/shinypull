@@ -1,13 +1,11 @@
 name: Process Creator Requests
 
 on:
-  # DISABLED: Instagram blocks GitHub Actions IPs with 429 errors
-  # Use local automation instead (see scripts/local/README.md)
-  # schedule:
-  #   - cron: '0 0 * * *'   # 00:00 UTC (6 PM CST)
-  #   - cron: '0 6 * * *'   # 06:00 UTC (12 AM CST)
-  #   - cron: '0 12 * * *'  # 12:00 UTC (6 AM CST)
-  #   - cron: '0 18 * * *'  # 18:00 UTC (12 PM CST)
+  schedule:
+    - cron: '0 0 * * *'   # 00:00 UTC (7 PM EST)
+    - cron: '0 6 * * *'   # 06:00 UTC (1 AM EST)
+    - cron: '0 12 * * *'  # 12:00 UTC (7 AM EST)
+    - cron: '0 18 * * *'  # 18:00 UTC (1 PM EST)
   workflow_dispatch:  # Keep manual trigger for testing
 
 jobs:
@@ -31,6 +29,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/processCreatorRequests.js
 
       - name: Report completion

@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
-import InstagramIcon from '../components/InstagramIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import { TableSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
@@ -15,7 +14,6 @@ import logger from '../lib/logger';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', hoverColor: 'hover:bg-red-700', lightBg: 'bg-red-50', textColor: 'text-red-600', available: true },
-  { id: 'instagram', name: 'Instagram', icon: InstagramIcon, color: 'bg-pink-600', hoverColor: 'hover:bg-pink-700', lightBg: 'bg-pink-50', textColor: 'text-pink-600', available: true },
   { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'bg-gray-900', hoverColor: 'hover:bg-gray-800', lightBg: 'bg-pink-50', textColor: 'text-pink-600', available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', hoverColor: 'hover:bg-purple-700', lightBg: 'bg-purple-50', textColor: 'text-purple-600', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'bg-green-500', hoverColor: 'hover:bg-green-600', lightBg: 'bg-green-50', textColor: 'text-green-600', available: true },
@@ -31,14 +29,13 @@ function getSeoData(platform, rankType, topCount) {
 
   const metricLabel = rankType === 'views' ? 'Most Viewed' :
     rankType === 'growth' ? 'Fastest Growing' :
-    pid === 'instagram' || pid === 'tiktok' || pid === 'twitch' ? 'Most Followed' :
+    pid === 'tiktok' || pid === 'twitch' ? 'Most Followed' :
     pid === 'kick' ? 'Most Subscribed' : 'Most Subscribed';
 
   const title = `${countLabel} ${p} ${rankType === 'growth' ? 'Fastest Growing' : rankType === 'views' ? 'Most Viewed' : pid === 'youtube' ? 'YouTubers' : p + ' Creators'} (2026) - Live Rankings`;
 
   const descriptions = {
     youtube: `The ${countLabel.toLowerCase()} most subscribed YouTubers ranked by subscribers, views, and growth. Updated daily with live stats. See who has the most YouTube subscribers in 2026.`,
-    instagram: `${countLabel} most followed Instagram accounts ranked by followers and growth. Updated daily. Find out who has the most Instagram followers in 2026.`,
     tiktok: `${countLabel} most followed TikTok creators ranked by followers, likes, and growth. Updated daily. See who has the most TikTok followers in 2026.`,
     twitch: `${countLabel} most followed Twitch streamers ranked by followers, watch hours, and growth. Updated daily. Find the most watched Twitch streamers in 2026.`,
     kick: `${countLabel} Kick streamers ranked by paid subscribers and growth. Updated daily. See the top Kick streamers in 2026.`,
@@ -46,7 +43,6 @@ function getSeoData(platform, rankType, topCount) {
 
   const keywords = {
     youtube: `top youtubers, top ${topCount} youtubers, most subscribed youtubers, biggest youtube channels, who has the most youtube subscribers, most popular youtubers 2026, youtube rankings`,
-    instagram: `top instagram accounts, top ${topCount} instagram, most followed instagram, who has the most instagram followers, biggest instagram accounts 2026, instagram rankings`,
     tiktok: `top tiktokers, top ${topCount} tiktokers, most followed tiktok, who has the most tiktok followers, most tiktok likes, biggest tiktok accounts 2026, tiktok rankings`,
     twitch: `top twitch streamers, top ${topCount} twitch streamers, most followed twitch, most watched twitch streamers, most hours watched twitch, biggest twitch channels 2026, twitch rankings`,
     kick: `top kick streamers, top ${topCount} kick streamers, most subscribed kick, biggest kick channels 2026, kick rankings`,
@@ -63,7 +59,6 @@ function getH1Text(platform, topCount) {
   const pid = platform?.id || 'youtube';
   const labels = {
     youtube: `Top ${topCount} YouTubers`,
-    instagram: `Top ${topCount} Instagram Accounts`,
     tiktok: `Top ${topCount} TikTok Creators`,
     twitch: `Top ${topCount} Twitch Streamers`,
     kick: `Top ${topCount} Kick Streamers`,
@@ -75,7 +70,6 @@ function getSubheading(platform) {
   const pid = platform?.id || 'youtube';
   const subs = {
     youtube: 'Ranked by subscribers, views, and growth. Updated daily.',
-    instagram: 'Ranked by followers and growth. Updated daily.',
     tiktok: 'Ranked by followers, likes, and growth. Updated daily.',
     twitch: 'Ranked by followers, watch hours, and growth. Updated daily.',
     kick: 'Ranked by paid subscribers and growth. Updated daily.',
@@ -116,9 +110,9 @@ export default function Rankings() {
   const [sortDirection, setSortDirection] = useState('desc');
 
   const rankTypes = [
-    { id: 'subscribers', name: selectedPlatform === 'instagram' ? 'Top Followers' : selectedPlatform === 'tiktok' ? 'Top Followers' : selectedPlatform === 'twitch' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
-    // Hide views for Kick, Instagram, and TikTok since APIs don't provide view data
-    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
+    { id: 'subscribers', name: selectedPlatform === 'tiktok' ? 'Top Followers' : selectedPlatform === 'twitch' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
+    // Hide views for Kick and TikTok since APIs don't provide view data
+    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
     { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
   ];
 
@@ -194,13 +188,13 @@ export default function Rankings() {
     if (!platformId) return;
     setSelectedPlatform(platformId);
     // Reset rank type if switching to a platform that doesn't support it
-    const noViews = platformId === 'kick' || platformId === 'instagram' || platformId === 'tiktok';
+    const noViews = platformId === 'kick' || platformId === 'tiktok';
     if (selectedRankType === 'views' && noViews) setSelectedRankType('subscribers');
     navigate(`/rankings/${platformId}`);
     analytics.switchPlatform('rankings', platformId);
   };
 
-  const followerLabel = selectedPlatform === 'instagram' ? 'Followers' : selectedPlatform === 'tiktok' ? 'Followers' : selectedPlatform === 'twitch' ? 'Followers' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
+  const followerLabel = selectedPlatform === 'tiktok' ? 'Followers' : selectedPlatform === 'twitch' ? 'Followers' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
   const currentPlatform = platforms.find(p => p.id === selectedPlatform);
   const seoData = getSeoData(currentPlatform, selectedRankType, topCount);
   const listSchema = createRankingListSchema(rankings, currentPlatform, topCount);
@@ -319,7 +313,7 @@ export default function Rankings() {
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-500 uppercase tracking-wider">
               <div className="col-span-1">Rank</div>
-              <div className={selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'col-span-7' : 'col-span-5'}>Creator</div>
+              <div className={selectedPlatform === 'kick' ? 'col-span-7' : 'col-span-5'}>Creator</div>
               <button
                 onClick={() => handleSort('subscribers')}
                 className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-700 transition-colors cursor-pointer"
@@ -336,7 +330,7 @@ export default function Rankings() {
                   <SortIcon column="views" />
                 </button>
               )}
-              {selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' && (
+              {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && (
                 <button
                   onClick={() => handleSort('views')}
                   className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-700 transition-colors cursor-pointer"
@@ -358,8 +352,6 @@ export default function Rankings() {
                       ? 'YouTube growth based on total views'
                       : selectedPlatform === 'kick'
                       ? 'Kick growth based on paid subscribers'
-                      : selectedPlatform === 'instagram'
-                      ? 'Instagram growth based on followers'
                       : selectedPlatform === 'tiktok'
                       ? 'TikTok growth based on followers'
                       : 'Twitch growth based on watch hours'}
@@ -416,7 +408,7 @@ export default function Rankings() {
                 </div>
 
                 {/* Creator Info */}
-                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'instagram' ? 'md:col-span-7' : 'md:col-span-5'}`}>
+                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' ? 'md:col-span-7' : 'md:col-span-5'}`}>
                   <img
                     src={creator.profile_image || '/placeholder-avatar.svg'}
                     alt={creator.display_name}
@@ -443,7 +435,7 @@ export default function Rankings() {
                     <span className="text-gray-600">{formatNumber(creator.totalViews)}</span>
                   </div>
                 )}
-                {selectedPlatform !== 'kick' && selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' && (
+                {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && (
                   <div className="hidden md:block col-span-2 text-right">
                     <span className="text-gray-600">{formatNumber(creator.totalViews)}</span>
                   </div>
@@ -459,11 +451,7 @@ export default function Rankings() {
                   <span className="text-gray-500">
                     <span className="font-medium text-gray-900">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
                   </span>
-                  {selectedPlatform === 'instagram' ? (
-                    <span className="text-gray-500">
-                      <span className="font-medium text-gray-900">{formatNumber(creator.totalPosts)}</span> posts
-                    </span>
-                  ) : selectedPlatform === 'tiktok' ? (
+                  {selectedPlatform === 'tiktok' ? (
                     <span className="text-gray-500">
                       <span className="font-medium text-gray-900">{formatNumber(creator.totalLikes || creator.totalViews)}</span> likes
                     </span>
@@ -497,18 +485,6 @@ export default function Rankings() {
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-1">How often are these rankings updated?</h3>
                       <p>Stats are collected multiple times per day, so the rankings reflect the latest publicly available data from YouTube.</p>
-                    </div>
-                  </>
-                )}
-                {selectedPlatform === 'instagram' && (
-                  <>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">Who has the most Instagram followers?</h3>
-                      <p>{rankings[0]?.display_name} leads with {formatNumber(rankings[0]?.subscribers)} followers. We track the biggest Instagram accounts and update follower counts regularly.</p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">How are Instagram rankings determined?</h3>
-                      <p>We rank Instagram accounts by follower count and track growth over time. You can also sort by fastest growing to see which accounts are gaining followers the quickest.</p>
                     </div>
                   </>
                 )}

@@ -39,7 +39,7 @@ export default function About() {
 
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Data</h2>
             <p className="text-gray-600 mb-4 leading-relaxed">
-              ShinyPull compiles data from YouTube, Instagram, Twitch, and Kick and uses the data to make
+              ShinyPull compiles data from YouTube, TikTok, Twitch, and Kick and uses the data to make
               statistical graphs and charts that track progress and growth. We include information such as
               estimated earnings and future projections, providing both numerical data and easy-to-read graphs.
               Statistics as well as top lists in various categories are available to anyone using our website.
@@ -70,7 +70,7 @@ export default function About() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Data Sources</h2>
             <p className="text-gray-600 mb-8 leading-relaxed">
               In order to keep statistical data updated, ShinyPull utilizes API services of third parties
-              including YouTube, Instagram, Twitch, and Kick. We only gather publicly available data from
+              including YouTube, TikTok, Twitch, and Kick. We only gather publicly available data from
               each of the API services, not anything private about your account. We collect statistics daily
               to provide accurate historical trends and growth analytics.
             </p>

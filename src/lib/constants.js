@@ -114,5 +114,4 @@ export const PLATFORMS = {
   TWITCH: 'twitch',
   KICK: 'kick',
   TIKTOK: 'tiktok',
-  INSTAGRAM: 'instagram',
 };

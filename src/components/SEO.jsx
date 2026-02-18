@@ -14,7 +14,7 @@ export default function SEO({
   const url = getSiteUrl(location.pathname);
   
   const fullTitle = title ? `${title} | Shiny Pull` : 'Shiny Pull - Social Media Analytics & Statistics';
-  const defaultDescription = 'Track YouTube, Instagram, TikTok, Twitch & Kick statistics. View subscriber counts, follower growth, rankings and analytics for your favorite creators.';
+  const defaultDescription = 'Track YouTube, TikTok, Twitch & Kick statistics. View subscriber counts, follower growth, rankings and analytics for your favorite creators.';
   const metaDescription = description || defaultDescription;
   
   useEffect(() => {

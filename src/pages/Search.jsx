@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight, Clock, CheckCircle, X } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
-import InstagramIcon from '../components/InstagramIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import { CreatorRowSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
@@ -19,7 +18,6 @@ import logger from '../lib/logger';
 
 const platformIcons = {
   youtube: Youtube,
-  instagram: InstagramIcon,
   tiktok: TikTokIcon,
   twitch: Twitch,
   kick: KickIcon,
@@ -27,7 +25,6 @@ const platformIcons = {
 
 const platformColors = {
   youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600' },
-  instagram: { bg: 'bg-gradient-to-br from-purple-600 to-pink-600', light: 'bg-purple-50', text: 'text-purple-600' },
   tiktok: { bg: 'bg-gray-900', light: 'bg-pink-50', text: 'text-pink-600' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
   kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
@@ -35,46 +32,12 @@ const platformColors = {
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, available: true },
-  { id: 'instagram', name: 'Instagram', icon: InstagramIcon, available: true },
   { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, available: true },
 ];
 
-// Instagram search function - searches database
-async function searchInstagram(query, limit = 25) {
-  // searchCreators takes (query, platform) - NOT (platform, query)!
-  const results = await searchCreators(query, 'instagram');
-
-  // Fetch stats for each creator
-  const withStats = await Promise.all(
-    results.map(async (creator) => {
-      // Get latest stats from creator_stats table
-      const { data: stats } = await supabase
-        .from('creator_stats')
-        .select('followers, total_posts')
-        .eq('creator_id', creator.id)
-        .order('recorded_at', { ascending: false })
-        .limit(1)
-        .single();
-
-      return {
-        platform: 'instagram',
-        platformId: creator.platform_id,
-        username: creator.username,
-        displayName: creator.display_name || creator.username,
-        profileImage: creator.profile_image,
-        description: creator.description,
-        followers: stats?.followers || 0,
-        totalPosts: stats?.total_posts || 0,
-      };
-    })
-  );
-
-  return withStats.slice(0, limit);
-}
-
-// TikTok search function - searches database (same pattern as Instagram)
+// TikTok search function - searches database
 async function searchTikTok(query, limit = 25) {
   const results = await searchCreators(query, 'tiktok');
 
@@ -118,7 +81,7 @@ export default function Search() {
   const [normalizedUsername, setNormalizedUsername] = useState('');
   const { user } = useAuth();
 
-  // Normalize a display name / search query to a likely Instagram/TikTok username
+  // Normalize a display name / search query to a likely TikTok username
   const normalizeToUsername = (input) => {
     return input
       .trim()
@@ -172,9 +135,6 @@ export default function Search() {
         if (channels.length > 0) {
           void persistYouTubeResults(channels);
         }
-      } else if (platform === 'instagram') {
-        // Search Instagram creators from database
-        channels = await searchInstagram(searchQuery, 25);
       } else if (platform === 'tiktok') {
         // Search TikTok creators from database
         channels = await searchTikTok(searchQuery, 25);
@@ -184,8 +144,8 @@ export default function Search() {
         channels = await searchKick(searchQuery, 25);
       }
       setResults(channels);
-      // Pre-fill normalized username for IG/TikTok request flow
-      if (platform === 'instagram' || platform === 'tiktok') {
+      // Pre-fill normalized username for TikTok request flow
+      if (platform === 'tiktok') {
         setNormalizedUsername(normalizeToUsername(searchQuery));
       }
     } catch (err) {
@@ -381,8 +341,8 @@ export default function Search() {
                 We couldn't find any {currentPlatform?.name} creators matching "{query}"
               </p>
 
-              {/* Instagram/TikTok: Request Creator Button */}
-              {(selectedPlatform === 'instagram' || selectedPlatform === 'tiktok') && (
+              {/* TikTok: Request Creator Button */}
+              {selectedPlatform === 'tiktok' && (
                 <>
                   {requestStatus === null && (
                     <div className="mt-6 max-w-md mx-auto">
@@ -395,14 +355,14 @@ export default function Search() {
                           type="text"
                           value={normalizedUsername}
                           onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
-                          placeholder={`e.g. ${selectedPlatform === 'instagram' ? 'barackobama' : 'charlidamelio'}`}
-                          className={`flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent ${selectedPlatform === 'tiktok' ? 'focus:ring-gray-900' : 'focus:ring-purple-500'}`}
+                          placeholder="e.g. charlidamelio"
+                          className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                         />
                       </div>
                       <button
                         onClick={() => handleRequestCreator()}
                         disabled={!normalizedUsername}
-                        className={`inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlatform === 'tiktok' ? 'bg-gray-900 hover:bg-gray-800' : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'}`}
+                        className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed bg-gray-900 hover:bg-gray-800"
                       >
                         <Clock className="w-5 h-5" />
                         Request @{normalizedUsername || '...'}
@@ -445,7 +405,7 @@ export default function Search() {
               )}
 
               {/* Standard platforms: Standard message */}
-              {selectedPlatform !== 'instagram' && selectedPlatform !== 'tiktok' && (
+              {selectedPlatform !== 'tiktok' && (
                 <p className="text-sm text-gray-400">
                   Try searching for a different name or check the spelling
                 </p>
@@ -492,9 +452,7 @@ export default function Search() {
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-gray-900 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
                         <p className="text-xs sm:text-sm text-gray-500">
-                          {creator.platform === 'twitch' ? 'followers' :
-                           creator.platform === 'instagram' ? 'followers' :
-                           creator.platform === 'tiktok' ? 'followers' :
+                          {creator.platform === 'twitch' || creator.platform === 'tiktok' ? 'followers' :
                            creator.platform === 'kick' ? 'paid subs' : 'subscribers'}
                         </p>
                       </div>
@@ -506,8 +464,8 @@ export default function Search() {
             </div>
           )}
 
-          {/* Instagram/TikTok: Request Creator (when no exact username match) */}
-          {(selectedPlatform === 'instagram' || selectedPlatform === 'tiktok') && searched && results.length > 0 && query && (
+          {/* TikTok: Request Creator (when no exact username match) */}
+          {selectedPlatform === 'tiktok' && searched && results.length > 0 && query && (
             (() => {
               // Check if any result has exact username match
               const hasExactMatch = results.some(r => r.username.toLowerCase() === query.toLowerCase());
@@ -517,7 +475,7 @@ export default function Search() {
                   <div className="text-center py-8 bg-white rounded-2xl border border-gray-100">
                     <div className="max-w-md mx-auto">
                       <p className="text-sm text-gray-600 mb-4">
-                        Can't find "@{query}"? {selectedPlatform === 'instagram' ? 'Instagram' : 'TikTok'} creators are added by request.
+                        Can't find "@{query}"? TikTok creators are added by request.
                       </p>
 
                       {requestStatus === null && (
@@ -531,14 +489,14 @@ export default function Search() {
                               type="text"
                               value={normalizedUsername}
                               onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
-                              placeholder={`e.g. ${selectedPlatform === 'instagram' ? 'barackobama' : 'charlidamelio'}`}
-                              className={`flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent ${selectedPlatform === 'tiktok' ? 'focus:ring-gray-900' : 'focus:ring-purple-500'}`}
+                              placeholder="e.g. charlidamelio"
+                              className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                             />
                           </div>
                           <button
                             onClick={() => handleRequestCreator()}
                             disabled={!normalizedUsername}
-                            className={`inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlatform === 'tiktok' ? 'bg-gray-900 hover:bg-gray-800' : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'}`}
+                            className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed bg-gray-900 hover:bg-gray-800"
                           >
                             <Clock className="w-5 h-5" />
                             Request @{normalizedUsername || '...'}

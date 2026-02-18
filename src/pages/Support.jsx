@@ -106,7 +106,7 @@ export default function Support() {
             </div>
             <p className="text-gray-700 text-center max-w-2xl mx-auto mb-8">
               ShinyPull provides free analytics for social media creators and their audiences.
-              We track growth metrics across YouTube, Twitch, Kick, Instagram, and TikTok. No paywalls, no sign-up required for basic features.
+              We track growth metrics across YouTube, Twitch, Kick, and TikTok. No paywalls, no sign-up required for basic features.
             </p>
 
             <div className="grid md:grid-cols-2 gap-6">

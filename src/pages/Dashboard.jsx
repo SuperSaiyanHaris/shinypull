@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Youtube, Twitch, Instagram, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft, Check, X, Filter } from 'lucide-react';
+import { Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft, Check, X, Filter } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import SEO from '../components/SEO';
@@ -15,7 +15,6 @@ import logger from '../lib/logger';
 
 const platformIcons = {
   youtube: Youtube,
-  instagram: Instagram,
   tiktok: TikTokIcon,
   twitch: Twitch,
   kick: KickIcon,
@@ -23,7 +22,6 @@ const platformIcons = {
 
 const platformColors = {
   youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600', border: 'border-red-500', ring: 'ring-red-200', bgLight: 'bg-red-100' },
-  instagram: { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-600', border: 'border-pink-500', ring: 'ring-pink-200', bgLight: 'bg-pink-100' },
   tiktok: { bg: 'bg-gray-900', light: 'bg-gray-100', text: 'text-gray-900', border: 'border-gray-700', ring: 'ring-gray-300', bgLight: 'bg-gray-100' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-500', ring: 'ring-purple-200', bgLight: 'bg-purple-100' },
   kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600', border: 'border-green-500', ring: 'ring-green-200', bgLight: 'bg-green-100' },
@@ -155,7 +153,6 @@ export default function Dashboard() {
   // Platform counts
   const platformCounts = {
     youtube: followedCreators.filter(c => c.platform === 'youtube').length,
-    instagram: followedCreators.filter(c => c.platform === 'instagram').length,
     tiktok: followedCreators.filter(c => c.platform === 'tiktok').length,
     twitch: followedCreators.filter(c => c.platform === 'twitch').length,
     kick: followedCreators.filter(c => c.platform === 'kick').length,
@@ -227,10 +224,10 @@ export default function Dashboard() {
                   </button>
 
                   {/* Platform Filters */}
-                  {['youtube', 'instagram', 'tiktok', 'twitch', 'kick'].map(platform => {
+                  {['youtube', 'tiktok', 'twitch', 'kick'].map(platform => {
                     const Icon = platformIcons[platform];
                     const count = platformCounts[platform];
-                    const label = platform === 'youtube' ? 'YouTube' : platform === 'instagram' ? 'Instagram' : platform === 'tiktok' ? 'TikTok' : platform === 'twitch' ? 'Twitch' : 'Kick';
+                    const label = platform === 'youtube' ? 'YouTube' : platform === 'tiktok' ? 'TikTok' : platform === 'twitch' ? 'Twitch' : 'Kick';
                     const isActive = selectedPlatforms.includes(platform);
 
                     return (
@@ -356,10 +353,10 @@ export default function Dashboard() {
                       </button>
 
                       {/* Platform Filters */}
-                      {['youtube', 'instagram', 'tiktok', 'twitch', 'kick'].map(platform => {
+                      {['youtube', 'tiktok', 'twitch', 'kick'].map(platform => {
                         const Icon = platformIcons[platform];
                         const count = platformCounts[platform];
-                        const label = platform === 'youtube' ? 'YouTube' : platform === 'instagram' ? 'Instagram' : platform === 'tiktok' ? 'TikTok' : platform === 'twitch' ? 'Twitch' : 'Kick';
+                        const label = platform === 'youtube' ? 'YouTube' : platform === 'tiktok' ? 'TikTok' : platform === 'twitch' ? 'Twitch' : 'Kick';
                         const isActive = selectedPlatforms.includes(platform);
 
                         return (
@@ -487,7 +484,6 @@ export default function Dashboard() {
                  selectedPlatforms.includes('live') ? 'Live Now' :
                  selectedPlatforms.length === 1 ? (
                    selectedPlatforms[0] === 'youtube' ? 'YouTube Creators' :
-                   selectedPlatforms[0] === 'instagram' ? 'Instagram Creators' :
                    selectedPlatforms[0] === 'tiktok' ? 'TikTok Creators' :
                    selectedPlatforms[0] === 'twitch' ? 'Twitch Streamers' :
                    selectedPlatforms[0] === 'kick' ? 'Kick Streamers' :

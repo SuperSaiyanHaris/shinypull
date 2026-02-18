@@ -74,7 +74,7 @@ export default function Terms() {
                   <strong>It is ShinyPull's policy to not delete data on our website.</strong> All the data on our
                   website is gathered from public sources, and ShinyPull will continue to display said data. If you
                   want us to stop displaying the statistics of your channel/account from a third party (e.g. YouTube,
-                  Twitch, Instagram, Kick), you will have to adjust your privacy settings on said third party website.
+                  Twitch, TikTok, Kick), you will have to adjust your privacy settings on said third party website.
                 </p>
                 <p className="mb-4">
                   Again just to reinstate, the data shown on ShinyPull is the same public data anyone could get by
@@ -91,7 +91,7 @@ export default function Terms() {
               <Section title="Data Sources">
                 <p>
                   In order to keep statistical data updated, ShinyPull utilizes API services of third parties
-                  including YouTube, Instagram, Twitch, and Kick. Unless specific access is asked for at time of
+                  including YouTube, TikTok, Twitch, and Kick. Unless specific access is asked for at time of
                   use (i.e. to validate your identity), we are only gathering publicly available data from each of
                   the API services, not anything private about your account. When private data is granted, collected
                   data via the private token isn't being stored, it is just being used to verify various things. If
@@ -108,7 +108,7 @@ export default function Terms() {
               <Section title="Description of Service">
                 <p>
                   ShinyPull provides social media analytics and statistics for content creators across multiple
-                  platforms including YouTube, Twitch, Kick, and Instagram. We collect publicly available
+                  platforms including YouTube, TikTok, Twitch, and Kick. We collect publicly available
                   data from official platform APIs.
                 </p>
               </Section>
@@ -176,7 +176,7 @@ export default function Terms() {
 
               <Section title="Third-Party Platforms">
                 <p>
-                  Our service relies on third-party platform APIs (YouTube, Twitch, Instagram, Kick, etc.). We are
+                  Our service relies on third-party platform APIs (YouTube, TikTok, Twitch, Kick, etc.). We are
                   not affiliated with these platforms. Changes to their APIs or terms may affect our service.
                 </p>
               </Section>
