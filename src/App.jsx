@@ -10,24 +10,45 @@ import { AuthProvider } from './contexts/AuthContext';
 // Eagerly load the homepage (critical path)
 import Home from './pages/Home';
 
+// Auto-reload on chunk load failure (happens after new deployments)
+function lazyWithRetry(importFn) {
+  return lazy(() =>
+    importFn().catch(() => {
+      // Chunk not found — new deploy invalidated old filenames. Reload once.
+      if (!sessionStorage.getItem('chunk_reload')) {
+        sessionStorage.setItem('chunk_reload', '1');
+        window.location.reload();
+      }
+      // If already reloaded once and still failing, let error boundary handle it
+      sessionStorage.removeItem('chunk_reload');
+      return importFn();
+    })
+  );
+}
+
+// Clear the reload flag on successful page loads
+if (sessionStorage.getItem('chunk_reload')) {
+  sessionStorage.removeItem('chunk_reload');
+}
+
 // Lazy load everything else — only downloaded when the route is visited
-const CreatorProfile = lazy(() => import('./pages/CreatorProfile'));
-const Search = lazy(() => import('./pages/Search'));
-const Rankings = lazy(() => import('./pages/Rankings'));
-const Compare = lazy(() => import('./pages/Compare'));
-const LiveCount = lazy(() => import('./pages/LiveCount'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const About = lazy(() => import('./pages/About'));
-const Contact = lazy(() => import('./pages/Contact'));
-const Privacy = lazy(() => import('./pages/Privacy'));
-const Terms = lazy(() => import('./pages/Terms'));
-const Blog = lazy(() => import('./pages/Blog'));
-const BlogPost = lazy(() => import('./pages/BlogPost'));
-const BlogAdmin = lazy(() => import('./pages/BlogAdmin'));
-const ResetPassword = lazy(() => import('./pages/ResetPassword'));
-const Calculator = lazy(() => import('./pages/Calculator'));
-const Gear = lazy(() => import('./pages/Gear'));
-const Support = lazy(() => import('./pages/Support'));
+const CreatorProfile = lazyWithRetry(() => import('./pages/CreatorProfile'));
+const Search = lazyWithRetry(() => import('./pages/Search'));
+const Rankings = lazyWithRetry(() => import('./pages/Rankings'));
+const Compare = lazyWithRetry(() => import('./pages/Compare'));
+const LiveCount = lazyWithRetry(() => import('./pages/LiveCount'));
+const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
+const About = lazyWithRetry(() => import('./pages/About'));
+const Contact = lazyWithRetry(() => import('./pages/Contact'));
+const Privacy = lazyWithRetry(() => import('./pages/Privacy'));
+const Terms = lazyWithRetry(() => import('./pages/Terms'));
+const Blog = lazyWithRetry(() => import('./pages/Blog'));
+const BlogPost = lazyWithRetry(() => import('./pages/BlogPost'));
+const BlogAdmin = lazyWithRetry(() => import('./pages/BlogAdmin'));
+const ResetPassword = lazyWithRetry(() => import('./pages/ResetPassword'));
+const Calculator = lazyWithRetry(() => import('./pages/Calculator'));
+const Gear = lazyWithRetry(() => import('./pages/Gear'));
+const Support = lazyWithRetry(() => import('./pages/Support'));
 
 // Minimal loading fallback
 function PageLoader() {
