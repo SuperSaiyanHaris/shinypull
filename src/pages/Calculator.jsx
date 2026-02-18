@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Calculator as CalcIcon, DollarSign, TrendingUp, Youtube, Search, Loader2, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Calculator as CalcIcon, DollarSign, TrendingUp, Youtube, Search, Loader2, Info, ArrowRight, ExternalLink } from 'lucide-react';
 import { searchChannels } from '../services/youtubeService';
 import SEO from '../components/SEO';
 import { formatNumber } from '../lib/utils';
@@ -220,6 +221,13 @@ export default function Calculator() {
                       <p className="font-semibold text-gray-900 truncate">{selectedCreator.displayName}</p>
                       <p className="text-xs text-gray-500">{formatNumber(selectedCreator.subscribers)} subscribers</p>
                     </div>
+                    <Link
+                      to={`/youtube/${selectedCreator.username}`}
+                      className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+                    >
+                      View Profile
+                      <ExternalLink className="w-3 h-3" />
+                    </Link>
                     <button
                       onClick={clearCreator}
                       className="text-gray-400 hover:text-red-500 transition-colors"
@@ -238,10 +246,17 @@ export default function Calculator() {
                           onChange={(e) => setSearchQuery(e.target.value)}
                           onFocus={() => searchResults.length > 0 && setShowResults(true)}
                           placeholder="Search for a YouTube creator..."
-                          className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                          className="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         />
-                        {searching && (
+                        {searching ? (
                           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+                        ) : searchQuery.trim() && (
+                          <button
+                            type="submit"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-emerald-500 hover:bg-emerald-600 rounded-lg flex items-center justify-center transition-colors"
+                          >
+                            <ArrowRight className="w-4 h-4 text-white" />
+                          </button>
                         )}
                       </div>
                     </form>
