@@ -665,53 +665,16 @@ export default function CreatorProfile() {
             {/* Growth Rate Cards */}
             {metrics && metrics.growthRates && statsHistory.length >= 7 && (
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200 p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-600">7-Day Growth</span>
-                    {metrics.growthRates.sevenDay > 0 ? (
-                      <TrendingUp className="w-5 h-5 text-emerald-600" />
-                    ) : metrics.growthRates.sevenDay < 0 ? (
-                      <TrendingUp className="w-5 h-5 text-red-500 rotate-180" />
-                    ) : (
-                      <TrendingUp className="w-5 h-5 text-gray-400" />
-                    )}
-                  </div>
-                  <div className={`text-2xl font-bold ${
-                    metrics.growthRates.sevenDay > 0 ? 'text-emerald-600' :
-                    metrics.growthRates.sevenDay < 0 ? 'text-red-500' :
-                    'text-gray-500'
-                  }`}>
-                    {metrics.growthRates.sevenDay > 0 ? '+' : ''}
-                    {metrics.growthRates.sevenDay.toFixed(2)}%
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {platform === 'tiktok' || platform === 'twitch' || platform === 'kick' ? 'Followers' : 'Subscribers'} growth rate
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-600">30-Day Growth</span>
-                    {metrics.growthRates.thirtyDay > 0 ? (
-                      <TrendingUp className="w-5 h-5 text-blue-600" />
-                    ) : metrics.growthRates.thirtyDay < 0 ? (
-                      <TrendingUp className="w-5 h-5 text-red-500 rotate-180" />
-                    ) : (
-                      <TrendingUp className="w-5 h-5 text-gray-400" />
-                    )}
-                  </div>
-                  <div className={`text-2xl font-bold ${
-                    metrics.growthRates.thirtyDay > 0 ? 'text-blue-600' :
-                    metrics.growthRates.thirtyDay < 0 ? 'text-red-500' :
-                    'text-gray-500'
-                  }`}>
-                    {metrics.growthRates.thirtyDay > 0 ? '+' : ''}
-                    {metrics.growthRates.thirtyDay.toFixed(2)}%
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {platform === 'tiktok' || platform === 'twitch' || platform === 'kick' ? 'Followers' : 'Subscribers'} growth rate
-                  </p>
-                </div>
+                <GrowthRateCard
+                  label="7-Day Growth"
+                  value={metrics.growthRates.sevenDay}
+                  platform={platform}
+                />
+                <GrowthRateCard
+                  label="30-Day Growth"
+                  value={metrics.growthRates.thirtyDay}
+                  platform={platform}
+                />
               </div>
             )}
 
@@ -1052,7 +1015,7 @@ export default function CreatorProfile() {
                         )}
                         {platform === 'youtube' && (
                           <>
-                            <td className="px-6 py-4 text-right text-emerald-600">
+                            <td className={`px-6 py-4 text-right ${metrics.dailyAverage.views > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
                               {metrics.dailyAverage.views > 0
                                 ? `+${formatNumber(metrics.dailyAverage.views)}`
                                 : '—'
@@ -1100,7 +1063,7 @@ export default function CreatorProfile() {
                         )}
                         {platform === 'youtube' && (
                           <>
-                            <td className="px-6 py-4 text-right text-emerald-600">
+                            <td className={`px-6 py-4 text-right ${metrics.weeklyAverage.views > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
                               {metrics.weeklyAverage.views > 0
                                 ? `+${formatNumber(metrics.weeklyAverage.views)}`
                                 : '—'
@@ -1222,8 +1185,12 @@ function SummaryCard({ label, sublabel, value, change }) {
   // Use smaller text for longer values (like earnings ranges)
   const isLongValue = value && value.length > 12;
 
+  const bgClass = isNegative
+    ? 'bg-gradient-to-br from-red-50 to-orange-50 border-red-100'
+    : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100';
+
   return (
-    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 sm:p-5 border border-indigo-100">
+    <div className={`rounded-2xl p-4 sm:p-5 border ${bgClass}`}>
       <p className={`font-bold text-gray-900 mb-1 ${isLongValue ? 'text-lg sm:text-xl md:text-2xl' : 'text-xl sm:text-2xl md:text-3xl'}`}>{value}</p>
       <p className="text-xs sm:text-sm font-medium text-gray-700">{label}</p>
       {sublabel && <p className="text-xs text-gray-500 mt-1">{sublabel}</p>}
@@ -1232,6 +1199,36 @@ function SummaryCard({ label, sublabel, value, change }) {
           {isPositive ? '+' : ''}{formatNumber(change)}
         </p>
       )}
+    </div>
+  );
+}
+
+function GrowthRateCard({ label, value, platform }) {
+  const isPositive = value > 0;
+  const isNegative = value < 0;
+  const isNeutral = value === 0;
+
+  const bgClass = isNegative
+    ? 'bg-gradient-to-br from-red-50 to-orange-50 border-red-200'
+    : isPositive
+    ? 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200'
+    : 'bg-gradient-to-br from-gray-50 to-slate-50 border-gray-200';
+
+  const iconColor = isPositive ? 'text-emerald-600' : isNegative ? 'text-red-500' : 'text-gray-400';
+  const valueColor = isPositive ? 'text-emerald-600' : isNegative ? 'text-red-500' : 'text-gray-500';
+
+  const followerLabel = platform === 'tiktok' || platform === 'twitch' || platform === 'kick' ? 'Followers' : 'Subscribers';
+
+  return (
+    <div className={`rounded-2xl border p-5 ${bgClass}`}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium text-gray-600">{label}</span>
+        <TrendingUp className={`w-5 h-5 ${iconColor} ${isNegative ? 'rotate-180' : ''}`} />
+      </div>
+      <div className={`text-2xl font-bold ${valueColor}`}>
+        {isPositive ? '+' : ''}{value.toFixed(2)}%
+      </div>
+      <p className="text-xs text-gray-500 mt-1">{followerLabel} growth rate</p>
     </div>
   );
 }
