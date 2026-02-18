@@ -311,7 +311,7 @@ export default function Compare() {
                         {filledCreators.map((creator) => (
                           <th key={creator.platformId} className="px-6 py-4 text-center font-semibold text-gray-900">
                             <div className="flex items-center justify-center gap-2">
-                              <img src={creator.profileImage} alt="" className="w-6 h-6 rounded-lg" />
+                              <img src={creator.profileImage} alt="" loading="lazy" className="w-6 h-6 rounded-lg" />
                               <span className="truncate max-w-[120px]">{creator.displayName}</span>
                             </div>
                           </th>
@@ -487,7 +487,7 @@ export default function Compare() {
                         to={`/${creator.platform}/${creator.username}`}
                         className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
                       >
-                        <img src={creator.profileImage} alt="" className="w-8 h-8 rounded-lg" />
+                        <img src={creator.profileImage} alt="" loading="lazy" className="w-8 h-8 rounded-lg" />
                         <span className="flex-1 font-medium text-gray-900 truncate">{creator.displayName}</span>
                         <ArrowRight className="w-4 h-4 text-gray-400" />
                       </Link>

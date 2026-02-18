@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -5,24 +6,37 @@ import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AuthProvider } from './contexts/AuthContext';
+
+// Eagerly load the homepage (critical path)
 import Home from './pages/Home';
-import CreatorProfile from './pages/CreatorProfile';
-import Search from './pages/Search';
-import Rankings from './pages/Rankings';
-import Compare from './pages/Compare';
-import LiveCount from './pages/LiveCount';
-import Dashboard from './pages/Dashboard';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import Privacy from './pages/Privacy';
-import Terms from './pages/Terms';
-import Blog from './pages/Blog';
-import BlogPost from './pages/BlogPost';
-import BlogAdmin from './pages/BlogAdmin';
-import ResetPassword from './pages/ResetPassword';
-import Calculator from './pages/Calculator';
-import Gear from './pages/Gear';
-import Support from './pages/Support';
+
+// Lazy load everything else — only downloaded when the route is visited
+const CreatorProfile = lazy(() => import('./pages/CreatorProfile'));
+const Search = lazy(() => import('./pages/Search'));
+const Rankings = lazy(() => import('./pages/Rankings'));
+const Compare = lazy(() => import('./pages/Compare'));
+const LiveCount = lazy(() => import('./pages/LiveCount'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const About = lazy(() => import('./pages/About'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Blog = lazy(() => import('./pages/Blog'));
+const BlogPost = lazy(() => import('./pages/BlogPost'));
+const BlogAdmin = lazy(() => import('./pages/BlogAdmin'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Calculator = lazy(() => import('./pages/Calculator'));
+const Gear = lazy(() => import('./pages/Gear'));
+const Support = lazy(() => import('./pages/Support'));
+
+// Minimal loading fallback
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
 
 function App() {
   return (
@@ -33,6 +47,7 @@ function App() {
         <Header />
         <main className="flex-1">
           <ErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
@@ -54,6 +69,7 @@ function App() {
             <Route path="/blog/admin" element={<BlogAdmin />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
           </Routes>
+          </Suspense>
           </ErrorBoundary>
         </main>
         <Footer />

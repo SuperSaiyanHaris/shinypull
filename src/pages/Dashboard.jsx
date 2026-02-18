@@ -555,6 +555,7 @@ export default function Dashboard() {
                         <img
                           src={creator.profile_image || '/placeholder-avatar.svg'}
                           alt={creator.display_name}
+                          loading="lazy"
                           className="w-12 h-12 rounded-xl object-cover"
                         />
                         {isLive && (
@@ -669,6 +670,7 @@ export default function Dashboard() {
                       <img
                         src={creator.profileImage || '/placeholder-avatar.svg'}
                         alt={creator.displayName}
+                        loading="lazy"
                         className="w-12 h-12 rounded-lg object-cover mx-auto mb-2"
                       />
                       <div className="text-center">
