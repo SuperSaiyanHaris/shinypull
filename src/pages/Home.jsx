@@ -201,8 +201,8 @@ export default function Home() {
               </form>
 
               {/* Platform Cards - Horizontal pills on mobile, grid on desktop */}
-              {/* Mobile: 2x2 grid pills */}
-              <div className="grid grid-cols-2 sm:hidden gap-2 px-4 -mx-4">
+              {/* Mobile: centered flex pills */}
+              <div className="flex flex-wrap justify-center sm:hidden gap-2.5">
                 {platforms.map((platform) => {
                   const Icon = platform.icon;
                   if (platform.available) {
@@ -210,7 +210,7 @@ export default function Home() {
                       <Link
                         key={platform.id}
                         to={`/rankings/${platform.id}`}
-                        className="flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2.5 border border-white/10 hover:bg-white/20 active:bg-white/25 transition-all"
+                        className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2.5 border border-white/10 hover:bg-white/20 active:bg-white/25 transition-all"
                       >
                         <div className={`w-7 h-7 ${platform.bgColor} rounded-full flex items-center justify-center`}>
                           {Icon && <Icon className={`w-3.5 h-3.5 ${platform.textColor}`} />}
