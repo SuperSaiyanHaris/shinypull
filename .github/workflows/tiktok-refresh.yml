@@ -1,6 +1,9 @@
 name: TikTok Profile Refresh
 
 on:
+  schedule:
+    - cron: '0 2 * * *'   # 02:00 UTC (9 PM EST)
+    - cron: '0 14 * * *'  # 14:00 UTC (9 AM EST)
   workflow_dispatch:
     inputs:
       count:
