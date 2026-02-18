@@ -29,7 +29,7 @@ const platformColors = {
   youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600', border: 'border-red-200' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-200' },
   kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600', border: 'border-green-200' },
-  tiktok: { bg: 'bg-pink-500', light: 'bg-pink-50', text: 'text-pink-600', border: 'border-pink-200' },
+  tiktok: { bg: 'bg-gray-900', light: 'bg-gray-50', text: 'text-gray-900', border: 'border-gray-200' },
 };
 
 const platformUrls = {
@@ -352,9 +352,15 @@ export default function CreatorProfile() {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2 flex-wrap">
                   <h1 className="text-3xl font-bold text-gray-900">@{username}</h1>
-                  <span className={`px-3 py-1 rounded-full text-sm ${colors.bg} text-white`}>
+                  <a
+                    href={platformUrls[platform]?.(username)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${colors.bg} text-white hover:opacity-90 transition-opacity`}
+                  >
+                    {Icon && <Icon className="w-3.5 h-3.5" />}
                     {platform}
-                  </span>
+                  </a>
                 </div>
                 <p className="text-gray-500 mb-4">Creator not found</p>
                 <a
@@ -422,10 +428,16 @@ export default function CreatorProfile() {
                 <div className="flex-1 w-full">
                   <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{creator.displayName}</h1>
-                    <span className={`inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm ${colors.bg} text-white`}>
+                    <a
+                      href={platformUrls[platform]?.(creator.username || username)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm ${colors.bg} text-white hover:opacity-90 transition-opacity`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {Icon && <Icon className="w-3 h-3 sm:w-4 sm:h-4" />}
                       {platform}
-                    </span>
+                    </a>
                     {isLive && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm bg-red-500 text-white animate-pulse">
                         <Radio className="w-3 h-3 sm:w-4 sm:h-4" />
