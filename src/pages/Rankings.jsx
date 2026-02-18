@@ -14,7 +14,7 @@ import logger from '../lib/logger';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', hoverColor: 'hover:bg-red-700', lightBg: 'bg-red-50', textColor: 'text-red-600', available: true },
-  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'bg-gray-900', hoverColor: 'hover:bg-gray-800', lightBg: 'bg-pink-50', textColor: 'text-pink-600', available: true },
+  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'bg-gray-900', hoverColor: 'hover:bg-gray-800', lightBg: 'bg-gray-900', textColor: 'text-pink-600', darkHeader: true, available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', hoverColor: 'hover:bg-purple-700', lightBg: 'bg-purple-50', textColor: 'text-purple-600', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'bg-green-500', hoverColor: 'hover:bg-green-600', lightBg: 'bg-green-50', textColor: 'text-green-600', available: true },
 ];
@@ -180,16 +180,20 @@ function RankingsOverview() {
                 return (
                   <div key={platform.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                     {/* Platform Header */}
-                    <div className={`flex items-center justify-between px-5 py-4 ${platform.lightBg} border-b border-gray-100`}>
+                    <div className={`flex items-center justify-between px-5 py-4 ${platform.lightBg} border-b ${platform.darkHeader ? 'border-gray-800' : 'border-gray-100'}`}>
                       <div className="flex items-center gap-2.5">
-                        <div className={`w-8 h-8 ${platform.color} rounded-lg flex items-center justify-center`}>
-                          <Icon className="w-4.5 h-4.5 text-white" />
-                        </div>
-                        <h2 className="font-bold text-gray-900">Top {platform.name} Creators</h2>
+                        {platform.darkHeader ? (
+                          <Icon className="w-5 h-5 text-white" />
+                        ) : (
+                          <div className={`w-8 h-8 ${platform.color} rounded-lg flex items-center justify-center`}>
+                            <Icon className="w-4.5 h-4.5 text-white" />
+                          </div>
+                        )}
+                        <h2 className={`font-bold ${platform.darkHeader ? 'text-white' : 'text-gray-900'}`}>Top {platform.name} Creators</h2>
                       </div>
                       <Link
                         to={`/rankings/${platform.id}`}
-                        className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+                        className={`text-sm font-medium transition-colors ${platform.darkHeader ? 'text-gray-300 hover:text-white' : 'text-indigo-600 hover:text-indigo-700'}`}
                       >
                         View All &rarr;
                       </Link>
