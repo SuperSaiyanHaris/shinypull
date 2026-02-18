@@ -199,7 +199,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/tiktok/khaby.lame</loc>
+    <loc>https://shinypull.com/kick/rraenee</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/odablock</loc>
     <lastmod>2026-02-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -218,6 +224,12 @@
   </url>
   <url>
     <loc>https://shinypull.com/youtube/mrbeast</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/khaby.lame</loc>
     <lastmod>2026-02-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -11227,12 +11239,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/kick/rraenee</loc>
-    <lastmod>2026-02-14</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/twitch/podasai</loc>
     <lastmod>2026-02-14</lastmod>
     <changefreq>daily</changefreq>
@@ -14342,12 +14348,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/kick/westcol</loc>
-    <lastmod>2026-02-14</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/odablock</loc>
     <lastmod>2026-02-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>

@@ -183,7 +183,7 @@ function RankingsOverview() {
                     <div className={`flex items-center justify-between px-5 py-4 ${platform.lightBg} border-b border-gray-100`}>
                       <div className="flex items-center gap-2.5">
                         <div className={`w-8 h-8 ${platform.color} rounded-lg flex items-center justify-center`}>
-                          <Icon className="w-4.5 h-4.5 text-white" />
+                          <Icon className="w-5 h-5 text-white" />
                         </div>
                         <h2 className="font-bold text-gray-900">Top {platform.name} Creators</h2>
                       </div>
