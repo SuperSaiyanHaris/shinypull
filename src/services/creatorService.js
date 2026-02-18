@@ -226,128 +226,34 @@ export const getLatestStats = withErrorHandling(
  */
 export const getRankedCreators = withErrorHandling(
   async (platform, rankType = 'subscribers', limit = 50) => {
-    // Fetch all creators with pagination to bypass Supabase's 1000 row limit
-    let allData = [];
-    let page = 0;
-    const pageSize = 1000;
-    let hasMore = true;
-
-    while (hasMore) {
-      const { data, error } = await supabase
-        .from('creators')
-        .select(`
-          id,
-          platform,
-          platform_id,
-          username,
-          display_name,
-          profile_image,
-          creator_stats (
-            recorded_at,
-            subscribers,
-            followers,
-            total_views,
-            total_posts,
-            followers_gained_month,
-            views_gained_month,
-            hours_watched_day,
-            hours_watched_week,
-            hours_watched_month
-          )
-        `)
-        .eq('platform', platform)
-        .range(page * pageSize, (page + 1) * pageSize - 1);
-
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        allData = allData.concat(data);
-        page++;
-        hasMore = data.length === pageSize; // Continue if we got a full page
-      } else {
-        hasMore = false;
-      }
-    }
-
-    const data = allData;
-
-    // Map creators and calculate growth from their stats history
-    const creators = (data || []).map((creator) => {
-      const allStats = (creator.creator_stats || []).sort(
-        (a, b) => new Date(b.recorded_at) - new Date(a.recorded_at)
-      );
-      
-      const latestStats = allStats[0] || null;
-      
-      // Calculate 30-day growth from historical data
-      // YouTube: require at least 7 days of data for accurate growth
-      // Twitch/Kick: require at least 2 days (counts are exact)
-      let calculatedGrowth = 0;
-      const minDataPoints = platform === 'youtube' ? 7 : 2;
-      
-      if (allStats.length >= minDataPoints) {
-        const oldestStat = allStats[allStats.length - 1];
-        const newestStat = allStats[0];
-        
-        // Check if data spans at least the minimum required days
-        const oldestDate = new Date(oldestStat.recorded_at).toDateString();
-        const newestDate = new Date(newestStat.recorded_at).toDateString();
-        
-        if (oldestDate !== newestDate) {
-          if (platform === 'youtube') {
-            // For YouTube, use view growth
-            calculatedGrowth = (newestStat?.total_views || 0) - (oldestStat?.total_views || 0);
-          } else if (platform === 'kick') {
-            // For Kick, use paid subscriber growth (followers field stores paid subs for Kick)
-            calculatedGrowth = (newestStat?.subscribers || newestStat?.followers || 0) - (oldestStat?.subscribers || oldestStat?.followers || 0);
-          } else if (platform === 'tiktok') {
-            // For TikTok, use follower growth
-            calculatedGrowth = (newestStat?.followers || newestStat?.subscribers || 0) - (oldestStat?.followers || oldestStat?.subscribers || 0);
-          } else {
-            // For Twitch, use watch hours growth
-            calculatedGrowth = (newestStat?.hours_watched_month || 0) - (oldestStat?.hours_watched_month || 0);
-          }
-        }
-      }
-      
-      return {
-        ...creator,
-        latestStats,
-        calculatedGrowth,
-      };
+    const { data, error } = await supabase.rpc('get_ranked_creators', {
+      p_platform: platform,
+      p_rank_type: rankType,
+      p_limit: limit,
     });
 
-    const withStats = creators.filter((creator) => creator.latestStats);
+    if (error) throw error;
 
-    const ranked = withStats
-      .map((creator) => {
-        const stats = creator.latestStats;
-        const subscribers = stats?.subscribers ?? stats?.followers ?? 0;
-        const views = stats?.total_views ?? 0;
-
-        // Use calculated growth, or fall back to pre-calculated field
-        const growth = creator.calculatedGrowth > 0
-          ? creator.calculatedGrowth
-          : (platform === 'youtube' ? (stats?.views_gained_month ?? 0) : (stats?.followers_gained_month ?? 0));
-
-        let sortValue = subscribers;
-        if (rankType === 'views') sortValue = views;
-        if (rankType === 'growth') sortValue = growth;
-
-        return {
-          ...creator,
-          latestStats: stats,
-          subscribers,
-          totalViews: views,
-          totalPosts: stats?.total_posts ?? 0,
-          growth30d: growth,
-          sortValue,
-        };
-      })
-      .sort((a, b) => b.sortValue - a.sortValue)
-      .slice(0, limit);
-
-    return ranked;
+    // Map DB column names to the format Rankings.jsx expects
+    return (data || []).map((creator) => ({
+      ...creator,
+      latestStats: {
+        subscribers: creator.subscribers,
+        followers: creator.subscribers,
+        total_views: creator.total_views,
+        total_posts: creator.total_posts,
+        hours_watched_day: creator.hours_watched_day,
+        hours_watched_week: creator.hours_watched_week,
+        hours_watched_month: creator.hours_watched_month,
+      },
+      subscribers: creator.subscribers,
+      totalViews: creator.total_views,
+      totalPosts: creator.total_posts,
+      growth30d: creator.growth_30d,
+      sortValue: rankType === 'views' ? creator.total_views
+        : rankType === 'growth' ? creator.growth_30d
+        : creator.subscribers,
+    }));
   },
   'creatorService.getRankedCreators'
 );

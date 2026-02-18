@@ -99,9 +99,166 @@ function createRankingListSchema(rankings, platform, topCount) {
 export default function Rankings() {
   const { platform: urlPlatform } = useParams();
   const navigate = useNavigate();
+
+  // If no platform in URL, show overview page
+  if (!urlPlatform) {
+    return <RankingsOverview />;
+  }
+
+  return <PlatformRankings urlPlatform={urlPlatform} />;
+}
+
+function RankingsOverview() {
+  const navigate = useNavigate();
+  const [platformData, setPlatformData] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadAll = async () => {
+      setLoading(true);
+      try {
+        const results = await Promise.all(
+          platforms.map(async (p) => {
+            try {
+              const data = await getRankedCreators(p.id, 'subscribers', 10);
+              return { platform: p.id, data };
+            } catch {
+              return { platform: p.id, data: [] };
+            }
+          })
+        );
+        const map = {};
+        results.forEach(r => { map[r.platform] = r.data; });
+        setPlatformData(map);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadAll();
+  }, []);
+
+  return (
+    <>
+      <SEO
+        title="Creator Rankings - Top YouTubers, TikTokers, Twitch & Kick Streamers (2026)"
+        description="Live rankings of the top creators across YouTube, TikTok, Twitch, and Kick. Updated daily with subscriber counts, follower stats, and growth metrics."
+        keywords="top youtubers, top tiktokers, top twitch streamers, top kick streamers, creator rankings, most subscribers, most followers, live rankings 2026"
+      />
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+            <div className="absolute top-0 right-1/4 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
+          </div>
+          <div className="relative w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
+              <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-400" />
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Creator Rankings</h1>
+            </div>
+            <p className="text-sm sm:text-base text-slate-400">Top creators across all platforms. Updated daily.</p>
+          </div>
+        </div>
+
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[1,2,3,4].map(i => (
+                <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                  <TableSkeleton rows={5} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {platforms.map((platform) => {
+                const Icon = platform.icon;
+                const creators = platformData[platform.id] || [];
+                const follLabel = platform.id === 'tiktok' || platform.id === 'twitch' ? 'followers' : platform.id === 'kick' ? 'paid subs' : 'subscribers';
+
+                return (
+                  <div key={platform.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    {/* Platform Header */}
+                    <div className={`flex items-center justify-between px-5 py-4 ${platform.lightBg} border-b border-gray-100`}>
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 ${platform.color} rounded-lg flex items-center justify-center`}>
+                          <Icon className="w-4.5 h-4.5 text-white" />
+                        </div>
+                        <h2 className="font-bold text-gray-900">Top {platform.name} Creators</h2>
+                      </div>
+                      <Link
+                        to={`/rankings/${platform.id}`}
+                        className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+                      >
+                        View All &rarr;
+                      </Link>
+                    </div>
+
+                    {/* Mini Rankings List */}
+                    <div className="divide-y divide-gray-50">
+                      {creators.length === 0 ? (
+                        <div className="px-5 py-8 text-center text-gray-400 text-sm">No data available</div>
+                      ) : (
+                        creators.map((creator, index) => (
+                          <Link
+                            key={creator.id}
+                            to={`/${creator.platform}/${creator.username}`}
+                            className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors group"
+                          >
+                            <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                              index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                              index === 1 ? 'bg-gray-100 text-gray-600' :
+                              index === 2 ? 'bg-orange-100 text-orange-700' :
+                              'bg-gray-50 text-gray-400'
+                            }`}>
+                              {index + 1}
+                            </span>
+                            <img
+                              src={creator.profile_image || '/placeholder-avatar.svg'}
+                              alt={creator.display_name}
+                              loading="lazy"
+                              className="w-8 h-8 rounded-lg object-cover bg-gray-100 flex-shrink-0"
+                              onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+                                {creator.display_name}
+                              </p>
+                            </div>
+                            <span className="text-sm font-medium text-gray-500 flex-shrink-0">
+                              {formatNumber(creator.subscribers)} {follLabel}
+                            </span>
+                          </Link>
+                        ))
+                      )}
+                    </div>
+
+                    {/* View Full Rankings Button */}
+                    <div className="px-5 py-3 border-t border-gray-100">
+                      <Link
+                        to={`/rankings/${platform.id}`}
+                        className={`block w-full text-center py-2.5 rounded-xl text-sm font-medium ${platform.color} text-white ${platform.hoverColor} transition-colors`}
+                      >
+                        View Top 50 {platform.name} Creators
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function PlatformRankings({ urlPlatform }) {
+  const navigate = useNavigate();
   const [selectedPlatform, setSelectedPlatform] = useState(urlPlatform || 'youtube');
   const [selectedRankType, setSelectedRankType] = useState('subscribers');
-  const [topCount, setTopCount] = useState(100);
+  const [topCount, setTopCount] = useState(50);
   const [topCountOpen, setTopCountOpen] = useState(false);
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(false);
