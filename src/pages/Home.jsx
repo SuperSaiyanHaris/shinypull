@@ -12,7 +12,7 @@ const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-600', stats: '72M+ channels', available: true },
   { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'from-gray-900 to-gray-800', bgColor: 'bg-pink-50', textColor: 'text-pink-600', stats: '1B+ accounts', available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50', textColor: 'text-purple-600', stats: '7M+ channels', available: true },
-  { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50', textColor: 'text-green-600', stats: 'New!', available: true },
+  { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50', textColor: 'text-green-600', stats: '10M+ channels', available: true },
 ];
 
 const features = [
