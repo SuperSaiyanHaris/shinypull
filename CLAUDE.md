@@ -503,6 +503,30 @@ All tables have RLS enabled. Here are the current policies:
 - Changing architectural patterns or conventions
 - Do NOT update for bug fixes, styling changes, or minor tweaks
 
+## Performance Optimization
+
+**PageSpeed scores (as of Feb 2026):** Mobile 85, Desktop 96. SEO 100, Best Practices 100.
+
+**Code splitting (React.lazy):**
+- `App.jsx` uses `React.lazy()` + `Suspense` for all page routes except Home
+- Home is eagerly loaded (critical path); all other pages load on-demand
+- `PageLoader` spinner component shown during lazy chunk loading
+- This reduced initial JS payload by ~60%
+
+**index.html optimizations:**
+- Google Fonts loaded non-blocking via `media="print" onload="this.media='all'"` pattern
+- Google Analytics deferred until `window.load` event (not render-blocking)
+- `preconnect` to Supabase origin for faster API calls
+- Only font weights 400/500/600/700 loaded (300 removed — unused)
+
+**Image loading:**
+- All below-fold `<img>` tags use `loading="lazy"`
+- Above-fold hero/LCP images intentionally do NOT have lazy loading
+
+**When adding new pages:**
+- Add them as lazy imports in `App.jsx`: `const NewPage = lazy(() => import('./pages/NewPage'));`
+- Do NOT add regular imports — this would bundle them into the main chunk and hurt performance
+
 ---
 
-*Last updated: 2026-02-17*
+*Last updated: 2026-02-18*
