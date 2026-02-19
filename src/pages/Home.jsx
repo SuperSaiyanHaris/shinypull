@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, ShoppingBag, ExternalLink, X } from 'lucide-react';
+import { Search, Youtube, Twitch, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, ShoppingBag, ExternalLink, X, Users, Eye, GitCompare } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import { useState, useEffect } from 'react';
@@ -9,37 +9,17 @@ import { getAllPosts } from '../services/blogService';
 import { getActiveProducts } from '../services/productsService';
 
 const platforms = [
-  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-600', stats: '72M+ channels', available: true },
-  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'from-gray-900 to-gray-800', bgColor: 'bg-pink-50', textColor: 'text-pink-600', stats: '1B+ accounts', available: true },
-  { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50', textColor: 'text-purple-600', stats: '7M+ channels', available: true },
-  { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50', textColor: 'text-green-600', stats: '10M+ channels', available: true },
+  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-600', ringColor: 'ring-red-200', stats: '72M+ channels', available: true },
+  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'from-gray-900 to-gray-800', bgColor: 'bg-gray-100', textColor: 'text-gray-900', ringColor: 'ring-gray-300', stats: '1B+ accounts', available: true },
+  { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50', textColor: 'text-purple-600', ringColor: 'ring-purple-200', stats: '7M+ channels', available: true },
+  { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50', textColor: 'text-green-600', ringColor: 'ring-green-200', stats: '10M+ channels', available: true },
 ];
 
-const features = [
-  {
-    icon: Search,
-    title: 'Search Creators',
-    description: 'Find any creator across all major platforms with real-time data.',
-    color: 'from-blue-500 to-indigo-600',
-    bgColor: 'bg-blue-50',
-    link: '/search',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Track Growth',
-    description: 'See daily, weekly, and monthly follower and view growth statistics.',
-    color: 'from-emerald-500 to-teal-600',
-    bgColor: 'bg-emerald-50',
-    link: '/rankings/youtube',
-  },
-  {
-    icon: BarChart3,
-    title: 'Compare & Rank',
-    description: 'Compare creators and see how they rank against others.',
-    color: 'from-purple-500 to-violet-600',
-    bgColor: 'bg-purple-50',
-    link: '/compare',
-  },
+const typewriterWords = [
+  { text: 'YouTube Creator', color: 'text-red-500' },
+  { text: 'TikTok Star', color: 'text-gray-900' },
+  { text: 'Twitch Streamer', color: 'text-purple-600' },
+  { text: 'Kick Channel', color: 'text-green-500' },
 ];
 
 export default function Home() {
@@ -47,6 +27,34 @@ export default function Home() {
   const [latestPosts, setLatestPosts] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const navigate = useNavigate();
+
+  // Typewriter effect
+  const [wordIndex, setWordIndex] = useState(0);
+  const [displayText, setDisplayText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentWord = typewriterWords[wordIndex].text;
+    let timeout;
+
+    if (!isDeleting && displayText === currentWord) {
+      // Pause at full word
+      timeout = setTimeout(() => setIsDeleting(true), 2000);
+    } else if (isDeleting && displayText === '') {
+      // Move to next word
+      setIsDeleting(false);
+      setWordIndex((prev) => (prev + 1) % typewriterWords.length);
+    } else {
+      // Type or delete
+      timeout = setTimeout(() => {
+        setDisplayText(prev =>
+          isDeleting ? prev.slice(0, -1) : currentWord.slice(0, prev.length + 1)
+        );
+      }, isDeleting ? 40 : 80);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [displayText, isDeleting, wordIndex]);
 
   useEffect(() => {
     getAllPosts().then(posts => setLatestPosts(posts.slice(0, 3)));
@@ -134,51 +142,58 @@ export default function Home() {
         keywords="youtube statistics, tiktok statistics, twitch statistics, kick statistics, subscriber count, follower count, social blade alternative, creator analytics, earnings calculator"
       />
 
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-        {/* Hero Section - Dark Gradient with Mesh */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
-          {/* Animated mesh gradient background */}
-          <div className="absolute inset-0">
-            {/* Grid pattern */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
-            {/* Gradient orbs */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
-          </div>
+      <div className="min-h-screen bg-white">
+        {/* Hero Section - Clean Light with Typewriter */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white">
+          {/* Subtle dot pattern */}
+          <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-[size:24px_24px] opacity-50"></div>
 
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 pb-20 sm:pb-32">
+          <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-16 sm:pb-24">
             <div className="text-center max-w-4xl mx-auto">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full text-xs sm:text-sm font-medium text-indigo-300 mb-6 sm:mb-8">
-                <span className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
-                Real-time creator analytics
+              {/* Platform chips - inline, above the heading */}
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10">
+                {platforms.map((platform) => {
+                  const Icon = platform.icon;
+                  return (
+                    <Link
+                      key={platform.id}
+                      to={`/rankings/${platform.id}`}
+                      className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 ${platform.bgColor} rounded-full hover:ring-2 ${platform.ringColor} transition-all duration-200 group`}
+                    >
+                      <Icon className={`w-4 h-4 ${platform.textColor}`} />
+                      <span className={`text-xs sm:text-sm font-semibold ${platform.textColor}`}>{platform.name}</span>
+                    </Link>
+                  );
+                })}
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-6 tracking-tight px-2">
-                Social Media{' '}
-                <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                  Statistics
+              {/* Typewriter heading */}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-5 sm:mb-6 tracking-tight leading-tight">
+                Find any{' '}
+                <span className={`${typewriterWords[wordIndex].color} inline-block min-w-[200px] sm:min-w-[300px] text-left`}>
+                  {displayText}
+                  <span className="animate-pulse text-indigo-400">|</span>
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg lg:text-xl text-slate-300 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-4">
-                Track followers, views, and growth for your favorite YouTube, TikTok, Twitch, and Kick creators. Get detailed analytics and insights.
+              <p className="text-base sm:text-lg lg:text-xl text-gray-500 mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed">
+                Real-time stats, growth tracking, and analytics across every major platform.
               </p>
 
-              {/* Search Bar - Modern Clean Design */}
-              <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12 sm:mb-16 px-4">
+              {/* Search Bar - Glowing on focus */}
+              <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-6 px-4">
                 <div className="space-y-3">
                   <div className="relative group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-20 group-hover:opacity-30 blur-xl transition duration-300"></div>
-                    <div className="relative flex items-center bg-white rounded-2xl shadow-2xl border-2 border-white/50">
+                    {/* Glow effect */}
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-0 group-focus-within:opacity-20 blur-lg transition-all duration-500"></div>
+                    <div className="relative flex items-center bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-200 group-focus-within:border-indigo-300 group-focus-within:shadow-indigo-100 transition-all duration-300">
                       <Search className="absolute left-5 w-5 h-5 text-gray-400" />
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search for a creator (e.g., MrBeast, Ninja)"
-                        className="w-full pl-14 pr-12 py-5 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl font-medium"
+                        className="w-full pl-14 pr-12 py-4 sm:py-5 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-base sm:text-lg rounded-2xl"
                       />
                       {searchQuery && (
                         <button
@@ -193,94 +208,41 @@ export default function Home() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-4 text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-2xl transition-all duration-200 shadow-2xl shadow-indigo-500/40 hover:shadow-indigo-500/60 hover:-translate-y-0.5"
+                    className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-3.5 sm:py-4 text-base sm:text-lg bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                   >
                     Search
                   </button>
                 </div>
               </form>
-
-              {/* Platform Cards - Bold tiles on mobile, grid on desktop */}
-              {/* Mobile: 2x2 bold gradient tiles */}
-              <div className="grid grid-cols-4 sm:hidden gap-3 px-2">
-                {platforms.map((platform) => {
-                  const Icon = platform.icon;
-                  if (platform.available) {
-                    return (
-                      <Link
-                        key={platform.id}
-                        to={`/rankings/${platform.id}`}
-                        className={`group flex flex-col items-center gap-2 py-4 rounded-2xl bg-gradient-to-br ${platform.color} shadow-lg shadow-black/20 hover:scale-105 active:scale-95 transition-all duration-200`}
-                      >
-                        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                          {Icon && <Icon className="w-5 h-5 text-white" />}
-                        </div>
-                        <span className="text-xs font-semibold text-white/90 tracking-wide">{platform.name}</span>
-                      </Link>
-                    );
-                  }
-                  return null;
-                })}
-              </div>
-
-              {/* Desktop: 4-column bold gradient tiles */}
-              <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto px-4">
-                {platforms.map((platform) => {
-                  const Icon = platform.icon;
-
-                  if (platform.available) {
-                    return (
-                      <Link
-                        key={platform.id}
-                        to={`/rankings/${platform.id}`}
-                        className={`group flex flex-col items-center gap-3 py-6 rounded-2xl bg-gradient-to-br ${platform.color} shadow-lg shadow-black/20 hover:scale-105 hover:-translate-y-1 active:scale-95 transition-all duration-200`}
-                      >
-                        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                          {Icon && <Icon className="w-6 h-6 text-white" />}
-                        </div>
-                        <div className="text-center">
-                          <h2 className="text-sm font-bold text-white">{platform.name}</h2>
-                          <p className="text-xs text-white/60 mt-0.5">{platform.stats}</p>
-                        </div>
-                      </Link>
-                    );
-                  }
-                  return null;
-                })}
-              </div>
             </div>
           </div>
-
-          {/* Bottom fade to white */}
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-gray-50 to-transparent"></div>
         </section>
 
-        {/* Features Section */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-20 bg-gray-50">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                Track Creator Growth
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Everything you need to analyze and track social media creators
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
-                <Link
-                  key={index}
-                  to={feature.link}
-                  className="group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer"
-                >
-                  <div className={`w-14 h-14 ${feature.bgColor} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <feature.icon className={`w-7 h-7 bg-gradient-to-r ${feature.color} bg-clip-text`} style={{ color: feature.color.includes('emerald') ? '#10b981' : feature.color.includes('blue') ? '#6366f1' : '#8b5cf6' }} />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-                </Link>
-              ))}
+        {/* Features Section - Minimal, integrated */}
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-white border-t border-gray-100">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
+              <Link to="/search" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-all duration-200">
+                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
+                  <Search className="w-6 h-6 text-indigo-600" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Search Creators</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">Find any creator across YouTube, TikTok, Twitch, and Kick instantly.</p>
+              </Link>
+              <Link to="/rankings" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-all duration-200">
+                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
+                  <TrendingUp className="w-6 h-6 text-emerald-600" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Track Growth</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">Daily, weekly, and monthly stats with historical charts and trends.</p>
+              </Link>
+              <Link to="/compare" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-all duration-200">
+                <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
+                  <BarChart3 className="w-6 h-6 text-purple-600" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Compare & Rank</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">Side-by-side comparisons and rankings across all platforms.</p>
+              </Link>
             </div>
           </div>
         </section>
@@ -316,7 +278,7 @@ export default function Home() {
 
         {/* Recommended Gear */}
         {featuredProducts.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-20 bg-white">
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-50">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center justify-between mb-12">
                 <div>
@@ -396,7 +358,7 @@ export default function Home() {
 
         {/* Latest Blog Posts */}
         {latestPosts.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-20 bg-gray-50">
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-white border-t border-gray-100">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center justify-between mb-12">
                 <div>
@@ -464,34 +426,22 @@ export default function Home() {
           </section>
         )}
 
-        {/* CTA Section - Dark Footer */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
-          {/* Background effects */}
-          <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
-            <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
-            <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
-          </div>
-
-          {/* Top fade from content */}
-          <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-gray-50 to-transparent"></div>
-
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
-                Start tracking your favorite creators
-              </h2>
-              <p className="text-slate-300 mb-8 max-w-xl mx-auto text-lg">
-                Search for any creator and get detailed analytics instantly.
-              </p>
-              <Link
-                to="/search"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors shadow-lg shadow-indigo-500/20"
-              >
-                Get Started
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
+        {/* CTA Section */}
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-50 border-t border-gray-100">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+              Ready to dive in?
+            </h2>
+            <p className="text-gray-500 mb-8 max-w-lg mx-auto">
+              Search for any creator and get real-time analytics instantly.
+            </p>
+            <Link
+              to="/search"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+            >
+              Get Started
+              <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
         </section>
       </div>
