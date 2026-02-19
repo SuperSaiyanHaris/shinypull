@@ -489,7 +489,7 @@ export default function Search() {
                               value={normalizedUsername}
                               onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
                               placeholder="e.g. charlidamelio"
-                              className="flex-1 px-4 py-2.5 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                              className="flex-1 px-4 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             />
                           </div>
                           <button
@@ -514,21 +514,21 @@ export default function Search() {
                       )}
 
                       {requestStatus === 'success' && (
-                        <div className="p-4 bg-green-950/30 border border-green-200 rounded-xl">
-                          <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                          <p className="text-sm text-green-800 font-medium mb-1">Request Submitted!</p>
-                          <p className="text-sm text-green-700">{requestMessage}</p>
+                        <div className="p-4 bg-green-950/30 border border-green-800/50 rounded-xl">
+                          <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                          <p className="text-sm text-green-300 font-medium mb-1">Request Submitted!</p>
+                          <p className="text-sm text-green-400">{requestMessage}</p>
                         </div>
                       )}
 
                       {requestStatus === 'error' && (
                         <div className="p-4 bg-red-950/30 border border-red-800 rounded-xl">
                           <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
-                          <p className="text-sm text-red-800 font-medium mb-1">Request Failed</p>
-                          <p className="text-sm text-red-700">{requestMessage}</p>
+                          <p className="text-sm text-red-300 font-medium mb-1">Request Failed</p>
+                          <p className="text-sm text-red-400">{requestMessage}</p>
                           <button
                             onClick={() => handleRequestCreator()}
-                            className="mt-3 text-sm text-red-700 hover:text-red-800 font-medium underline"
+                            className="mt-3 text-sm text-red-400 hover:text-red-300 font-medium underline"
                           >
                             Try Again
                           </button>
