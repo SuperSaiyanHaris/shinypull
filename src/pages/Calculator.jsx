@@ -153,7 +153,7 @@ export default function Calculator() {
                   onClick={() => switchMode('creator')}
                   className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all ${
                     mode === 'creator'
-                      ? 'bg-gray-900 text-white shadow-sm'
+                      ? 'bg-indigo-600 text-white shadow-sm'
                       : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
@@ -164,7 +164,7 @@ export default function Calculator() {
                   onClick={() => switchMode('personal')}
                   className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all ${
                     mode === 'personal'
-                      ? 'bg-gray-900 text-white shadow-sm'
+                      ? 'bg-indigo-600 text-white shadow-sm'
                       : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >

@@ -303,16 +303,16 @@ export default function Blog() {
                 </div>
 
                 {/* CTA Section */}
-                <div className="mt-16 bg-gray-900 rounded-2xl p-8 md:p-12 text-center text-white">
+                <div className="mt-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 md:p-12 text-center text-white">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">
                     Track Your Channel's Growth
                   </h2>
-                  <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
+                  <p className="text-indigo-100 mb-6 max-w-2xl mx-auto">
                     Use ShinyPull's free analytics to monitor your subscribers, views, and compare your growth with top creators.
                   </p>
                   <Link
                     to="/search"
-                    className="inline-block px-8 py-3 bg-white text-gray-900 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
+                    className="inline-block px-8 py-3 bg-white text-indigo-700 font-semibold rounded-xl hover:bg-indigo-50 transition-colors"
                   >
                     Search Creators
                   </Link>

@@ -202,7 +202,7 @@ export default function Dashboard() {
                     onClick={() => togglePlatform('all')}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       selectedPlatforms.includes('all')
-                        ? 'bg-gray-900 text-white shadow-sm'
+                        ? 'bg-indigo-600 text-white shadow-sm'
                         : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   >
@@ -236,7 +236,7 @@ export default function Dashboard() {
                         onClick={() => togglePlatform(platform)}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           isActive
-                            ? 'bg-gray-900 text-white shadow-sm'
+                            ? 'bg-indigo-600 text-white shadow-sm'
                             : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
@@ -265,7 +265,7 @@ export default function Dashboard() {
                     disabled={liveCount === 0}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       selectedPlatforms.includes('live')
-                        ? 'bg-gray-900 text-white shadow-sm'
+                        ? 'bg-indigo-600 text-white shadow-sm'
                         : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                     } ${liveCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
@@ -296,7 +296,7 @@ export default function Dashboard() {
             <div className="lg:hidden fixed bottom-6 left-6 z-40">
               <button
                 onClick={() => setMobileFiltersOpen(true)}
-                className="flex items-center gap-2 px-5 py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-full shadow-lg transition-colors"
+                className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full shadow-lg transition-colors"
               >
                 <Filter className="w-5 h-5" />
                 Filters
@@ -331,7 +331,7 @@ export default function Dashboard() {
                         onClick={() => togglePlatform('all')}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           selectedPlatforms.includes('all')
-                            ? 'bg-gray-900 text-white shadow-sm'
+                            ? 'bg-indigo-600 text-white shadow-sm'
                             : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
@@ -365,7 +365,7 @@ export default function Dashboard() {
                             onClick={() => togglePlatform(platform)}
                             className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                               isActive
-                                ? 'bg-gray-900 text-white shadow-sm'
+                                ? 'bg-indigo-600 text-white shadow-sm'
                                 : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                             }`}
                           >
@@ -394,7 +394,7 @@ export default function Dashboard() {
                         disabled={liveCount === 0}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           selectedPlatforms.includes('live')
-                            ? 'bg-gray-900 text-white shadow-sm'
+                            ? 'bg-indigo-600 text-white shadow-sm'
                             : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                         } ${liveCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
@@ -432,7 +432,7 @@ export default function Dashboard() {
               {!compareMode ? (
                 <button
                   onClick={() => setCompareMode(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
                 >
                   <Scale className="w-4 h-4" />
                   Compare Followed Creators
@@ -453,7 +453,7 @@ export default function Dashboard() {
                     }}
                     className={`inline-flex items-center gap-2 px-4 py-2 font-medium rounded-xl transition-colors ${
                       selectedForCompare.length >= 2
-                        ? 'bg-gray-900 text-white hover:bg-gray-800'
+                        ? 'bg-indigo-600 text-white hover:bg-indigo-700'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed pointer-events-none'
                     }`}
                   >
@@ -516,7 +516,7 @@ export default function Dashboard() {
                 {!selectedPlatforms.includes('live') && (
                   <Link
                     to="/search"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
                   >
                     Find Creators
                   </Link>

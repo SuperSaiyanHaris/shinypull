@@ -446,7 +446,7 @@ export default function CreatorProfile() {
                   className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base shadow-lg ${
                     isFollowing
                       ? 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                      : 'bg-gray-900 text-white hover:bg-gray-800 shadow-sm'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <Star className={`w-4 h-4 ${isFollowing ? 'fill-current' : ''}`} />
@@ -876,7 +876,7 @@ export default function CreatorProfile() {
             {platform !== 'tiktok' && (
               <Link
                 to={`/live/${platform}/${creator.username}`}
-                className="flex items-center justify-between bg-gray-900 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:bg-gray-800 transition-all group"
+                className="flex items-center justify-between bg-indigo-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:bg-indigo-700 transition-all group"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -886,7 +886,7 @@ export default function CreatorProfile() {
                     <p className="font-semibold text-sm sm:text-base truncate">
                       Live {platform === 'twitch' ? 'Follower' : platform === 'kick' ? 'Paid Subscriber' : 'Subscriber'} Count
                     </p>
-                    <p className="text-xs sm:text-sm text-gray-400 truncate">Watch the count update in real-time</p>
+                    <p className="text-xs sm:text-sm text-indigo-200 truncate">Watch the count update in real-time</p>
                   </div>
                 </div>
                 <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform flex-shrink-0" />

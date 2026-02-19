@@ -208,7 +208,7 @@ export default function Home() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-3.5 sm:py-4 text-base sm:text-lg bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                    className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-3.5 sm:py-4 text-base sm:text-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                   >
                     Search
                   </button>
@@ -230,15 +230,15 @@ export default function Home() {
                 <p className="text-gray-500 text-sm leading-relaxed">Find any creator across YouTube, TikTok, Twitch, and Kick instantly.</p>
               </Link>
               <Link to="/rankings" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-all duration-200">
-                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
-                  <TrendingUp className="w-6 h-6 text-emerald-600" />
+                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
+                  <TrendingUp className="w-6 h-6 text-indigo-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">Track Growth</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">Daily, weekly, and monthly stats with historical charts and trends.</p>
               </Link>
               <Link to="/compare" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-all duration-200">
-                <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
-                  <BarChart3 className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
+                  <BarChart3 className="w-6 h-6 text-indigo-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">Compare & Rank</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">Side-by-side comparisons and rankings across all platforms.</p>
@@ -248,7 +248,7 @@ export default function Home() {
         </section>
 
         {/* Calculator Promo Banner */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-14 bg-gradient-to-r from-emerald-500 to-teal-600">
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-14 bg-gradient-to-r from-indigo-600 to-purple-600">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex items-center gap-6">
@@ -259,14 +259,14 @@ export default function Home() {
                   <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
                     YouTube Money Calculator
                   </h3>
-                  <p className="text-emerald-100 text-lg">
+                  <p className="text-indigo-100 text-lg">
                     Estimate how much YouTubers earn from their videos
                   </p>
                 </div>
               </div>
               <Link
                 to="/youtube/money-calculator"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-emerald-700 font-bold rounded-xl hover:bg-emerald-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-indigo-700 font-bold rounded-xl hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 <Calculator className="w-5 h-5" />
                 Try Calculator
@@ -437,7 +437,7 @@ export default function Home() {
             </p>
             <Link
               to="/search"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               Get Started
               <ArrowRight className="w-5 h-5" />

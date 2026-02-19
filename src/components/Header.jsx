@@ -151,7 +151,7 @@ export default function Header() {
               ) : (
                 <button
                   onClick={() => setAuthPanelOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
                 >
                   <User className="w-4 h-4" />
                   Sign Up / Sign In
@@ -228,7 +228,7 @@ export default function Header() {
                       setAuthPanelOpen(true);
                       setMobileMenuOpen(false);
                     }}
-                    className="flex items-center justify-center gap-2 py-3 px-6 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-colors w-full"
+                    className="flex items-center justify-center gap-2 py-3 px-6 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors w-full"
                   >
                     <User className="w-5 h-5" />
                     Sign Up / Sign In
