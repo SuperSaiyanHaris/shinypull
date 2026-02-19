@@ -181,12 +181,12 @@ export default function Calculator() {
             {/* Creator Mode Helper - Shows at top on both mobile and desktop */}
             {mode === 'creator' && !selectedCreator && (
               <div className="order-1 lg:col-span-2">
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6">
+                <div className="bg-indigo-950/40 rounded-2xl border border-indigo-700/40 p-6">
                   <div className="flex items-start gap-3">
-                    <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <Info className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-semibold text-blue-900 mb-1">Search for a Creator</h4>
-                      <p className="text-sm text-blue-700">
+                      <h4 className="font-semibold text-gray-100 mb-1">Search for a Creator</h4>
+                      <p className="text-sm text-gray-300">
                         Select a YouTube creator to see earnings estimates based on their real channel data.
                         We'll auto-populate daily views and RPM ranges based on their category and performance.
                       </p>
@@ -206,7 +206,7 @@ export default function Calculator() {
                   </label>
 
                   {selectedCreator ? (
-                  <div className="flex items-center gap-3 p-3 bg-red-950/30 border border-red-100 rounded-xl">
+                  <div className="flex items-center gap-3 p-3 bg-gray-800/50 border border-gray-700 rounded-xl">
                     <img
                       src={selectedCreator.profileImage}
                       alt={selectedCreator.displayName}
@@ -351,9 +351,9 @@ export default function Calculator() {
                     />
                   </div>
                 </div>
-                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl">
-                  <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-amber-700">
+                <div className="flex items-start gap-2 p-3 bg-amber-950/30 border border-amber-700/40 rounded-xl">
+                  <Info className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-300">
                     {mode === 'creator' && selectedCreator
                       ? 'RPM estimated based on content category. Actual earnings vary by audience location and ad engagement.'
                       : 'RPM varies by niche, country, and ad engagement. The default range ($0.25 - $4.00) covers most creators. Gaming/entertainment tend to be lower, finance/tech higher.'}
@@ -390,25 +390,25 @@ export default function Calculator() {
 
                 <div className="space-y-6">
                   {/* Daily */}
-                  <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
-                    <p className="text-sm text-gray-300 mb-1">Estimated Daily Earnings</p>
+                  <div className="p-4 bg-emerald-950/30 rounded-xl border border-emerald-800/50">
+                    <p className="text-sm text-gray-400 mb-1">Estimated Daily Earnings</p>
                     <p className="text-2xl font-bold text-emerald-400">
                       {formatCurrency(dailyLow)} - {formatCurrency(dailyHigh)}
                     </p>
                   </div>
 
                   {/* Monthly */}
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                    <p className="text-sm text-gray-300 mb-1">Estimated Monthly Earnings</p>
-                    <p className="text-2xl font-bold text-blue-600">
+                  <div className="p-4 bg-blue-950/30 rounded-xl border border-blue-800/50">
+                    <p className="text-sm text-gray-400 mb-1">Estimated Monthly Earnings</p>
+                    <p className="text-2xl font-bold text-blue-400">
                       {formatCurrency(monthlyLow)} - {formatCurrency(monthlyHigh)}
                     </p>
                   </div>
 
                   {/* Yearly */}
-                  <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100">
-                    <p className="text-sm text-gray-300 mb-1">Estimated Yearly Earnings</p>
-                    <p className="text-2xl font-bold text-purple-600">
+                  <div className="p-4 bg-purple-950/30 rounded-xl border border-purple-800/50">
+                    <p className="text-sm text-gray-400 mb-1">Estimated Yearly Earnings</p>
+                    <p className="text-2xl font-bold text-purple-400">
                       {formatCurrency(yearlyLow)} - {formatCurrency(yearlyHigh)}
                     </p>
                   </div>
