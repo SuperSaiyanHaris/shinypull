@@ -191,7 +191,7 @@ function RankingsOverview() {
                     </div>
 
                     {/* Mini Rankings List */}
-                    <div className="divide-y divide-gray-50">
+                    <div className="divide-y divide-gray-800/70">
                       {creators.length === 0 ? (
                         <div className="px-5 py-8 text-center text-gray-300 text-sm">No data available</div>
                       ) : (
