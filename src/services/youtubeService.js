@@ -35,7 +35,11 @@ export const getChannelByUsername = withErrorHandling(
       if (response.status === 404) {
         throw new NotFoundError('YouTube channel', username);
       }
-      const error = await response.json();
+      const error = await response.json().catch(() => ({}));
+      // Also treat 500 with 'not found' message as NotFoundError
+      if (error.error && error.error.toLowerCase().includes('not found')) {
+        throw new NotFoundError('YouTube channel', username);
+      }
       throw new Error(error.error || 'Failed to fetch channel');
     }
 

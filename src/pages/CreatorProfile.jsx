@@ -190,15 +190,16 @@ export default function CreatorProfile() {
               backgroundOps.push(getHoursWatched(dbCreator.id));
             }
 
-            const results = await Promise.all(backgroundOps);
+            const results = await Promise.allSettled(backgroundOps);
 
-            // Update stats history
-            const history = results[1];
-            setStatsHistory(history || []);
+            // Update stats history (only if successful)
+            if (results[1].status === 'fulfilled') {
+              setStatsHistory(results[1].value || []);
+            }
 
-            // Update hours watched data for Twitch/Kick
-            if ((platform === 'twitch' || platform === 'kick') && results[2]) {
-              const hoursWatchedData = results[2];
+            // Update hours watched data for Twitch/Kick (only if successful)
+            if ((platform === 'twitch' || platform === 'kick') && results[2]?.status === 'fulfilled' && results[2].value) {
+              const hoursWatchedData = results[2].value;
               setCreator(prev => ({
                 ...prev,
                 hoursWatchedDay: hoursWatchedData.hours_watched_day,
@@ -348,7 +349,7 @@ export default function CreatorProfile() {
       <div className="min-h-screen bg-gray-50 px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <FunErrorState
-            type={error.includes('fetch') || error.includes('Failed to load') ? 'server' : 'notfound'}
+            type={error.includes('not found') || error.includes('Not found') ? 'notfound' : 'server'}
             message={error}
             onRetry={loadCreator}
             retryText="Try Again"

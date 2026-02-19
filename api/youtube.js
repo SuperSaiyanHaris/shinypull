@@ -330,6 +330,12 @@ export default async function handler(req, res) {
     return res.status(200).json(result);
   } catch (error) {
     console.error('YouTube API error:', error);
+    
+    // Return 404 for "not found" errors instead of 500
+    if (error.message && error.message.toLowerCase().includes('not found')) {
+      return res.status(404).json({ error: error.message });
+    }
+    
     return res.status(500).json({ 
       error: error.message || 'Internal server error',
       details: process.env.NODE_ENV === 'development' ? error.stack : undefined
