@@ -773,6 +773,11 @@ export default function CreatorProfile() {
                       value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
                       change={metrics?.last30Days.subs}
                     />
+                    <SummaryCard
+                      label="Hours Watched"
+                      sublabel="Last 30 days"
+                      value={creator.hoursWatchedMonth ? formatHoursWatched(creator.hoursWatchedMonth) : 'Tracking...'}
+                    />
                   </>
                 ) : platform === 'kick' ? (
                   <>
@@ -1421,12 +1426,18 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       color: '#ec4899'
     });
   } else if (platform === 'twitch') {
-    // Twitch: only follower growth (views deprecated)
+    // Twitch: follower growth + hours watched
     metrics.push({
       value: 'subscribers',
       label: 'Follower Growth',
       dataKey: 'subscribers',
       color: '#6366f1'
+    });
+    metrics.push({
+      value: 'hoursWatched',
+      label: 'Hours Watched',
+      dataKey: 'hoursWatched',
+      color: '#a855f7'
     });
   } else {
     // Other platforms
@@ -1465,6 +1476,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       subscribers: stat.subscribers || stat.followers || 0,
       views: stat.total_views || 0,
       videos: stat.total_posts || 0,
+      hoursWatched: stat.hours_watched_day || 0,
       label: new Date(stat.recorded_at + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     }));
 
@@ -1497,7 +1509,9 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
           </p>
           <p className="text-sm text-gray-600">
             <span className="font-semibold" style={{ color: currentMetric.color }}>
-              {formatNumber(payload[0].value)}
+              {currentMetric.dataKey === 'hoursWatched'
+                ? formatHoursWatched(payload[0].value)
+                : formatNumber(payload[0].value)}
             </span>
             {' '}{currentMetric.label.toLowerCase().replace(' growth', '').replace(' count', '')}
           </p>
