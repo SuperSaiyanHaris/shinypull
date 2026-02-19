@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import { Youtube, Twitch, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star, Play, ThumbsUp, MessageCircle } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -41,6 +41,7 @@ const platformUrls = {
 
 export default function CreatorProfile() {
   const { platform, username } = useParams();
+  const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   const [creator, setCreator] = useState(null);
   const [statsHistory, setStatsHistory] = useState([]);
@@ -68,16 +69,31 @@ export default function CreatorProfile() {
       let channelData = null;
 
       if (platform === 'youtube') {
-        // Check database first — the stored platform_id gives an exact lookup
-        const knownCreator = await getCreatorByUsername('youtube', username);
-        if (knownCreator?.platform_id) {
-          channelData = await getYouTubeChannelById(knownCreator.platform_id);
-          // Verify the DB record points to the right channel — the stored username
-          // must match what was requested (prevents stale/wrong DB mappings)
-          if (channelData && channelData.username?.toLowerCase() !== username.toLowerCase()) {
-            channelData = null;
+        // Priority 1: Use platformId from navigation state (e.g. from search results)
+        // This avoids the race condition where search results haven't been persisted to DB yet
+        const navPlatformId = location.state?.platformId;
+        if (navPlatformId) {
+          try {
+            channelData = await getYouTubeChannelById(navPlatformId);
+          } catch (e) {
+            logger.warn('Failed to fetch by nav platformId, falling back:', e);
           }
         }
+
+        // Priority 2: Check database for stored platform_id
+        if (!channelData) {
+          const knownCreator = await getCreatorByUsername('youtube', username);
+          if (knownCreator?.platform_id) {
+            channelData = await getYouTubeChannelById(knownCreator.platform_id);
+            // Verify the DB record points to the right channel — the stored username
+            // must match what was requested (prevents stale/wrong DB mappings)
+            if (channelData && channelData.username?.toLowerCase() !== username.toLowerCase()) {
+              channelData = null;
+            }
+          }
+        }
+
+        // Priority 3: Look up by username/handle
         if (!channelData) {
           channelData = await getYouTubeChannel(username);
         }

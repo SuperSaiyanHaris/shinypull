@@ -426,6 +426,7 @@ export default function Search() {
                     <Link
                       key={creator.platformId}
                       to={`/${creator.platform}/${creator.username}`}
+                      state={{ platformId: creator.platformId }}
                       className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-100 rounded-2xl hover:shadow-lg hover:border-gray-200 transition-all duration-200 group"
                     >
                       <img
