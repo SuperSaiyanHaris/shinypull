@@ -137,20 +137,15 @@ export default function Blog() {
       />
 
       <div className="min-h-screen bg-gray-50">
-        {/* Header - Dark */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
-          <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
-            <div className="absolute top-0 right-1/4 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
-          </div>
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-100">
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
             <div className="max-w-6xl mx-auto text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3">
-                <BookOpen className="w-7 h-7 sm:w-9 sm:h-9 text-indigo-400" />
-                <h1 className="text-3xl sm:text-4xl font-bold text-white">Creator Resources</h1>
+                <BookOpen className="w-7 h-7 sm:w-9 sm:h-9 text-indigo-600" />
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Creator Resources</h1>
               </div>
-              <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto">
                 Expert guides on streaming gear, growth strategies, and industry insights to help you succeed as a creator
               </p>
             </div>
@@ -308,16 +303,16 @@ export default function Blog() {
                 </div>
 
                 {/* CTA Section */}
-                <div className="mt-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-8 md:p-12 text-center text-white">
+                <div className="mt-16 bg-gray-900 rounded-2xl p-8 md:p-12 text-center text-white">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">
                     Track Your Channel's Growth
                   </h2>
-                  <p className="text-indigo-100 mb-6 max-w-2xl mx-auto">
+                  <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
                     Use ShinyPull's free analytics to monitor your subscribers, views, and compare your growth with top creators.
                   </p>
                   <Link
                     to="/search"
-                    className="inline-block px-8 py-3 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors"
+                    className="inline-block px-8 py-3 bg-white text-gray-900 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
                   >
                     Search Creators
                   </Link>

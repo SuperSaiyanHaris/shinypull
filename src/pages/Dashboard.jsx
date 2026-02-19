@@ -177,12 +177,12 @@ export default function Dashboard() {
 
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+        <div className="bg-white border-b border-gray-100">
           <div className="max-w-6xl mx-auto px-4 py-12">
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back, {displayName}!
             </h1>
-            <p className="text-slate-400">
+            <p className="text-gray-500">
               Track your favorite creators and see their latest updates.
             </p>
           </div>
@@ -202,8 +202,8 @@ export default function Dashboard() {
                     onClick={() => togglePlatform('all')}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       selectedPlatforms.includes('all')
-                        ? 'bg-indigo-600 text-white shadow-md'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                        ? 'bg-gray-900 text-white shadow-sm'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -236,8 +236,8 @@ export default function Dashboard() {
                         onClick={() => togglePlatform(platform)}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           isActive
-                            ? 'bg-indigo-600 text-white shadow-md'
-                            : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                            ? 'bg-gray-900 text-white shadow-sm'
+                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -265,8 +265,8 @@ export default function Dashboard() {
                     disabled={liveCount === 0}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       selectedPlatforms.includes('live')
-                        ? 'bg-indigo-600 text-white shadow-md'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                        ? 'bg-gray-900 text-white shadow-sm'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                     } ${liveCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <div className="flex items-center gap-3">
@@ -296,7 +296,7 @@ export default function Dashboard() {
             <div className="lg:hidden fixed bottom-6 left-6 z-40">
               <button
                 onClick={() => setMobileFiltersOpen(true)}
-                className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full shadow-lg transition-colors"
+                className="flex items-center gap-2 px-5 py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-full shadow-lg transition-colors"
               >
                 <Filter className="w-5 h-5" />
                 Filters
@@ -331,8 +331,8 @@ export default function Dashboard() {
                         onClick={() => togglePlatform('all')}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           selectedPlatforms.includes('all')
-                            ? 'bg-indigo-600 text-white shadow-md'
-                            : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                            ? 'bg-gray-900 text-white shadow-sm'
+                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -365,8 +365,8 @@ export default function Dashboard() {
                             onClick={() => togglePlatform(platform)}
                             className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                               isActive
-                                ? 'bg-indigo-600 text-white shadow-md'
-                                : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                                ? 'bg-gray-900 text-white shadow-sm'
+                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                             }`}
                           >
                             <div className="flex items-center gap-3">
@@ -394,8 +394,8 @@ export default function Dashboard() {
                         disabled={liveCount === 0}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           selectedPlatforms.includes('live')
-                            ? 'bg-indigo-600 text-white shadow-md'
-                            : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                            ? 'bg-gray-900 text-white shadow-sm'
+                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                         } ${liveCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex items-center gap-3">
@@ -432,7 +432,7 @@ export default function Dashboard() {
               {!compareMode ? (
                 <button
                   onClick={() => setCompareMode(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
                 >
                   <Scale className="w-4 h-4" />
                   Compare Followed Creators
@@ -453,7 +453,7 @@ export default function Dashboard() {
                     }}
                     className={`inline-flex items-center gap-2 px-4 py-2 font-medium rounded-xl transition-colors ${
                       selectedForCompare.length >= 2
-                        ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        ? 'bg-gray-900 text-white hover:bg-gray-800'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed pointer-events-none'
                     }`}
                   >
@@ -516,7 +516,7 @@ export default function Dashboard() {
                 {!selectedPlatforms.includes('live') && (
                   <Link
                     to="/search"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
                   >
                     Find Creators
                   </Link>
@@ -545,7 +545,7 @@ export default function Dashboard() {
                       {compareMode && (
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                           isSelected
-                            ? 'bg-indigo-600 border-indigo-600'
+                            ? 'bg-gray-900 border-gray-900'
                             : 'border-gray-300 hover:border-indigo-400'
                         }`}>
                           {isSelected && <Check className="w-4 h-4 text-white" />}

@@ -228,19 +228,14 @@ export default function Search() {
       />
 
       <div className="min-h-screen bg-gray-50">
-        {/* Header - Dark */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
-          <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
-            <div className="absolute top-0 left-1/4 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
-          </div>
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Header - Light */}
+        <div className="bg-white border-b border-gray-100">
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
-              <SearchIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-400" />
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Search Creators</h1>
+              <SearchIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Search Creators</h1>
             </div>
-            <p className="text-sm sm:text-base text-slate-400">Find any creator and view their detailed statistics</p>
+            <p className="text-sm sm:text-base text-gray-500">Find any creator and view their detailed statistics</p>
           </div>
         </div>
 
@@ -301,7 +296,7 @@ export default function Search() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-4 text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-2xl transition-all duration-200 shadow-xl shadow-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:hover:translate-y-0"
+                className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-4 text-lg bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:hover:translate-y-0"
               >
                 {loading ? 'Searching...' : 'Search'}
               </button>

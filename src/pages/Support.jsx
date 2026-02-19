@@ -31,13 +31,13 @@ export default function Support() {
 
       <div className="min-h-screen bg-gray-50">
         {/* Hero */}
-        <div className="bg-gradient-to-br from-pink-500 to-orange-400 text-white py-16">
+        <div className="bg-white border-b border-gray-100 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Heart className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 bg-pink-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Heart className="w-8 h-8 text-pink-500" />
             </div>
-            <h1 className="text-4xl font-bold mb-4">Support ShinyPull</h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Support ShinyPull</h1>
+            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
               ShinyPull is free to use for everyone. Your support helps keep it that way and funds new features.
             </p>
           </div>

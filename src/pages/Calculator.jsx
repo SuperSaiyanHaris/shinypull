@@ -134,32 +134,27 @@ export default function Calculator() {
 
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
-          <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
-            <div className="absolute top-0 left-1/4 w-64 h-64 bg-green-500/20 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl"></div>
-          </div>
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="bg-white border-b border-gray-100">
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2">
-                <CalcIcon className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-400" />
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">YouTube Money Calculator</h1>
+                <CalcIcon className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600" />
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">YouTube Money Calculator</h1>
               </div>
-              <p className="text-base sm:text-lg text-slate-400 mb-6">
+              <p className="text-base sm:text-lg text-gray-500 mb-6">
                 {mode === 'creator'
                   ? 'Estimate a creator\'s earnings based on real data'
                   : 'Estimate your own potential earnings'}
               </p>
 
               {/* Mode Toggle */}
-              <div className="inline-flex items-center gap-2 p-1 bg-slate-800/50 border border-slate-700 rounded-xl backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 p-1 bg-gray-100 border border-gray-200 rounded-xl">
                 <button
                   onClick={() => switchMode('creator')}
                   className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all ${
                     mode === 'creator'
-                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-gray-900 text-white shadow-sm'
+                      : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
                   <span className="hidden sm:inline">Estimate a Creator</span>
@@ -169,8 +164,8 @@ export default function Calculator() {
                   onClick={() => switchMode('personal')}
                   className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all ${
                     mode === 'personal'
-                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-gray-900 text-white shadow-sm'
+                      : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
                   <span className="hidden sm:inline">Estimate My Earnings</span>
