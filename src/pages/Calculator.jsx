@@ -132,14 +132,14 @@ export default function Calculator() {
         keywords="youtube money calculator, youtube earnings calculator, how much do youtubers make, youtube income estimator, youtube revenue calculator, youtuber salary, youtube ad revenue, RPM calculator"
       />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-800/50">
         {/* Header */}
-        <div className="bg-white border-b border-gray-100">
+        <div className="bg-gray-900 border-b border-gray-800">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2">
-                <CalcIcon className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600" />
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">YouTube Money Calculator</h1>
+                <CalcIcon className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-400" />
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-100">YouTube Money Calculator</h1>
               </div>
               <p className="text-base sm:text-lg text-gray-500 mb-6">
                 {mode === 'creator'
@@ -148,13 +148,13 @@ export default function Calculator() {
               </p>
 
               {/* Mode Toggle */}
-              <div className="inline-flex items-center gap-2 p-1 bg-gray-100 border border-gray-200 rounded-xl">
+              <div className="inline-flex items-center gap-2 p-1 bg-gray-800 border border-gray-700 rounded-xl">
                 <button
                   onClick={() => switchMode('creator')}
                   className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all ${
                     mode === 'creator'
                       ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-900'
+                      : 'text-gray-500 hover:text-gray-100'
                   }`}
                 >
                   <span className="hidden sm:inline">Estimate a Creator</span>
@@ -165,7 +165,7 @@ export default function Calculator() {
                   className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all ${
                     mode === 'personal'
                       ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-900'
+                      : 'text-gray-500 hover:text-gray-100'
                   }`}
                 >
                   <span className="hidden sm:inline">Estimate My Earnings</span>
@@ -200,32 +200,32 @@ export default function Calculator() {
             <div className="space-y-6 order-2 lg:col-start-1">
               {/* Creator Search - Only in Creator Mode */}
               {mode === 'creator' && (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Select YouTube Creator {selectedCreator && <span className="text-emerald-600 text-xs">(Data auto-populated)</span>}
+                <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
+                  <label className="block text-sm font-medium text-gray-500 mb-3">
+                    Select YouTube Creator {selectedCreator && <span className="text-emerald-400 text-xs">(Data auto-populated)</span>}
                   </label>
 
                   {selectedCreator ? (
-                  <div className="flex items-center gap-3 p-3 bg-red-50 border border-red-100 rounded-xl">
+                  <div className="flex items-center gap-3 p-3 bg-red-950/30 border border-red-100 rounded-xl">
                     <img
                       src={selectedCreator.profileImage}
                       alt={selectedCreator.displayName}
                       className="w-10 h-10 rounded-lg object-cover"
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 truncate">{selectedCreator.displayName}</p>
+                      <p className="font-semibold text-gray-100 truncate">{selectedCreator.displayName}</p>
                       <p className="text-xs text-gray-500">{formatNumber(selectedCreator.subscribers)} subscribers</p>
                     </div>
                     <Link
                       to={`/youtube/${selectedCreator.username}`}
-                      className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+                      className="flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-700 font-medium transition-colors"
                     >
                       View Profile
                       <ExternalLink className="w-3 h-3" />
                     </Link>
                     <button
                       onClick={clearCreator}
-                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      className="text-gray-500 hover:text-red-500 transition-colors"
                     >
                       <span className="text-sm">Clear</span>
                     </button>
@@ -234,17 +234,17 @@ export default function Calculator() {
                   <div className="relative">
                     <form onSubmit={handleSearch}>
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <input
                           type="text"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           onFocus={() => searchResults.length > 0 && setShowResults(true)}
                           placeholder="Search for a YouTube creator..."
-                          className="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                          className="w-full pl-10 pr-10 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         />
                         {searching ? (
-                          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+                          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 animate-spin" />
                         ) : searchQuery.trim() && (
                           <button
                             type="submit"
@@ -257,12 +257,12 @@ export default function Calculator() {
                     </form>
 
                     {showResults && searchResults.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-64 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-lg z-10 max-h-64 overflow-y-auto">
                         {searchResults.map((result) => (
                           <button
                             key={result.platformId}
                             onClick={() => selectCreator(result)}
-                            className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors text-left"
+                            className="w-full flex items-center gap-3 p-3 hover:bg-gray-800/50 transition-colors text-left"
                           >
                             <img
                               src={result.profileImage}
@@ -270,7 +270,7 @@ export default function Calculator() {
                               className="w-10 h-10 rounded-lg object-cover"
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-gray-900 truncate">{result.displayName}</p>
+                              <p className="font-medium text-gray-100 truncate">{result.displayName}</p>
                               <p className="text-xs text-gray-500">{formatNumber(result.subscribers)} subs</p>
                             </div>
                           </button>
@@ -283,11 +283,11 @@ export default function Calculator() {
               )}
 
               {/* Daily Views */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
+                <label className="block text-sm font-medium text-gray-500 mb-3">
                   Daily Views
                   {mode === 'creator' && selectedCreator && (
-                    <span className="ml-2 text-xs text-emerald-600">(Estimated from channel data)</span>
+                    <span className="ml-2 text-xs text-emerald-400">(Estimated from channel data)</span>
                   )}
                 </label>
                 <input
@@ -295,8 +295,8 @@ export default function Calculator() {
                   value={dailyViews}
                   onChange={(e) => setDailyViews(Math.max(0, parseInt(e.target.value) || 0))}
                   disabled={mode === 'creator' && selectedCreator}
-                  className={`w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 font-semibold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent mb-3 ${
-                    mode === 'creator' && selectedCreator ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-50'
+                  className={`w-full px-4 py-3 border border-gray-700 rounded-xl text-gray-100 font-semibold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent mb-3 ${
+                    mode === 'creator' && selectedCreator ? 'bg-gray-800 cursor-not-allowed' : 'bg-gray-800/50'
                   }`}
                 />
                 <input
@@ -306,21 +306,21 @@ export default function Calculator() {
                   step="1000"
                   value={dailyViews}
                   onChange={(e) => setDailyViews(parseInt(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                 />
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
                   <span>1K</span>
-                  <span className="font-semibold text-emerald-600">{formatNumber(dailyViews)}</span>
+                  <span className="font-semibold text-emerald-400">{formatNumber(dailyViews)}</span>
                   <span>10M</span>
                 </div>
               </div>
 
               {/* RPM Range */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
+                <label className="block text-sm font-medium text-gray-500 mb-3">
                   Estimated RPM (Revenue per 1000 views)
                   {mode === 'creator' && selectedCreator && (
-                    <span className="ml-2 text-xs text-emerald-600">(Based on category)</span>
+                    <span className="ml-2 text-xs text-emerald-400">(Based on category)</span>
                   )}
                 </label>
                 <div className="grid grid-cols-2 gap-4 mb-3">
@@ -332,8 +332,8 @@ export default function Calculator() {
                       value={rpmLow}
                       onChange={(e) => setRpmLow(Math.max(0, parseFloat(e.target.value) || 0))}
                       disabled={mode === 'creator' && selectedCreator}
-                      className={`w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                        mode === 'creator' && selectedCreator ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-50'
+                      className={`w-full px-3 py-2 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                        mode === 'creator' && selectedCreator ? 'bg-gray-800 cursor-not-allowed' : 'bg-gray-800/50'
                       }`}
                     />
                   </div>
@@ -345,8 +345,8 @@ export default function Calculator() {
                       value={rpmHigh}
                       onChange={(e) => setRpmHigh(Math.max(rpmLow, parseFloat(e.target.value) || 0))}
                       disabled={mode === 'creator' && selectedCreator}
-                      className={`w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                        mode === 'creator' && selectedCreator ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-50'
+                      className={`w-full px-3 py-2 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                        mode === 'creator' && selectedCreator ? 'bg-gray-800 cursor-not-allowed' : 'bg-gray-800/50'
                       }`}
                     />
                   </div>
@@ -362,14 +362,14 @@ export default function Calculator() {
               </div>
 
               {/* Currency */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
+                <label className="block text-sm font-medium text-gray-500 mb-3">
                   Currency
                 </label>
                 <select
                   value={currency.code}
                   onChange={(e) => setCurrency(currencies.find(c => c.code === e.target.value))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 >
                   {currencies.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -382,8 +382,8 @@ export default function Calculator() {
 
             {/* Results Section */}
             <div className="space-y-4 order-3 lg:col-start-2">
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-100 mb-6 flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-emerald-500" />
                   Estimated Earnings
                 </h3>
@@ -391,15 +391,15 @@ export default function Calculator() {
                 <div className="space-y-6">
                   {/* Daily */}
                   <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
-                    <p className="text-sm text-gray-600 mb-1">Estimated Daily Earnings</p>
-                    <p className="text-2xl font-bold text-emerald-600">
+                    <p className="text-sm text-gray-500 mb-1">Estimated Daily Earnings</p>
+                    <p className="text-2xl font-bold text-emerald-400">
                       {formatCurrency(dailyLow)} - {formatCurrency(dailyHigh)}
                     </p>
                   </div>
 
                   {/* Monthly */}
                   <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                    <p className="text-sm text-gray-600 mb-1">Estimated Monthly Earnings</p>
+                    <p className="text-sm text-gray-500 mb-1">Estimated Monthly Earnings</p>
                     <p className="text-2xl font-bold text-blue-600">
                       {formatCurrency(monthlyLow)} - {formatCurrency(monthlyHigh)}
                     </p>
@@ -407,7 +407,7 @@ export default function Calculator() {
 
                   {/* Yearly */}
                   <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100">
-                    <p className="text-sm text-gray-600 mb-1">Estimated Yearly Earnings</p>
+                    <p className="text-sm text-gray-500 mb-1">Estimated Yearly Earnings</p>
                     <p className="text-2xl font-bold text-purple-600">
                       {formatCurrency(yearlyLow)} - {formatCurrency(yearlyHigh)}
                     </p>
@@ -416,9 +416,9 @@ export default function Calculator() {
               </div>
 
               {/* Info Card */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <h4 className="font-semibold text-gray-900 mb-3">How This Works</h4>
-                <ul className="text-sm text-gray-600 space-y-2">
+              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
+                <h4 className="font-semibold text-gray-100 mb-3">How This Works</h4>
+                <ul className="text-sm text-gray-500 space-y-2">
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>Earnings = (Daily Views ÷ 1000) × RPM</span>
@@ -448,27 +448,27 @@ export default function Calculator() {
 
               {/* Selected Creator Stats */}
               {selectedCreator && (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
+                  <h4 className="font-semibold text-gray-100 mb-3 flex items-center gap-2">
                     <Youtube className="w-5 h-5 text-red-500" />
                     {selectedCreator.displayName}'s Stats
                   </h4>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 bg-gray-50 rounded-xl">
+                    <div className="p-3 bg-gray-800/50 rounded-xl">
                       <p className="text-xs text-gray-500">Subscribers</p>
-                      <p className="font-bold text-gray-900">{formatNumber(selectedCreator.subscribers)}</p>
+                      <p className="font-bold text-gray-100">{formatNumber(selectedCreator.subscribers)}</p>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded-xl">
+                    <div className="p-3 bg-gray-800/50 rounded-xl">
                       <p className="text-xs text-gray-500">Total Views</p>
-                      <p className="font-bold text-gray-900">{formatNumber(selectedCreator.totalViews)}</p>
+                      <p className="font-bold text-gray-100">{formatNumber(selectedCreator.totalViews)}</p>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded-xl">
+                    <div className="p-3 bg-gray-800/50 rounded-xl">
                       <p className="text-xs text-gray-500">Videos</p>
-                      <p className="font-bold text-gray-900">{formatNumber(selectedCreator.totalPosts)}</p>
+                      <p className="font-bold text-gray-100">{formatNumber(selectedCreator.totalPosts)}</p>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded-xl">
+                    <div className="p-3 bg-gray-800/50 rounded-xl">
                       <p className="text-xs text-gray-500">Avg Views/Video</p>
-                      <p className="font-bold text-gray-900">
+                      <p className="font-bold text-gray-100">
                         {selectedCreator.totalPosts > 0
                           ? formatNumber(Math.round(selectedCreator.totalViews / selectedCreator.totalPosts))
                           : '-'}

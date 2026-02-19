@@ -14,16 +14,16 @@ export default function Breadcrumbs({ items }) {
         {items.map((item, index) => (
           <li key={index} className="flex items-center gap-2">
             {index > 0 && (
-              <ChevronRight className="w-4 h-4 text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-gray-500" />
             )}
             {index === items.length - 1 ? (
-              <span className="font-medium text-gray-900 truncate max-w-[200px]">
+              <span className="font-medium text-gray-100 truncate max-w-[200px]">
                 {item.label}
               </span>
             ) : (
               <Link
                 to={item.path}
-                className="hover:text-indigo-600 transition-colors"
+                className="hover:text-indigo-400 transition-colors"
               >
                 {item.label}
               </Link>

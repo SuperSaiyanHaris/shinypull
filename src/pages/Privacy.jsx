@@ -8,17 +8,17 @@ export default function Privacy() {
         description="Learn how Shiny Pull collects, uses, and protects your personal information."
       />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-800/50">
         {/* Hero */}
-        <div className="bg-white border-b border-gray-100 py-16">
+        <div className="bg-gray-900 border-b border-gray-800 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
+            <h1 className="text-4xl font-bold text-gray-100 mb-4">Privacy Policy</h1>
             <p className="text-gray-500">Last updated: February 11, 2026</p>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto px-4 py-12">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8">
             <div className="prose max-w-none">
               <Section title="Legal Notes">
                 <p className="mb-4">
@@ -102,7 +102,7 @@ export default function Privacy() {
                   To remove the authorization token for third party authenticated accounts you can do so in three
                   different, equally good ways: 1) At that third party site via their own tools 2) In your dashboard
                   in the authenticated accounts section or 3) by contacting us at{' '}
-                  <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-700">
+                  <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-300">
                     shinypull@proton.me
                   </a>{' '}
                   and responding to any follow up questions needed to authenticate you. No matter what method you
@@ -114,7 +114,7 @@ export default function Privacy() {
                   settings page.
                 </p>
                 <p className="mb-2">ShinyPull may share your information for the following reasons:</p>
-                <ul className="list-disc list-inside text-gray-600 space-y-1 mb-4">
+                <ul className="list-disc list-inside text-gray-500 space-y-1 mb-4">
                   <li>We may disclose the information we collect from you to comply with the law, a court order, or other legal process.</li>
                   <li>We may disclose the information we collect from you where we believe it is necessary to investigate, or prevent illegal activities, suspected fraud, situations involving potential threats to the safety of any person, violations of our Terms of Use or this Policy, or as evidence in litigation in which we are involved.</li>
                   <li>We may share aggregate information about users with third parties for marketing, advertising, research, or similar purposes.</li>
@@ -140,7 +140,7 @@ export default function Privacy() {
               <Section title="Contact Us">
                 <p>
                   If you have questions about this Privacy Policy, please reach out at{' '}
-                  <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-700">
+                  <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-300">
                     shinypull@proton.me
                   </a>
                 </p>
@@ -160,8 +160,8 @@ export default function Privacy() {
 function Section({ title, children }) {
   return (
     <section className="mb-8">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>
-      <div className="text-gray-600 leading-relaxed">{children}</div>
+      <h2 className="text-xl font-bold text-gray-100 mb-4">{title}</h2>
+      <div className="text-gray-500 leading-relaxed">{children}</div>
     </section>
   );
 }

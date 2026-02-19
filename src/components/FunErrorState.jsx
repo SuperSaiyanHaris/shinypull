@@ -21,7 +21,7 @@ export default function FunErrorState({
       message: message || "Our servers are taking a coffee break. They'll be back shortly!",
       icon: ServerCrash,
       iconColor: 'text-orange-500',
-      bgColor: 'bg-orange-50',
+      bgColor: 'bg-orange-950/30',
       borderColor: 'border-orange-100',
     },
     network: {
@@ -37,7 +37,7 @@ export default function FunErrorState({
       message: message || "Still working on it. Hang tight.",
       icon: Loader2,
       iconColor: 'text-indigo-500',
-      bgColor: 'bg-indigo-50',
+      bgColor: 'bg-indigo-950/50',
       borderColor: 'border-indigo-100',
       animateIcon: true,
     },
@@ -45,9 +45,9 @@ export default function FunErrorState({
       title: "Not found",
       message: message || "We couldn't find what you're looking for.",
       icon: SearchX,
-      iconColor: 'text-gray-400',
-      bgColor: 'bg-gray-50',
-      borderColor: 'border-gray-100',
+      iconColor: 'text-gray-500',
+      bgColor: 'bg-gray-800/50',
+      borderColor: 'border-gray-800',
     }
   };
 
@@ -63,7 +63,7 @@ export default function FunErrorState({
         </div>
 
         {/* Title */}
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-100 mb-3">
           {config.title}
         </h2>
 
@@ -76,7 +76,7 @@ export default function FunErrorState({
         {onRetry && (
           <button
             onClick={onRetry}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md group"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md group"
           >
             <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
             {retryText}

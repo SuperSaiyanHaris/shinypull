@@ -142,17 +142,17 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
       />
 
       {/* Slide-out Panel */}
-      <div className={`fixed right-0 top-0 h-full w-full sm:w-[480px] bg-white z-50 shadow-2xl overflow-y-auto transform transition-all duration-300 ease-out ${
+      <div className={`fixed right-0 top-0 h-full w-full sm:w-[480px] bg-gray-900 z-50 shadow-2xl overflow-y-auto transform transition-all duration-300 ease-out ${
         isAnimating ? 'translate-x-0' : 'translate-x-full'
       }`}>
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">
+        <div className="sticky top-0 bg-gray-900 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-100">
             {mode === 'signup' ? 'Create Account' : mode === 'reset' ? 'Reset Password' : 'Welcome Back'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+            className="p-2 rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-500 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -161,7 +161,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
         {/* Content */}
         <div className="px-6 py-8">
           {contextMessage && (
-            <div className="mb-6 bg-indigo-50 border border-indigo-200 rounded-lg p-4 flex items-start gap-3">
+            <div className="mb-6 bg-indigo-950/50 border border-indigo-800 rounded-lg p-4 flex items-start gap-3">
               <div className="flex-shrink-0 mt-0.5">
                 <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -173,7 +173,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
             </div>
           )}
           
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-500 mb-6">
             {mode === 'signup'
               ? 'Sign up to start tracking your favorite creators'
               : mode === 'reset'
@@ -184,34 +184,34 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
           {/* Benefits Section - Only show on signup */}
           {mode === 'signup' && (
             <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-200 p-5 mb-6">
-              <h3 className="font-semibold text-gray-900 mb-4 text-sm">Why Create an Account?</h3>
+              <h3 className="font-semibold text-gray-100 mb-4 text-sm">Why Create an Account?</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <Star className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-900 font-medium">Follow Your Favorite Creators</p>
-                    <p className="text-xs text-gray-600">Never miss updates from the creators you love</p>
+                    <p className="text-sm text-gray-100 font-medium">Follow Your Favorite Creators</p>
+                    <p className="text-xs text-gray-500">Never miss updates from the creators you love</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <BarChart3 className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-900 font-medium">Track Growth in Your Dashboard</p>
-                    <p className="text-xs text-gray-600">See daily stats and growth trends in one place</p>
+                    <p className="text-sm text-gray-100 font-medium">Track Growth in Your Dashboard</p>
+                    <p className="text-xs text-gray-500">See daily stats and growth trends in one place</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Scale className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-900 font-medium">Save and Compare Creators</p>
-                    <p className="text-xs text-gray-600">Compare stats side-by-side across platforms</p>
+                    <p className="text-sm text-gray-100 font-medium">Save and Compare Creators</p>
+                    <p className="text-xs text-gray-500">Compare stats side-by-side across platforms</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Clock className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-900 font-medium">View Your Recently Browsed Profiles</p>
-                    <p className="text-xs text-gray-600">Quick access to creators you've checked out</p>
+                    <p className="text-sm text-gray-100 font-medium">View Your Recently Browsed Profiles</p>
+                    <p className="text-xs text-gray-500">Quick access to creators you've checked out</p>
                   </div>
                 </div>
               </div>
@@ -224,7 +224,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
               <button
                 onClick={handleGoogleSignIn}
                 disabled={loading}
-                className="w-full bg-white text-gray-900 py-3 rounded-lg font-medium border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mb-6 disabled:opacity-50"
+                className="w-full bg-gray-900 text-gray-100 py-3 rounded-lg font-medium border-2 border-gray-700 hover:border-gray-600 hover:bg-gray-800/50 transition-colors flex items-center justify-center gap-2 mb-6 disabled:opacity-50"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -249,10 +249,10 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
 
               <div className="relative mb-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200"></div>
+                  <div className="w-full border-t border-gray-700"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">Or continue with email</span>
+                  <span className="px-2 bg-gray-900 text-gray-500">Or continue with email</span>
                 </div>
               </div>
             </>
@@ -261,14 +261,14 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
           {/* Email/Password Form */}
           <form onSubmit={mode === 'reset' ? handleResetPassword : handleEmailAuth} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label className="block text-sm font-medium text-gray-500 mb-2">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white border border-gray-300 rounded-lg py-3 px-10 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full bg-gray-900 border border-gray-600 rounded-lg py-3 px-10 text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="you@example.com"
                   required
                 />
@@ -277,14 +277,14 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
 
             {mode !== 'reset' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <label className="block text-sm font-medium text-gray-500 mb-2">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-white border border-gray-300 rounded-lg py-3 px-10 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full bg-gray-900 border border-gray-600 rounded-lg py-3 px-10 text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="••••••••"
                     required
                     minLength={6}
@@ -294,13 +294,13 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
             )}
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-950/30 border border-red-800 text-red-400 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
             {message && (
-              <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-green-950/30 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">
                 {message}
               </div>
             )}
@@ -308,7 +308,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Loading...' : mode === 'signup' ? 'Create Account' : mode === 'reset' ? 'Send Reset Link' : 'Sign In'}
             </button>
@@ -323,7 +323,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
                   setError('');
                   setMessage('');
                 }}
-                className="text-gray-500 hover:text-gray-700 text-sm"
+                className="text-gray-500 hover:text-gray-500 text-sm"
               >
                 Forgot your password?
               </button>
@@ -338,7 +338,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
                 setError('');
                 setMessage('');
               }}
-              className="text-indigo-600 hover:text-indigo-700 font-medium text-sm"
+              className="text-indigo-600 hover:text-indigo-300 font-medium text-sm"
             >
               {mode === 'reset'
                 ? 'Back to sign in'

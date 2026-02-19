@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --primary: #4F46E5;
-  --primary-dark: #4338CA;
-  --primary-light: #6366F1;
+  --primary: #6366F1;
+  --primary-dark: #4F46E5;
+  --primary-light: #818CF8;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #F8FAFC;
-  color: #1E293B;
+  background-color: #0a0a0f;
+  color: #e2e8f0;
 }
 
 /* Platform colors */
@@ -32,53 +32,53 @@ body {
 
 /* Modern stat cards */
 .stat-card {
-  @apply bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow;
+  @apply bg-gray-900 rounded-2xl p-5 border border-gray-800 shadow-sm hover:shadow-md transition-shadow;
 }
 
 .stat-value {
-  @apply text-2xl font-bold text-gray-900;
+  @apply text-2xl font-bold text-gray-100;
 }
 
 .stat-label {
-  @apply text-sm text-gray-500 font-medium;
+  @apply text-sm text-gray-400 font-medium;
 }
 
 /* Growth indicators */
-.growth-positive { @apply text-emerald-600; }
-.growth-negative { @apply text-red-500; }
-.growth-neutral { @apply text-gray-400; }
+.growth-positive { @apply text-emerald-400; }
+.growth-negative { @apply text-red-400; }
+.growth-neutral { @apply text-gray-500; }
 
 /* Modern buttons */
 .btn-primary {
-  @apply px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5;
+  @apply px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5;
 }
 
 .btn-secondary {
-  @apply px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl border border-gray-200 transition-all duration-200 hover:shadow-md;
+  @apply px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold rounded-xl border border-gray-700 transition-all duration-200 hover:shadow-md;
 }
 
 /* Modern cards */
 .card {
-  @apply bg-white rounded-2xl border border-gray-100 shadow-sm;
+  @apply bg-gray-900 rounded-2xl border border-gray-800 shadow-sm;
 }
 
 .card-hover {
-  @apply hover:shadow-lg hover:border-gray-200 transition-all duration-200;
+  @apply hover:shadow-lg hover:border-gray-700 transition-all duration-200;
 }
 
 /* Glassmorphism effect */
 .glass {
-  @apply bg-white/80 backdrop-blur-lg;
+  @apply bg-gray-900/80 backdrop-blur-lg;
 }
 
 /* Gradient text */
 .gradient-text {
-  @apply bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent;
+  @apply bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent;
 }
 
 /* Modern input */
 .input-modern {
-  @apply w-full px-5 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200;
+  @apply w-full px-5 py-4 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200;
 }
 
 /* Scrollbar styling */
@@ -88,20 +88,20 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  @apply bg-gray-900;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full;
+  @apply bg-gray-700 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400;
+  @apply bg-gray-600;
 }
 
 /* Selection color */
 ::selection {
-  @apply bg-indigo-100 text-indigo-900;
+  @apply bg-indigo-900 text-indigo-100;
 }
 
 /* Animations */

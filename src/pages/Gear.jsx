@@ -90,16 +90,16 @@ export default function Gear() {
         keywords="best streaming gear, streaming setup, streaming microphone, streaming camera, streaming lights, capture card, audio interface, streamer equipment 2026"
       />
 
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-[#0a0a0f]">
         {/* Hero */}
-        <section className="bg-white border-b border-gray-100">
+        <section className="bg-gray-900 border-b border-gray-800">
           <div className="w-full px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-12 sm:pb-16">
             <div className="text-center max-w-4xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-full text-sm font-medium text-indigo-600 mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-950/50 border border-indigo-800 rounded-full text-sm font-medium text-indigo-600 mb-6">
                 <ShoppingBag className="w-4 h-4" />
                 Hand-picked by the ShinyPull team
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-100 mb-4 tracking-tight">
                 Recommended Streaming Gear
               </h1>
               <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
@@ -116,7 +116,7 @@ export default function Gear() {
               {/* Desktop Sidebar */}
               <aside className="hidden lg:block w-64 flex-shrink-0">
                 <div className="sticky top-24">
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 px-3">
                     Categories
                   </h3>
                   <nav className="space-y-1">
@@ -132,21 +132,21 @@ export default function Gear() {
                           className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                             isActive
                               ? 'bg-indigo-600 text-white shadow-md'
-                              : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                              : 'text-gray-500 hover:bg-gray-800/50 hover:text-indigo-400'
                           }`}
                         >
                           <div className="flex items-center gap-3">
                             <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                               isActive
-                                ? 'bg-white border-white'
-                                : 'border-gray-300'
+                                ? 'bg-gray-900 border-gray-800'
+                                : 'border-gray-600'
                             }`}>
                               {isActive && <Check className="w-3 h-3 text-indigo-600" />}
                             </div>
                             <span>{cat.label}</span>
                           </div>
                           <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                            isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                            isActive ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
                           }`}>
                             {count}
                           </span>
@@ -161,7 +161,7 @@ export default function Gear() {
               <div className="lg:hidden fixed bottom-6 left-6 z-40">
                 <button
                   onClick={() => setMobileFiltersOpen(true)}
-                  className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full shadow-lg transition-colors"
+                  className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-full shadow-lg transition-colors"
                 >
                   <Filter className="w-5 h-5" />
                   Filters
@@ -178,13 +178,13 @@ export default function Gear() {
                   />
 
                   {/* Slide Panel */}
-                  <div className="lg:hidden fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl animate-slide-in-left overflow-y-auto">
+                  <div className="lg:hidden fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gray-900 z-50 shadow-2xl animate-slide-in-left overflow-y-auto">
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-bold text-gray-900">Filter by Category</h3>
+                        <h3 className="text-lg font-bold text-gray-100">Filter by Category</h3>
                         <button
                           onClick={() => setMobileFiltersOpen(false)}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
                         >
                           <X className="w-5 h-5 text-gray-500" />
                         </button>
@@ -203,21 +203,21 @@ export default function Gear() {
                               className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                                 isActive
                                   ? 'bg-indigo-600 text-white shadow-md'
-                                  : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                                  : 'text-gray-500 hover:bg-gray-800/50 hover:text-indigo-400'
                               }`}
                             >
                               <div className="flex items-center gap-3">
                                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                                   isActive
-                                    ? 'bg-white border-white'
-                                    : 'border-gray-300'
+                                    ? 'bg-gray-900 border-gray-800'
+                                    : 'border-gray-600'
                                 }`}>
                                   {isActive && <Check className="w-3 h-3 text-indigo-600" />}
                                 </div>
                                 <span>{cat.label}</span>
                               </div>
                               <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                                isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                                isActive ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
                               }`}>
                                 {count}
                               </span>
@@ -235,16 +235,16 @@ export default function Gear() {
                 {loading ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {Array.from({ length: 8 }).map((_, i) => (
-                      <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 animate-pulse">
-                        <div className="w-full aspect-square bg-gray-100 rounded-lg mb-3"></div>
-                        <div className="h-4 bg-gray-100 rounded mb-2 w-3/4"></div>
-                        <div className="h-6 bg-gray-100 rounded w-1/3"></div>
+                      <div key={i} className="bg-gray-900 rounded-xl border border-gray-700 p-4 animate-pulse">
+                        <div className="w-full aspect-square bg-gray-800 rounded-lg mb-3"></div>
+                        <div className="h-4 bg-gray-800 rounded mb-2 w-3/4"></div>
+                        <div className="h-6 bg-gray-800 rounded w-1/3"></div>
                       </div>
                     ))}
                   </div>
                 ) : filtered.length === 0 ? (
                   <div className="text-center py-16">
-                    <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <Package className="w-12 h-12 text-gray-500 mx-auto mb-4" />
                     <p className="text-gray-500 text-lg">No products in this category yet.</p>
                   </div>
                 ) : (
@@ -254,9 +254,9 @@ export default function Gear() {
                   const hasImage = product.image && product.image.trim() !== '';
 
                   return (
-                    <div key={product.id} className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 hover:shadow-lg hover:border-indigo-200 transition-all flex flex-col group">
+                    <div key={product.id} className="bg-gray-900 rounded-xl border border-gray-700 p-3 sm:p-4 hover:shadow-lg hover:border-indigo-700 transition-all flex flex-col group">
                       {/* Image */}
-                      <div className="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden mb-2 sm:mb-3">
+                      <div className="w-full aspect-square bg-gray-800/50 rounded-lg flex items-center justify-center overflow-hidden mb-2 sm:mb-3">
                         {hasImage ? (
                           <img
                             src={product.image}
@@ -265,7 +265,7 @@ export default function Gear() {
                             className="w-full h-full object-contain p-1 sm:p-2 group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                          <div className="w-full h-full bg-gradient-to-br from-indigo-900/30 to-purple-900/30 flex items-center justify-center">
                             <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-300" />
                           </div>
                         )}
@@ -273,13 +273,13 @@ export default function Gear() {
 
                       {/* Badge */}
                       {product.badge && (
-                        <span className="inline-block self-start px-1.5 sm:px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full mb-1 sm:mb-2">
+                        <span className="inline-block self-start px-1.5 sm:px-2 py-0.5 bg-indigo-900/50 text-indigo-300 text-xs font-semibold rounded-full mb-1 sm:mb-2">
                           {product.badge}
                         </span>
                       )}
 
                       {/* Name */}
-                      <h3 className="text-xs sm:text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-1">
+                      <h3 className="text-xs sm:text-sm font-semibold text-gray-100 line-clamp-2 leading-snug mb-1">
                         {product.name}
                       </h3>
 
@@ -300,13 +300,13 @@ export default function Gear() {
                             href={affiliateLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors"
                           >
                             Buy
                             <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                           </a>
                         ) : (
-                          <span className="px-2.5 py-1.5 sm:px-4 sm:py-2 bg-gray-100 text-gray-400 text-xs sm:text-sm font-medium rounded-lg">
+                          <span className="px-2.5 py-1.5 sm:px-4 sm:py-2 bg-gray-800 text-gray-500 text-xs sm:text-sm font-medium rounded-lg">
                             Soon
                           </span>
                         )}
@@ -320,17 +320,17 @@ export default function Gear() {
         </section>
 
         {/* Blog Posts CTA */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-white border-t border-gray-100">
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gray-900 border-t border-gray-800">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4">
               Need help choosing?
             </h2>
-            <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-gray-500 text-lg mb-8 max-w-2xl mx-auto">
               Check out our in-depth gear guides and comparison articles to find the perfect setup for your budget.
             </p>
             <Link
               to="/blog"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-500/20"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-500/20"
             >
               Read Our Gear Guides
             </Link>

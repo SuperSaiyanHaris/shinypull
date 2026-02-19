@@ -32,24 +32,24 @@ class ErrorBoundary extends Component {
     if (this.state.hasError) {
       // Render fallback UI
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertTriangle className="w-8 h-8 text-red-600" />
+        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-gray-900 rounded-2xl shadow-lg border border-gray-800 p-8 text-center">
+            <div className="w-16 h-16 bg-red-950/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertTriangle className="w-8 h-8 text-red-400" />
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-100 mb-2">
               Something went wrong
             </h1>
 
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-400 mb-6">
               We encountered an unexpected error. Please try refreshing the page or return to the home page.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-500 transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
                 Refresh Page
@@ -58,7 +58,7 @@ class ErrorBoundary extends Component {
               <Link
                 to="/"
                 onClick={this.handleReset}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-800 text-gray-300 font-semibold rounded-xl hover:bg-gray-700 transition-colors"
               >
                 <Home className="w-4 h-4" />
                 Go Home
@@ -68,7 +68,7 @@ class ErrorBoundary extends Component {
             {/* Show error details in development */}
             {import.meta.env.DEV && this.state.error && (
               <details className="mt-8 text-left">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
+                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300">
                   Technical details
                 </summary>
                 <div className="mt-2 p-4 bg-gray-900 rounded-lg overflow-auto">

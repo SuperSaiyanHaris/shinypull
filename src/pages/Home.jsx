@@ -9,15 +9,15 @@ import { getAllPosts } from '../services/blogService';
 import { getActiveProducts } from '../services/productsService';
 
 const platforms = [
-  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-600', ringColor: 'ring-red-200', stats: '72M+ channels', available: true },
-  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'from-gray-900 to-gray-800', bgColor: 'bg-gray-100', textColor: 'text-gray-900', ringColor: 'ring-gray-300', stats: '1B+ accounts', available: true },
-  { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50', textColor: 'text-purple-600', ringColor: 'ring-purple-200', stats: '7M+ channels', available: true },
-  { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50', textColor: 'text-green-600', ringColor: 'ring-green-200', stats: '10M+ channels', available: true },
+  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-950/30', textColor: 'text-red-600', ringColor: 'ring-red-800', stats: '72M+ channels', available: true },
+  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'from-pink-500 to-pink-600', bgColor: 'bg-pink-950/30', textColor: 'text-pink-400', ringColor: 'ring-pink-800', stats: '1B+ accounts', available: true },
+  { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-950/30', textColor: 'text-purple-600', ringColor: 'ring-purple-800', stats: '7M+ channels', available: true },
+  { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-950/30', textColor: 'text-green-600', ringColor: 'ring-green-800', stats: '10M+ channels', available: true },
 ];
 
 const typewriterWords = [
   { text: 'YouTube Creator', color: 'text-red-500' },
-  { text: 'TikTok Star', color: 'text-gray-900' },
+  { text: 'TikTok Star', color: 'text-pink-400' },
   { text: 'Twitch Streamer', color: 'text-purple-600' },
   { text: 'Kick Channel', color: 'text-green-500' },
 ];
@@ -142,11 +142,11 @@ export default function Home() {
         keywords="youtube statistics, tiktok statistics, twitch statistics, kick statistics, subscriber count, follower count, social blade alternative, creator analytics, earnings calculator"
       />
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gray-900">
         {/* Hero Section - Clean Light with Typewriter */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white">
+        <section className="relative overflow-hidden bg-gradient-to-b from-gray-900 to-[#0a0a0f]">
           {/* Subtle dot pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-[size:24px_24px] opacity-50"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-[size:24px_24px] opacity-50"></div>
 
           <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-16 sm:pb-24">
             <div className="text-center max-w-4xl mx-auto">
@@ -157,7 +157,7 @@ export default function Home() {
                   return (
                     <Link
                       key={platform.id}
-                      to={`/rankings/${platform.id}`}
+                      to={`/search?platform=${platform.id}`}
                       className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 ${platform.bgColor} rounded-full hover:ring-2 ${platform.ringColor} transition-all duration-200 group`}
                     >
                       <Icon className={`w-4 h-4 ${platform.textColor}`} />
@@ -168,7 +168,7 @@ export default function Home() {
               </div>
 
               {/* Typewriter heading */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-5 sm:mb-6 tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-100 mb-5 sm:mb-6 tracking-tight leading-tight">
                 Find any{' '}
                 <span className={`${typewriterWords[wordIndex].color} inline-block min-w-[200px] sm:min-w-[300px] text-left`}>
                   {displayText}
@@ -186,20 +186,20 @@ export default function Home() {
                   <div className="relative group">
                     {/* Glow effect */}
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-0 group-focus-within:opacity-20 blur-lg transition-all duration-500"></div>
-                    <div className="relative flex items-center bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-200 group-focus-within:border-indigo-300 group-focus-within:shadow-indigo-100 transition-all duration-300">
-                      <Search className="absolute left-5 w-5 h-5 text-gray-400" />
+                    <div className="relative flex items-center bg-gray-900 rounded-2xl shadow-lg shadow-black/20 border border-gray-700 group-focus-within:border-indigo-500 group-focus-within:shadow-indigo-500/20 transition-all duration-300">
+                      <Search className="absolute left-5 w-5 h-5 text-gray-500" />
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search for a creator (e.g., MrBeast, Ninja)"
-                        className="w-full pl-14 pr-12 py-4 sm:py-5 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-base sm:text-lg rounded-2xl"
+                        className="w-full pl-14 pr-12 py-4 sm:py-5 bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none text-base sm:text-lg rounded-2xl"
                       />
                       {searchQuery && (
                         <button
                           type="button"
                           onClick={() => setSearchQuery('')}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-500 transition-colors"
                         >
                           <X className="w-5 h-5" />
                         </button>
@@ -208,7 +208,7 @@ export default function Home() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-3.5 sm:py-4 text-base sm:text-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                    className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-3.5 sm:py-4 text-base sm:text-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                   >
                     Search
                   </button>
@@ -219,28 +219,28 @@ export default function Home() {
         </section>
 
         {/* Features Section - Minimal, integrated */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-white border-t border-gray-100">
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-900 border-t border-gray-800">
           <div className="max-w-5xl mx-auto">
             <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
-              <Link to="/search" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-all duration-200">
-                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
+              <Link to="/search" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-800/50 transition-all duration-200">
+                <div className="w-12 h-12 bg-indigo-950/50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
                   <Search className="w-6 h-6 text-indigo-600" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Search Creators</h3>
+                <h3 className="text-lg font-bold text-gray-100 mb-2">Search Creators</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">Find any creator across YouTube, TikTok, Twitch, and Kick instantly.</p>
               </Link>
-              <Link to="/rankings" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-all duration-200">
-                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
+              <Link to="/rankings" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-800/50 transition-all duration-200">
+                <div className="w-12 h-12 bg-indigo-950/50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
                   <TrendingUp className="w-6 h-6 text-indigo-600" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Track Growth</h3>
+                <h3 className="text-lg font-bold text-gray-100 mb-2">Track Growth</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">Daily, weekly, and monthly stats with historical charts and trends.</p>
               </Link>
-              <Link to="/compare" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-50 transition-all duration-200">
-                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
+              <Link to="/compare" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-800/50 transition-all duration-200">
+                <div className="w-12 h-12 bg-indigo-950/50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
                   <BarChart3 className="w-6 h-6 text-indigo-600" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Compare & Rank</h3>
+                <h3 className="text-lg font-bold text-gray-100 mb-2">Compare & Rank</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">Side-by-side comparisons and rankings across all platforms.</p>
               </Link>
             </div>
@@ -252,7 +252,7 @@ export default function Home() {
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex items-center gap-6">
-                <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                <div className="w-20 h-20 bg-indigo-600/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
                   <DollarSign className="w-10 h-10 text-white" />
                 </div>
                 <div>
@@ -266,7 +266,7 @@ export default function Home() {
               </div>
               <Link
                 to="/youtube/money-calculator"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-indigo-700 font-bold rounded-xl hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-indigo-300 font-bold rounded-xl hover:bg-indigo-950/50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 <Calculator className="w-5 h-5" />
                 Try Calculator
@@ -278,20 +278,20 @@ export default function Home() {
 
         {/* Recommended Gear */}
         {featuredProducts.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-50">
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-800/50">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center justify-between mb-12">
                 <div>
-                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-100 mb-2">
                     Recommended Gear
                   </h2>
-                  <p className="text-lg text-gray-600">
+                  <p className="text-lg text-gray-500">
                     Top picks for streamers and content creators
                   </p>
                 </div>
                 <Link
                   to="/gear"
-                  className="hidden sm:flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+                  className="hidden sm:flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-300 transition-colors"
                 >
                   View all gear <ChevronRight className="w-4 h-4" />
                 </Link>
@@ -303,8 +303,8 @@ export default function Home() {
                   const hasImage = product.image && product.image.trim() !== '';
 
                   return (
-                    <div key={product.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg hover:border-indigo-200 transition-all flex flex-col group">
-                      <div className="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden mb-3">
+                    <div key={product.id} className="bg-gray-900 rounded-xl border border-gray-700 p-4 hover:shadow-lg hover:border-indigo-700 transition-all flex flex-col group">
+                      <div className="w-full aspect-square bg-gray-800/50 rounded-lg flex items-center justify-center overflow-hidden mb-3">
                         {hasImage ? (
                           <img
                             src={product.image}
@@ -313,17 +313,17 @@ export default function Home() {
                             className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                          <div className="w-full h-full bg-gradient-to-br from-indigo-900/30 to-purple-900/30 flex items-center justify-center">
                             <ShoppingBag className="w-8 h-8 text-indigo-300" />
                           </div>
                         )}
                       </div>
                       {product.badge && (
-                        <span className="inline-block self-start px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full mb-2">
+                        <span className="inline-block self-start px-2 py-0.5 bg-indigo-900/50 text-indigo-300 text-xs font-semibold rounded-full mb-2">
                           {product.badge}
                         </span>
                       )}
-                      <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-2">
+                      <h3 className="text-sm font-semibold text-gray-100 line-clamp-2 leading-snug mb-2">
                         {product.name}
                       </h3>
                       <div className="flex items-center justify-between mt-auto">
@@ -333,12 +333,12 @@ export default function Home() {
                             href={affiliateLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors"
                           >
                             Buy <ExternalLink className="w-3 h-3" />
                           </a>
                         ) : (
-                          <span className="px-3 py-1.5 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg">Soon</span>
+                          <span className="px-3 py-1.5 bg-gray-800 text-gray-500 text-sm font-medium rounded-lg">Soon</span>
                         )}
                       </div>
                     </div>
@@ -348,7 +348,7 @@ export default function Home() {
 
               <Link
                 to="/gear"
-                className="mt-8 flex sm:hidden items-center justify-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+                className="mt-8 flex sm:hidden items-center justify-center gap-2 text-indigo-600 font-medium hover:text-indigo-300 transition-colors"
               >
                 View all gear <ChevronRight className="w-4 h-4" />
               </Link>
@@ -358,20 +358,20 @@ export default function Home() {
 
         {/* Latest Blog Posts */}
         {latestPosts.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-white border-t border-gray-100">
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-900 border-t border-gray-800">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center justify-between mb-12">
                 <div>
-                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-100 mb-2">
                     Latest from the Blog
                   </h2>
-                  <p className="text-lg text-gray-600">
+                  <p className="text-lg text-gray-500">
                     Tips, guides, and insights for creators
                   </p>
                 </div>
                 <Link
                   to="/blog"
-                  className="hidden sm:flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+                  className="hidden sm:flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-300 transition-colors"
                 >
                   View all posts <ChevronRight className="w-4 h-4" />
                 </Link>
@@ -384,7 +384,7 @@ export default function Home() {
                     to={`/blog/${post.slug}`}
                     className="group"
                   >
-                    <article className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+                    <article className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
                       <img
                         src={post.image}
                         alt={post.title}
@@ -395,10 +395,10 @@ export default function Home() {
                         <span className="text-indigo-600 font-medium text-sm mb-2">
                           {post.category}
                         </span>
-                        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                        <h3 className="text-lg font-bold text-gray-100 mb-2 group-hover:text-indigo-400 transition-colors line-clamp-2">
                           {post.title}
                         </h3>
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-1">
+                        <p className="text-gray-500 text-sm mb-4 line-clamp-2 flex-1">
                           {post.description}
                         </p>
                         <div className="flex items-center justify-between text-sm text-gray-500">
@@ -418,7 +418,7 @@ export default function Home() {
 
               <Link
                 to="/blog"
-                className="mt-8 flex sm:hidden items-center justify-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+                className="mt-8 flex sm:hidden items-center justify-center gap-2 text-indigo-600 font-medium hover:text-indigo-300 transition-colors"
               >
                 View all posts <ChevronRight className="w-4 h-4" />
               </Link>
@@ -427,9 +427,9 @@ export default function Home() {
         )}
 
         {/* CTA Section */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-50 border-t border-gray-100">
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-800/50 border-t border-gray-800">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-3">
               Ready to dive in?
             </h2>
             <p className="text-gray-500 mb-8 max-w-lg mx-auto">
@@ -437,7 +437,7 @@ export default function Home() {
             </p>
             <Link
               to="/search"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-500 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               Get Started
               <ArrowRight className="w-5 h-5" />

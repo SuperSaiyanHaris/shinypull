@@ -71,7 +71,7 @@ export default function ResetPassword() {
             <div className="bg-gray-800 rounded-lg p-8 border border-gray-700">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h1 className="text-2xl font-bold mb-2">Password Updated!</h1>
-              <p className="text-gray-400 mb-4">
+              <p className="text-gray-500 mb-4">
                 Your password has been successfully changed. Redirecting you to the home page...
               </p>
             </div>
@@ -92,7 +92,7 @@ export default function ResetPassword() {
         <div className="max-w-md w-full">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">Set New Password</h1>
-            <p className="text-gray-400">
+            <p className="text-gray-500">
               Enter your new password below
             </p>
           </div>
@@ -102,7 +102,7 @@ export default function ResetPassword() {
               <div>
                 <label className="block text-sm font-medium mb-2">New Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                   <input
                     type="password"
                     value={password}
@@ -118,7 +118,7 @@ export default function ResetPassword() {
               <div>
                 <label className="block text-sm font-medium mb-2">Confirm Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                   <input
                     type="password"
                     value={confirmPassword}

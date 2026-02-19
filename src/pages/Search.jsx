@@ -24,10 +24,11 @@ const platformIcons = {
 };
 
 const platformColors = {
-  youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600' },
-  tiktok: { bg: 'bg-gray-900', light: 'bg-pink-50', text: 'text-pink-600' },
-  twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
-  kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600' },
+  youtube: { bg: 'bg-red-600', light: 'bg-red-950/30', text: 'text-red-400' },
+  tiktok: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400' },
+  twitch: { bg: 'bg-purple-600', light: 'bg-purple-950/30', text: 'text-purple-400' },
+  kick: { bg: 'bg-green-600', light: 'bg-green-950/30', text: 'text-green-400' },
+  instagram: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400' },
 };
 
 const platforms = [
@@ -71,7 +72,9 @@ async function searchTikTok(query, limit = 25) {
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
-  const [selectedPlatform, setSelectedPlatform] = useState('youtube');
+  const validPlatforms = ['youtube', 'tiktok', 'twitch', 'kick', 'instagram'];
+  const initialPlatform = validPlatforms.includes(searchParams.get('platform')) ? searchParams.get('platform') : 'youtube';
+  const [selectedPlatform, setSelectedPlatform] = useState(initialPlatform);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -227,13 +230,13 @@ export default function Search() {
         description="Search for social media creators to view their statistics and analytics."
       />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-800/50">
         {/* Header - Light */}
-        <div className="bg-white border-b border-gray-100">
+        <div className="bg-gray-900 border-b border-gray-800">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <SearchIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Search Creators</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-100">Search Creators</h1>
             </div>
             <p className="text-sm sm:text-base text-gray-500">Find any creator and view their detailed statistics</p>
           </div>
@@ -256,8 +259,8 @@ export default function Search() {
                     isSelected
                       ? `${colors.bg} text-white shadow-lg`
                       : platform.available
-                      ? 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:shadow-md'
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      ? 'bg-gray-900 text-gray-500 border border-gray-700 hover:border-gray-600 hover:shadow-md'
+                      : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                   }`}
                 >
                   {Icon && <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -273,20 +276,20 @@ export default function Search() {
             <div className="space-y-3">
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-15 group-focus-within:opacity-25 blur-xl transition duration-300"></div>
-                <div className="relative flex items-center bg-white rounded-2xl shadow-lg border-2 border-gray-100 group-focus-within:border-indigo-200 transition-colors">
-                  <SearchIcon className="absolute left-5 w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+                  <div className="relative flex items-center bg-gray-900 rounded-2xl shadow-lg border-2 border-gray-800 group-focus-within:border-indigo-500 transition-colors">
+                  <SearchIcon className="absolute left-5 w-5 h-5 text-gray-500 group-focus-within:text-indigo-500 transition-colors" />
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={`Search ${currentPlatform?.name || ''} creators...`}
-                    className="w-full pl-14 pr-12 py-4 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-lg rounded-2xl font-medium"
+                    className="w-full pl-14 pr-12 py-4 bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none text-lg rounded-2xl font-medium"
                   />
                   {query && (
                     <button
                       type="button"
                       onClick={() => { setQuery(''); setResults([]); setSearched(false); }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-500 transition-colors"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -296,7 +299,7 @@ export default function Search() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-4 text-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:hover:translate-y-0"
+                className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-4 text-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:hover:translate-y-0"
               >
                 {loading ? 'Searching...' : 'Search'}
               </button>
@@ -327,11 +330,11 @@ export default function Search() {
 
           {/* No Results */}
           {!loading && searched && !error && results.length === 0 && (
-            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-8 h-8 text-gray-400" />
+            <div className="text-center py-16 bg-gray-900 rounded-2xl border border-gray-800">
+              <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="w-8 h-8 text-gray-500" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No creators found</h3>
+              <h3 className="text-xl font-semibold text-gray-100 mb-2">No creators found</h3>
               <p className="text-gray-500 mb-4">
                 We couldn't find any {currentPlatform?.name} creators matching "{query}"
               </p>
@@ -341,42 +344,42 @@ export default function Search() {
                 <>
                   {requestStatus === null && (
                     <div className="mt-6 max-w-md mx-auto">
-                      <p className="text-sm text-gray-600 mb-3">
+                      <p className="text-sm text-gray-500 mb-3">
                         If you know the exact handle, enter it below — otherwise leave as-is and our smart search will find the right match.
                       </p>
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="text-gray-400 text-lg font-medium">@</span>
+                        <span className="text-gray-500 text-lg font-medium">@</span>
                         <input
                           type="text"
                           value={normalizedUsername}
                           onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
                           placeholder="e.g. charlidamelio"
-                          className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          className="flex-1 px-4 py-2.5 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                         />
                       </div>
                       <button
                         onClick={() => handleRequestCreator()}
                         disabled={!normalizedUsername}
-                        className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed bg-indigo-600 hover:bg-indigo-700"
+                        className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed bg-indigo-600 hover:bg-indigo-500"
                       >
                         <Clock className="w-5 h-5" />
                         Request @{normalizedUsername || '...'}
                       </button>
-                      <p className="text-xs text-gray-400 mt-3">
+                      <p className="text-xs text-gray-500 mt-3">
                         We'll add them within 24 hours
                       </p>
                     </div>
                   )}
 
                   {requestStatus === 'requesting' && (
-                    <div className="mt-6 max-w-md mx-auto p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
+                    <div className="mt-6 max-w-md mx-auto p-4 bg-indigo-950/50 border border-indigo-800 rounded-xl">
                       <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                      <p className="text-sm text-indigo-700 font-medium">Submitting request...</p>
+                      <p className="text-sm text-indigo-300 font-medium">Submitting request...</p>
                     </div>
                   )}
 
                   {requestStatus === 'success' && (
-                    <div className="mt-6 max-w-md mx-auto p-4 bg-green-50 border border-green-200 rounded-xl">
+                    <div className="mt-6 max-w-md mx-auto p-4 bg-green-950/30 border border-green-200 rounded-xl">
                       <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
                       <p className="text-sm text-green-800 font-medium mb-1">Request Submitted!</p>
                       <p className="text-sm text-green-700">{requestMessage}</p>
@@ -384,8 +387,8 @@ export default function Search() {
                   )}
 
                   {requestStatus === 'error' && (
-                    <div className="mt-6 max-w-md mx-auto p-4 bg-red-50 border border-red-200 rounded-xl">
-                      <AlertCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
+                    <div className="mt-6 max-w-md mx-auto p-4 bg-red-950/30 border border-red-800 rounded-xl">
+                      <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
                       <p className="text-sm text-red-800 font-medium mb-1">Request Failed</p>
                       <p className="text-sm text-red-700">{requestMessage}</p>
                       <button
@@ -401,7 +404,7 @@ export default function Search() {
 
               {/* Standard platforms: Standard message */}
               {selectedPlatform !== 'tiktok' && (
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-500">
                   Try searching for a different name or check the spelling
                 </p>
               )}
@@ -422,20 +425,20 @@ export default function Search() {
                       key={creator.platformId}
                       to={`/${creator.platform}/${creator.username}`}
                       state={{ platformId: creator.platformId }}
-                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-gray-100 rounded-2xl hover:shadow-lg hover:border-gray-200 transition-all duration-200 group"
+                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900 border border-gray-800 rounded-2xl hover:shadow-lg hover:border-gray-700 transition-all duration-200 group"
                     >
                       <img
                         src={creator.profileImage || '/placeholder-avatar.svg'}
                         alt={creator.displayName}
                         loading="lazy"
-                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0"
+                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover bg-gray-800 flex-shrink-0"
                         onError={(e) => {
                           e.target.src = '/placeholder-avatar.svg';
                         }}
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <h3 className="font-semibold text-base sm:text-lg text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+                          <h3 className="font-semibold text-base sm:text-lg text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
                             {creator.displayName}
                           </h3>
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium ${colors.bg} text-white`}>
@@ -446,13 +449,13 @@ export default function Search() {
                         <p className="text-sm sm:text-base text-gray-500 truncate">@{creator.username}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="font-bold text-gray-900 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
+                        <p className="font-bold text-gray-100 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
                         <p className="text-xs sm:text-sm text-gray-500">
                           {creator.platform === 'twitch' || creator.platform === 'tiktok' ? 'followers' :
                            creator.platform === 'kick' ? 'paid subs' : 'subscribers'}
                         </p>
                       </div>
-                      <ArrowRight className="hidden sm:block w-5 h-5 text-gray-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="hidden sm:block w-5 h-5 text-gray-500 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
                     </Link>
                   );
                 })}
@@ -468,50 +471,50 @@ export default function Search() {
 
               if (!hasExactMatch) {
                 return (
-                  <div className="text-center py-8 bg-white rounded-2xl border border-gray-100">
+                  <div className="text-center py-8 bg-gray-900 rounded-2xl border border-gray-800">
                     <div className="max-w-md mx-auto">
-                      <p className="text-sm text-gray-600 mb-4">
+                      <p className="text-sm text-gray-500 mb-4">
                         Can't find "@{query}"? TikTok creators are added by request.
                       </p>
 
                       {requestStatus === null && (
                         <>
-                          <p className="text-sm text-gray-600 mb-3">
+                          <p className="text-sm text-gray-500 mb-3">
                             If you know the exact handle, enter it below — otherwise leave as-is and our smart search will find the right match.
                           </p>
                           <div className="flex items-center gap-2 mb-4">
-                            <span className="text-gray-400 text-lg font-medium">@</span>
+                            <span className="text-gray-500 text-lg font-medium">@</span>
                             <input
                               type="text"
                               value={normalizedUsername}
                               onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
                               placeholder="e.g. charlidamelio"
-                              className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                              className="flex-1 px-4 py-2.5 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                             />
                           </div>
                           <button
                             onClick={() => handleRequestCreator()}
                             disabled={!normalizedUsername}
-                            className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed bg-indigo-600 hover:bg-indigo-700"
+                            className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed bg-indigo-600 hover:bg-indigo-500"
                           >
                             <Clock className="w-5 h-5" />
                             Request @{normalizedUsername || '...'}
                           </button>
-                          <p className="text-xs text-gray-400 mt-3">
+                          <p className="text-xs text-gray-500 mt-3">
                             We'll add them within 24 hours
                           </p>
                         </>
                       )}
 
                       {requestStatus === 'requesting' && (
-                        <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
+                        <div className="p-4 bg-indigo-950/50 border border-indigo-800 rounded-xl">
                           <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                          <p className="text-sm text-indigo-700 font-medium">Submitting request...</p>
+                          <p className="text-sm text-indigo-300 font-medium">Submitting request...</p>
                         </div>
                       )}
 
                       {requestStatus === 'success' && (
-                        <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                        <div className="p-4 bg-green-950/30 border border-green-200 rounded-xl">
                           <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
                           <p className="text-sm text-green-800 font-medium mb-1">Request Submitted!</p>
                           <p className="text-sm text-green-700">{requestMessage}</p>
@@ -519,8 +522,8 @@ export default function Search() {
                       )}
 
                       {requestStatus === 'error' && (
-                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                          <AlertCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
+                        <div className="p-4 bg-red-950/30 border border-red-800 rounded-xl">
+                          <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
                           <p className="text-sm text-red-800 font-medium mb-1">Request Failed</p>
                           <p className="text-sm text-red-700">{requestMessage}</p>
                           <button

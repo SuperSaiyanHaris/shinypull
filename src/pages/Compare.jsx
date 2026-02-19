@@ -15,10 +15,10 @@ import { formatNumber } from '../lib/utils';
 import logger from '../lib/logger';
 
 const platformConfig = {
-  youtube: { icon: Youtube, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
-  tiktok: { icon: TikTokIcon, color: 'text-pink-600', bg: 'bg-pink-50', border: 'border-pink-200' },
-  twitch: { icon: Twitch, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
-  kick: { icon: KickIcon, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
+  youtube: { icon: Youtube, color: 'text-red-400', bg: 'bg-red-950/30', border: 'border-red-800' },
+  tiktok: { icon: TikTokIcon, color: 'text-pink-400', bg: 'bg-pink-950/30', border: 'border-pink-800' },
+  twitch: { icon: Twitch, color: 'text-purple-400', bg: 'bg-purple-950/30', border: 'border-purple-800' },
+  kick: { icon: KickIcon, color: 'text-green-400', bg: 'bg-green-950/30', border: 'border-green-800' },
 };
 
 export default function Compare() {
@@ -209,8 +209,8 @@ export default function Compare() {
 
   // Helper: Get growth color
   const getGrowthColor = (percentage) => {
-    if (!percentage || isNaN(percentage)) return 'text-gray-400';
-    return percentage > 0 ? 'text-emerald-600' : 'text-red-500';
+    if (!percentage || isNaN(percentage)) return 'text-gray-500';
+    return percentage > 0 ? 'text-emerald-400' : 'text-red-500';
   };
 
   // Helper: Format earnings estimate (YouTube only)
@@ -235,14 +235,14 @@ export default function Compare() {
         description="Compare social media creators side-by-side. See subscriber counts, follower counts, views, and growth metrics."
       />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-800/50">
         {/* Header */}
-        <div className="bg-white border-b border-gray-100">
+        <div className="bg-gray-900 border-b border-gray-800">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="max-w-6xl mx-auto text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2">
                 <Scale className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Compare Creators</h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-100">Compare Creators</h1>
               </div>
               <p className="text-base sm:text-lg text-gray-500">
                 Side-by-side comparison across all platforms
@@ -282,7 +282,7 @@ export default function Compare() {
             {creators.length < 3 && (
               <button
                 onClick={addSlot}
-                className="min-h-[280px] border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors"
+                className="min-h-[280px] border-2 border-dashed border-gray-700 rounded-2xl flex items-center justify-center text-gray-500 hover:text-gray-500 hover:border-gray-600 transition-colors"
               >
                 <Plus className="w-8 h-8" />
               </button>
@@ -294,17 +294,17 @@ export default function Compare() {
           {!loadingFromUrl && filledCreators.length >= 2 && (
             <>
               {/* Desktop Table View */}
-              <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100">
-                  <h3 className="text-lg font-semibold text-gray-900">Comparison</h3>
+              <div className="hidden md:block bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-800">
+                  <h3 className="text-lg font-semibold text-gray-100">Comparison</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-100 bg-gray-50">
-                        <th className="px-6 py-4 text-left font-semibold text-gray-600">Metric</th>
+                      <tr className="border-b border-gray-800 bg-gray-800/50">
+                        <th className="px-6 py-4 text-left font-semibold text-gray-500">Metric</th>
                         {filledCreators.map((creator) => (
-                          <th key={creator.platformId} className="px-6 py-4 text-center font-semibold text-gray-900">
+                          <th key={creator.platformId} className="px-6 py-4 text-center font-semibold text-gray-100">
                             <div className="flex items-center justify-center gap-2">
                               <img src={creator.profileImage} alt="" loading="lazy" className="w-6 h-6 rounded-lg" />
                               <span className="truncate max-w-[120px]">{creator.displayName}</span>
@@ -399,13 +399,13 @@ export default function Compare() {
                 </div>
 
                 {/* View Full Profiles - Desktop */}
-                <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                <div className="px-6 py-4 border-t border-gray-800 bg-gray-800/50">
                   <div className="flex flex-wrap gap-4 justify-center">
                     {filledCreators.map((creator) => (
                       <Link
                         key={creator.platformId}
                         to={`/${creator.platform}/${creator.username}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-gray-500 hover:text-indigo-400 hover:border-indigo-700 transition-colors"
                       >
                         View {creator.displayName}'s profile
                         <ArrowRight className="w-4 h-4" />
@@ -473,18 +473,18 @@ export default function Compare() {
                 )}
 
                 {/* View Full Profiles - Mobile */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+                <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4">
                   <p className="text-sm font-medium text-gray-500 mb-3">View Profiles</p>
                   <div className="space-y-2">
                     {filledCreators.map((creator) => (
                       <Link
                         key={creator.platformId}
                         to={`/${creator.platform}/${creator.username}`}
-                        className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                        className="flex items-center gap-3 p-3 bg-gray-800/50 hover:bg-gray-800 rounded-xl transition-colors"
                       >
                         <img src={creator.profileImage} alt="" loading="lazy" className="w-8 h-8 rounded-lg" />
-                        <span className="flex-1 font-medium text-gray-900 truncate">{creator.displayName}</span>
-                        <ArrowRight className="w-4 h-4 text-gray-400" />
+                        <span className="flex-1 font-medium text-gray-100 truncate">{creator.displayName}</span>
+                        <ArrowRight className="w-4 h-4 text-gray-500" />
                       </Link>
                     ))}
                   </div>
@@ -494,11 +494,11 @@ export default function Compare() {
           )}
 
           {!loadingFromUrl && filledCreators.length < 2 && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-              <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-12 text-center">
+              <div className="w-16 h-16 bg-indigo-950/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-indigo-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Select at least 2 creators</h3>
+              <h3 className="text-lg font-semibold text-gray-100 mb-2">Select at least 2 creators</h3>
               <p className="text-gray-500">Search for creators in the slots above to start comparing</p>
             </div>
           )}
@@ -513,10 +513,10 @@ function CreatorCard({ creator, onRemove }) {
   const Icon = config.icon;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 relative group">
+    <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-5 relative group">
       <button
         onClick={onRemove}
-        className="absolute top-3 right-3 p-1.5 bg-gray-100 hover:bg-red-100 rounded-lg text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+        className="absolute top-3 right-3 p-1.5 bg-gray-800 hover:bg-red-900/30 rounded-lg text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
       >
         <X className="w-4 h-4" />
       </button>
@@ -527,7 +527,7 @@ function CreatorCard({ creator, onRemove }) {
           className="w-16 h-16 rounded-xl object-cover"
         />
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-gray-900 truncate">{creator.displayName}</p>
+          <p className="font-bold text-gray-100 truncate">{creator.displayName}</p>
           <p className="text-sm text-gray-500 truncate">@{creator.username}</p>
           <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md text-xs ${config.bg} ${config.color}`}>
             <Icon className="w-3 h-3" />
@@ -536,13 +536,13 @@ function CreatorCard({ creator, onRemove }) {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-gray-50 rounded-xl p-3">
+        <div className="bg-gray-800/50 rounded-xl p-3">
           <p className="text-xs text-gray-500 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' ? 'Followers' : 'Subs'}</p>
-          <p className="font-bold text-gray-900">{formatNumber(creator.subscribers || creator.followers)}</p>
+          <p className="font-bold text-gray-100">{formatNumber(creator.subscribers || creator.followers)}</p>
         </div>
-        <div className="bg-gray-50 rounded-xl p-3">
+        <div className="bg-gray-800/50 rounded-xl p-3">
           <p className="text-xs text-gray-500 mb-1">{creator.platform === 'tiktok' ? 'Likes' : 'Views'}</p>
-          <p className="font-bold text-gray-900">{formatNumber(creator.totalViews)}</p>
+          <p className="font-bold text-gray-100">{formatNumber(creator.totalViews)}</p>
         </div>
       </div>
     </div>
@@ -610,11 +610,11 @@ function SearchableSlot({ onSelect, onRemove }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 min-h-[280px] flex flex-col relative">
+    <div className="bg-gray-900 rounded-2xl border border-gray-700 shadow-sm p-4 min-h-[280px] flex flex-col relative">
       {onRemove && (
         <button
           onClick={onRemove}
-          className="absolute top-2 right-2 p-1.5 bg-gray-100 hover:bg-red-100 rounded-lg text-gray-400 hover:text-red-500 transition-all z-10"
+          className="absolute top-2 right-2 p-1.5 bg-gray-800 hover:bg-red-900/30 rounded-lg text-gray-500 hover:text-red-500 transition-all z-10"
         >
           <X className="w-4 h-4" />
         </button>
@@ -625,7 +625,7 @@ function SearchableSlot({ onSelect, onRemove }) {
           <select
             value={searchPlatform}
             onChange={(e) => setSearchPlatform(e.target.value)}
-            className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           >
             <option value="youtube">YouTube</option>
             <option value="tiktok">TikTok</option>
@@ -633,19 +633,19 @@ function SearchableSlot({ onSelect, onRemove }) {
             <option value="kick">Kick</option>
           </select>
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search creator..."
-              className="w-full pl-9 pr-9 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full pl-9 pr-9 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => { setSearchQuery(''); setSearchResults([]); }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-500 hover:text-gray-500 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -655,7 +655,7 @@ function SearchableSlot({ onSelect, onRemove }) {
         <button
           type="submit"
           disabled={searching || !searchQuery.trim()}
-          className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           {searching ? (
             <>
@@ -675,7 +675,7 @@ function SearchableSlot({ onSelect, onRemove }) {
               <button
                 key={result.platformId}
                 onClick={() => handleSelect(result)}
-                className="w-full flex items-center gap-3 p-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 p-2 bg-gray-800/50 hover:bg-gray-800 rounded-lg transition-colors text-left"
               >
                 <img
                   src={result.profileImage}
@@ -683,7 +683,7 @@ function SearchableSlot({ onSelect, onRemove }) {
                   className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-gray-900 truncate">{result.displayName}</p>
+                  <p className="font-semibold text-sm text-gray-100 truncate">{result.displayName}</p>
                   <p className="text-xs text-gray-500 truncate">
                     {formatNumber(result.subscribers || result.followers)} {result.platform === 'twitch' ? 'followers' : 'subs'}
                   </p>
@@ -698,7 +698,7 @@ function SearchableSlot({ onSelect, onRemove }) {
             ))}
           </div>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-gray-400">
+          <div className="h-full flex flex-col items-center justify-center text-gray-500">
             <Search className="w-8 h-8 mb-2" />
             <span className="text-sm font-medium">Search for a creator</span>
           </div>
@@ -710,10 +710,10 @@ function SearchableSlot({ onSelect, onRemove }) {
 
 function ComparisonRow({ label, icon: Icon, values, highlight }) {
   return (
-    <tr className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-      <td className="px-6 py-4 text-gray-600 font-medium">
+    <tr className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+      <td className="px-6 py-4 text-gray-500 font-medium">
         <div className="flex items-center gap-2">
-          {Icon && <Icon className="w-4 h-4 text-gray-400" />}
+          {Icon && <Icon className="w-4 h-4 text-gray-500" />}
           {label}
         </div>
       </td>
@@ -721,7 +721,7 @@ function ComparisonRow({ label, icon: Icon, values, highlight }) {
         <td
           key={index}
           className={`px-6 py-4 text-center font-semibold ${
-            highlight === index ? 'text-emerald-600 bg-emerald-50' : 'text-gray-900'
+            highlight === index ? 'text-emerald-400 bg-emerald-950/30' : 'text-gray-100'
           }`}
         >
           {value}
@@ -738,9 +738,9 @@ function MobileComparisonCard({ label, icon: Icon, creators, getValue, formatVal
   const winner = getWinner(values);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+    <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4">
       <div className="flex items-center gap-2 mb-3">
-        {Icon && <Icon className="w-4 h-4 text-gray-400" />}
+        {Icon && <Icon className="w-4 h-4 text-gray-500" />}
         <span className="text-sm font-medium text-gray-500">{label}</span>
       </div>
       <div className="space-y-2">
@@ -751,7 +751,7 @@ function MobileComparisonCard({ label, icon: Icon, creators, getValue, formatVal
             <div
               key={creator.platformId}
               className={`flex items-center gap-3 p-3 rounded-xl ${
-                isWinner ? 'bg-emerald-50 ring-1 ring-emerald-200' : 'bg-gray-50'
+                isWinner ? 'bg-emerald-950/30 ring-1 ring-emerald-200' : 'bg-gray-800/50'
               }`}
             >
               <img
@@ -759,14 +759,14 @@ function MobileComparisonCard({ label, icon: Icon, creators, getValue, formatVal
                 alt={creator.displayName}
                 className="w-8 h-8 rounded-lg object-cover"
               />
-              <span className="flex-1 font-medium text-gray-900 truncate text-sm">
+              <span className="flex-1 font-medium text-gray-100 truncate text-sm">
                 {creator.displayName}
               </span>
-              <span className={`font-bold ${isWinner ? 'text-emerald-600' : 'text-gray-900'}`}>
+              <span className={`font-bold ${isWinner ? 'text-emerald-400' : 'text-gray-100'}`}>
                 {formatValue(value)}
               </span>
               {isWinner && (
-                <span className="text-xs font-medium text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-medium text-emerald-400 bg-emerald-900/30 px-2 py-0.5 rounded-full">
                   ✓
                 </span>
               )}

@@ -61,7 +61,7 @@ export default function Blog() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-800/50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
       </div>
     );
@@ -75,21 +75,21 @@ export default function Blog() {
         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
           selectedCategories.includes('all')
             ? 'bg-indigo-600 text-white shadow-md'
-            : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+            : 'text-gray-500 hover:bg-gray-800/50 hover:text-indigo-400'
         }`}
       >
         <div className="flex items-center gap-3">
           <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
             selectedCategories.includes('all')
-              ? 'bg-white border-white'
-              : 'border-gray-300'
+              ? 'bg-gray-900 border-gray-800'
+              : 'border-gray-600'
           }`}>
             {selectedCategories.includes('all') && <Check className="w-3 h-3 text-indigo-600" />}
           </div>
           <span>All Posts</span>
         </div>
         <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-          selectedCategories.includes('all') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+          selectedCategories.includes('all') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
         }`}>
           {posts.length}
         </span>
@@ -105,21 +105,21 @@ export default function Blog() {
             className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               isActive
                 ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                : 'text-gray-500 hover:bg-gray-800/50 hover:text-indigo-400'
             }`}
           >
             <div className="flex items-center gap-3">
               <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                 isActive
-                  ? 'bg-white border-white'
-                  : 'border-gray-300'
+                  ? 'bg-gray-900 border-gray-800'
+                  : 'border-gray-600'
               }`}>
                 {isActive && <Check className="w-3 h-3 text-indigo-600" />}
               </div>
               <span>{category}</span>
             </div>
             <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-              isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+              isActive ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
             }`}>
               {count}
             </span>
@@ -136,14 +136,14 @@ export default function Blog() {
         description="Expert guides on streaming equipment, YouTube growth strategies, and creator economy insights. Grow your channel with data-driven advice."
       />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-800/50">
         {/* Header */}
-        <div className="bg-white border-b border-gray-100">
+        <div className="bg-gray-900 border-b border-gray-800">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
             <div className="max-w-6xl mx-auto text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3">
                 <BookOpen className="w-7 h-7 sm:w-9 sm:h-9 text-indigo-600" />
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Creator Resources</h1>
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-100">Creator Resources</h1>
               </div>
               <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto">
                 Expert guides on streaming gear, growth strategies, and industry insights to help you succeed as a creator
@@ -159,7 +159,7 @@ export default function Blog() {
               {/* Desktop Sidebar */}
               <aside className="hidden lg:block w-64 flex-shrink-0">
                 <div className="sticky top-24">
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 px-3">
                     Categories
                   </h3>
                   {renderCategoryButtons(toggleCategory)}
@@ -170,7 +170,7 @@ export default function Blog() {
               <div className="lg:hidden fixed bottom-6 left-6 z-40">
                 <button
                   onClick={() => setMobileFiltersOpen(true)}
-                  className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full shadow-lg transition-colors"
+                  className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-full shadow-lg transition-colors"
                 >
                   <Filter className="w-5 h-5" />
                   Filters
@@ -187,13 +187,13 @@ export default function Blog() {
                   />
 
                   {/* Slide Panel */}
-                  <div className="lg:hidden fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl animate-slide-in-left overflow-y-auto">
+                  <div className="lg:hidden fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gray-900 z-50 shadow-2xl animate-slide-in-left overflow-y-auto">
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-bold text-gray-900">Filter by Category</h3>
+                        <h3 className="text-lg font-bold text-gray-100">Filter by Category</h3>
                         <button
                           onClick={() => setMobileFiltersOpen(false)}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
                         >
                           <X className="w-5 h-5 text-gray-500" />
                         </button>
@@ -212,7 +212,7 @@ export default function Blog() {
                 {/* No posts message */}
                 {filteredPosts.length === 0 && (
                   <div className="text-center py-12">
-                    <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <BookOpen className="w-12 h-12 text-gray-500 mx-auto mb-4" />
                     <p className="text-gray-500 text-lg">No blog posts in this category yet.</p>
                   </div>
                 )}
@@ -223,7 +223,7 @@ export default function Blog() {
                     to={`/blog/${filteredPosts[0].slug}`}
                     className="block mb-8 group"
                   >
-                    <article className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
+                    <article className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
                       <div className="md:flex">
                         <div className="md:w-1/2">
                           <img
@@ -236,10 +236,10 @@ export default function Blog() {
                           <span className="text-indigo-600 font-medium text-sm mb-2">
                             {filteredPosts[0].category}
                           </span>
-                          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                          <h2 className="text-2xl md:text-3xl font-bold text-gray-100 mb-3 group-hover:text-indigo-400 transition-colors">
                             {filteredPosts[0].title}
                           </h2>
-                          <p className="text-gray-600 mb-4 line-clamp-2">
+                          <p className="text-gray-500 mb-4 line-clamp-2">
                             {filteredPosts[0].description}
                           </p>
                           <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -270,7 +270,7 @@ export default function Blog() {
                       to={`/blog/${post.slug}`}
                       className="group"
                     >
-                      <article className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+                      <article className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
                         <img
                           src={post.image}
                           alt={post.title}
@@ -281,10 +281,10 @@ export default function Blog() {
                           <span className="text-indigo-600 font-medium text-sm mb-2">
                             {post.category}
                           </span>
-                          <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                          <h3 className="text-lg font-bold text-gray-100 mb-2 group-hover:text-indigo-400 transition-colors line-clamp-2">
                             {post.title}
                           </h3>
-                          <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-1">
+                          <p className="text-gray-500 text-sm mb-4 line-clamp-2 flex-1">
                             {post.description}
                           </p>
                           <div className="flex items-center justify-between text-sm text-gray-500">
@@ -307,12 +307,12 @@ export default function Blog() {
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">
                     Track Your Channel's Growth
                   </h2>
-                  <p className="text-indigo-100 mb-6 max-w-2xl mx-auto">
+                  <p className="text-indigo-800 mb-6 max-w-2xl mx-auto">
                     Use ShinyPull's free analytics to monitor your subscribers, views, and compare your growth with top creators.
                   </p>
                   <Link
                     to="/search"
-                    className="inline-block px-8 py-3 bg-white text-indigo-700 font-semibold rounded-xl hover:bg-indigo-50 transition-colors"
+                    className="inline-block px-8 py-3 bg-gray-900 text-indigo-300 font-semibold rounded-xl hover:bg-indigo-950/50 transition-colors"
                   >
                     Search Creators
                   </Link>

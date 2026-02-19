@@ -26,10 +26,10 @@ const platformIcons = {
 };
 
 const platformColors = {
-  youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600', border: 'border-red-200' },
-  twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-200' },
-  kick: { bg: 'bg-green-500', light: 'bg-green-50', text: 'text-green-600', border: 'border-green-200' },
-  tiktok: { bg: 'bg-gray-900', light: 'bg-gray-50', text: 'text-gray-900', border: 'border-gray-200' },
+  youtube: { bg: 'bg-red-600', light: 'bg-red-950/30', text: 'text-red-400', border: 'border-red-800' },
+  twitch: { bg: 'bg-purple-600', light: 'bg-purple-950/30', text: 'text-purple-400', border: 'border-purple-800' },
+  kick: { bg: 'bg-green-600', light: 'bg-green-950/30', text: 'text-green-400', border: 'border-green-800' },
+  tiktok: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400', border: 'border-pink-800' },
 };
 
 const platformUrls = {
@@ -342,7 +342,7 @@ export default function CreatorProfile() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-73px)] bg-gray-50">
+      <div className="flex items-center justify-center min-h-[calc(100vh-73px)] bg-gray-800/50">
         <div className="text-center">
           <div className="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500">Loading {platform} channel...</p>
@@ -353,7 +353,7 @@ export default function CreatorProfile() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 px-4 py-8">
+      <div className="min-h-screen bg-gray-800/50 px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <FunErrorState
             type={error.includes('not found') || error.includes('Not found') ? 'notfound' : 'server'}
@@ -368,16 +368,16 @@ export default function CreatorProfile() {
 
   if (!creator) {
     return (
-      <div className="min-h-screen bg-gray-50 px-4 py-8">
+      <div className="min-h-screen bg-gray-800/50 px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8">
             <div className="flex items-start gap-6 mb-8">
               <div className={`w-24 h-24 ${colors.light} rounded-2xl flex items-center justify-center`}>
                 {Icon && <Icon className={`w-12 h-12 ${colors.text}`} />}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2 flex-wrap">
-                  <h1 className="text-3xl font-bold text-gray-900">@{username}</h1>
+                  <h1 className="text-3xl font-bold text-gray-100">@{username}</h1>
                   <a
                     href={platformUrls[platform]?.(username)}
                     target="_blank"
@@ -393,7 +393,7 @@ export default function CreatorProfile() {
                   href={platformUrls[platform]?.(username)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium"
+                  className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-300 font-medium"
                 >
                   <ExternalLink className="w-4 h-4" />
                   Check on {platform}
@@ -413,10 +413,10 @@ export default function CreatorProfile() {
         description={`View ${creator.displayName}'s ${platform} statistics including subscribers, views, and growth analytics.`}
       />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-800/50">
         {/* Banner */}
         {creator.bannerImage && (
-          <div className="h-32 md:h-48 bg-gray-100 overflow-hidden">
+          <div className="h-32 md:h-48 bg-gray-800 overflow-hidden">
             <img
               src={creator.bannerImage}
               alt="Channel banner"
@@ -428,7 +428,7 @@ export default function CreatorProfile() {
         <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-6xl mx-auto">
             {/* Profile Header */}
-            <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 mb-6 relative z-10 ${creator.bannerImage ? '-mt-16' : ''}`}>
+            <div className={`bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4 sm:p-6 md:p-8 mb-6 relative z-10 ${creator.bannerImage ? '-mt-16' : ''}`}>
               {/* Follow Button - Top Right */}
               <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
                 <button
@@ -436,8 +436,8 @@ export default function CreatorProfile() {
                   disabled={followLoading}
                   className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base shadow-lg ${
                     isFollowing
-                      ? 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm'
+                      ? 'bg-gray-900 text-gray-500 hover:bg-gray-800/50 border border-gray-700'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <Star className={`w-4 h-4 ${isFollowing ? 'fill-current' : ''}`} />
@@ -449,11 +449,11 @@ export default function CreatorProfile() {
                 <img
                   src={creator.profileImage}
                   alt={creator.displayName}
-                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl object-cover bg-gray-100 border-4 border-white shadow-lg"
+                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl object-cover bg-gray-800 border-4 border-gray-800 shadow-lg"
                 />
                 <div className="flex-1 w-full">
                   <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
-                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{creator.displayName}</h1>
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-100">{creator.displayName}</h1>
                     <a
                       href={platformUrls[platform]?.(creator.username || username)}
                       target="_blank"
@@ -471,7 +471,7 @@ export default function CreatorProfile() {
                       </span>
                     )}
                     {creator.country && (
-                      <span className="px-2 sm:px-2.5 py-1 bg-gray-100 rounded-lg text-xs sm:text-sm text-gray-600 font-medium">
+                      <span className="px-2 sm:px-2.5 py-1 bg-gray-800 rounded-lg text-xs sm:text-sm text-gray-500 font-medium">
                         {creator.country}
                       </span>
                     )}
@@ -479,7 +479,7 @@ export default function CreatorProfile() {
                   <p className="text-sm sm:text-base text-gray-500 mb-1">@{creator.username}</p>
 
                   {/* Data Freshness Indicator */}
-                  <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-3">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
                     <Clock className="w-3.5 h-3.5" />
                     <span>
                       Updated {(() => {
@@ -494,7 +494,7 @@ export default function CreatorProfile() {
                         return `${diffDays} days ago`;
                       })()}
                     </span>
-                    <span className="text-gray-300">•</span>
+                    <span className="text-gray-500">•</span>
                     <span className="text-gray-500">Refreshed daily at 6 AM & 6 PM EST</span>
                   </div>
 
@@ -504,7 +504,7 @@ export default function CreatorProfile() {
                       href={platformUrls[platform]?.(creator.username)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 sm:gap-2 text-indigo-600 hover:text-indigo-700 font-medium text-xs sm:text-sm"
+                      className="inline-flex items-center gap-1.5 sm:gap-2 text-indigo-600 hover:text-indigo-300 font-medium text-xs sm:text-sm"
                     >
                       <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                       <span className="hidden xs:inline">View on {platform}</span>
@@ -514,7 +514,7 @@ export default function CreatorProfile() {
                     {/* Watch Live Button for Twitch */}
                     {isLive && platform === 'twitch' && (
                       <>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-500">•</span>
                         <a
                           href={`https://twitch.tv/${creator.username}`}
                           target="_blank"
@@ -535,30 +535,30 @@ export default function CreatorProfile() {
                     {/* Additional social links for YouTube channels */}
                     {platform === 'youtube' && creator.platformId && (
                       <>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-500">•</span>
                         <a
                           href={`https://www.youtube.com/channel/${creator.platformId}/about`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-500 hover:text-gray-100 text-sm"
                         >
                           About
                         </a>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-500">•</span>
                         <a
                           href={`https://www.youtube.com/channel/${creator.platformId}/videos`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-500 hover:text-gray-100 text-sm"
                         >
                           Videos
                         </a>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-500">•</span>
                         <a
                           href={`https://www.youtube.com/channel/${creator.platformId}/community`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-500 hover:text-gray-100 text-sm"
                         >
                           Community
                         </a>
@@ -568,30 +568,30 @@ export default function CreatorProfile() {
                     {/* Twitch-specific links */}
                     {platform === 'twitch' && (
                       <>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-500">•</span>
                         <a
                           href={`https://twitch.tv/${creator.username}/videos`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-500 hover:text-gray-100 text-sm"
                         >
                           Videos
                         </a>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-500">•</span>
                         <a
                           href={`https://twitch.tv/${creator.username}/schedule`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-500 hover:text-gray-100 text-sm"
                         >
                           Schedule
                         </a>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-500">•</span>
                         <a
                           href={`https://twitch.tv/${creator.username}/about`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-500 hover:text-gray-100 text-sm"
                         >
                           About
                         </a>
@@ -602,7 +602,7 @@ export default function CreatorProfile() {
               </div>
 
               {creator.description && (
-                <p className="text-gray-600 text-sm mt-6 line-clamp-3 leading-relaxed">
+                <p className="text-gray-500 text-sm mt-6 line-clamp-3 leading-relaxed">
                   {creator.description}
                 </p>
               )}
@@ -816,7 +816,7 @@ export default function CreatorProfile() {
                 href={`https://youtube.com/watch?v=${latestVideo.videoId}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6 hover:shadow-md hover:border-gray-200 transition-all group"
+                className="block bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden mb-6 hover:shadow-md hover:border-gray-700 transition-all group"
               >
                 <div className="flex flex-col sm:flex-row">
                   <div className="relative sm:w-72 flex-shrink-0">
@@ -835,7 +835,7 @@ export default function CreatorProfile() {
                   <div className="p-5 flex flex-col justify-between flex-1 min-w-0">
                     <div>
                       <p className="text-xs font-medium text-indigo-600 mb-1.5">Latest Video</p>
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                      <h3 className="font-semibold text-gray-100 mb-2 line-clamp-2 group-hover:text-indigo-400 transition-colors">
                         {latestVideo.title}
                       </h3>
                       <p className="text-sm text-gray-500">
@@ -852,17 +852,17 @@ export default function CreatorProfile() {
                         })()}
                       </p>
                     </div>
-                    <div className="flex items-center gap-5 mt-3 text-sm text-gray-600">
+                    <div className="flex items-center gap-5 mt-3 text-sm text-gray-500">
                       <span className="flex items-center gap-1.5">
-                        <Eye className="w-4 h-4 text-gray-400" />
+                        <Eye className="w-4 h-4 text-gray-500" />
                         {formatNumber(latestVideo.views)}
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <ThumbsUp className="w-4 h-4 text-gray-400" />
+                        <ThumbsUp className="w-4 h-4 text-gray-500" />
                         {formatNumber(latestVideo.likes)}
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <MessageCircle className="w-4 h-4 text-gray-400" />
+                        <MessageCircle className="w-4 h-4 text-gray-500" />
                         {formatNumber(latestVideo.comments)}
                       </span>
                     </div>
@@ -875,10 +875,10 @@ export default function CreatorProfile() {
             {platform !== 'tiktok' && (
               <Link
                 to={`/live/${platform}/${creator.username}`}
-                className="flex items-center justify-between bg-indigo-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:bg-indigo-700 transition-all group"
+                className="flex items-center justify-between bg-indigo-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:bg-indigo-500 transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-indigo-600/20 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Radio className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <div className="min-w-0">
@@ -922,29 +922,29 @@ export default function CreatorProfile() {
 
             {/* Daily Metrics Table */}
             {metrics ? (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100">
-                  <h3 className="text-lg font-semibold text-gray-900">Daily Channel Metrics</h3>
+              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-800">
+                  <h3 className="text-lg font-semibold text-gray-100">Daily Channel Metrics</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-gray-100 bg-gray-50 text-left">
-                        <th className="px-6 py-4 font-semibold text-gray-600">Date</th>
-                        <th className="px-6 py-4 font-semibold text-gray-600 text-right">
+                      <tr className="border-b border-gray-800 bg-gray-800/50 text-left">
+                        <th className="px-6 py-4 font-semibold text-gray-500">Date</th>
+                        <th className="px-6 py-4 font-semibold text-gray-500 text-right">
                           {platform === 'tiktok' ? 'Followers' : platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : 'Subscribers'}
                         </th>
-                        {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Likes</th>}
-                        {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
-                        {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
-                        {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
-                        {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Est. Earnings</th>}
+                        {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-500 text-right">Likes</th>}
+                        {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-500 text-right">Videos</th>}
+                        {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-500 text-right">Views</th>}
+                        {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-500 text-right">Videos</th>}
+                        {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-500 text-right">Est. Earnings</th>}
                       </tr>
                     </thead>
                     <tbody>
                       {metrics.dailyStats.map((stat) => (
-                        <tr key={stat.recorded_at} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4 text-gray-900">
+                        <tr key={stat.recorded_at} className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+                          <td className="px-6 py-4 text-gray-100">
                             {new Date(stat.recorded_at + 'T12:00:00').toLocaleDateString('en-US', {
                               weekday: 'short',
                               month: 'short',
@@ -953,9 +953,9 @@ export default function CreatorProfile() {
                           </td>
                           <td className="px-6 py-4 text-right">
                             <div className="flex flex-col items-end">
-                              <span className="font-medium text-gray-900">{formatNumber(stat.subscribers || stat.followers)}</span>
+                              <span className="font-medium text-gray-100">{formatNumber(stat.subscribers || stat.followers)}</span>
                               {(platform === 'tiktok' || platform === 'twitch' || platform === 'kick') && stat.subsChange !== 0 && (
-                                <span className={`text-xs ${stat.subsChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                <span className={`text-xs ${stat.subsChange > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                                   {stat.subsChange > 0 ? '+' : ''}{formatNumber(stat.subsChange)}
                                 </span>
                               )}
@@ -965,9 +965,9 @@ export default function CreatorProfile() {
                             <>
                               <td className="px-6 py-4 text-right">
                                 <div className="flex flex-col items-end">
-                                  <span className="font-medium text-gray-900">{formatNumber(stat.total_views || 0)}</span>
+                                  <span className="font-medium text-gray-100">{formatNumber(stat.total_views || 0)}</span>
                                   {stat.viewsChange !== 0 && (
-                                    <span className={`text-xs ${stat.viewsChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                    <span className={`text-xs ${stat.viewsChange > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                                       {stat.viewsChange > 0 ? '+' : ''}{formatNumber(stat.viewsChange)}
                                     </span>
                                   )}
@@ -975,9 +975,9 @@ export default function CreatorProfile() {
                               </td>
                               <td className="px-6 py-4 text-right">
                                 <div className="flex flex-col items-end">
-                                  <span className="font-medium text-gray-900">{formatNumber(stat.total_posts || 0)}</span>
+                                  <span className="font-medium text-gray-100">{formatNumber(stat.total_posts || 0)}</span>
                                   {stat.videosChange !== 0 && (
-                                    <span className={`text-xs ${stat.videosChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                    <span className={`text-xs ${stat.videosChange > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                                       {stat.videosChange > 0 ? '+' : ''}{stat.videosChange}
                                     </span>
                                   )}
@@ -989,9 +989,9 @@ export default function CreatorProfile() {
                             <>
                               <td className="px-6 py-4 text-right">
                                 <div className="flex flex-col items-end">
-                                  <span className="font-medium text-gray-900">{formatNumber(stat.total_views)}</span>
+                                  <span className="font-medium text-gray-100">{formatNumber(stat.total_views)}</span>
                                   {stat.viewsChange !== 0 && (
-                                    <span className={`text-xs ${stat.viewsChange > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
+                                    <span className={`text-xs ${stat.viewsChange > 0 ? 'text-emerald-400' : 'text-gray-500'}`}>
                                       {stat.viewsChange > 0 ? '+' : ''}{formatNumber(stat.viewsChange)}
                                     </span>
                                   )}
@@ -999,15 +999,15 @@ export default function CreatorProfile() {
                               </td>
                               <td className="px-6 py-4 text-right">
                                 <div className="flex flex-col items-end">
-                                  <span className="font-medium text-gray-900">{formatNumber(stat.total_posts || 0)}</span>
+                                  <span className="font-medium text-gray-100">{formatNumber(stat.total_posts || 0)}</span>
                                   {stat.videosChange !== 0 && (
-                                    <span className={`text-xs ${stat.videosChange > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                    <span className={`text-xs ${stat.videosChange > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                                       {stat.videosChange > 0 ? '+' : ''}{stat.videosChange}
                                     </span>
                                   )}
                                 </div>
                               </td>
-                              <td className="px-6 py-4 text-right text-gray-600">
+                              <td className="px-6 py-4 text-right text-gray-500">
                                 {stat.viewsChange > 0
                                   ? formatEarnings(stat.viewsChange / 1000 * 2, stat.viewsChange / 1000 * 7)
                                   : '—'
@@ -1019,14 +1019,14 @@ export default function CreatorProfile() {
                       ))}
 
                       {/* Summary Rows */}
-                      <tr className="bg-indigo-50 font-semibold">
-                        <td className="px-6 py-4 text-indigo-900">Daily Average</td>
+                      <tr className="bg-indigo-950/50 font-semibold">
+                        <td className="px-6 py-4 text-indigo-200">Daily Average</td>
                         <td className="px-6 py-4 text-right">
                           {/* For YouTube, show dash since subscriber counts are rounded */}
                           {platform === 'youtube' ? (
-                            <span className="text-gray-400">—</span>
+                            <span className="text-gray-500">—</span>
                           ) : (
-                            <span className={metrics.dailyAverage.subs >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                            <span className={metrics.dailyAverage.subs >= 0 ? 'text-emerald-400' : 'text-red-500'}>
                               {metrics.dailyAverage.subs >= 0 ? '+' : ''}{formatNumber(metrics.dailyAverage.subs)}
                             </span>
                           )}
@@ -1034,7 +1034,7 @@ export default function CreatorProfile() {
                         {platform === 'tiktok' && (
                           <>
                             <td className="px-6 py-4 text-right">
-                              <span className={metrics.dailyAverage.views >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                              <span className={metrics.dailyAverage.views >= 0 ? 'text-emerald-400' : 'text-red-500'}>
                                 {metrics.dailyAverage.views > 0 ? `+${formatNumber(metrics.dailyAverage.views)}` : '—'}
                               </span>
                             </td>
@@ -1043,14 +1043,14 @@ export default function CreatorProfile() {
                         )}
                         {platform === 'youtube' && (
                           <>
-                            <td className={`px-6 py-4 text-right ${metrics.dailyAverage.views > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
+                            <td className={`px-6 py-4 text-right ${metrics.dailyAverage.views > 0 ? 'text-emerald-400' : 'text-gray-500'}`}>
                               {metrics.dailyAverage.views > 0
                                 ? `+${formatNumber(metrics.dailyAverage.views)}`
                                 : '—'
                               }
                             </td>
                             <td className="px-6 py-4 text-right"></td>
-                            <td className="px-6 py-4 text-right text-indigo-900">
+                            <td className="px-6 py-4 text-right text-indigo-200">
                               {metrics.dailyAverage.views > 0
                                 ? formatEarnings(metrics.dailyAverage.views / 1000 * 2, metrics.dailyAverage.views / 1000 * 7)
                                 : '—'
@@ -1060,13 +1060,13 @@ export default function CreatorProfile() {
                         )}
                       </tr>
 
-                      <tr className="bg-indigo-50 font-semibold">
-                        <td className="px-6 py-4 text-indigo-900">Weekly Average</td>
+                      <tr className="bg-indigo-950/50 font-semibold">
+                        <td className="px-6 py-4 text-indigo-200">Weekly Average</td>
                         <td className="px-6 py-4 text-right">
                           {platform === 'youtube' ? (
-                            <span className="text-gray-400">—</span>
+                            <span className="text-gray-500">—</span>
                           ) : (
-                            <span className={metrics.weeklyAverage.subs >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                            <span className={metrics.weeklyAverage.subs >= 0 ? 'text-emerald-400' : 'text-red-500'}>
                               {metrics.weeklyAverage.subs >= 0 ? '+' : ''}{formatNumber(metrics.weeklyAverage.subs)}
                             </span>
                           )}
@@ -1074,7 +1074,7 @@ export default function CreatorProfile() {
                         {platform === 'tiktok' && (
                           <>
                             <td className="px-6 py-4 text-right">
-                              <span className={metrics.weeklyAverage.views >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                              <span className={metrics.weeklyAverage.views >= 0 ? 'text-emerald-400' : 'text-red-500'}>
                                 {metrics.weeklyAverage.views > 0 ? `+${formatNumber(metrics.weeklyAverage.views)}` : '—'}
                               </span>
                             </td>
@@ -1083,14 +1083,14 @@ export default function CreatorProfile() {
                         )}
                         {platform === 'youtube' && (
                           <>
-                            <td className={`px-6 py-4 text-right ${metrics.weeklyAverage.views > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
+                            <td className={`px-6 py-4 text-right ${metrics.weeklyAverage.views > 0 ? 'text-emerald-400' : 'text-gray-500'}`}>
                               {metrics.weeklyAverage.views > 0
                                 ? `+${formatNumber(metrics.weeklyAverage.views)}`
                                 : '—'
                               }
                             </td>
                             <td className="px-6 py-4 text-right"></td>
-                            <td className="px-6 py-4 text-right text-indigo-900">
+                            <td className="px-6 py-4 text-right text-indigo-200">
                               {metrics.weeklyAverage.views > 0
                                 ? formatEarnings(metrics.weeklyAverage.views / 1000 * 2, metrics.weeklyAverage.views / 1000 * 7)
                                 : '—'
@@ -1100,39 +1100,39 @@ export default function CreatorProfile() {
                         )}
                       </tr>
 
-                      <tr className="bg-indigo-50 font-semibold">
-                        <td className="px-6 py-4 text-indigo-900">Last 30 Days</td>
+                      <tr className="bg-indigo-950/50 font-semibold">
+                        <td className="px-6 py-4 text-indigo-200">Last 30 Days</td>
                         <td className="px-6 py-4 text-right">
                           {platform === 'youtube' ? (
-                            <span className="text-gray-400">—</span>
+                            <span className="text-gray-500">—</span>
                           ) : (
-                            <span className={metrics.last30Days.subs >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                            <span className={metrics.last30Days.subs >= 0 ? 'text-emerald-400' : 'text-red-500'}>
                               {metrics.last30Days.subs >= 0 ? '+' : ''}{formatNumber(metrics.last30Days.subs)}
                             </span>
                           )}
                         </td>
                         {platform === 'tiktok' && (
                           <>
-                            <td className={`px-6 py-4 text-right ${metrics.last30Days.views >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                            <td className={`px-6 py-4 text-right ${metrics.last30Days.views >= 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                               {metrics.last30Days.views >= 0 ? '+' : ''}{formatNumber(metrics.last30Days.views)}
                             </td>
-                            <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                            <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                               {metrics.last30Days.videos >= 0 ? '+' : ''}{metrics.last30Days.videos}
                             </td>
                           </>
                         )}
                         {platform === 'youtube' && (
                           <>
-                            <td className="px-6 py-4 text-right text-emerald-600">
+                            <td className="px-6 py-4 text-right text-emerald-400">
                               {metrics.last30Days.views > 0
                                 ? `+${formatNumber(metrics.last30Days.views)}`
                                 : '—'
                               }
                             </td>
-                            <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                            <td className={`px-6 py-4 text-right ${metrics.last30Days.videos >= 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                               {metrics.last30Days.videos >= 0 ? '+' : ''}{metrics.last30Days.videos}
                             </td>
-                            <td className="px-6 py-4 text-right text-indigo-900">
+                            <td className="px-6 py-4 text-right text-indigo-200">
                               {metrics.last30Days.views > 0
                                 ? formatEarnings(metrics.last30Days.views / 1000 * 2, metrics.last30Days.views / 1000 * 7)
                                 : '—'
@@ -1146,15 +1146,15 @@ export default function CreatorProfile() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
-                <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8 text-center">
+                <div className="w-16 h-16 bg-indigo-950/50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="w-8 h-8 text-indigo-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Building Historical Data</h3>
+                <h3 className="text-lg font-semibold text-gray-100 mb-2">Building Historical Data</h3>
                 <p className="text-gray-500 text-sm mb-2">
                   This creator is being tracked! We collect daily snapshots to show growth trends and metrics.
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-500">
                   {statsHistory.length} day(s) of data collected • Check back soon for trends!
                 </p>
               </div>
@@ -1180,13 +1180,13 @@ export default function CreatorProfile() {
 
 function StatCard({ icon: Icon, label, value, sublabel }) {
   return (
-    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-800 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center gap-2 mb-2">
-        {Icon && <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />}
+        {Icon && <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />}
         <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">{label}</p>
       </div>
-      <p className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{value}</p>
-      {sublabel && <p className="text-xs text-gray-400 mt-1 truncate">{sublabel}</p>}
+      <p className="text-xl sm:text-2xl font-bold text-gray-100 truncate">{value}</p>
+      {sublabel && <p className="text-xs text-gray-500 mt-1 truncate">{sublabel}</p>}
     </div>
   );
 }
@@ -1198,16 +1198,16 @@ function SummaryCard({ label, sublabel, value, change }) {
   const isLongValue = value && value.length > 12;
 
   const bgClass = isNegative
-    ? 'bg-gradient-to-br from-red-50 to-orange-50 border-red-100'
-    : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100';
+    ? 'bg-gradient-to-br from-red-950/30 to-orange-950/30 border-red-800'
+    : 'bg-gradient-to-br from-indigo-950/30 to-purple-950/30 border-indigo-800';
 
   return (
     <div className={`rounded-2xl p-4 sm:p-5 border ${bgClass}`}>
-      <p className={`font-bold text-gray-900 mb-1 ${isLongValue ? 'text-lg sm:text-xl md:text-2xl' : 'text-xl sm:text-2xl md:text-3xl'}`}>{value}</p>
-      <p className="text-xs sm:text-sm font-medium text-gray-700">{label}</p>
+      <p className={`font-bold text-gray-100 mb-1 ${isLongValue ? 'text-lg sm:text-xl md:text-2xl' : 'text-xl sm:text-2xl md:text-3xl'}`}>{value}</p>
+      <p className="text-xs sm:text-sm font-medium text-gray-500">{label}</p>
       {sublabel && <p className="text-xs text-gray-500 mt-1">{sublabel}</p>}
       {change !== undefined && change !== null && (
-        <p className={`text-xs mt-2 font-medium ${isPositive ? 'text-emerald-600' : isNegative ? 'text-red-500' : 'text-gray-400'}`}>
+        <p className={`text-xs mt-2 font-medium ${isPositive ? 'text-emerald-400' : isNegative ? 'text-red-500' : 'text-gray-500'}`}>
           {isPositive ? '+' : ''}{formatNumber(change)}
         </p>
       )}
@@ -1221,20 +1221,20 @@ function GrowthRateCard({ label, value, platform }) {
   const isNeutral = value === 0;
 
   const bgClass = isNegative
-    ? 'bg-gradient-to-br from-red-50 to-orange-50 border-red-200'
+    ? 'bg-gradient-to-br from-red-950/30 to-orange-950/30 border-red-800'
     : isPositive
-    ? 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200'
-    : 'bg-gradient-to-br from-gray-50 to-slate-50 border-gray-200';
+    ? 'bg-gradient-to-br from-emerald-950/30 to-teal-950/30 border-emerald-800'
+    : 'bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700';
 
-  const iconColor = isPositive ? 'text-emerald-600' : isNegative ? 'text-red-500' : 'text-gray-400';
-  const valueColor = isPositive ? 'text-emerald-600' : isNegative ? 'text-red-500' : 'text-gray-500';
+  const iconColor = isPositive ? 'text-emerald-400' : isNegative ? 'text-red-500' : 'text-gray-500';
+  const valueColor = isPositive ? 'text-emerald-400' : isNegative ? 'text-red-500' : 'text-gray-500';
 
   const followerLabel = platform === 'tiktok' || platform === 'twitch' || platform === 'kick' ? 'Followers' : 'Subscribers';
 
   return (
     <div className={`rounded-2xl border p-5 ${bgClass}`}>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-gray-600">{label}</span>
+        <span className="text-sm font-medium text-gray-500">{label}</span>
         <TrendingUp className={`w-5 h-5 ${iconColor} ${isNegative ? 'rotate-180' : ''}`} />
       </div>
       <div className={`text-2xl font-bold ${valueColor}`}>
@@ -1327,10 +1327,10 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+    <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6 mb-6">
       <div className="flex items-center gap-2 mb-4">
         <Target className="w-5 h-5 text-indigo-600" />
-        <h3 className="text-lg font-semibold text-gray-900">Milestone Predictions</h3>
+        <h3 className="text-lg font-semibold text-gray-100">Milestone Predictions</h3>
       </div>
       <p className="text-sm text-gray-500 mb-4">
         Based on current {metricLabel} growth of <span className="font-semibold text-indigo-600">+{formatNumber(dailyGrowth)}/day</span>
@@ -1341,24 +1341,24 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
             key={pred.milestone}
             className={`rounded-xl p-4 ${
               index === 0
-                ? 'bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100'
-                : 'bg-gray-50'
+                ? 'bg-gradient-to-br from-indigo-950/30 to-purple-950/30 border border-indigo-800'
+                : 'bg-gray-800/50'
             }`}
           >
             <div className="flex items-center gap-2 mb-2">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                index === 0 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'
+                index === 0 ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-400'
               }`}>
                 <Target className="w-4 h-4" />
               </div>
               <span className={`text-2xl font-bold ${
-                index === 0 ? 'text-indigo-600' : 'text-gray-900'
+                index === 0 ? 'text-indigo-600' : 'text-gray-100'
               }`}>
                 {formatMilestone(pred.milestone)}
               </span>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-600 flex items-center gap-1">
+              <p className="text-sm text-gray-500 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />
                 {formatDays(pred.daysNeeded)}
               </p>
@@ -1373,7 +1373,7 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
           </div>
         ))}
       </div>
-      <p className="text-xs text-gray-400 mt-4">
+      <p className="text-xs text-gray-500 mt-4">
         * Predictions assume consistent growth. Actual results may vary based on content, algorithm changes, and other factors.
       </p>
     </div>
@@ -1518,8 +1518,8 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-3">
-          <p className="text-sm font-medium text-gray-900 mb-1">
+        <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-lg p-3">
+          <p className="text-sm font-medium text-gray-100 mb-1">
             {new Date(payload[0].payload.date + 'T12:00:00').toLocaleDateString('en-US', {
               weekday: 'short',
               month: 'short',
@@ -1527,7 +1527,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
               year: 'numeric'
             })}
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-500">
             <span className="font-semibold" style={{ color: currentMetric.color }}>
               {currentMetric.dataKey === 'hoursWatched'
                 ? formatHoursWatched(payload[0].value)
@@ -1542,32 +1542,32 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+    <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6 mb-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-lg">
+        <div className="flex flex-wrap gap-1 bg-gray-800 p-1 rounded-lg">
           {metrics.map((m) => (
             <button
               key={m.value}
               onClick={() => onMetricChange(m.value)}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 metric === m.value
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-gray-900 text-indigo-600 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-100'
               }`}
             >
               {m.label}
             </button>
           ))}
         </div>
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+        <div className="flex gap-1 bg-gray-800 p-1 rounded-lg">
           {ranges.map((r) => (
             <button
               key={r.value}
               onClick={() => onRangeChange(r.value)}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 range === r.value
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-gray-900 text-indigo-600 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-100'
               }`}
             >
               {r.label}
@@ -1608,14 +1608,14 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
               strokeWidth={2}
               fill={`url(#${metric}Gradient)`}
               dot={false}
-              activeDot={{ r: 6, fill: currentMetric.color, stroke: '#fff', strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: currentMetric.color, stroke: '#1f2937', strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
       <div className="flex items-center justify-center gap-4 mt-4 text-sm text-gray-500">
         <span>{filteredData.length} data points</span>
-        <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+        <span className="w-1 h-1 rounded-full bg-gray-600"></span>
         <span>
           {formatNumber(filteredData[filteredData.length - 1]?.[currentMetric.dataKey] - filteredData[0]?.[currentMetric.dataKey])} net growth
         </span>

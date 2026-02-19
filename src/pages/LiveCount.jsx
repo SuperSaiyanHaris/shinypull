@@ -235,7 +235,7 @@ export default function LiveCount() {
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black flex items-center justify-center">
         <div className="text-center">
           <div className="w-20 h-20 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-          <p className="text-gray-400 text-lg">Loading live count...</p>
+          <p className="text-gray-500 text-lg">Loading live count...</p>
         </div>
       </div>
     );
@@ -247,10 +247,10 @@ export default function LiveCount() {
         <div className="text-center">
           <AlertCircle className="w-20 h-20 text-red-500 mx-auto mb-6" />
           <h2 className="text-3xl font-bold text-white mb-3">Creator Not Found</h2>
-          <p className="text-gray-400 mb-6 text-lg">{error || `Could not find @${username} on ${platform}`}</p>
+          <p className="text-gray-500 mb-6 text-lg">{error || `Could not find @${username} on ${platform}`}</p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-2xl transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl transition-colors"
           >
             Go Home
           </Link>
@@ -289,7 +289,7 @@ export default function LiveCount() {
               />
               <div className="text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1">{creator.displayName}</h1>
-                <p className="text-gray-400 text-base sm:text-lg mb-3">@{creator.username || username}</p>
+                <p className="text-gray-500 text-base sm:text-lg mb-3">@{creator.username || username}</p>
                 <a
                   href={platformUrls[platform]?.(creator.username || username)}
                   target="_blank"
@@ -309,7 +309,7 @@ export default function LiveCount() {
                   <Odometer value={estimatedCount} duration={300} />
                 )}
               </div>
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-400 mt-4 font-medium">
+              <p className="text-lg sm:text-xl md:text-2xl text-gray-500 mt-4 font-medium">
                 {config.label}
               </p>
             </div>
@@ -325,7 +325,7 @@ export default function LiveCount() {
               </button>
               <Link
                 to={`/${platform}/${username}`}
-                className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors"
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-colors"
               >
                 <ExternalLink className="w-5 h-5" />
                 Full Profile
