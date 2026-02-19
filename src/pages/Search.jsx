@@ -354,7 +354,7 @@ export default function Search() {
                           value={normalizedUsername}
                           onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
                           placeholder="e.g. charlidamelio"
-                          className="flex-1 px-4 py-2.5 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-600 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         />
                       </div>
                       <button
@@ -489,7 +489,7 @@ export default function Search() {
                               value={normalizedUsername}
                               onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
                               placeholder="e.g. charlidamelio"
-                              className="flex-1 px-4 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-600 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             />
                           </div>
                           <button
