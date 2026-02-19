@@ -609,7 +609,12 @@ export default function CreatorProfile() {
             </div>
 
             {/* Stats Grid */}
-            <div className={`grid gap-4 mb-6 ${platform === 'tiktok' ? 'grid-cols-3' : platform === 'kick' ? 'grid-cols-2' : platform === 'twitch' ? 'grid-cols-3' : 'grid-cols-2 lg:grid-cols-4'}`}>
+            <div className={`grid gap-4 mb-6 ${
+              platform === 'tiktok' ? 'grid-cols-3'
+              : platform === 'kick' ? (creator.category ? 'grid-cols-2' : 'grid-cols-1 max-w-md')
+              : platform === 'twitch' ? 'grid-cols-3'
+              : 'grid-cols-2 lg:grid-cols-4'
+            }`}>
               {/* Subscribers/Followers Card */}
               <StatCard
                 icon={Users}
