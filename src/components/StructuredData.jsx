@@ -48,12 +48,12 @@ export function createBlogPostingSchema({ title, description, image, datePublish
     dateModified: dateModified || datePublished,
     author: {
       '@type': 'Person',
-      name: author || 'Shiny Pull',
+      name: author || 'ShinyPull',
       url: 'https://shinypull.com/about'
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Shiny Pull',
+      name: 'ShinyPull',
       url: 'https://shinypull.com',
       logo: {
         '@type': 'ImageObject',
@@ -107,7 +107,7 @@ export function createOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Shiny Pull',
+    name: 'ShinyPull',
     url: 'https://shinypull.com',
     logo: 'https://shinypull.com/logo.png',
     description: 'Track and compare social media creator stats across YouTube, Twitch, TikTok and more.',

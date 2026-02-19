@@ -85,7 +85,7 @@ export default function BlogPost() {
         article={{
           publishedTime: post.published_at,
           modifiedTime: post.updated_at,
-          author: post.author || 'Shiny Pull',
+          author: post.author || 'ShinyPull',
           section: post.category
         }}
       />

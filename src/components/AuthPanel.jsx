@@ -178,7 +178,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
               ? 'Sign up to start tracking your favorite creators'
               : mode === 'reset'
               ? 'Enter your email to receive a password reset link'
-              : 'Sign in to your Shiny Pull account'}
+              : 'Sign in to your ShinyPull account'}
           </p>
 
           {/* Benefits Section - Only show on signup */}

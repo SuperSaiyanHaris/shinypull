@@ -7,7 +7,7 @@ export default function About() {
     <>
       <SEO
         title="About Us"
-        description="Learn about Shiny Pull - the leading social media analytics platform for tracking YouTube, Twitch, and other creator statistics."
+        description="Learn about ShinyPull - the leading social media analytics platform for tracking YouTube, Twitch, and other creator statistics."
       />
 
       <div className="min-h-screen bg-gray-800/50">

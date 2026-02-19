@@ -5,7 +5,7 @@ export default function Terms() {
     <>
       <SEO
         title="Terms of Service"
-        description="Read the Shiny Pull Terms of Service to understand the rules and regulations for using our platform."
+        description="Read the ShinyPull Terms of Service to understand the rules and regulations for using our platform."
       />
 
       <div className="min-h-screen bg-gray-800/50">

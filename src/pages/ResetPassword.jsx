@@ -85,7 +85,7 @@ export default function ResetPassword() {
     <>
       <SEO
         title="Reset Password"
-        description="Set a new password for your Shiny Pull account."
+        description="Set a new password for your ShinyPull account."
       />
 
       <div className="min-h-screen flex items-center justify-center px-4 py-12">

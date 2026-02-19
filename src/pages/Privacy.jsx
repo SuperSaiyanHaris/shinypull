@@ -5,7 +5,7 @@ export default function Privacy() {
     <>
       <SEO
         title="Privacy Policy"
-        description="Learn how Shiny Pull collects, uses, and protects your personal information."
+        description="Learn how ShinyPull collects, uses, and protects your personal information."
       />
 
       <div className="min-h-screen bg-gray-800/50">

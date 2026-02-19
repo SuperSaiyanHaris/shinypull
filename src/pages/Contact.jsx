@@ -44,7 +44,7 @@ export default function Contact() {
     <>
       <SEO
         title="Contact Us"
-        description="Get in touch with the Shiny Pull team. We're here to help with questions, feedback, and support."
+        description="Get in touch with the ShinyPull team. We're here to help with questions, feedback, and support."
       />
 
       <div className="min-h-screen bg-gray-800/50">

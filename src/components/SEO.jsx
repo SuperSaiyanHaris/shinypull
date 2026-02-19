@@ -13,7 +13,7 @@ export default function SEO({
   const location = useLocation();
   const url = getSiteUrl(location.pathname);
   
-  const fullTitle = title ? `${title} | Shiny Pull` : 'Shiny Pull - Social Media Analytics & Statistics';
+  const fullTitle = title ? `${title} | ShinyPull` : 'ShinyPull - Social Media Analytics & Statistics';
   const defaultDescription = 'Track YouTube, TikTok, Twitch & Kick statistics. View subscriber counts, follower growth, rankings and analytics for your favorite creators.';
   const metaDescription = description || defaultDescription;
   
@@ -45,7 +45,7 @@ export default function SEO({
     updateMetaTag('og:url', url, true);
     updateMetaTag('og:type', type, true);
     updateMetaTag('og:image', image, true);
-    updateMetaTag('og:site_name', 'Shiny Pull', true);
+    updateMetaTag('og:site_name', 'ShinyPull', true);
     
     // Twitter Card tags
     updateMetaTag('twitter:card', 'summary_large_image');
@@ -69,7 +69,7 @@ export default function SEO({
     
     // Additional SEO tags
     updateMetaTag('robots', 'index, follow');
-    updateMetaTag('author', 'Shiny Pull');
+    updateMetaTag('author', 'ShinyPull');
     
     // Canonical URL
     let canonical = document.querySelector('link[rel="canonical"]');
