@@ -31,13 +31,13 @@ export default function Support() {
 
       <div className="min-h-screen bg-gray-800/50">
         {/* Hero */}
-        <div className="bg-gradient-to-br from-pink-500 to-orange-400 text-white py-16">
+        <div className="bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 border-b border-gray-800 text-white py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <div className="w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Heart className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-indigo-500/30">
+              <Heart className="w-8 h-8 text-indigo-400" />
             </div>
             <h1 className="text-4xl font-bold mb-4">Support ShinyPull</h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
               ShinyPull is free to use for everyone. Your support helps keep it that way and funds new features.
             </p>
           </div>
@@ -54,7 +54,7 @@ export default function Support() {
               href={BUYMEACOFFEE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-[#FFDD00] text-gray-100 rounded-xl font-bold text-lg hover:bg-[#FFDD00]/90 transition-colors shadow-lg shadow-yellow-200/50 hover:shadow-xl hover:shadow-yellow-200/60"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-[#FFDD00] text-gray-900 rounded-xl font-bold text-lg hover:bg-yellow-300 transition-colors shadow-lg shadow-yellow-500/20 hover:shadow-xl hover:shadow-yellow-500/30"
             >
               <Coffee className="w-6 h-6" />
               Buy Me a Coffee
@@ -99,37 +99,35 @@ export default function Support() {
           </div>
 
           {/* Mission Statement & Data Transparency */}
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-800 p-8">
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Target className="w-6 h-6 text-indigo-600" />
               <h2 className="text-2xl font-bold text-gray-100">Our Mission</h2>
             </div>
-            <p className="text-gray-500 text-center max-w-2xl mx-auto mb-8">
-              ShinyPull provides free analytics for social media creators and their audiences.
-              We track growth metrics across YouTube, Twitch, Kick, and TikTok. No paywalls, no sign-up required for basic features.
+            <p className="text-gray-400 text-center max-w-2xl mx-auto mb-8">
+              Creator analytics should be open, honest, and accessible to everyone. We built ShinyPull because that wasn't always the case.
             </p>
 
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-gray-900 rounded-xl p-6">
+              <div className="bg-gray-800/60 rounded-xl p-6 border border-gray-700/50">
                 <div className="flex items-start gap-3">
-                  <Database className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-1" />
+                  <Database className="w-6 h-6 text-indigo-400 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-100 mb-2">Real Data</h3>
-                    <p className="text-sm text-gray-500">
-                      We collect statistics from social media platforms. No fake data or generated numbers.
-                      Historical data builds from daily snapshots starting when we add a creator to the database.
+                    <h3 className="font-semibold text-gray-100 mb-2">Accurate Data</h3>
+                    <p className="text-sm text-gray-400">
+                      Every number on ShinyPull comes from the source. We don't estimate, interpolate, or fill gaps with guesses. If the data isn't reliable, we don't show it.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gray-900 rounded-xl p-6">
+              <div className="bg-gray-800/60 rounded-xl p-6 border border-gray-700/50">
                 <div className="flex items-start gap-3">
-                  <RefreshCw className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-1" />
+                  <RefreshCw className="w-6 h-6 text-indigo-400 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-100 mb-2">Daily Updates</h3>
-                    <p className="text-sm text-gray-500">
-                      Creator statistics are refreshed daily to keep the data current and allow you to track growth over time.
+                    <h3 className="font-semibold text-gray-100 mb-2">Always Current</h3>
+                    <p className="text-sm text-gray-400">
+                      Stats are refreshed continuously so the growth trends you're seeing reflect what's actually happening, not a stale snapshot from last week.
                     </p>
                   </div>
                 </div>
