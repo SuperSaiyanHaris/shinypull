@@ -168,7 +168,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
                 </svg>
               </div>
               <div className="flex-1">
-                <p className="text-sm text-indigo-800 font-medium">{contextMessage}</p>
+                <p className="text-sm text-indigo-300 font-medium">{contextMessage}</p>
               </div>
             </div>
           )}
@@ -183,7 +183,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
 
           {/* Benefits Section - Only show on signup */}
           {mode === 'signup' && (
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-200 p-5 mb-6">
+            <div className="bg-gradient-to-br from-indigo-950/40 to-purple-950/40 rounded-xl border border-indigo-800/50 p-5 mb-6">
               <h3 className="font-semibold text-gray-100 mb-4 text-sm">Why Create an Account?</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
