@@ -609,7 +609,7 @@ export default function CreatorProfile() {
             </div>
 
             {/* Stats Grid */}
-            <div className={`grid gap-4 mb-6 ${platform === 'tiktok' ? 'grid-cols-3' : 'grid-cols-2 lg:grid-cols-4'}`}>
+            <div className={`grid gap-4 mb-6 ${platform === 'tiktok' ? 'grid-cols-3' : platform === 'kick' ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`}>
               {/* Subscribers/Followers Card */}
               <StatCard
                 icon={Users}
@@ -634,16 +634,6 @@ export default function CreatorProfile() {
                 </>
               )}
 
-              {/* Followers Card for Kick (not available) */}
-              {platform === 'kick' && (
-                <StatCard
-                  icon={Users}
-                  label="Followers"
-                  value="—"
-                  sublabel="Not available via Kick API"
-                />
-              )}
-
               {/* Hours Watched / Total Views */}
               {platform === 'twitch' ? (
                 <StatCard
@@ -651,13 +641,6 @@ export default function CreatorProfile() {
                   label="Hours Watched"
                   value={creator.hoursWatchedMonth ? formatHoursWatched(creator.hoursWatchedMonth) : 'Tracking...'}
                   sublabel="Last 30 days"
-                />
-              ) : platform === 'kick' ? (
-                <StatCard
-                  icon={Eye}
-                  label="Total Views"
-                  value="—"
-                  sublabel="Not available via Kick API"
                 />
               ) : platform === 'youtube' ? (
                 <StatCard
@@ -718,7 +701,12 @@ export default function CreatorProfile() {
 
             {/* Growth Summary */}
             {(creator.subscribers || creator.followers) && (
-              <div className={`grid gap-4 mb-6 ${platform === 'tiktok' ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`}>
+              <div className={`grid gap-4 mb-6 ${
+                platform === 'youtube' ? 'grid-cols-2 lg:grid-cols-4'
+                : platform === 'tiktok' ? 'grid-cols-2'
+                : platform === 'twitch' || platform === 'kick' ? 'grid-cols-1 max-w-xs'
+                : 'grid-cols-2 lg:grid-cols-4'
+              }`}>
                 {platform === 'youtube' ? (
                   <>
                     {/* For YouTube, lead with Views (accurate) instead of Subscribers (rounded) */}
@@ -772,11 +760,6 @@ export default function CreatorProfile() {
                       sublabel="Last 30 days"
                       value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
                       change={metrics?.last30Days.subs}
-                    />
-                    <SummaryCard
-                      label="Hours Watched"
-                      sublabel="Last 30 days"
-                      value={creator.hoursWatchedMonth ? formatHoursWatched(creator.hoursWatchedMonth) : 'Tracking...'}
                     />
                   </>
                 ) : platform === 'kick' ? (
@@ -1426,7 +1409,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       color: '#ec4899'
     });
   } else if (platform === 'twitch') {
-    // Twitch: follower growth + hours watched
+    // Twitch: follower growth + hours watched (cumulative)
     metrics.push({
       value: 'subscribers',
       label: 'Follower Growth',
@@ -1438,6 +1421,14 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       label: 'Hours Watched',
       dataKey: 'hoursWatched',
       color: '#a855f7'
+    });
+  } else if (platform === 'kick') {
+    // Kick: only paid subscriber growth (no views/followers available)
+    metrics.push({
+      value: 'subscribers',
+      label: 'Subscriber Growth',
+      dataKey: 'subscribers',
+      color: '#6366f1'
     });
   } else {
     // Other platforms
@@ -1476,9 +1467,18 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       subscribers: stat.subscribers || stat.followers || 0,
       views: stat.total_views || 0,
       videos: stat.total_posts || 0,
-      hoursWatched: stat.hours_watched_day || 0,
+      hoursWatchedDay: stat.hours_watched_day || 0,
       label: new Date(stat.recorded_at + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     }));
+
+  // Build cumulative hours watched (running total from oldest to newest)
+  if (platform === 'twitch' || platform === 'kick') {
+    let cumulative = 0;
+    for (let i = 0; i < filteredData.length; i++) {
+      cumulative += filteredData[i].hoursWatchedDay;
+      filteredData[i].hoursWatched = cumulative;
+    }
+  }
 
   if (filteredData.length < 2) {
     return null;

@@ -199,6 +199,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://shinypull.com/kick/drb7h</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/summit1g</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://shinypull.com/youtube/summitenespanolrdu</loc>
     <lastmod>2026-02-19</lastmod>
     <changefreq>daily</changefreq>
@@ -247,12 +259,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/summit1g</loc>
-    <lastmod>2026-02-19</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/youtube/sammit</loc>
     <lastmod>2026-02-19</lastmod>
     <changefreq>daily</changefreq>
@@ -289,7 +295,19 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://shinypull.com/youtube/summitcrossingworship-topic</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://shinypull.com/youtube/thesummitchurchrdu</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/summitnews-24</loc>
     <lastmod>2026-02-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -313,13 +331,13 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/ressummit2026</loc>
+    <loc>https://shinypull.com/kick/odablock</loc>
     <lastmod>2026-02-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/summitnews-24</loc>
+    <loc>https://shinypull.com/youtube/ressummit2026</loc>
     <lastmod>2026-02-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -4052,18 +4070,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/kick/rraenee</loc>
-    <lastmod>2026-02-18</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/odablock</loc>
-    <lastmod>2026-02-18</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/drb7h</loc>
     <lastmod>2026-02-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
