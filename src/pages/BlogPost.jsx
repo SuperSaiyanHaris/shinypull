@@ -201,7 +201,7 @@ export default function BlogPost() {
           {/* CTA */}
           <div className="mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-center text-white">
             <h2 className="text-xl font-bold mb-3">Track Your Growth</h2>
-            <p className="text-indigo-800 mb-4">
+            <p className="text-indigo-200 mb-4">
               Monitor your channel's statistics and compare with top creators
             </p>
             <Link
