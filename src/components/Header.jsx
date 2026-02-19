@@ -94,7 +94,7 @@ export default function Header() {
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive(link.path)
                     ? 'bg-indigo-600 text-white'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-transparent'
+                    : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 border border-transparent'
                 }`}
               >
                 <link.icon className="w-4 h-4" />
@@ -109,7 +109,7 @@ export default function Header() {
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive('/dashboard')
                     ? 'bg-indigo-600 text-white'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-transparent'
+                    : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 border border-transparent'
                 }`}
               >
                 <LayoutDashboard className="w-4 h-4" />
@@ -191,7 +191,7 @@ export default function Header() {
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                     isActive(link.path)
                       ? 'bg-indigo-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-transparent'
+                      : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 border border-transparent'
                   }`}
                 >
                   <link.icon className="w-5 h-5" />
