@@ -161,6 +161,7 @@ export const getHoursWatched = withErrorHandling(
       .from('creator_stats')
       .select('hours_watched_day, hours_watched_week, hours_watched_month, peak_viewers_day, avg_viewers_day, streams_count_day')
       .eq('creator_id', creatorId)
+      .not('hours_watched_month', 'is', null)
       .order('recorded_at', { ascending: false })
       .limit(1)
       .single();

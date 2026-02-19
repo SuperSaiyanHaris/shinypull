@@ -609,7 +609,7 @@ export default function CreatorProfile() {
             </div>
 
             {/* Stats Grid */}
-            <div className={`grid gap-4 mb-6 ${platform === 'tiktok' ? 'grid-cols-3' : platform === 'kick' ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`}>
+            <div className={`grid gap-4 mb-6 ${platform === 'tiktok' ? 'grid-cols-3' : platform === 'kick' ? 'grid-cols-2' : platform === 'twitch' ? 'grid-cols-3' : 'grid-cols-2 lg:grid-cols-4'}`}>
               {/* Subscribers/Followers Card */}
               <StatCard
                 icon={Users}
@@ -683,8 +683,42 @@ export default function CreatorProfile() {
               )}
             </div>
 
-            {/* Growth Rate Cards */}
-            {metrics && metrics.growthRates && statsHistory.length >= 7 && (
+            {/* Growth Rate Cards + Summary - Combined row for Twitch/Kick */}
+            {(platform === 'twitch' || platform === 'kick') && metrics && metrics.growthRates && statsHistory.length >= 7 && (
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <GrowthRateCard
+                  label="7-Day Growth"
+                  value={metrics.growthRates.sevenDay}
+                  platform={platform}
+                />
+                <GrowthRateCard
+                  label="30-Day Growth"
+                  value={metrics.growthRates.thirtyDay}
+                  platform={platform}
+                />
+                <SummaryCard
+                  label={platform === 'kick' ? 'Paid Subscribers' : 'Followers'}
+                  sublabel="Last 30 days"
+                  value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
+                  change={metrics?.last30Days.subs}
+                />
+              </div>
+            )}
+
+            {/* Fallback Summary for Twitch/Kick when not enough history for growth rates */}
+            {(platform === 'twitch' || platform === 'kick') && metrics && !(metrics.growthRates && statsHistory.length >= 7) && (
+              <div className="grid grid-cols-1 max-w-xs gap-4 mb-6">
+                <SummaryCard
+                  label={platform === 'kick' ? 'Paid Subscribers' : 'Followers'}
+                  sublabel="Last 30 days"
+                  value={formatNumber(metrics.last30Days.subs)}
+                  change={metrics?.last30Days.subs}
+                />
+              </div>
+            )}
+
+            {/* Growth Rate Cards - Other platforms */}
+            {platform !== 'twitch' && platform !== 'kick' && metrics && metrics.growthRates && statsHistory.length >= 7 && (
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <GrowthRateCard
                   label="7-Day Growth"
@@ -699,12 +733,11 @@ export default function CreatorProfile() {
               </div>
             )}
 
-            {/* Growth Summary */}
-            {(creator.subscribers || creator.followers) && (
+            {/* Growth Summary - Non Twitch/Kick platforms */}
+            {platform !== 'twitch' && platform !== 'kick' && (creator.subscribers || creator.followers) && (
               <div className={`grid gap-4 mb-6 ${
                 platform === 'youtube' ? 'grid-cols-2 lg:grid-cols-4'
                 : platform === 'tiktok' ? 'grid-cols-2'
-                : platform === 'twitch' || platform === 'kick' ? 'grid-cols-1 max-w-xs'
                 : 'grid-cols-2 lg:grid-cols-4'
               }`}>
                 {platform === 'youtube' ? (
@@ -751,24 +784,6 @@ export default function CreatorProfile() {
                       sublabel="Last 30 days"
                       value={metrics ? formatNumber(metrics.last30Days.views) : '--'}
                       change={metrics?.last30Days.views}
-                    />
-                  </>
-                ) : platform === 'twitch' ? (
-                  <>
-                    <SummaryCard
-                      label="Followers"
-                      sublabel="Last 30 days"
-                      value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
-                      change={metrics?.last30Days.subs}
-                    />
-                  </>
-                ) : platform === 'kick' ? (
-                  <>
-                    <SummaryCard
-                      label="Paid Subscribers"
-                      sublabel="Last 30 days"
-                      value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
-                      change={metrics?.last30Days.subs}
                     />
                   </>
                 ) : (
