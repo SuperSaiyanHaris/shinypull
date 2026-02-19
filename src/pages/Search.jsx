@@ -343,7 +343,7 @@ export default function Search() {
               {selectedPlatform === 'tiktok' && (
                 <>
                   {requestStatus === null && (
-                    <div className="mt-6 max-w-md mx-auto">
+                    <div className="mt-6 max-w-md mx-auto px-4">
                       <p className="text-sm text-gray-300 mb-3">
                         If you know the exact handle, enter it below — otherwise leave as-is and our smart search will find the right match.
                       </p>
