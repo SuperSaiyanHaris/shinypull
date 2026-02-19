@@ -100,22 +100,22 @@ async function aggregateHoursWatched() {
     const weekStats = aggregateSessions(weekSessions || []);
     const monthStats = aggregateSessions(monthSessions || []);
 
-    // Upsert hours watched data (update if exists, insert if not)
+    // UPDATE only — never insert. collectDailyStats.js is responsible for
+    // creating the row with correct subscriber data. If we used upsert here,
+    // we'd create rows with NULL subscribers on days where collectDailyStats
+    // hasn't run yet, corrupting the historical chart.
     const { error } = await supabase
       .from('creator_stats')
-      .upsert({
-        creator_id: creator.id,
-        recorded_at: todayStr,
+      .update({
         hours_watched_day: todayStats.hoursWatched, // Hours from streams that ended TODAY
         hours_watched_week: weekStats.hoursWatched,
         hours_watched_month: monthStats.hoursWatched,
         peak_viewers_day: todayStats.peakViewers,
         avg_viewers_day: todayStats.avgViewers,
         streams_count_day: todayStats.streamCount,
-      }, {
-        onConflict: 'creator_id,recorded_at',
-        ignoreDuplicates: false
-      });
+      })
+      .eq('creator_id', creator.id)
+      .eq('recorded_at', todayStr);
 
     if (error) {
       console.log(`   ❌ ${creator.display_name}: ${error.message}`);

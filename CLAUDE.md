@@ -10,10 +10,16 @@ ShinyPull is a social media analytics platform (similar to SocialBlade) that tra
 
 ## Critical Rules
 
-**DATA INTEGRITY:**
-- We use REAL API data only - NO fake/generated historical data
-- Historical data builds up naturally from daily snapshots
-- Never backfill or generate synthetic data
+**DATA INTEGRITY — THIS IS THE MOST IMPORTANT RULE:**
+
+Our creator stats are the entire reason this site exists. Every chart and table users see is powered directly by the `creator_stats` table. A single corrupt row can trash a chart by causing wild swings (e.g., 630K → 0 → 630K). The rules below are non-negotiable:
+
+- **Never write 0 or null for subscriber/follower counts.** A 0 means the API call failed — it is NOT a real value. Always validate API responses before saving.
+- **Always check `response.ok` before reading API data.** Never do `data.total || 0` as a fallback — throw an error instead so the calling code can skip the write.
+- **`aggregateHoursWatched.js` and similar secondary scripts must use `.update()`, never `.upsert()`.** If the primary stats collection failed and no row exists for today, a secondary script must not create a row with NULL subscribers. Use `update` — if no row exists, nothing happens (correct behavior).
+- **`api/update-creator.js` must never write stats with 0 subscribers.** If the API returns 0, skip the stats write entirely — a failed API call must not overwrite a good historical record.
+- **Never backfill or generate synthetic data.** We use REAL API data only. Historical data builds up naturally from daily snapshots.
+- **When in doubt, skip the write.** A missing row is far better than a corrupt row with 0 data. Charts handle gaps gracefully; they cannot handle zeros masquerading as real values.
 
 **UI/UX - NO DISCLAIMERS:**
 - NEVER add warning banners, info boxes, or explanatory notes to user-facing pages
@@ -529,4 +535,4 @@ All tables have RLS enabled. Here are the current policies:
 
 ---
 
-*Last updated: 2026-02-18*
+*Last updated: 2026-02-19*

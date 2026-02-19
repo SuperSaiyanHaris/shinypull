@@ -161,13 +161,17 @@ export default function Compare() {
           const stats = await getCreatorStats(dbCreator.id, 30);
           if (!stats || stats.length < 2) continue;
 
-          const latest = stats[0];
-          const sevenDaysAgo = stats[Math.min(7, stats.length - 1)];
-          const thirtyDaysAgo = stats[stats.length - 1];
+          // getCreatorStats returns ascending order (oldest first), so:
+          // stats[0] = oldest (~30 days ago), stats[last] = newest (today)
+          const latest = stats[stats.length - 1];
+          const sevenDaysBack = stats[Math.max(0, stats.length - 1 - 7)];
+          const thirtyDaysBack = stats[0];
 
           // Calculate growth percentages
-          const calc7Day = sevenDaysAgo ? ((latest.subscribers - sevenDaysAgo.subscribers) / sevenDaysAgo.subscribers * 100) : 0;
-          const calc30Day = thirtyDaysAgo ? ((latest.subscribers - thirtyDaysAgo.subscribers) / thirtyDaysAgo.subscribers * 100) : 0;
+          const calc7Day = sevenDaysBack?.subscribers
+            ? ((latest.subscribers - sevenDaysBack.subscribers) / sevenDaysBack.subscribers * 100) : 0;
+          const calc30Day = thirtyDaysBack?.subscribers
+            ? ((latest.subscribers - thirtyDaysBack.subscribers) / thirtyDaysBack.subscribers * 100) : 0;
 
           // Calculate estimated daily views for YouTube (for earnings)
           let dailyViews = 0;

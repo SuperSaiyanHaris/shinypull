@@ -114,8 +114,17 @@ async function fetchTwitchFollowers(broadcasterId) {
     }
   );
 
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Followers API ${response.status}: ${text}`);
+  }
+
   const data = await response.json();
-  return data.total || 0;
+  // data.total can be 0 for real (brand new channel), but undefined means API failure
+  if (data.total === undefined) {
+    throw new Error(`Followers API returned no total field`);
+  }
+  return data.total;
 }
 
 /**
@@ -295,7 +304,7 @@ async function collectDailyStats() {
 
         for (const creator of batch) {
           const stats = statsMap.get(creator.platform_id);
-          if (stats) {
+          if (stats && stats.subscribers > 0) {
             statsToUpsert.push({
               creator_id: creator.id,
               recorded_at: today,
@@ -306,6 +315,11 @@ async function collectDailyStats() {
             });
             console.log(`   ✅ ${creator.display_name}: ${(stats.subscribers / 1000000).toFixed(1)}M subs`);
             successCount++;
+          } else if (stats && stats.subscribers === 0) {
+            // YouTube returned 0 — likely a hidden subscriber count or API anomaly.
+            // Never write 0 to the database; skip this creator for today.
+            console.log(`   ⚠️  ${creator.display_name}: Skipping — API returned 0 subscribers`);
+            errorCount++;
           } else {
             console.log(`   ❌ ${creator.display_name}: Channel not found`);
             errorCount++;

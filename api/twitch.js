@@ -142,11 +142,15 @@ async function getChannelByUsername(username) {
     }
   );
 
-  let followers = 0;
-  if (followersResponse.ok) {
-    const followersData = await followersResponse.json();
-    followers = followersData.total || 0;
+  if (!followersResponse.ok) {
+    const errText = await followersResponse.text();
+    throw new Error(`Twitch followers API ${followersResponse.status}: ${errText}`);
   }
+  const followersData = await followersResponse.json();
+  if (followersData.total === undefined) {
+    throw new Error('Twitch followers API returned no total field');
+  }
+  const followers = followersData.total;
 
   // Get channel info (for game/category)
   const channelResponse = await fetch(

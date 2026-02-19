@@ -290,7 +290,6 @@ export default function CreatorProfile() {
     );
 
     const latest = sortedStats[0];
-    const oldest = sortedStats[sortedStats.length - 1];
 
     const dailyStats = sortedStats.map((stat, index) => {
       const prevStat = sortedStats[index + 1];
@@ -302,15 +301,24 @@ export default function CreatorProfile() {
       };
     });
 
-    const subsGrowth = (latest.subscribers || latest.followers) - (oldest.subscribers || oldest.followers);
-    const viewsGrowth = latest.total_views - oldest.total_views;
-    const videosGrowth = (latest.total_posts || 0) - (oldest.total_posts || 0);
+    // For "Last 30 days" metrics, use the 30th data point back from today (not the absolute
+    // oldest in the 90-day window). sortedStats is descending, so index 29 = ~30 days ago.
+    const last30Stat = sortedStats[Math.min(29, sortedStats.length - 1)];
 
-    const days = sortedStats.length;
-    const dailyAvgSubs = Math.round(subsGrowth / days);
-    const dailyAvgViews = Math.round(viewsGrowth / days);
-    const weeklyAvgSubs = Math.round(subsGrowth / (days / 7));
-    const weeklyAvgViews = Math.round(viewsGrowth / (days / 7));
+    const subsGrowth = (latest.subscribers || latest.followers) - (last30Stat.subscribers || last30Stat.followers);
+    const viewsGrowth = latest.total_views - last30Stat.total_views;
+    const videosGrowth = (latest.total_posts || 0) - (last30Stat.total_posts || 0);
+
+    // Use actual calendar days between the 30-day lookback point and today, not row count.
+    // Rows can have gaps (e.g. 28 rows spanning 30 calendar days), so dividing by
+    // row count overstates daily/weekly averages and skews milestone predictions.
+    const calendarDays = Math.max(1, Math.round(
+      (new Date(latest.recorded_at) - new Date(last30Stat.recorded_at)) / (1000 * 60 * 60 * 24)
+    ));
+    const dailyAvgSubs = Math.round(subsGrowth / calendarDays);
+    const dailyAvgViews = Math.round(viewsGrowth / calendarDays);
+    const weeklyAvgSubs = Math.round(subsGrowth / (calendarDays / 7));
+    const weeklyAvgViews = Math.round(viewsGrowth / (calendarDays / 7));
 
     const last14Days = sortedStats.slice(0, Math.min(14, sortedStats.length));
     const last14First = last14Days[last14Days.length - 1];
@@ -324,8 +332,8 @@ export default function CreatorProfile() {
       ? ((latest.subscribers || latest.followers) - (last7First.subscribers || last7First.followers)) / (last7First.subscribers || last7First.followers) * 100
       : 0;
 
-    const growth30DayPercent = oldest.subscribers || oldest.followers
-      ? subsGrowth / (oldest.subscribers || oldest.followers) * 100
+    const growth30DayPercent = last30Stat.subscribers || last30Stat.followers
+      ? subsGrowth / (last30Stat.subscribers || last30Stat.followers) * 100
       : 0;
 
     return {

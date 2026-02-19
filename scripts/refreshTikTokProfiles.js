@@ -96,17 +96,22 @@ async function refreshTikTokProfiles() {
         .update(profileUpdate)
         .eq('id', creator.id);
 
-      // Upsert today's stats
-      await supabase
-        .from('creator_stats')
-        .upsert({
-          creator_id: creator.id,
-          recorded_at: today,
-          subscribers: profileData.followers,
-          followers: profileData.followers,
-          total_views: profileData.totalLikes || 0,
-          total_posts: profileData.totalPosts,
-        }, { onConflict: 'creator_id,recorded_at' });
+      // Guard: never write 0 followers — that means the scrape returned bad data.
+      if (!profileData.followers) {
+        console.log(`   ⚠️  ${creator.display_name}: Skipping stats — scraper returned 0 followers`);
+      } else {
+        // Upsert today's stats
+        await supabase
+          .from('creator_stats')
+          .upsert({
+            creator_id: creator.id,
+            recorded_at: today,
+            subscribers: profileData.followers,
+            followers: profileData.followers,
+            total_views: profileData.totalLikes || 0,
+            total_posts: profileData.totalPosts,
+          }, { onConflict: 'creator_id,recorded_at' });
+      }
 
       const followers = (profileData.followers / 1000000).toFixed(1);
       const likes = ((profileData.totalLikes || 0) / 1000000).toFixed(1);

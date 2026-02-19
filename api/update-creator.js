@@ -130,7 +130,9 @@ export default async function handler(req, res) {
 
     // If stats data provided, save it
     // Use creatorId from request if provided, otherwise use creator.id from upsert above
-    if (statsData && (creatorId || creator)) {
+    // GUARD: never write 0 or null subscribers — that means the API call failed and we
+    // must not overwrite a good historical row with bad data.
+    if (statsData && (creatorId || creator) && statsData.subscribers) {
       const targetCreatorId = creatorId || creator.id;
 
       // Get today's date in America/New_York timezone
