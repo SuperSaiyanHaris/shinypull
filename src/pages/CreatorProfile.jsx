@@ -312,15 +312,6 @@ export default function CreatorProfile() {
     const weeklyAvgSubs = Math.round(subsGrowth / (days / 7));
     const weeklyAvgViews = Math.round(viewsGrowth / (days / 7));
 
-    // Calculate hours watched averages for Twitch
-    const hoursWatchedStats = sortedStats.filter(s => s.hours_watched_day != null);
-    const avgHoursWatchedDay = hoursWatchedStats.length > 0
-      ? Math.round(hoursWatchedStats.reduce((sum, s) => sum + (s.hours_watched_day || 0), 0) / hoursWatchedStats.length)
-      : 0;
-    const avgHoursWatchedWeek = avgHoursWatchedDay * 7;
-    const totalHoursWatched30Days = hoursWatchedStats.slice(0, Math.min(30, hoursWatchedStats.length))
-      .reduce((sum, s) => sum + (s.hours_watched_day || 0), 0);
-
     const last14Days = sortedStats.slice(0, Math.min(14, sortedStats.length));
     const last14First = last14Days[last14Days.length - 1];
     const last14Subs = last14Days.length > 1 ? (latest.subscribers || latest.followers) - (last14First.subscribers || last14First.followers) : 0;
@@ -339,11 +330,11 @@ export default function CreatorProfile() {
 
     return {
       dailyStats: dailyStats.slice(0, 14),
-      last30Days: { subs: subsGrowth, views: viewsGrowth, videos: videosGrowth, hoursWatched: totalHoursWatched30Days },
+      last30Days: { subs: subsGrowth, views: viewsGrowth, videos: videosGrowth },
       last14Days: { subs: last14Subs, views: last14Views },
       growthRates: { sevenDay: growth7DayPercent, thirtyDay: growth30DayPercent },
-      dailyAverage: { subs: dailyAvgSubs, views: dailyAvgViews, hoursWatched: avgHoursWatchedDay },
-      weeklyAverage: { subs: weeklyAvgSubs, views: weeklyAvgViews, hoursWatched: avgHoursWatchedWeek },
+      dailyAverage: { subs: dailyAvgSubs, views: dailyAvgViews },
+      weeklyAverage: { subs: weeklyAvgSubs, views: weeklyAvgViews },
     };
   };
 
@@ -937,7 +928,6 @@ export default function CreatorProfile() {
                         </th>
                         {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Likes</th>}
                         {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
-                        {platform === 'twitch' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Watch Hours</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Views</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Videos</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-600 text-right">Est. Earnings</th>}
@@ -986,15 +976,6 @@ export default function CreatorProfile() {
                                 </div>
                               </td>
                             </>
-                          )}
-                          {platform === 'twitch' && (
-                            <td className="px-6 py-4 text-right">
-                              <div className="flex flex-col items-end">
-                                <span className="font-medium text-gray-900">
-                                  {stat.hours_watched_day ? `${(stat.hours_watched_day / 1000).toFixed(1)}K` : '-'}
-                                </span>
-                              </div>
-                            </td>
                           )}
                           {platform === 'youtube' && (
                             <>
@@ -1052,14 +1033,6 @@ export default function CreatorProfile() {
                             <td className="px-6 py-4 text-right"></td>
                           </>
                         )}
-                        {platform === 'twitch' && (
-                          <td className="px-6 py-4 text-right text-indigo-900">
-                            {metrics.dailyAverage?.hoursWatched > 0
-                              ? `${(metrics.dailyAverage.hoursWatched / 1000).toFixed(1)}K`
-                              : '—'
-                            }
-                          </td>
-                        )}
                         {platform === 'youtube' && (
                           <>
                             <td className={`px-6 py-4 text-right ${metrics.dailyAverage.views > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
@@ -1100,14 +1073,6 @@ export default function CreatorProfile() {
                             <td className="px-6 py-4 text-right"></td>
                           </>
                         )}
-                        {platform === 'twitch' && (
-                          <td className="px-6 py-4 text-right text-indigo-900">
-                            {metrics.weeklyAverage?.hoursWatched > 0
-                              ? `${(metrics.weeklyAverage.hoursWatched / 1000).toFixed(1)}K`
-                              : '—'
-                            }
-                          </td>
-                        )}
                         {platform === 'youtube' && (
                           <>
                             <td className={`px-6 py-4 text-right ${metrics.weeklyAverage.views > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
@@ -1147,14 +1112,6 @@ export default function CreatorProfile() {
                               {metrics.last30Days.videos >= 0 ? '+' : ''}{metrics.last30Days.videos}
                             </td>
                           </>
-                        )}
-                        {platform === 'twitch' && (
-                          <td className="px-6 py-4 text-right text-indigo-900">
-                            {metrics.last30Days?.hoursWatched > 0
-                              ? `${(metrics.last30Days.hoursWatched / 1000).toFixed(1)}K`
-                              : '—'
-                            }
-                          </td>
                         )}
                         {platform === 'youtube' && (
                           <>
