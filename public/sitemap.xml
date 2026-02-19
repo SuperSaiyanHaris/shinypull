@@ -199,6 +199,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://shinypull.com/twitch/summit1g</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeast</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://shinypull.com/youtube/mrbeastgaming</loc>
     <lastmod>2026-02-19</lastmod>
     <changefreq>daily</changefreq>
@@ -206,12 +218,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/youtube/karl</loc>
-    <lastmod>2026-02-19</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeast</loc>
     <lastmod>2026-02-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -35546,12 +35552,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/youtube/burntpeanutplus</loc>
-    <lastmod>2026-02-08</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/twitch/summit1g</loc>
     <lastmod>2026-02-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
