@@ -238,7 +238,7 @@ export default function Search() {
               <SearchIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-100">Search Creators</h1>
             </div>
-            <p className="text-sm sm:text-base text-gray-500">Find any creator and view their detailed statistics</p>
+            <p className="text-sm sm:text-base text-gray-300">Find any creator and view their detailed statistics</p>
           </div>
         </div>
 
@@ -259,8 +259,8 @@ export default function Search() {
                     isSelected
                       ? `${colors.bg} text-white shadow-lg`
                       : platform.available
-                      ? 'bg-gray-900 text-gray-500 border border-gray-700 hover:border-gray-600 hover:shadow-md'
-                      : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                      ? 'bg-gray-900 text-gray-300 border border-gray-700 hover:border-gray-600 hover:shadow-md'
+                      : 'bg-gray-800 text-gray-300 cursor-not-allowed'
                   }`}
                 >
                   {Icon && <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -277,7 +277,7 @@ export default function Search() {
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-15 group-focus-within:opacity-25 blur-xl transition duration-300"></div>
                   <div className="relative flex items-center bg-gray-900 rounded-2xl shadow-lg border-2 border-gray-800 group-focus-within:border-indigo-500 transition-colors">
-                  <SearchIcon className="absolute left-5 w-5 h-5 text-gray-500 group-focus-within:text-indigo-500 transition-colors" />
+                  <SearchIcon className="absolute left-5 w-5 h-5 text-gray-300 group-focus-within:text-indigo-500 transition-colors" />
                   <input
                     type="text"
                     value={query}
@@ -289,7 +289,7 @@ export default function Search() {
                     <button
                       type="button"
                       onClick={() => { setQuery(''); setResults([]); setSearched(false); }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-500 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-gray-300 transition-colors"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -320,7 +320,7 @@ export default function Search() {
           {loading && (
             <div className="space-y-3">
               <div className="text-center mb-6">
-                <p className="text-gray-500">Searching {currentPlatform?.name}...</p>
+                <p className="text-gray-300">Searching {currentPlatform?.name}...</p>
               </div>
               {Array.from({ length: 5 }).map((_, i) => (
                 <CreatorRowSkeleton key={i} />
@@ -332,10 +332,10 @@ export default function Search() {
           {!loading && searched && !error && results.length === 0 && (
             <div className="text-center py-16 bg-gray-900 rounded-2xl border border-gray-800">
               <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-8 h-8 text-gray-500" />
+                <User className="w-8 h-8 text-gray-300" />
               </div>
               <h3 className="text-xl font-semibold text-gray-100 mb-2">No creators found</h3>
-              <p className="text-gray-500 mb-4">
+              <p className="text-gray-300 mb-4">
                 We couldn't find any {currentPlatform?.name} creators matching "{query}"
               </p>
 
@@ -344,11 +344,11 @@ export default function Search() {
                 <>
                   {requestStatus === null && (
                     <div className="mt-6 max-w-md mx-auto">
-                      <p className="text-sm text-gray-500 mb-3">
+                      <p className="text-sm text-gray-300 mb-3">
                         If you know the exact handle, enter it below — otherwise leave as-is and our smart search will find the right match.
                       </p>
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="text-gray-500 text-lg font-medium">@</span>
+                        <span className="text-gray-300 text-lg font-medium">@</span>
                         <input
                           type="text"
                           value={normalizedUsername}
@@ -365,7 +365,7 @@ export default function Search() {
                         <Clock className="w-5 h-5" />
                         Request @{normalizedUsername || '...'}
                       </button>
-                      <p className="text-xs text-gray-500 mt-3">
+                      <p className="text-xs text-gray-300 mt-3">
                         We'll add them within 24 hours
                       </p>
                     </div>
@@ -404,7 +404,7 @@ export default function Search() {
 
               {/* Standard platforms: Standard message */}
               {selectedPlatform !== 'tiktok' && (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-300">
                   Try searching for a different name or check the spelling
                 </p>
               )}
@@ -414,7 +414,7 @@ export default function Search() {
           {/* Results */}
           {results.length > 0 && (
             <div className="mb-8">
-              <p className="text-gray-500 mb-4">{results.length} creators found</p>
+              <p className="text-gray-300 mb-4">{results.length} creators found</p>
               <div className="space-y-3">
                 {results.map((creator) => {
                   const Icon = platformIcons[creator.platform] || User;
@@ -446,16 +446,16 @@ export default function Search() {
                             {creator.platform}
                           </span>
                         </div>
-                        <p className="text-sm sm:text-base text-gray-500 truncate">@{creator.username}</p>
+                        <p className="text-sm sm:text-base text-gray-300 truncate">@{creator.username}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-gray-100 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
-                        <p className="text-xs sm:text-sm text-gray-500">
+                        <p className="text-xs sm:text-sm text-gray-300">
                           {creator.platform === 'twitch' || creator.platform === 'tiktok' ? 'followers' :
                            creator.platform === 'kick' ? 'paid subs' : 'subscribers'}
                         </p>
                       </div>
-                      <ArrowRight className="hidden sm:block w-5 h-5 text-gray-500 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="hidden sm:block w-5 h-5 text-gray-300 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
                     </Link>
                   );
                 })}
@@ -473,17 +473,17 @@ export default function Search() {
                 return (
                   <div className="text-center py-8 bg-gray-900 rounded-2xl border border-gray-800">
                     <div className="max-w-md mx-auto">
-                      <p className="text-sm text-gray-500 mb-4">
+                      <p className="text-sm text-gray-300 mb-4">
                         Can't find "@{query}"? TikTok creators are added by request.
                       </p>
 
                       {requestStatus === null && (
                         <>
-                          <p className="text-sm text-gray-500 mb-3">
+                          <p className="text-sm text-gray-300 mb-3">
                             If you know the exact handle, enter it below — otherwise leave as-is and our smart search will find the right match.
                           </p>
                           <div className="flex items-center gap-2 mb-4">
-                            <span className="text-gray-500 text-lg font-medium">@</span>
+                            <span className="text-gray-300 text-lg font-medium">@</span>
                             <input
                               type="text"
                               value={normalizedUsername}
@@ -500,7 +500,7 @@ export default function Search() {
                             <Clock className="w-5 h-5" />
                             Request @{normalizedUsername || '...'}
                           </button>
-                          <p className="text-xs text-gray-500 mt-3">
+                          <p className="text-xs text-gray-300 mt-3">
                             We'll add them within 24 hours
                           </p>
                         </>

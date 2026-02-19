@@ -45,7 +45,7 @@ export default function FunErrorState({
       title: "Not found",
       message: message || "We couldn't find what you're looking for.",
       icon: SearchX,
-      iconColor: 'text-gray-500',
+      iconColor: 'text-gray-300',
       bgColor: 'bg-gray-800/50',
       borderColor: 'border-gray-800',
     }
@@ -68,7 +68,7 @@ export default function FunErrorState({
         </h2>
 
         {/* Message */}
-        <p className="text-gray-500 text-base mb-8 leading-relaxed">
+        <p className="text-gray-300 text-base mb-8 leading-relaxed">
           {config.message}
         </p>
 
@@ -85,7 +85,7 @@ export default function FunErrorState({
 
         {/* Connection status indicator */}
         {type === 'network' && (
-          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
+          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-300">
             <WifiOff className="w-4 h-4 text-red-500 animate-pulse" />
             <span>Waiting for connection...</span>
           </div>
@@ -93,7 +93,7 @@ export default function FunErrorState({
 
         {/* Server status indicator */}
         {type === 'server' && (
-          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
+          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-300">
             <div className="flex gap-1.5">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
               <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: '75ms' }}></div>
@@ -105,7 +105,7 @@ export default function FunErrorState({
 
         {/* Loading indicator */}
         {type === 'loading' && (
-          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
+          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-300">
             <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
             <span>Still loading...</span>
           </div>

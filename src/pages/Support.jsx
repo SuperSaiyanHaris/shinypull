@@ -47,7 +47,7 @@ export default function Support() {
           {/* Buy Me a Coffee CTA */}
           <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8 mb-8 text-center">
             <h2 className="text-2xl font-bold text-gray-100 mb-3">Buy Me a Coffee</h2>
-            <p className="text-gray-500 mb-6 max-w-lg mx-auto">
+            <p className="text-gray-300 mb-6 max-w-lg mx-auto">
               If you find ShinyPull useful, consider buying the developer a coffee. Every contribution helps keep the site running and growing.
             </p>
             <a
@@ -71,7 +71,7 @@ export default function Support() {
                     <reason.icon className="w-6 h-6 text-indigo-600" />
                   </div>
                   <h3 className="font-semibold text-gray-100 mb-2">{reason.title}</h3>
-                  <p className="text-sm text-gray-500">{reason.description}</p>
+                  <p className="text-sm text-gray-300">{reason.description}</p>
                 </div>
               ))}
             </div>
@@ -85,14 +85,14 @@ export default function Support() {
                 <span className="text-2xl">📣</span>
                 <div>
                   <h3 className="font-semibold text-gray-100">Spread the Word</h3>
-                  <p className="text-sm text-gray-500">Share ShinyPull with friends, creators, or on social media.</p>
+                  <p className="text-sm text-gray-300">Share ShinyPull with friends, creators, or on social media.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-4 bg-gray-800/50 rounded-xl">
                 <span className="text-2xl">💡</span>
                 <div>
                   <h3 className="font-semibold text-gray-100">Send Feedback</h3>
-                  <p className="text-sm text-gray-500">Suggest features or report bugs to help us improve.</p>
+                  <p className="text-sm text-gray-300">Suggest features or report bugs to help us improve.</p>
                 </div>
               </div>
             </div>

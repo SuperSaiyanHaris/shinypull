@@ -37,7 +37,7 @@ export default function ShareButtons({ url, title }) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm font-medium text-gray-500">Share:</span>
+      <span className="text-sm font-medium text-gray-300">Share:</span>
       
       <div className="flex items-center gap-2">
         {/* X (formerly Twitter) */}
@@ -45,7 +45,7 @@ export default function ShareButtons({ url, title }) {
           href={shareLinks.twitter}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-500 hover:text-gray-100 transition-colors"
+          className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-gray-100 transition-colors"
           aria-label="Share on X"
         >
           <XIcon className="w-4 h-4" />
@@ -56,7 +56,7 @@ export default function ShareButtons({ url, title }) {
           href={shareLinks.facebook}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-lg bg-gray-800 hover:bg-blue-900/30 text-gray-500 hover:text-blue-400 transition-colors"
+          className="p-2 rounded-lg bg-gray-800 hover:bg-blue-900/30 text-gray-300 hover:text-blue-400 transition-colors"
           aria-label="Share on Facebook"
         >
           <Facebook className="w-4 h-4" />
@@ -67,7 +67,7 @@ export default function ShareButtons({ url, title }) {
           href={shareLinks.linkedin}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-lg bg-gray-800 hover:bg-blue-900/30 text-gray-500 hover:text-blue-400 transition-colors"
+          className="p-2 rounded-lg bg-gray-800 hover:bg-blue-900/30 text-gray-300 hover:text-blue-400 transition-colors"
           aria-label="Share on LinkedIn"
         >
           <Linkedin className="w-4 h-4" />
@@ -76,7 +76,7 @@ export default function ShareButtons({ url, title }) {
         {/* Copy Link */}
         <button
           onClick={handleCopyLink}
-          className="p-2 rounded-lg bg-gray-800 hover:bg-indigo-900/50 text-gray-500 hover:text-indigo-400 transition-colors relative"
+          className="p-2 rounded-lg bg-gray-800 hover:bg-indigo-900/50 text-gray-300 hover:text-indigo-400 transition-colors relative"
           aria-label="Copy link"
         >
           {copied ? (

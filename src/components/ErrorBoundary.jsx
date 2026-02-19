@@ -68,7 +68,7 @@ class ErrorBoundary extends Component {
             {/* Show error details in development */}
             {import.meta.env.DEV && this.state.error && (
               <details className="mt-8 text-left">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300">
+                <summary className="text-sm text-gray-300 cursor-pointer hover:text-gray-300">
                   Technical details
                 </summary>
                 <div className="mt-2 p-4 bg-gray-900 rounded-lg overflow-auto">

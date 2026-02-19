@@ -152,7 +152,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-500 transition-colors"
+            className="p-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-gray-300 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -173,7 +173,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
             </div>
           )}
           
-          <p className="text-gray-500 mb-6">
+          <p className="text-gray-300 mb-6">
             {mode === 'signup'
               ? 'Sign up to start tracking your favorite creators'
               : mode === 'reset'
@@ -190,28 +190,28 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
                   <Star className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-100 font-medium">Follow Your Favorite Creators</p>
-                    <p className="text-xs text-gray-500">Never miss updates from the creators you love</p>
+                    <p className="text-xs text-gray-300">Never miss updates from the creators you love</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <BarChart3 className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-100 font-medium">Track Growth in Your Dashboard</p>
-                    <p className="text-xs text-gray-500">See daily stats and growth trends in one place</p>
+                    <p className="text-xs text-gray-300">See daily stats and growth trends in one place</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Scale className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-100 font-medium">Save and Compare Creators</p>
-                    <p className="text-xs text-gray-500">Compare stats side-by-side across platforms</p>
+                    <p className="text-xs text-gray-300">Compare stats side-by-side across platforms</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Clock className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-100 font-medium">View Your Recently Browsed Profiles</p>
-                    <p className="text-xs text-gray-500">Quick access to creators you've checked out</p>
+                    <p className="text-xs text-gray-300">Quick access to creators you've checked out</p>
                   </div>
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
                   <div className="w-full border-t border-gray-700"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-gray-900 text-gray-500">Or continue with email</span>
+                  <span className="px-2 bg-gray-900 text-gray-300">Or continue with email</span>
                 </div>
               </div>
             </>
@@ -261,9 +261,9 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
           {/* Email/Password Form */}
           <form onSubmit={mode === 'reset' ? handleResetPassword : handleEmailAuth} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-500 mb-2">Email</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
                 <input
                   type="email"
                   value={email}
@@ -277,9 +277,9 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
 
             {mode !== 'reset' && (
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-2">Password</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
                   <input
                     type="password"
                     value={password}
@@ -323,7 +323,7 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
                   setError('');
                   setMessage('');
                 }}
-                className="text-gray-500 hover:text-gray-500 text-sm"
+                className="text-gray-300 hover:text-gray-300 text-sm"
               >
                 Forgot your password?
               </button>

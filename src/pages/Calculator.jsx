@@ -141,7 +141,7 @@ export default function Calculator() {
                 <CalcIcon className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-400" />
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-100">YouTube Money Calculator</h1>
               </div>
-              <p className="text-base sm:text-lg text-gray-500 mb-6">
+              <p className="text-base sm:text-lg text-gray-300 mb-6">
                 {mode === 'creator'
                   ? 'Estimate a creator\'s earnings based on real data'
                   : 'Estimate your own potential earnings'}
@@ -154,7 +154,7 @@ export default function Calculator() {
                   className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all ${
                     mode === 'creator'
                       ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-100'
+                      : 'text-gray-300 hover:text-gray-100'
                   }`}
                 >
                   <span className="hidden sm:inline">Estimate a Creator</span>
@@ -165,7 +165,7 @@ export default function Calculator() {
                   className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all ${
                     mode === 'personal'
                       ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-100'
+                      : 'text-gray-300 hover:text-gray-100'
                   }`}
                 >
                   <span className="hidden sm:inline">Estimate My Earnings</span>
@@ -201,7 +201,7 @@ export default function Calculator() {
               {/* Creator Search - Only in Creator Mode */}
               {mode === 'creator' && (
                 <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
-                  <label className="block text-sm font-medium text-gray-500 mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
                     Select YouTube Creator {selectedCreator && <span className="text-emerald-400 text-xs">(Data auto-populated)</span>}
                   </label>
 
@@ -214,7 +214,7 @@ export default function Calculator() {
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-100 truncate">{selectedCreator.displayName}</p>
-                      <p className="text-xs text-gray-500">{formatNumber(selectedCreator.subscribers)} subscribers</p>
+                      <p className="text-xs text-gray-300">{formatNumber(selectedCreator.subscribers)} subscribers</p>
                     </div>
                     <Link
                       to={`/youtube/${selectedCreator.username}`}
@@ -225,7 +225,7 @@ export default function Calculator() {
                     </Link>
                     <button
                       onClick={clearCreator}
-                      className="text-gray-500 hover:text-red-500 transition-colors"
+                      className="text-gray-300 hover:text-red-500 transition-colors"
                     >
                       <span className="text-sm">Clear</span>
                     </button>
@@ -234,7 +234,7 @@ export default function Calculator() {
                   <div className="relative">
                     <form onSubmit={handleSearch}>
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                         <input
                           type="text"
                           value={searchQuery}
@@ -244,7 +244,7 @@ export default function Calculator() {
                           className="w-full pl-10 pr-10 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         />
                         {searching ? (
-                          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 animate-spin" />
+                          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 animate-spin" />
                         ) : searchQuery.trim() && (
                           <button
                             type="submit"
@@ -271,7 +271,7 @@ export default function Calculator() {
                             />
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-gray-100 truncate">{result.displayName}</p>
-                              <p className="text-xs text-gray-500">{formatNumber(result.subscribers)} subs</p>
+                              <p className="text-xs text-gray-300">{formatNumber(result.subscribers)} subs</p>
                             </div>
                           </button>
                         ))}
@@ -284,7 +284,7 @@ export default function Calculator() {
 
               {/* Daily Views */}
               <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
-                <label className="block text-sm font-medium text-gray-500 mb-3">
+                <label className="block text-sm font-medium text-gray-300 mb-3">
                   Daily Views
                   {mode === 'creator' && selectedCreator && (
                     <span className="ml-2 text-xs text-emerald-400">(Estimated from channel data)</span>
@@ -308,7 +308,7 @@ export default function Calculator() {
                   onChange={(e) => setDailyViews(parseInt(e.target.value))}
                   className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                 />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <div className="flex justify-between text-xs text-gray-300 mt-1">
                   <span>1K</span>
                   <span className="font-semibold text-emerald-400">{formatNumber(dailyViews)}</span>
                   <span>10M</span>
@@ -317,7 +317,7 @@ export default function Calculator() {
 
               {/* RPM Range */}
               <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
-                <label className="block text-sm font-medium text-gray-500 mb-3">
+                <label className="block text-sm font-medium text-gray-300 mb-3">
                   Estimated RPM (Revenue per 1000 views)
                   {mode === 'creator' && selectedCreator && (
                     <span className="ml-2 text-xs text-emerald-400">(Based on category)</span>
@@ -325,7 +325,7 @@ export default function Calculator() {
                 </label>
                 <div className="grid grid-cols-2 gap-4 mb-3">
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Low</label>
+                    <label className="text-xs text-gray-300 mb-1 block">Low</label>
                     <input
                       type="number"
                       step="0.01"
@@ -338,7 +338,7 @@ export default function Calculator() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">High</label>
+                    <label className="text-xs text-gray-300 mb-1 block">High</label>
                     <input
                       type="number"
                       step="0.01"
@@ -363,7 +363,7 @@ export default function Calculator() {
 
               {/* Currency */}
               <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
-                <label className="block text-sm font-medium text-gray-500 mb-3">
+                <label className="block text-sm font-medium text-gray-300 mb-3">
                   Currency
                 </label>
                 <select
@@ -391,7 +391,7 @@ export default function Calculator() {
                 <div className="space-y-6">
                   {/* Daily */}
                   <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
-                    <p className="text-sm text-gray-500 mb-1">Estimated Daily Earnings</p>
+                    <p className="text-sm text-gray-300 mb-1">Estimated Daily Earnings</p>
                     <p className="text-2xl font-bold text-emerald-400">
                       {formatCurrency(dailyLow)} - {formatCurrency(dailyHigh)}
                     </p>
@@ -399,7 +399,7 @@ export default function Calculator() {
 
                   {/* Monthly */}
                   <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                    <p className="text-sm text-gray-500 mb-1">Estimated Monthly Earnings</p>
+                    <p className="text-sm text-gray-300 mb-1">Estimated Monthly Earnings</p>
                     <p className="text-2xl font-bold text-blue-600">
                       {formatCurrency(monthlyLow)} - {formatCurrency(monthlyHigh)}
                     </p>
@@ -407,7 +407,7 @@ export default function Calculator() {
 
                   {/* Yearly */}
                   <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100">
-                    <p className="text-sm text-gray-500 mb-1">Estimated Yearly Earnings</p>
+                    <p className="text-sm text-gray-300 mb-1">Estimated Yearly Earnings</p>
                     <p className="text-2xl font-bold text-purple-600">
                       {formatCurrency(yearlyLow)} - {formatCurrency(yearlyHigh)}
                     </p>
@@ -418,7 +418,7 @@ export default function Calculator() {
               {/* Info Card */}
               <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
                 <h4 className="font-semibold text-gray-100 mb-3">How This Works</h4>
-                <ul className="text-sm text-gray-500 space-y-2">
+                <ul className="text-sm text-gray-300 space-y-2">
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>Earnings = (Daily Views ÷ 1000) × RPM</span>
@@ -455,19 +455,19 @@ export default function Calculator() {
                   </h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 bg-gray-800/50 rounded-xl">
-                      <p className="text-xs text-gray-500">Subscribers</p>
+                      <p className="text-xs text-gray-300">Subscribers</p>
                       <p className="font-bold text-gray-100">{formatNumber(selectedCreator.subscribers)}</p>
                     </div>
                     <div className="p-3 bg-gray-800/50 rounded-xl">
-                      <p className="text-xs text-gray-500">Total Views</p>
+                      <p className="text-xs text-gray-300">Total Views</p>
                       <p className="font-bold text-gray-100">{formatNumber(selectedCreator.totalViews)}</p>
                     </div>
                     <div className="p-3 bg-gray-800/50 rounded-xl">
-                      <p className="text-xs text-gray-500">Videos</p>
+                      <p className="text-xs text-gray-300">Videos</p>
                       <p className="font-bold text-gray-100">{formatNumber(selectedCreator.totalPosts)}</p>
                     </div>
                     <div className="p-3 bg-gray-800/50 rounded-xl">
-                      <p className="text-xs text-gray-500">Avg Views/Video</p>
+                      <p className="text-xs text-gray-300">Avg Views/Video</p>
                       <p className="font-bold text-gray-100">
                         {selectedCreator.totalPosts > 0
                           ? formatNumber(Math.round(selectedCreator.totalViews / selectedCreator.totalPosts))

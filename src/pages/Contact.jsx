@@ -52,7 +52,7 @@ export default function Contact() {
         <div className="bg-gray-900 border-b border-gray-800 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-4xl font-bold text-gray-100 mb-4">Contact Us</h1>
-            <p className="text-xl text-gray-500">
+            <p className="text-xl text-gray-300">
               We'd love to hear from you
             </p>
           </div>
@@ -62,7 +62,7 @@ export default function Contact() {
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8">
-                <p className="text-gray-500 mb-8">
+                <p className="text-gray-300 mb-8">
                   Have a question, feedback, or need support? We'd love to hear from you.
                 </p>
 
@@ -85,7 +85,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-100 mb-1">Response Time</h3>
-                      <p className="text-gray-500">We typically respond within 24-48 hours</p>
+                      <p className="text-gray-300">We typically respond within 24-48 hours</p>
                     </div>
                   </div>
                 </div>
@@ -99,7 +99,7 @@ export default function Contact() {
                     <CheckCircle className="w-8 h-8 text-emerald-400" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-100 mb-2">Message Sent!</h3>
-                  <p className="text-gray-500">We'll get back to you soon.</p>
+                  <p className="text-gray-300">We'll get back to you soon.</p>
                   <button
                     onClick={() => setStatus('idle')}
                     className="mt-4 text-indigo-600 hover:text-indigo-300 font-medium"
@@ -117,7 +117,7 @@ export default function Contact() {
                   )}
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">Name</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
                     <input
                       type="text"
                       name="name"
@@ -130,7 +130,7 @@ export default function Contact() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">Email</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
                     <input
                       type="email"
                       name="email"
@@ -143,7 +143,7 @@ export default function Contact() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">Message</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Message</label>
                     <textarea
                       name="message"
                       value={formData.message}

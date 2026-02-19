@@ -182,7 +182,7 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-gray-100 mb-2">
               Welcome back, {displayName}!
             </h1>
-            <p className="text-gray-500">
+            <p className="text-gray-300">
               Track your favorite creators and see their latest updates.
             </p>
           </div>
@@ -193,7 +193,7 @@ export default function Dashboard() {
             {/* Desktop Sidebar */}
             <aside className="hidden lg:block w-64 flex-shrink-0">
               <div className="sticky top-24">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 px-3">
+                <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4 px-3">
                   Platforms
                 </h3>
                 <nav className="space-y-1">
@@ -203,7 +203,7 @@ export default function Dashboard() {
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       selectedPlatforms.includes('all')
                         ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-gray-500 hover:bg-gray-800/50 hover:text-gray-100'
+                        : 'text-gray-300 hover:bg-gray-800/50 hover:text-gray-100'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -217,7 +217,7 @@ export default function Dashboard() {
                       <span>All Following</span>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                      selectedPlatforms.includes('all') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
+                      selectedPlatforms.includes('all') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-300'
                     }`}>
                       {followedCreators.length}
                     </span>
@@ -237,7 +237,7 @@ export default function Dashboard() {
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           isActive
                             ? 'bg-indigo-600 text-white shadow-sm'
-                            : 'text-gray-500 hover:bg-gray-800/50 hover:text-gray-100'
+                            : 'text-gray-300 hover:bg-gray-800/50 hover:text-gray-100'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -251,7 +251,7 @@ export default function Dashboard() {
                           <span>{label}</span>
                         </div>
                         <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                          isActive ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
+                          isActive ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-300'
                         }`}>
                           {count}
                         </span>
@@ -266,7 +266,7 @@ export default function Dashboard() {
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       selectedPlatforms.includes('live')
                         ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-gray-500 hover:bg-gray-800/50 hover:text-gray-100'
+                        : 'text-gray-300 hover:bg-gray-800/50 hover:text-gray-100'
                     } ${liveCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <div className="flex items-center gap-3">
@@ -283,7 +283,7 @@ export default function Dashboard() {
                       <span>Live Now</span>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                      selectedPlatforms.includes('live') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
+                      selectedPlatforms.includes('live') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-300'
                     }`}>
                       {liveCount}
                     </span>
@@ -321,7 +321,7 @@ export default function Dashboard() {
                         onClick={() => setMobileFiltersOpen(false)}
                         className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
                       >
-                        <X className="w-5 h-5 text-gray-500" />
+                        <X className="w-5 h-5 text-gray-300" />
                       </button>
                     </div>
 
@@ -332,7 +332,7 @@ export default function Dashboard() {
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           selectedPlatforms.includes('all')
                             ? 'bg-indigo-600 text-white shadow-sm'
-                            : 'text-gray-500 hover:bg-gray-800/50 hover:text-gray-100'
+                            : 'text-gray-300 hover:bg-gray-800/50 hover:text-gray-100'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -346,7 +346,7 @@ export default function Dashboard() {
                           <span>All Following</span>
                         </div>
                         <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                          selectedPlatforms.includes('all') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
+                          selectedPlatforms.includes('all') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-300'
                         }`}>
                           {followedCreators.length}
                         </span>
@@ -366,7 +366,7 @@ export default function Dashboard() {
                             className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                               isActive
                                 ? 'bg-indigo-600 text-white shadow-sm'
-                                : 'text-gray-500 hover:bg-gray-800/50 hover:text-gray-100'
+                                : 'text-gray-300 hover:bg-gray-800/50 hover:text-gray-100'
                             }`}
                           >
                             <div className="flex items-center gap-3">
@@ -380,7 +380,7 @@ export default function Dashboard() {
                               <span>{label}</span>
                             </div>
                             <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                              isActive ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
+                              isActive ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-300'
                             }`}>
                               {count}
                             </span>
@@ -395,7 +395,7 @@ export default function Dashboard() {
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           selectedPlatforms.includes('live')
                             ? 'bg-indigo-600 text-white shadow-sm'
-                            : 'text-gray-500 hover:bg-gray-800/50 hover:text-gray-100'
+                            : 'text-gray-300 hover:bg-gray-800/50 hover:text-gray-100'
                         } ${liveCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex items-center gap-3">
@@ -412,7 +412,7 @@ export default function Dashboard() {
                           <span>Live Now</span>
                         </div>
                         <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                          selectedPlatforms.includes('live') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
+                          selectedPlatforms.includes('live') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-300'
                         }`}>
                           {liveCount}
                         </span>
@@ -439,7 +439,7 @@ export default function Dashboard() {
                 </button>
               ) : (
                 <>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-300">
                     Select 2-3 creators to compare ({selectedForCompare.length}/3)
                   </span>
                   <Link
@@ -454,7 +454,7 @@ export default function Dashboard() {
                     className={`inline-flex items-center gap-2 px-4 py-2 font-medium rounded-xl transition-colors ${
                       selectedForCompare.length >= 2
                         ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-                        : 'bg-gray-700 text-gray-500 cursor-not-allowed pointer-events-none'
+                        : 'bg-gray-700 text-gray-300 cursor-not-allowed pointer-events-none'
                     }`}
                   >
                     <Scale className="w-4 h-4" />
@@ -465,7 +465,7 @@ export default function Dashboard() {
                       setCompareMode(false);
                       setSelectedForCompare([]);
                     }}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 text-gray-500 font-medium rounded-xl hover:bg-gray-700 transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 text-gray-300 font-medium rounded-xl hover:bg-gray-700 transition-colors"
                   >
                     <X className="w-4 h-4" />
                     Cancel
@@ -504,11 +504,11 @@ export default function Dashboard() {
               </div>
             ) : filteredCreators.length === 0 ? (
               <div className="text-center p-12">
-                <Star className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-100 mb-2">
                   {selectedPlatforms.includes('live') ? 'No one is live right now' : 'No creators found'}
                 </h3>
-                <p className="text-gray-500 mb-6">
+                <p className="text-gray-300 mb-6">
                   {selectedPlatforms.includes('live')
                     ? 'Check back later to see when your followed streamers go live.'
                     : 'Start following creators to track their statistics here.'}
@@ -526,7 +526,7 @@ export default function Dashboard() {
               <div className="divide-y divide-gray-800">
                 {filteredCreators.map(creator => {
                   const PlatformIcon = platformIcons[creator.platform] || Users;
-                  const colors = platformColors[creator.platform] || { bg: 'bg-gray-600', light: 'bg-gray-800/50', text: 'text-gray-500' };
+                  const colors = platformColors[creator.platform] || { bg: 'bg-gray-600', light: 'bg-gray-800/50', text: 'text-gray-300' };
                   const stats = creatorStats[creator.id];
                   const isLive = (creator.platform === 'twitch' || creator.platform === 'kick') && liveStreamers.has(creator.username.toLowerCase());
                   const growth = getGrowth(creator.id, creator.platform === 'youtube' ? 'subscribers' : 'followers');
@@ -579,7 +579,7 @@ export default function Dashboard() {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500">@{creator.username}</p>
+                        <p className="text-sm text-gray-300">@{creator.username}</p>
                       </div>
                       <div className="text-right hidden sm:block">
                         <p className="font-semibold text-gray-100">
@@ -596,13 +596,13 @@ export default function Dashboard() {
                               {growth > 0 ? '+' : ''}{formatNumber(growth)}
                             </span>
                           ) : (
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-300">
                               {creator.platform === 'youtube' ? 'subs' : 'followers'}
                             </span>
                           )}
                         </div>
                       </div>
-                      {!compareMode && <ChevronRight className="w-5 h-5 text-gray-500" />}
+                      {!compareMode && <ChevronRight className="w-5 h-5 text-gray-300" />}
                     </div>
                   );
 
@@ -635,7 +635,7 @@ export default function Dashboard() {
             <div className="mt-8">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-gray-500" />
+                  <Clock className="w-5 h-5 text-gray-300" />
                   <h2 className="text-lg font-semibold text-gray-100">Recently Viewed</h2>
                 </div>
                 {recentlyViewed.length > 4 && (
@@ -643,14 +643,14 @@ export default function Dashboard() {
                     <button
                       onClick={() => setRecentlyViewedIndex(Math.max(0, recentlyViewedIndex - 4))}
                       disabled={recentlyViewedIndex === 0}
-                      className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-500 hover:bg-gray-800/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-300 hover:bg-gray-800/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setRecentlyViewedIndex(Math.min(recentlyViewed.length - 4, recentlyViewedIndex + 4))}
                       disabled={recentlyViewedIndex >= recentlyViewed.length - 4}
-                      className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-500 hover:bg-gray-800/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-300 hover:bg-gray-800/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -660,7 +660,7 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {recentlyViewed.slice(recentlyViewedIndex, recentlyViewedIndex + 4).map((creator, idx) => {
                   const PlatformIcon = platformIcons[creator.platform] || Users;
-                  const colors = platformColors[creator.platform] || { light: 'bg-gray-800/50', text: 'text-gray-500' };
+                  const colors = platformColors[creator.platform] || { light: 'bg-gray-800/50', text: 'text-gray-300' };
                   return (
                     <Link
                       key={`${creator.platform}-${creator.username}-${idx}`}
@@ -679,7 +679,7 @@ export default function Dashboard() {
                           <span className={`p-0.5 rounded ${colors.light}`}>
                             <PlatformIcon className={`w-3 h-3 ${colors.text}`} />
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-300">
                             {formatNumber(creator.subscribers || creator.followers || 0)}
                           </span>
                         </div>

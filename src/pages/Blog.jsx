@@ -75,7 +75,7 @@ export default function Blog() {
         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
           selectedCategories.includes('all')
             ? 'bg-indigo-600 text-white shadow-md'
-            : 'text-gray-500 hover:bg-gray-800/50 hover:text-indigo-400'
+            : 'text-gray-300 hover:bg-gray-800/50 hover:text-indigo-400'
         }`}
       >
         <div className="flex items-center gap-3">
@@ -89,7 +89,7 @@ export default function Blog() {
           <span>All Posts</span>
         </div>
         <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-          selectedCategories.includes('all') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
+          selectedCategories.includes('all') ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-300'
         }`}>
           {posts.length}
         </span>
@@ -105,7 +105,7 @@ export default function Blog() {
             className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               isActive
                 ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-gray-500 hover:bg-gray-800/50 hover:text-indigo-400'
+                : 'text-gray-300 hover:bg-gray-800/50 hover:text-indigo-400'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -119,7 +119,7 @@ export default function Blog() {
               <span>{category}</span>
             </div>
             <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-              isActive ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-500'
+              isActive ? 'bg-indigo-600/20 text-white' : 'bg-gray-800 text-gray-300'
             }`}>
               {count}
             </span>
@@ -145,7 +145,7 @@ export default function Blog() {
                 <BookOpen className="w-7 h-7 sm:w-9 sm:h-9 text-indigo-600" />
                 <h1 className="text-3xl sm:text-4xl font-bold text-gray-100">Creator Resources</h1>
               </div>
-              <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
                 Expert guides on streaming gear, growth strategies, and industry insights to help you succeed as a creator
               </p>
             </div>
@@ -159,7 +159,7 @@ export default function Blog() {
               {/* Desktop Sidebar */}
               <aside className="hidden lg:block w-64 flex-shrink-0">
                 <div className="sticky top-24">
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 px-3">
+                  <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4 px-3">
                     Categories
                   </h3>
                   {renderCategoryButtons(toggleCategory)}
@@ -195,7 +195,7 @@ export default function Blog() {
                           onClick={() => setMobileFiltersOpen(false)}
                           className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
                         >
-                          <X className="w-5 h-5 text-gray-500" />
+                          <X className="w-5 h-5 text-gray-300" />
                         </button>
                       </div>
 
@@ -212,8 +212,8 @@ export default function Blog() {
                 {/* No posts message */}
                 {filteredPosts.length === 0 && (
                   <div className="text-center py-12">
-                    <BookOpen className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                    <p className="text-gray-500 text-lg">No blog posts in this category yet.</p>
+                    <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-300 text-lg">No blog posts in this category yet.</p>
                   </div>
                 )}
 
@@ -239,10 +239,10 @@ export default function Blog() {
                           <h2 className="text-2xl md:text-3xl font-bold text-gray-100 mb-3 group-hover:text-indigo-400 transition-colors">
                             {filteredPosts[0].title}
                           </h2>
-                          <p className="text-gray-500 mb-4 line-clamp-2">
+                          <p className="text-gray-300 mb-4 line-clamp-2">
                             {filteredPosts[0].description}
                           </p>
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-4 text-sm text-gray-300">
                             <span className="flex items-center gap-1">
                               <Calendar className="w-4 h-4" />
                               {new Date(filteredPosts[0].published_at).toLocaleDateString('en-US', {
@@ -284,10 +284,10 @@ export default function Blog() {
                           <h3 className="text-lg font-bold text-gray-100 mb-2 group-hover:text-indigo-400 transition-colors line-clamp-2">
                             {post.title}
                           </h3>
-                          <p className="text-gray-500 text-sm mb-4 line-clamp-2 flex-1">
+                          <p className="text-gray-300 text-sm mb-4 line-clamp-2 flex-1">
                             {post.description}
                           </p>
-                          <div className="flex items-center justify-between text-sm text-gray-500">
+                          <div className="flex items-center justify-between text-sm text-gray-300">
                             <span className="flex items-center gap-1">
                               <Clock className="w-4 h-4" />
                               {post.read_time}

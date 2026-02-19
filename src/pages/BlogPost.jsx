@@ -137,7 +137,7 @@ export default function BlogPost() {
               </h1>
 
               {/* Meta */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-8 pb-8 border-b border-gray-800">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300 mb-8 pb-8 border-b border-gray-800">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   {new Date(post.published_at).toLocaleDateString('en-US', {
@@ -189,7 +189,7 @@ export default function BlogPost() {
                         <h3 className="font-bold text-gray-100 group-hover:text-indigo-400 transition-colors mb-2">
                           {related.title}
                         </h3>
-                        <p className="text-sm text-gray-500">{related.read_time}</p>
+                        <p className="text-sm text-gray-300">{related.read_time}</p>
                       </div>
                     </article>
                   </Link>

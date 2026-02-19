@@ -213,7 +213,7 @@ export default function Compare() {
 
   // Helper: Get growth color
   const getGrowthColor = (percentage) => {
-    if (!percentage || isNaN(percentage)) return 'text-gray-500';
+    if (!percentage || isNaN(percentage)) return 'text-gray-300';
     return percentage > 0 ? 'text-emerald-400' : 'text-red-500';
   };
 
@@ -248,7 +248,7 @@ export default function Compare() {
                 <Scale className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-100">Compare Creators</h1>
               </div>
-              <p className="text-base sm:text-lg text-gray-500">
+              <p className="text-base sm:text-lg text-gray-300">
                 Side-by-side comparison across all platforms
               </p>
             </div>
@@ -286,7 +286,7 @@ export default function Compare() {
             {creators.length < 3 && (
               <button
                 onClick={addSlot}
-                className="min-h-[280px] border-2 border-dashed border-gray-700 rounded-2xl flex items-center justify-center text-gray-500 hover:text-gray-500 hover:border-gray-600 transition-colors"
+                className="min-h-[280px] border-2 border-dashed border-gray-700 rounded-2xl flex items-center justify-center text-gray-300 hover:text-gray-300 hover:border-gray-600 transition-colors"
               >
                 <Plus className="w-8 h-8" />
               </button>
@@ -306,7 +306,7 @@ export default function Compare() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-800 bg-gray-800/50">
-                        <th className="px-6 py-4 text-left font-semibold text-gray-500">Metric</th>
+                        <th className="px-6 py-4 text-left font-semibold text-gray-300">Metric</th>
                         {filledCreators.map((creator) => (
                           <th key={creator.platformId} className="px-6 py-4 text-center font-semibold text-gray-100">
                             <div className="flex items-center justify-center gap-2">
@@ -409,7 +409,7 @@ export default function Compare() {
                       <Link
                         key={creator.platformId}
                         to={`/${creator.platform}/${creator.username}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-gray-500 hover:text-indigo-400 hover:border-indigo-700 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-gray-300 hover:text-indigo-400 hover:border-indigo-700 transition-colors"
                       >
                         View {creator.displayName}'s profile
                         <ArrowRight className="w-4 h-4" />
@@ -478,7 +478,7 @@ export default function Compare() {
 
                 {/* View Full Profiles - Mobile */}
                 <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4">
-                  <p className="text-sm font-medium text-gray-500 mb-3">View Profiles</p>
+                  <p className="text-sm font-medium text-gray-300 mb-3">View Profiles</p>
                   <div className="space-y-2">
                     {filledCreators.map((creator) => (
                       <Link
@@ -488,7 +488,7 @@ export default function Compare() {
                       >
                         <img src={creator.profileImage} alt="" loading="lazy" className="w-8 h-8 rounded-lg" />
                         <span className="flex-1 font-medium text-gray-100 truncate">{creator.displayName}</span>
-                        <ArrowRight className="w-4 h-4 text-gray-500" />
+                        <ArrowRight className="w-4 h-4 text-gray-300" />
                       </Link>
                     ))}
                   </div>
@@ -503,7 +503,7 @@ export default function Compare() {
                 <Users className="w-8 h-8 text-indigo-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-100 mb-2">Select at least 2 creators</h3>
-              <p className="text-gray-500">Search for creators in the slots above to start comparing</p>
+              <p className="text-gray-300">Search for creators in the slots above to start comparing</p>
             </div>
           )}
         </div>
@@ -520,7 +520,7 @@ function CreatorCard({ creator, onRemove }) {
     <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-5 relative group">
       <button
         onClick={onRemove}
-        className="absolute top-3 right-3 p-1.5 bg-gray-800 hover:bg-red-900/30 rounded-lg text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+        className="absolute top-3 right-3 p-1.5 bg-gray-800 hover:bg-red-900/30 rounded-lg text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
       >
         <X className="w-4 h-4" />
       </button>
@@ -532,7 +532,7 @@ function CreatorCard({ creator, onRemove }) {
         />
         <div className="flex-1 min-w-0">
           <p className="font-bold text-gray-100 truncate">{creator.displayName}</p>
-          <p className="text-sm text-gray-500 truncate">@{creator.username}</p>
+          <p className="text-sm text-gray-300 truncate">@{creator.username}</p>
           <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md text-xs ${config.bg} ${config.color}`}>
             <Icon className="w-3 h-3" />
             {creator.platform}
@@ -541,11 +541,11 @@ function CreatorCard({ creator, onRemove }) {
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-gray-800/50 rounded-xl p-3">
-          <p className="text-xs text-gray-500 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' ? 'Followers' : 'Subs'}</p>
+          <p className="text-xs text-gray-300 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' ? 'Followers' : 'Subs'}</p>
           <p className="font-bold text-gray-100">{formatNumber(creator.subscribers || creator.followers)}</p>
         </div>
         <div className="bg-gray-800/50 rounded-xl p-3">
-          <p className="text-xs text-gray-500 mb-1">{creator.platform === 'tiktok' ? 'Likes' : 'Views'}</p>
+          <p className="text-xs text-gray-300 mb-1">{creator.platform === 'tiktok' ? 'Likes' : 'Views'}</p>
           <p className="font-bold text-gray-100">{formatNumber(creator.totalViews)}</p>
         </div>
       </div>
@@ -618,7 +618,7 @@ function SearchableSlot({ onSelect, onRemove }) {
       {onRemove && (
         <button
           onClick={onRemove}
-          className="absolute top-2 right-2 p-1.5 bg-gray-800 hover:bg-red-900/30 rounded-lg text-gray-500 hover:text-red-500 transition-all z-10"
+          className="absolute top-2 right-2 p-1.5 bg-gray-800 hover:bg-red-900/30 rounded-lg text-gray-300 hover:text-red-500 transition-all z-10"
         >
           <X className="w-4 h-4" />
         </button>
@@ -637,7 +637,7 @@ function SearchableSlot({ onSelect, onRemove }) {
             <option value="kick">Kick</option>
           </select>
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
             <input
               type="text"
               value={searchQuery}
@@ -649,7 +649,7 @@ function SearchableSlot({ onSelect, onRemove }) {
               <button
                 type="button"
                 onClick={() => { setSearchQuery(''); setSearchResults([]); }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-500 hover:text-gray-500 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-300 hover:text-gray-300 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -688,7 +688,7 @@ function SearchableSlot({ onSelect, onRemove }) {
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-gray-100 truncate">{result.displayName}</p>
-                  <p className="text-xs text-gray-500 truncate">
+                  <p className="text-xs text-gray-300 truncate">
                     {formatNumber(result.subscribers || result.followers)} {result.platform === 'twitch' ? 'followers' : 'subs'}
                   </p>
                 </div>
@@ -702,7 +702,7 @@ function SearchableSlot({ onSelect, onRemove }) {
             ))}
           </div>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-gray-500">
+          <div className="h-full flex flex-col items-center justify-center text-gray-300">
             <Search className="w-8 h-8 mb-2" />
             <span className="text-sm font-medium">Search for a creator</span>
           </div>
@@ -715,9 +715,9 @@ function SearchableSlot({ onSelect, onRemove }) {
 function ComparisonRow({ label, icon: Icon, values, highlight }) {
   return (
     <tr className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
-      <td className="px-6 py-4 text-gray-500 font-medium">
+      <td className="px-6 py-4 text-gray-300 font-medium">
         <div className="flex items-center gap-2">
-          {Icon && <Icon className="w-4 h-4 text-gray-500" />}
+          {Icon && <Icon className="w-4 h-4 text-gray-300" />}
           {label}
         </div>
       </td>
@@ -744,8 +744,8 @@ function MobileComparisonCard({ label, icon: Icon, creators, getValue, formatVal
   return (
     <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4">
       <div className="flex items-center gap-2 mb-3">
-        {Icon && <Icon className="w-4 h-4 text-gray-500" />}
-        <span className="text-sm font-medium text-gray-500">{label}</span>
+        {Icon && <Icon className="w-4 h-4 text-gray-300" />}
+        <span className="text-sm font-medium text-gray-300">{label}</span>
       </div>
       <div className="space-y-2">
         {creators.map((creator, index) => {

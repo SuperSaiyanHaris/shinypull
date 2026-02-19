@@ -13,14 +13,14 @@ export default function Terms() {
         <div className="bg-gray-900 border-b border-gray-800 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-4xl font-bold text-gray-100 mb-4">Terms of Service</h1>
-            <p className="text-gray-500">Last updated: February 11, 2026</p>
+            <p className="text-gray-300">Last updated: February 11, 2026</p>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto px-4 py-12">
           <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8">
             <div className="prose max-w-none">
-              <p className="text-gray-500 mb-8 leading-relaxed">
+              <p className="text-gray-300 mb-8 leading-relaxed">
                 This is the terms of use agreement (the "Agreement") that governs your use of ShinyPull's website
                 and data. If you do not agree with these terms, please stop using ShinyPull's website and refrain
                 from using our data.
@@ -115,7 +115,7 @@ export default function Terms() {
 
               <Section title="User Accounts">
                 <p className="mb-2">When creating an account, you agree to:</p>
-                <ul className="list-disc list-inside text-gray-500 space-y-1">
+                <ul className="list-disc list-inside text-gray-300 space-y-1">
                   <li>Provide accurate and complete information</li>
                   <li>Maintain the security of your account credentials</li>
                   <li>Notify us immediately of any unauthorized access</li>
@@ -137,7 +137,7 @@ export default function Terms() {
                   Our "Live Counter" feature displays <strong>estimated</strong> real-time subscriber and follower
                   counts. These numbers are simulations based on:
                 </p>
-                <ul className="list-disc list-inside text-gray-500 space-y-1 mb-4">
+                <ul className="list-disc list-inside text-gray-300 space-y-1 mb-4">
                   <li>The most recent publicly available count from the platform's official API</li>
                   <li>Typical growth patterns for channels of similar size</li>
                   <li>Statistical modeling to simulate realistic fluctuations</li>
@@ -156,7 +156,7 @@ export default function Terms() {
 
               <Section title="Acceptable Use">
                 <p className="mb-2">You agree NOT to:</p>
-                <ul className="list-disc list-inside text-gray-500 space-y-1">
+                <ul className="list-disc list-inside text-gray-300 space-y-1">
                   <li>Use automated tools to scrape or download data without permission</li>
                   <li>Attempt to access unauthorized areas of the service</li>
                   <li>Interfere with or disrupt the service</li>
@@ -228,13 +228,13 @@ export default function Terms() {
                 </p>
               </Section>
 
-              <p className="text-sm text-gray-500 mt-8">
+              <p className="text-sm text-gray-300 mt-8">
                 This Document is Effective as of February 11, 2026.
               </p>
             </div>
           </div>
 
-          <div className="text-center text-sm text-gray-500 mt-8">
+          <div className="text-center text-sm text-gray-300 mt-8">
             <p>Copyright ©2026 ShinyPull</p>
           </div>
         </div>
@@ -247,7 +247,7 @@ function Section({ title, children }) {
   return (
     <section className="mb-8">
       <h2 className="text-xl font-bold text-gray-100 mb-4">{title}</h2>
-      <div className="text-gray-500 leading-relaxed">{children}</div>
+      <div className="text-gray-300 leading-relaxed">{children}</div>
     </section>
   );
 }

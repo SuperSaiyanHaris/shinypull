@@ -58,7 +58,7 @@ export default function MiniProductCard({ product }) {
             <ExternalLink className="w-3 h-3" />
           </a>
         ) : (
-          <span className="px-3 py-1.5 bg-gray-800 text-gray-500 text-sm font-medium rounded-lg">
+          <span className="px-3 py-1.5 bg-gray-800 text-gray-300 text-sm font-medium rounded-lg">
             Soon
           </span>
         )}

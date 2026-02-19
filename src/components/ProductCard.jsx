@@ -46,13 +46,13 @@ export default function ProductCard({ product }) {
             </p>
 
             {/* Description */}
-            <p className="text-gray-500 text-sm mb-4">
+            <p className="text-gray-300 text-sm mb-4">
               {product.description}
             </p>
 
             {/* Features */}
             {product.features && (
-              <ul className="text-sm text-gray-500 space-y-1 mb-4">
+              <ul className="text-sm text-gray-300 space-y-1 mb-4">
                 {product.features.map((feature, i) => (
                   <li key={i} className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />

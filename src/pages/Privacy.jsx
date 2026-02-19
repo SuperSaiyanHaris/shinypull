@@ -13,7 +13,7 @@ export default function Privacy() {
         <div className="bg-gray-900 border-b border-gray-800 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-4xl font-bold text-gray-100 mb-4">Privacy Policy</h1>
-            <p className="text-gray-500">Last updated: February 11, 2026</p>
+            <p className="text-gray-300">Last updated: February 11, 2026</p>
           </div>
         </div>
 
@@ -114,7 +114,7 @@ export default function Privacy() {
                   settings page.
                 </p>
                 <p className="mb-2">ShinyPull may share your information for the following reasons:</p>
-                <ul className="list-disc list-inside text-gray-500 space-y-1 mb-4">
+                <ul className="list-disc list-inside text-gray-300 space-y-1 mb-4">
                   <li>We may disclose the information we collect from you to comply with the law, a court order, or other legal process.</li>
                   <li>We may disclose the information we collect from you where we believe it is necessary to investigate, or prevent illegal activities, suspected fraud, situations involving potential threats to the safety of any person, violations of our Terms of Use or this Policy, or as evidence in litigation in which we are involved.</li>
                   <li>We may share aggregate information about users with third parties for marketing, advertising, research, or similar purposes.</li>
@@ -148,7 +148,7 @@ export default function Privacy() {
             </div>
           </div>
 
-          <div className="text-center text-sm text-gray-500 mt-8">
+          <div className="text-center text-sm text-gray-300 mt-8">
             <p>Copyright ©2026 ShinyPull</p>
           </div>
         </div>
@@ -161,7 +161,7 @@ function Section({ title, children }) {
   return (
     <section className="mb-8">
       <h2 className="text-xl font-bold text-gray-100 mb-4">{title}</h2>
-      <div className="text-gray-500 leading-relaxed">{children}</div>
+      <div className="text-gray-300 leading-relaxed">{children}</div>
     </section>
   );
 }

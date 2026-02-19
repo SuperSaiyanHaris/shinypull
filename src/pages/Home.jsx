@@ -176,7 +176,7 @@ export default function Home() {
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg lg:text-xl text-gray-500 mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-lg lg:text-xl text-gray-300 mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed">
                 Real-time stats, growth tracking, and analytics across every major platform.
               </p>
 
@@ -187,7 +187,7 @@ export default function Home() {
                     {/* Glow effect */}
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-0 group-focus-within:opacity-20 blur-lg transition-all duration-500"></div>
                     <div className="relative flex items-center bg-gray-900 rounded-2xl shadow-lg shadow-black/20 border border-gray-700 group-focus-within:border-indigo-500 group-focus-within:shadow-indigo-500/20 transition-all duration-300">
-                      <Search className="absolute left-5 w-5 h-5 text-gray-500" />
+                      <Search className="absolute left-5 w-5 h-5 text-gray-300" />
                       <input
                         type="text"
                         value={searchQuery}
@@ -199,7 +199,7 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={() => setSearchQuery('')}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-500 transition-colors"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-gray-300 transition-colors"
                         >
                           <X className="w-5 h-5" />
                         </button>
@@ -227,21 +227,21 @@ export default function Home() {
                   <Search className="w-6 h-6 text-indigo-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-100 mb-2">Search Creators</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">Find any creator across YouTube, TikTok, Twitch, and Kick instantly.</p>
+                <p className="text-gray-300 text-sm leading-relaxed">Find any creator across YouTube, TikTok, Twitch, and Kick instantly.</p>
               </Link>
               <Link to="/rankings" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-800/50 transition-all duration-200">
                 <div className="w-12 h-12 bg-indigo-950/50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
                   <TrendingUp className="w-6 h-6 text-indigo-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-100 mb-2">Track Growth</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">Daily, weekly, and monthly stats with historical charts and trends.</p>
+                <p className="text-gray-300 text-sm leading-relaxed">Daily, weekly, and monthly stats with historical charts and trends.</p>
               </Link>
               <Link to="/compare" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-800/50 transition-all duration-200">
                 <div className="w-12 h-12 bg-indigo-950/50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
                   <BarChart3 className="w-6 h-6 text-indigo-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-100 mb-2">Compare & Rank</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">Side-by-side comparisons and rankings across all platforms.</p>
+                <p className="text-gray-300 text-sm leading-relaxed">Side-by-side comparisons and rankings across all platforms.</p>
               </Link>
             </div>
           </div>
@@ -285,7 +285,7 @@ export default function Home() {
                   <h2 className="text-3xl sm:text-4xl font-bold text-gray-100 mb-2">
                     Recommended Gear
                   </h2>
-                  <p className="text-lg text-gray-500">
+                  <p className="text-lg text-gray-300">
                     Top picks for streamers and content creators
                   </p>
                 </div>
@@ -338,7 +338,7 @@ export default function Home() {
                             Buy <ExternalLink className="w-3 h-3" />
                           </a>
                         ) : (
-                          <span className="px-3 py-1.5 bg-gray-800 text-gray-500 text-sm font-medium rounded-lg">Soon</span>
+                          <span className="px-3 py-1.5 bg-gray-800 text-gray-300 text-sm font-medium rounded-lg">Soon</span>
                         )}
                       </div>
                     </div>
@@ -365,7 +365,7 @@ export default function Home() {
                   <h2 className="text-3xl sm:text-4xl font-bold text-gray-100 mb-2">
                     Latest from the Blog
                   </h2>
-                  <p className="text-lg text-gray-500">
+                  <p className="text-lg text-gray-300">
                     Tips, guides, and insights for creators
                   </p>
                 </div>
@@ -398,10 +398,10 @@ export default function Home() {
                         <h3 className="text-lg font-bold text-gray-100 mb-2 group-hover:text-indigo-400 transition-colors line-clamp-2">
                           {post.title}
                         </h3>
-                        <p className="text-gray-500 text-sm mb-4 line-clamp-2 flex-1">
+                        <p className="text-gray-300 text-sm mb-4 line-clamp-2 flex-1">
                           {post.description}
                         </p>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
+                        <div className="flex items-center justify-between text-sm text-gray-300">
                           <span className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
                             {post.read_time}
@@ -432,7 +432,7 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-3">
               Ready to dive in?
             </h2>
-            <p className="text-gray-500 mb-8 max-w-lg mx-auto">
+            <p className="text-gray-300 mb-8 max-w-lg mx-auto">
               Search for any creator and get real-time analytics instantly.
             </p>
             <Link

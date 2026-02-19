@@ -94,7 +94,7 @@ export default function Header() {
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive(link.path)
                     ? 'bg-indigo-600 text-white'
-                    : 'text-gray-500 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
+                    : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
                 }`}
               >
                 <link.icon className="w-4 h-4" />
@@ -109,7 +109,7 @@ export default function Header() {
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive('/dashboard')
                     ? 'bg-indigo-600 text-white'
-                    : 'text-gray-500 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
+                    : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
                 }`}
               >
                 <LayoutDashboard className="w-4 h-4" />
@@ -139,7 +139,7 @@ export default function Header() {
                             signOut();
                             setUserMenuOpen(false);
                           }}
-                          className="flex items-center gap-2 px-4 py-2 text-gray-500 hover:bg-gray-800 hover:text-gray-100 w-full transition-colors"
+                          className="flex items-center gap-2 px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-gray-100 w-full transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
                           Sign Out
@@ -164,14 +164,14 @@ export default function Header() {
           <div className="md:hidden flex items-center gap-1">
             <Link
               to="/search"
-              className="p-2 rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-100 transition-colors"
+              className="p-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors"
               aria-label="Search"
             >
               <Search className="w-6 h-6" />
             </Link>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-100 transition-colors"
+              className="p-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors"
               aria-label="Menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -191,7 +191,7 @@ export default function Header() {
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                     isActive(link.path)
                       ? 'bg-indigo-600 text-white'
-                      : 'text-gray-500 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
+                      : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
                   }`}
                 >
                   <link.icon className="w-5 h-5" />
@@ -206,7 +206,7 @@ export default function Header() {
                     <Link
                       to="/dashboard"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-500 hover:bg-gray-800 hover:text-gray-100 transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors"
                     >
                       <LayoutDashboard className="w-5 h-5" />
                       My Dashboard
@@ -216,7 +216,7 @@ export default function Header() {
                         signOut();
                         setMobileMenuOpen(false);
                       }}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-500 hover:bg-gray-800 hover:text-gray-100 transition-colors w-full"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors w-full"
                     >
                       <LogOut className="w-5 h-5" />
                       Sign Out
