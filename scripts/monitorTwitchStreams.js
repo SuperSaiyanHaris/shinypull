@@ -80,8 +80,26 @@ async function finalizeStreamSession(sessionId) {
     .eq('session_id', sessionId)
     .order('recorded_at', { ascending: true });
 
-  if (!samples || samples.length < 2) {
-    return;
+  // Get the session's started_at for duration calculation
+  const { data: session } = await supabase
+    .from('stream_sessions')
+    .select('started_at')
+    .eq('id', sessionId)
+    .single();
+
+  if (!samples || samples.length === 0) {
+    // No samples at all — mark as ended with 0 stats using started_at
+    const endedAt = session?.started_at || new Date().toISOString();
+    await supabase
+      .from('stream_sessions')
+      .update({
+        ended_at: endedAt,
+        avg_viewers: 0,
+        peak_viewers: 0,
+        hours_watched: 0,
+      })
+      .eq('id', sessionId);
+    return null;
   }
 
   // Calculate average viewers
@@ -89,10 +107,10 @@ async function finalizeStreamSession(sessionId) {
   const avgViewers = Math.round(totalViewers / samples.length);
   const peakViewers = Math.max(...samples.map(s => s.viewer_count));
 
-  // Calculate duration in hours
-  const startTime = new Date(samples[0].recorded_at);
+  // Use the session's started_at and the last sample as the time range
+  const startTime = new Date(session?.started_at || samples[0].recorded_at);
   const endTime = new Date(samples[samples.length - 1].recorded_at);
-  const durationHours = (endTime - startTime) / (1000 * 60 * 60);
+  const durationHours = Math.max((endTime - startTime) / (1000 * 60 * 60), 0);
 
   // Hours watched = avg viewers × duration
   const hoursWatched = avgViewers * durationHours;
@@ -134,16 +152,32 @@ async function monitorStreams() {
 
   console.log(`📊 Monitoring ${creators.length} Twitch creators\n`);
 
-  // Get currently active sessions (streams we're tracking that haven't ended)
-  const { data: activeSessions } = await supabase
-    .from('stream_sessions')
-    .select('id, creator_id, stream_id')
-    .is('ended_at', null);
+  // Get ALL active sessions for Twitch creators only (paginate to avoid 1000-row default limit)
+  const creatorIds = creators.map(c => c.id);
+  let allActiveSessions = [];
+  const SESSION_PAGE_SIZE = 1000;
+  for (let page = 0; ; page++) {
+    const { data } = await supabase
+      .from('stream_sessions')
+      .select('id, creator_id, stream_id, started_at, peak_viewers')
+      .is('ended_at', null)
+      .in('creator_id', creatorIds)
+      .range(page * SESSION_PAGE_SIZE, (page + 1) * SESSION_PAGE_SIZE - 1);
+    if (!data || data.length === 0) break;
+    allActiveSessions.push(...data);
+    if (data.length < SESSION_PAGE_SIZE) break;
+  }
 
-  const activeSessionMap = new Map();
-  (activeSessions || []).forEach(s => {
-    activeSessionMap.set(s.creator_id, s);
+  // Group all active sessions by creator_id (there may be multiple orphaned ones)
+  const activeSessionsByCreator = new Map();
+  allActiveSessions.forEach(s => {
+    if (!activeSessionsByCreator.has(s.creator_id)) {
+      activeSessionsByCreator.set(s.creator_id, []);
+    }
+    activeSessionsByCreator.get(s.creator_id).push(s);
   });
+
+  console.log(`   Active (unfinalised) sessions in DB: ${allActiveSessions.length}`);
 
   // Fetch live streams in batches
   const creatorBatches = chunk(creators, BATCH_SIZE);
@@ -169,20 +203,22 @@ async function monitorStreams() {
 
   for (const creator of creators) {
     const liveStream = liveStreamMap.get(creator.platform_id);
-    const activeSession = activeSessionMap.get(creator.id);
+    const activeSessions = activeSessionsByCreator.get(creator.id) || [];
 
     if (liveStream) {
-      // Creator is live
-      let sessionId = activeSession?.id;
-
-      // Check if this is a new stream (different stream_id)
-      if (activeSession && activeSession.stream_id !== liveStream.id) {
-        // Previous stream ended, finalize it
-        console.log(`   ⏹️  ${creator.display_name}: Previous stream ended`);
-        await finalizeStreamSession(activeSession.id);
-        sessionsEnded++;
-        sessionId = null;
+      // Creator is live — find the matching session if any
+      const matchingSession = activeSessions.find(s => s.stream_id === liveStream.id);
+      
+      // Finalize ALL sessions that don't match the current stream (orphaned)
+      for (const session of activeSessions) {
+        if (session.stream_id !== liveStream.id) {
+          console.log(`   🧹 ${creator.display_name}: Finalizing orphaned session ${session.stream_id}`);
+          await finalizeStreamSession(session.id);
+          sessionsEnded++;
+        }
       }
+
+      let sessionId = matchingSession?.id;
 
       // Start new session if needed
       if (!sessionId) {
@@ -213,7 +249,7 @@ async function monitorStreams() {
         });
 
         // Update peak viewers if higher
-        if (activeSession && liveStream.viewer_count > (activeSession.peak_viewers || 0)) {
+        if (matchingSession && liveStream.viewer_count > (matchingSession.peak_viewers || 0)) {
           await supabase
             .from('stream_sessions')
             .update({ peak_viewers: liveStream.viewer_count })
@@ -223,14 +259,16 @@ async function monitorStreams() {
         samplesRecorded++;
         console.log(`   📊 ${creator.display_name}: ${liveStream.viewer_count.toLocaleString()} viewers`);
       }
-    } else if (activeSession) {
-      // Creator is not live but has active session - stream ended
-      console.log(`   ⏹️  ${creator.display_name}: Stream ended`);
-      const stats = await finalizeStreamSession(activeSession.id);
-      if (stats) {
-        console.log(`      └─ ${stats.durationHours.toFixed(1)}h, ${stats.avgViewers.toLocaleString()} avg, ${stats.hoursWatched.toFixed(0)} hours watched`);
+    } else if (activeSessions.length > 0) {
+      // Creator is not live but has active session(s) - all streams ended
+      for (const session of activeSessions) {
+        console.log(`   ⏹️  ${creator.display_name}: Stream ended`);
+        const stats = await finalizeStreamSession(session.id);
+        if (stats) {
+          console.log(`      └─ ${stats.durationHours.toFixed(1)}h, ${stats.avgViewers.toLocaleString()} avg, ${stats.hoursWatched.toFixed(0)} hours watched`);
+        }
+        sessionsEnded++;
       }
-      sessionsEnded++;
     }
   }
 

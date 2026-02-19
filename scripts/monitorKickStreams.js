@@ -70,17 +70,33 @@ async function finalizeStreamSession(sessionId) {
     .eq('session_id', sessionId)
     .order('recorded_at', { ascending: true });
 
-  if (!samples || samples.length < 2) {
-    return;
+  const { data: session } = await supabase
+    .from('stream_sessions')
+    .select('started_at')
+    .eq('id', sessionId)
+    .single();
+
+  if (!samples || samples.length === 0) {
+    const endedAt = session?.started_at || new Date().toISOString();
+    await supabase
+      .from('stream_sessions')
+      .update({
+        ended_at: endedAt,
+        avg_viewers: 0,
+        peak_viewers: 0,
+        hours_watched: 0,
+      })
+      .eq('id', sessionId);
+    return null;
   }
 
   const totalViewers = samples.reduce((sum, s) => sum + s.viewer_count, 0);
   const avgViewers = Math.round(totalViewers / samples.length);
   const peakViewers = Math.max(...samples.map(s => s.viewer_count));
 
-  const startTime = new Date(samples[0].recorded_at);
+  const startTime = new Date(session?.started_at || samples[0].recorded_at);
   const endTime = new Date(samples[samples.length - 1].recorded_at);
-  const durationHours = (endTime - startTime) / (1000 * 60 * 60);
+  const durationHours = Math.max((endTime - startTime) / (1000 * 60 * 60), 0);
 
   const hoursWatched = avgViewers * durationHours;
 
@@ -124,18 +140,23 @@ async function monitorStreams() {
     return;
   }
 
-  // Get currently active sessions
+  // Get ALL active sessions — a creator may have multiple orphaned ones
   const creatorIds = creators.map(c => c.id);
   const { data: activeSessions } = await supabase
     .from('stream_sessions')
-    .select('id, creator_id, stream_id')
+    .select('id, creator_id, stream_id, started_at, peak_viewers')
     .is('ended_at', null)
     .in('creator_id', creatorIds);
 
-  const activeSessionMap = new Map();
+  const activeSessionsByCreator = new Map();
   (activeSessions || []).forEach(s => {
-    activeSessionMap.set(s.creator_id, s);
+    if (!activeSessionsByCreator.has(s.creator_id)) {
+      activeSessionsByCreator.set(s.creator_id, []);
+    }
+    activeSessionsByCreator.get(s.creator_id).push(s);
   });
+
+  console.log(`   Active (unfinalised) sessions in DB: ${activeSessions?.length || 0}`);
 
   // Fetch channel data in batches (includes live status)
   const creatorBatches = chunk(creators, BATCH_SIZE);
@@ -169,18 +190,21 @@ async function monitorStreams() {
 
   for (const creator of creators) {
     const liveStream = liveChannelMap.get(creator.username.toLowerCase());
-    const activeSession = activeSessionMap.get(creator.id);
+    const activeSessions = activeSessionsByCreator.get(creator.id) || [];
 
     if (liveStream) {
-      let sessionId = activeSession?.id;
+      const matchingSession = activeSessions.find(s => s.stream_id === liveStream.streamId);
 
-      // Check if this is a different stream
-      if (activeSession && activeSession.stream_id !== liveStream.streamId) {
-        console.log(`   ⏹️  ${creator.display_name}: Previous stream ended`);
-        await finalizeStreamSession(activeSession.id);
-        sessionsEnded++;
-        sessionId = null;
+      // Finalize ALL sessions that don't match the current stream (orphaned)
+      for (const session of activeSessions) {
+        if (session.stream_id !== liveStream.streamId) {
+          console.log(`   🧹 ${creator.display_name}: Finalizing orphaned session ${session.stream_id}`);
+          await finalizeStreamSession(session.id);
+          sessionsEnded++;
+        }
       }
+
+      let sessionId = matchingSession?.id;
 
       // Start new session if needed
       if (!sessionId) {
@@ -210,7 +234,7 @@ async function monitorStreams() {
           game_name: liveStream.gameName,
         });
 
-        if (activeSession && liveStream.viewerCount > (activeSession.peak_viewers || 0)) {
+        if (matchingSession && liveStream.viewerCount > (matchingSession.peak_viewers || 0)) {
           await supabase
             .from('stream_sessions')
             .update({ peak_viewers: liveStream.viewerCount })
@@ -220,13 +244,16 @@ async function monitorStreams() {
         samplesRecorded++;
         console.log(`   📊 ${creator.display_name}: ${liveStream.viewerCount.toLocaleString()} viewers`);
       }
-    } else if (activeSession) {
-      console.log(`   ⏹️  ${creator.display_name}: Stream ended`);
-      const stats = await finalizeStreamSession(activeSession.id);
-      if (stats) {
-        console.log(`      └─ ${stats.durationHours.toFixed(1)}h, ${stats.avgViewers.toLocaleString()} avg, ${stats.hoursWatched.toFixed(0)} hours watched`);
+    } else if (activeSessions.length > 0) {
+      // Creator is not live — finalize all active sessions
+      for (const session of activeSessions) {
+        console.log(`   ⏹️  ${creator.display_name}: Stream ended`);
+        const stats = await finalizeStreamSession(session.id);
+        if (stats) {
+          console.log(`      └─ ${stats.durationHours.toFixed(1)}h, ${stats.avgViewers.toLocaleString()} avg, ${stats.hoursWatched.toFixed(0)} hours watched`);
+        }
+        sessionsEnded++;
       }
-      sessionsEnded++;
     }
   }
 
