@@ -210,7 +210,7 @@ async function getExistingCreators() {
  */
 async function discoverTikTokCreators() {
   const today = getTodayLocal();
-  const count = parseInt(process.argv[2]) || 10;
+  const count = parseInt(process.argv[2]) || 50;
 
   console.log('🎵 TikTok Creator Discovery\n');
   console.log('═══════════════════════════════════════════════════');
@@ -267,21 +267,33 @@ async function discoverTikTokCreators() {
         .select()
         .single();
 
-      // Insert today's stats
-      await supabase
-        .from('creator_stats')
-        .upsert({
-          creator_id: creator.id,
-          recorded_at: today,
-          subscribers: profileData.followers,
-          followers: profileData.followers,
-          total_views: profileData.totalLikes || 0,
-          total_posts: profileData.totalPosts,
-        }, { onConflict: 'creator_id,recorded_at' });
+      // Insert today's stats — skip if followers is 0 (scraper returned bad data)
+      if (!profileData.followers) {
+        console.log(`   ⚠️  ${profileData.displayName}: Skipping stats — scraper returned 0 followers\n`);
+      } else {
+        await supabase
+          .from('creator_stats')
+          .upsert({
+            creator_id: creator.id,
+            recorded_at: today,
+            subscribers: profileData.followers,
+            followers: profileData.followers,
+            total_views: profileData.totalLikes || 0,
+            total_posts: profileData.totalPosts,
+          }, { onConflict: 'creator_id,recorded_at' });
+      }
 
-      const followers = (profileData.followers / 1000000).toFixed(1);
-      const likes = (profileData.totalLikes / 1000000).toFixed(1);
-      console.log(`   ✅ ${profileData.displayName}: ${followers}M followers, ${likes}M likes\n`);
+      const followers = profileData.followers >= 1000000
+        ? `${(profileData.followers / 1000000).toFixed(1)}M`
+        : profileData.followers >= 1000
+          ? `${(profileData.followers / 1000).toFixed(0)}K`
+          : profileData.followers.toLocaleString();
+      const likes = profileData.totalLikes >= 1000000
+        ? `${(profileData.totalLikes / 1000000).toFixed(1)}M`
+        : profileData.totalLikes >= 1000
+          ? `${(profileData.totalLikes / 1000).toFixed(0)}K`
+          : (profileData.totalLikes || 0).toLocaleString();
+      console.log(`   ✅ ${profileData.displayName}: ${followers} followers, ${likes} likes\n`);
       successCount++;
 
     } catch (err) {

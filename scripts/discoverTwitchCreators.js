@@ -136,16 +136,24 @@ async function getFollowerCount(broadcasterId) {
  * Get existing Twitch user IDs from database
  */
 async function getExistingUserIds() {
-  const { data, error } = await supabase
-    .from('creators')
-    .select('platform_id')
-    .eq('platform', 'twitch');
+  const allIds = new Set();
+  let from = 0;
+  const pageSize = 1000;
 
-  if (error) {
-    throw new Error(`Supabase error: ${error.message}`);
+  while (true) {
+    const { data, error } = await supabase
+      .from('creators')
+      .select('platform_id')
+      .eq('platform', 'twitch')
+      .range(from, from + pageSize - 1);
+
+    if (error) throw new Error(`Supabase error: ${error.message}`);
+    data.forEach(c => allIds.add(c.platform_id));
+    if (data.length < pageSize) break;
+    from += pageSize;
   }
 
-  return new Set(data.map(c => c.platform_id));
+  return allIds;
 }
 
 /**
