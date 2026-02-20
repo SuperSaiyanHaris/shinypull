@@ -1,13 +1,16 @@
 /**
- * Discover and add new TikTok creators from curated list
+ * Discover TikTok creators using our existing DB as the source
  *
- * Uses the TikTok scraper (tiktokScraper.js) to fetch profile data
- * from TikTok's embedded __UNIVERSAL_DATA_FOR_REHYDRATION__ JSON.
- * Smart progression: tracks how many creators exist and adds the NEXT batch from the list.
- * Guarantees no duplicates - each run adds fresh creators until the list is exhausted.
+ * Strategy: Pull YouTube/Twitch/Kick creators from our DB, try their username
+ * on TikTok, and validate the result actually matches them.
+ * Most creators use the same handle across platforms, so this organically
+ * grows TikTok without any hardcoded lists or hallucinated usernames.
+ *
+ * Validation: TikTok result must have 10K+ followers AND display name must
+ * share at least one significant word with the known YouTube/Twitch display name.
  *
  * Usage: node scripts/discoverTikTokCreators.js [count]
- *   count: number of creators to discover (default: 10)
+ *   count: number of candidates to try per run (default: 30)
  */
 import { config } from 'dotenv';
 config();
@@ -21,7 +24,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
 
-const DELAY_BETWEEN_PROFILES = 3000; // 3 seconds (TikTok is less aggressive with rate limits)
+const DELAY_BETWEEN_PROFILES = 3000;
+const MIN_FOLLOWERS = 10000;
 
 function getTodayLocal() {
   return new Intl.DateTimeFormat('en-CA', {
@@ -33,203 +37,148 @@ function getTodayLocal() {
 }
 
 /**
- * Curated list of top TikTok creators
- * As the database grows, the script automatically progresses through this list.
- * Add more usernames to the end as needed - duplicates are prevented by the database.
+ * Check if two display names are likely the same person.
+ * Matches if any significant word (4+ chars) from one name appears in the other,
+ * or if the normalized names are highly similar.
  */
-const TOP_TIKTOK_USERNAMES = [
-  // Mega accounts (100M+ followers)
-  'khaby.lame', 'charlidamelio', 'mrbeast', 'bellapoarch', 'addisonre',
-  'zachking', 'kimberly.loaiza', 'tiktok', 'selenagomez', 'therock',
+function namesMatch(knownName, tiktokName) {
+  const normalize = s => s.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+  const n1 = normalize(knownName);
+  const n2 = normalize(tiktokName);
 
-  // Top creators (50M+)
-  'willsmith', 'justinbieber', 'lorengray', 'dixiedamelio', 'brentrivera',
-  'jasonderulo', 'spencerx', 'rosalia', 'babyariel', 'arianagrande',
+  // Exact match after normalization
+  if (n1 === n2) return true;
 
-  // Popular creators (20M+)
-  'khloekardashian', 'caseyneistat', 'noahbeck', 'avanigregg',
-  'ondreazlopez', 'masonramsey', 'gilmhercroes', 'itsjojosiwa', 'lizzo',
+  // Check if either name contains the other
+  if (n1.includes(n2) || n2.includes(n1)) return true;
 
-  // Content creators & influencers
-  'dobretwins', 'hfranco_', 'kallmekris', 'youneszarou',
-  'therealkingbach', 'bayashi.tiktok',
+  // Check if any significant word (4+ chars) from either name appears in the other
+  const words1 = n1.split(/\s+/).filter(w => w.length >= 4);
+  const words2 = n2.split(/\s+/).filter(w => w.length >= 4);
+  for (const word of words1) {
+    if (n2.includes(word)) return true;
+  }
+  for (const word of words2) {
+    if (n1.includes(word)) return true;
+  }
 
-  // Gaming & entertainment
-  'pewdiepie', 'ninja', 'dream', 'georgenotfound',
-  'jesser', 'markiplier', 'tsm',
-
-  // Comedy & skits
-  'brodiethedog', 'itscaitlinhello', 'brittany.broski',
-  'drewafualo', 'chrisklemens', 'mikaela.testa',
-
-  // Dance & music
-  'nfrealmusic', 'billieeilish', 'travisscott', 'postmalone',
-  'shawnmendes', 'sabrinacarpenter', 'oliviarodrigo', 'dojacat', 'lilyachty',
-
-  // Beauty & lifestyle
-  'jamescharles', 'nikkietutorials', 'patricstarrr', 'mannymua', 'bretmanrock',
-  'skincarebyhyram', 'mikirai',
-
-  // Athletes
-  'cristianoronaldo', 'neymarjr', 'leomessi', 'stephencurry', 'lebronjames',
-  'tombrady', 'usainbolt', 'patrickmahomes',
-
-  // Food & cooking
-  'gordonramsayofficial', 'feelgoodfoodie', 'chloeting',
-  'cookingwithlynja', 'tabithabrown', 'chefclub',
-
-  // Education & Science
-  'billnye', 'mrsdowjones', 'underthedesknews', 'finance.unfolded', 'mndiaye97',
-
-  // Massive followings (50M+)
-  'wifreo', 'kingjafi_rock', 'cznburak', 'bts_official_bighit',
-  'thalia', 'xobrooklynne',
-
-  // Major creators (20M-50M)
-  'landonbarker', 'ameliezilber', 'michaelle.wandji', 'benoftheweek',
-  'tryguys', 'emilymariko', 'theellenshow', 'daviddobrik', 'hannahstocking',
-  'tatemcrae', 'lilnasx', 'icespice', 'enkyboys', 'demibagby', 'noen.eubanks',
-
-  // Popular influencers (10M-20M)
-  'rickygervais', 'jessicaalba', 'katyperry', 'djkhaled',
-  'kevinhart4real', 'snoopdogg', 'mileycyrus',
-  'thereallukecombs', 'timothechalamet', 'demilovato', 'niallhoran', 'shakira',
-  'charlieputh', 'meghantrainor', 'maluma', 'ozuna', 'anuel',
-
-  // Top gaming/content creators
-  'valkyrae', 'sykkuno', 'typical_gamer', 'sssniperwolf',
-  'jakewebber', 'the.nba', 'domelipa', 'sofiawylie', 'madisonbeer',
-
-  // Top comedy/skit creators
-  'iamtabithabrown', 'blogilates', 'whoisjimmy', 'zhcyt', 'jongraz',
-  'alixearle', 'summermckeen',
-
-  // Fashion & lifestyle
-  'madelyncline', 'emmachamberlain', 'codyko', 'noellemiller',
-  'kelseaballerini', 'trevorwallace',
-
-  // Music artists on TikTok
-  'edsheeran', 'taylorswift', 'cardib', 'nickiminaj',
-  'brunomars', 'samsmith', 'harrystyles', 'sza', 'kendricklamar',
-
-  // Sports personalities
-  'alexmorgan', 'tonyhawk', 'simonebilesowens', 'lewishamilton', 'maxverstappen1',
-
-  // Fitness & health
-  'whitneyysimmons', 'pamela_rf', 'natacha.oceane', 'blogilates',
-  'kelsey.wells', 'kayla.itsines',
-
-  // Art & creative
-  'vexx', 'moriah.elizabeth',
-
-  // Viral/trending creators
-  'younggravy', 'ryantrahan', 'austinmcbroom',
-  'joshrichards', 'bryce.hall', 'anthonypadilla', 'laurdiy',
-
-  // Musicians & artists
-  'dojacatofficial', 'normaniofficial', 'tyga', 'nle_choppa', 'jackharlow',
-  'iann.dior', 'conan.gray', 'gracie.abrams', 'finneas',
-
-  // Reality TV & media personalities
-  'jeffreestar', 'nikita.dragun', 'kyliejenner', 'kendalljenner',
-  'kimkardashian', 'krisjenner', 'scottdisick',
-
-  // YouTube crossovers
-  'airrack', 'sidemenofficial', 'ricegum', 'theodd1sout',
-
-  // Comedy / viral
-  'dannyduncan', 'nelkboys', 'juanpa.zurita', 'fazerug', 'fazeadapt',
-
-  // Cooking / food
-  'saltbae', 'moribyan', 'joshuaweissman', 'bingingwithbabish',
-  'maangchi', 'emmymade', 'ethan.chlebowski',
-
-  // Fitness & wellness
-  'chrisheria', 'laurendrainfit', 'gracefituk', 'krissy.cela',
-  'growingannanas', 'brittne.babe', 'ashleykfit',
-
-  // Travel & adventure
-  'kara.and.nate', 'lost.leblancs', 'chrisburkard', 'jackmorris',
-
-  // Sports & athletes
-  'bronny', 'overtime', 'dude.perfect',
-  'house_of_highlights', 'bleacherreport', 'espn', 'nfl', 'ufc',
-
-  // News & commentary
-  'hasanabi', 'thedailyshow', 'trevornoah', 'johnoliver',
-  'kurzgesagt', 'vox', 'businessinsider',
-
-  // Pets & animals
-  'jiffpom', 'itsdougthepug', 'juniperfoxx',
-];
-
-/**
- * Get existing TikTok creators from database
- */
-async function getExistingCreators() {
-  const { data, error } = await supabase
-    .from('creators')
-    .select('username')
-    .eq('platform', 'tiktok');
-
-  if (error) throw error;
-  return data?.map(c => c.username.toLowerCase()) || [];
+  return false;
 }
 
 /**
- * Main discovery function
+ * Get all existing TikTok usernames from DB
  */
-async function discoverTikTokCreators() {
-  const today = getTodayLocal();
-  const count = parseInt(process.argv[2]) || 50;
+async function getExistingTikTokUsernames() {
+  const allUsernames = new Set();
+  let from = 0;
+  const pageSize = 1000;
 
-  console.log('🎵 TikTok Creator Discovery\n');
-  console.log('═══════════════════════════════════════════════════');
+  while (true) {
+    const { data, error } = await supabase
+      .from('creators')
+      .select('username')
+      .eq('platform', 'tiktok')
+      .range(from, from + pageSize - 1);
 
-  // Get existing creators
-  const existingUsernames = await getExistingCreators();
-  const existingCount = existingUsernames.length;
-
-  console.log(`📊 Current TikTok creators in database: ${existingCount}`);
-  console.log(`📋 Total usernames in curated list: ${TOP_TIKTOK_USERNAMES.length}`);
-
-  // Find usernames NOT yet in database
-  const newUsernames = TOP_TIKTOK_USERNAMES.filter(
-    username => !existingUsernames.includes(username.toLowerCase())
-  );
-
-  if (newUsernames.length === 0) {
-    console.log('\n✅ All usernames from the curated list are already in the database!');
-    console.log('💡 Tip: Add more usernames to TOP_TIKTOK_USERNAMES array to continue discovery.\n');
-    return;
+    if (error) throw new Error(`Supabase error: ${error.message}`);
+    data.forEach(c => allUsernames.add(c.username.toLowerCase()));
+    if (data.length < pageSize) break;
+    from += pageSize;
   }
 
-  console.log(`🎯 Fresh usernames available: ${newUsernames.length}`);
-  console.log(`📥 Discovering ${Math.min(count, newUsernames.length)} new creator(s)\n`);
+  return allUsernames;
+}
+
+/**
+ * Get YouTube/Twitch/Kick creators from DB as TikTok discovery candidates.
+ * Returns { username, display_name } sorted by follower count desc
+ * so we try the biggest creators first.
+ */
+async function getCandidates(existingTikTokUsernames) {
+  const seen = new Set(); // dedupe by username
+  const candidates = [];
+  let from = 0;
+  const pageSize = 1000;
+
+  while (true) {
+    // Join with creator_stats to get follower count for sorting
+    const { data, error } = await supabase
+      .from('creators')
+      .select('username, display_name, creator_stats(subscribers)')
+      .in('platform', ['youtube', 'twitch', 'kick'])
+      .order('username')
+      .range(from, from + pageSize - 1);
+
+    if (error) throw new Error(`Supabase error: ${error.message}`);
+
+    for (const c of data) {
+      const username = c.username.toLowerCase();
+      // Skip if already a TikTok creator or already seen this username
+      if (existingTikTokUsernames.has(username)) continue;
+      if (seen.has(username)) continue;
+      seen.add(username);
+
+      // Get max subscriber count from their stats (may be array)
+      const stats = Array.isArray(c.creator_stats) ? c.creator_stats : [c.creator_stats];
+      const maxSubs = Math.max(...stats.map(s => s?.subscribers || 0));
+
+      candidates.push({ username: c.username, display_name: c.display_name, subs: maxSubs });
+    }
+
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+
+  // Sort by subscriber count desc — try the biggest names first
+  candidates.sort((a, b) => b.subs - a.subs);
+  return candidates;
+}
+
+async function discoverTikTokCreators() {
+  const today = getTodayLocal();
+  const count = parseInt(process.argv[2]) || 30;
+
+  console.log('🎵 TikTok Creator Discovery (DB-driven)\n');
+  console.log('═══════════════════════════════════════════════════');
+
+  const existingTikTokUsernames = await getExistingTikTokUsernames();
+  console.log(`📊 Current TikTok creators in database: ${existingTikTokUsernames.size}`);
+
+  const candidates = await getCandidates(existingTikTokUsernames);
+  console.log(`🔍 Candidates from YouTube/Twitch/Kick DB: ${candidates.length}`);
+  console.log(`📥 Trying ${Math.min(count, candidates.length)} this run (sorted by follower count)\n`);
   console.log('═══════════════════════════════════════════════════\n');
 
-  // Take the first N fresh usernames
-  const usernamesToAdd = newUsernames.slice(0, count);
+  const toTry = candidates.slice(0, count);
+  let added = 0;
+  let skippedWrongAccount = 0;
+  let skippedNotFound = 0;
 
-  let successCount = 0;
-  let failedCount = 0;
-
-  for (let i = 0; i < usernamesToAdd.length; i++) {
-    const username = usernamesToAdd[i];
+  for (let i = 0; i < toTry.length; i++) {
+    const { username, display_name } = toTry[i];
 
     try {
-      console.log(`[${i + 1}/${usernamesToAdd.length}] Fetching ${username}...`);
+      process.stdout.write(`[${i + 1}/${toTry.length}] @${username} (known as "${display_name}")... `);
 
       const profileData = await scrapeTikTokProfile(username);
 
-      // If followers is too low, it's the wrong account (impersonator or stale username)
-      // Real creators in this list should have at least 10K followers
-      if (profileData.followers < 10000) {
-        console.log(`   ⏭️  ${profileData.displayName} (@${profileData.username}): Only ${profileData.followers.toLocaleString()} followers — likely wrong account, skipping\n`);
+      // Reject if followers too low — likely a fan/impersonator account
+      if (profileData.followers < MIN_FOLLOWERS) {
+        console.log(`⏭️  wrong account (${profileData.followers.toLocaleString()} followers)`);
+        skippedWrongAccount++;
+        await new Promise(r => setTimeout(r, DELAY_BETWEEN_PROFILES));
         continue;
       }
 
-      // Insert creator
+      // Reject if display name doesn't match — different person with same handle
+      if (!namesMatch(display_name, profileData.displayName)) {
+        console.log(`⏭️  name mismatch ("${profileData.displayName}")`);
+        skippedWrongAccount++;
+        await new Promise(r => setTimeout(r, DELAY_BETWEEN_PROFILES));
+        continue;
+      }
+
+      // Looks like a match — insert creator
       const { data: creator } = await supabase
         .from('creators')
         .upsert({
@@ -245,10 +194,8 @@ async function discoverTikTokCreators() {
         .select()
         .single();
 
-      // Insert today's stats — skip if followers is 0 (scraper returned bad data)
-      if (!profileData.followers) {
-        console.log(`   ⚠️  ${profileData.displayName}: Skipping stats — scraper returned 0 followers\n`);
-      } else {
+      // Insert today's stats
+      if (profileData.followers) {
         await supabase
           .from('creator_stats')
           .upsert({
@@ -261,47 +208,39 @@ async function discoverTikTokCreators() {
           }, { onConflict: 'creator_id,recorded_at' });
       }
 
-      const followers = profileData.followers >= 1000000
+      const fStr = profileData.followers >= 1000000
         ? `${(profileData.followers / 1000000).toFixed(1)}M`
-        : profileData.followers >= 1000
-          ? `${(profileData.followers / 1000).toFixed(0)}K`
-          : profileData.followers.toLocaleString();
-      const likes = profileData.totalLikes >= 1000000
-        ? `${(profileData.totalLikes / 1000000).toFixed(1)}M`
-        : profileData.totalLikes >= 1000
-          ? `${(profileData.totalLikes / 1000).toFixed(0)}K`
-          : (profileData.totalLikes || 0).toLocaleString();
-      console.log(`   ✅ ${profileData.displayName}: ${followers} followers, ${likes} likes\n`);
-      successCount++;
+        : `${(profileData.followers / 1000).toFixed(0)}K`;
+      console.log(`✅ ${profileData.displayName} — ${fStr} followers`);
+      added++;
 
     } catch (err) {
-      console.error(`   ❌ ${username}: ${err.message}\n`);
-      failedCount++;
-
-      // If rate limited, stop immediately
-      if (err.message.includes('429') || err.message.includes('403')) {
-        console.log('   ⚠️  Rate limited — stopping early (will resume next run)\n');
+      if (err.message.includes('No user info') || err.message.includes('No rehydration')) {
+        console.log(`❌ not on TikTok`);
+        skippedNotFound++;
+      } else if (err.message.includes('429') || err.message.includes('403')) {
+        console.log(`⚠️  rate limited — stopping early`);
         break;
+      } else {
+        console.log(`❌ ${err.message}`);
+        skippedNotFound++;
       }
     }
 
-    // Delay between profiles
-    if (i < usernamesToAdd.length - 1) {
-      const delaySeconds = (DELAY_BETWEEN_PROFILES / 1000).toFixed(0);
-      process.stdout.write(`   ⏳ Waiting ${delaySeconds}s before next request...`);
+    if (i < toTry.length - 1) {
       await new Promise(r => setTimeout(r, DELAY_BETWEEN_PROFILES));
-      process.stdout.write('\r' + ' '.repeat(60) + '\r'); // Clear line
     }
   }
 
   await closeBrowser();
 
-  console.log('═══════════════════════════════════════════════════');
-  console.log(`\n📈 Discovery Summary:`);
-  console.log(`   ✅ Successful: ${successCount}`);
-  console.log(`   ❌ Failed: ${failedCount}`);
-  console.log(`   📊 Total in database now: ${existingCount + successCount}`);
-  console.log(`   🎯 Fresh usernames remaining: ${newUsernames.length - usernamesToAdd.length}\n`);
+  console.log('\n═══════════════════════════════════════════════════');
+  console.log(`📈 Discovery Summary:`);
+  console.log(`   ✅ Added: ${added}`);
+  console.log(`   ⏭️  Wrong account / name mismatch: ${skippedWrongAccount}`);
+  console.log(`   ❌ Not on TikTok: ${skippedNotFound}`);
+  console.log(`   📊 Total TikTok creators now: ${existingTikTokUsernames.size + added}`);
+  console.log(`   🔍 Candidates remaining: ${candidates.length - toTry.length}\n`);
 }
 
 discoverTikTokCreators().catch(err => {
