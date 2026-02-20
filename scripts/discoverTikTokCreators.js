@@ -41,155 +41,126 @@ const TOP_TIKTOK_USERNAMES = [
   // Mega accounts (100M+ followers)
   'khaby.lame', 'charlidamelio', 'mrbeast', 'bellapoarch', 'addisonre',
   'zachking', 'kimberly.loaiza', 'tiktok', 'selenagomez', 'therock',
-  
+
   // Top creators (50M+)
   'willsmith', 'justinbieber', 'lorengray', 'dixiedamelio', 'brentrivera',
   'jasonderulo', 'spencerx', 'rosalia', 'babyariel', 'arianagrande',
 
   // Popular creators (20M+)
-  'khloekardashian', 'caseyneistat', 'noahbeck', 'avanigregg', 'larrayeeee',
+  'khloekardashian', 'caseyneistat', 'noahbeck', 'avanigregg',
   'ondreazlopez', 'masonramsey', 'gilmhercroes', 'itsjojosiwa', 'lizzo',
 
   // Content creators & influencers
-  'dobretwins', 'hfranco_', 'kallmekris', 'youneszarou', 'ox_zung',
-  'dominotoliver', 'brentrivera', 'therealkingbach', 'tonbaker', 'bayashi.tiktok',
+  'dobretwins', 'hfranco_', 'kallmekris', 'youneszarou',
+  'therealkingbach', 'bayashi.tiktok',
 
   // Gaming & entertainment
-  'pewdiepie', 'ninja', 'pokimane', 'dream', 'georgenotfound',
-  'jesser', 'ksinolern', 'faze', 'tsm', 'markiplier',
+  'pewdiepie', 'ninja', 'dream', 'georgenotfound',
+  'jesser', 'markiplier', 'tsm',
 
   // Comedy & skits
-  'danidev', 'khaby00', 'khabylame', 'brodiethedog', 'itscaitlinhello',
-  'grandmasdayout', 'brittany.broski', 'drewafualo', 'chrisklemens', 'mikaela.testa',
+  'brodiethedog', 'itscaitlinhello', 'brittany.broski',
+  'drewafualo', 'chrisklemens', 'mikaela.testa',
 
   // Dance & music
-  'nfrealmusic', 'dualipa', 'billieeilish', 'travisscott', 'postmalone',
+  'nfrealmusic', 'billieeilish', 'travisscott', 'postmalone',
   'shawnmendes', 'sabrinacarpenter', 'oliviarodrigo', 'dojacat', 'lilyachty',
 
   // Beauty & lifestyle
   'jamescharles', 'nikkietutorials', 'patricstarrr', 'mannymua', 'bretmanrock',
-  'charlidamelio', 'hylohydration', 'skincarebyhyram', 'glowbyramona', 'mikirai',
+  'skincarebyhyram', 'mikirai',
 
   // Athletes
   'cristianoronaldo', 'neymarjr', 'leomessi', 'stephencurry', 'lebronjames',
-  'tombrady', 'usainbolt', 'sifreddoc', 'jonathandaviss', 'patrickmahomes',
+  'tombrady', 'usainbolt', 'patrickmahomes',
 
   // Food & cooking
-  'gordonramsayofficial', 'eatwithmo', 'newt', 'feelgoodfoodie', 'chloeting',
-  'cookingwithlynja', 'tabithabrown', 'thecreativkitchen', 'senpairamen', 'chefclub',
+  'gordonramsayofficial', 'feelgoodfoodie', 'chloeting',
+  'cookingwithlynja', 'tabithabrown', 'chefclub',
 
   // Education & Science
-  'billnye', 'mrsdowjones', 'habortstudies', 'tiktokscience', 'doctorjesss',
-  'underthedesknews', 'finance.unfolded', 'mndiaye97', 'mathandscience', 'tylastanford',
-
-  // === EXPANDED LIST: Top TikTokers not yet in database ===
+  'billnye', 'mrsdowjones', 'underthedesknews', 'finance.unfolded', 'mndiaye97',
 
   // Massive followings (50M+)
-  'wifreo', 'kingjafi_rock', 'cznburak', 'bts_official_bighit', 'iamtyla',
-  'thalia', 'xobrooklynne', 'maboroshi_japan', 'anifrendo', 'jojo_asmr',
+  'wifreo', 'kingjafi_rock', 'cznburak', 'bts_official_bighit',
+  'thalia', 'xobrooklynne',
 
   // Major creators (20M-50M)
   'landonbarker', 'ameliezilber', 'michaelle.wandji', 'benoftheweek',
-  'tryguys', 'acaboricua', 'emilymariko', 'paaboricua', 'maaboricua',
-  'theellenshow', 'daviddobrik', 'hannahstocking', 'rikimaravilla',
-  'tatemcrae', 'ajr', 'lilnasx', 'tylerthecreatorbest', 'icespice',
-  'wifreo', 'enkyboys', 'demibagby', 'jungikook', 'noen.eubanks',
+  'tryguys', 'emilymariko', 'theellenshow', 'daviddobrik', 'hannahstocking',
+  'tatemcrae', 'lilnasx', 'icespice', 'enkyboys', 'demibagby', 'noen.eubanks',
 
   // Popular influencers (10M-20M)
-  'rickygervais', 'jessicaalba', 'katyperry', 'djkhaled', 'eminem',
-  'vindiesel', 'kevinhart4real', 'snoopdogg', 'mileycyrus', 'badgirlriri',
+  'rickygervais', 'jessicaalba', 'katyperry', 'djkhaled',
+  'kevinhart4real', 'snoopdogg', 'mileycyrus',
   'thereallukecombs', 'timothechalamet', 'demilovato', 'niallhoran', 'shakira',
   'charlieputh', 'meghantrainor', 'maluma', 'ozuna', 'anuel',
 
   // Top gaming/content creators
-  'valkyrae', 'sykkuno', 'itsloganbrett', 'typical_gamer', 'sssniperwolf',
-  'jakewebber', 'courtneyshott', 'the.nba', 'paigeniemann', 'maddison',
-  'aubreyhuff', 'domelipa', 'sofiawylie', 'madisonbeer', 'denisemercado',
+  'valkyrae', 'sykkuno', 'typical_gamer', 'sssniperwolf',
+  'jakewebber', 'the.nba', 'domelipa', 'sofiawylie', 'madisonbeer',
 
   // Top comedy/skit creators
   'iamtabithabrown', 'blogilates', 'whoisjimmy', 'zhcyt', 'jongraz',
-  'giannakiefer', 'alixearle', 'amelie.zilber', 'summermckeen', 'jordihewitt',
+  'alixearle', 'summermckeen',
 
   // Fashion & lifestyle
-  'wisdm8', 'madelyncline', 'emmachamberlain', 'jamesandoliver', 'halleybham',
-  'codyko', 'noellemiller', 'kelseaballerini', 'trevorwallace', 'pfreddyp',
+  'madelyncline', 'emmachamberlain', 'codyko', 'noellemiller',
+  'kelseaballerini', 'trevorwallace',
 
   // Music artists on TikTok
-  'edsheeran', 'taylorswift', 'badgalriri', 'cardib', 'nickiminaj',
+  'edsheeran', 'taylorswift', 'cardib', 'nickiminaj',
   'brunomars', 'samsmith', 'harrystyles', 'sza', 'kendricklamar',
 
   // Sports personalities
-  'alexmorgan', 'serenwilliams', 'tonyhawk', 'simonebilesowens', 'kylian.mbappe',
-  'paulpogba', 'mohamedhenni', 'lewishamilton', 'maxverstappen1',
+  'alexmorgan', 'tonyhawk', 'simonebilesowens', 'lewishamilton', 'maxverstappen1',
 
-  // Top fitness & health
-  'blogilates', 'whitneyysimmons', 'demibagby', 'pamela_rf', 'natacha.oceane',
+  // Fitness & health
+  'whitneyysimmons', 'pamela_rf', 'natacha.oceane', 'blogilates',
+  'kelsey.wells', 'kayla.itsines',
 
-  // Top art & creative
-  'jamesllewis', 'zhcyt', 'vexx', 'tikkiwatercolors', 'leticia_gomes',
-
-  // === BATCH 2: More top creators ===
+  // Art & creative
+  'vexx', 'moriah.elizabeth',
 
   // Viral/trending creators
-  'younggravy', 'ryantrahan', 'nicklucido', 'kallmekris', 'alexclark',
-  'anthpo', 'scottthewoz', 'brandontv', 'mattdoesfitness', 'austinmcbroom',
-  'jasonpaul', 'chasehhudson', 'griffinjohnson', 'joshrichards', 'bryce.hall',
-  'kioandjeremiah', 'anthonypadilla', 'ianpaget', 'laurdiy', 'tmartn2',
+  'younggravy', 'ryantrahan', 'austinmcbroom',
+  'joshrichards', 'bryce.hall', 'anthonypadilla', 'laurdiy',
 
-  // More musicians & artists
-  'dualipa', 'dojacatofficial', 'lizzobeeating', 'normaniofficial', 'jackharloww',
-  'liltecca', 'tyga', 'nle_choppa', 'jackharlow', '24kgoldn',
-  'iann.dior', 'powfu', 'benplatt', 'conan.gray', 'powfuofficial',
-  'gracie.abrams', 'clairo', 'ruel', 'finneas', 'joshuabasset',
+  // Musicians & artists
+  'dojacatofficial', 'normaniofficial', 'tyga', 'nle_choppa', 'jackharlow',
+  'iann.dior', 'conan.gray', 'gracie.abrams', 'finneas',
 
   // Reality TV & media personalities
-  'jamescharles', 'jeffreestar', 'tanamongeauofficial', 'nikita.dragun', 'bretmanrock',
-  'louistheroux', 'kardashian', 'kyliejenner', 'kendalljenner', 'kourtneykardash',
-  'kimkardashian', 'krisjenner', 'robkardashian', 'caitlynjenner', 'scottdisick',
+  'jeffreestar', 'nikita.dragun', 'kyliejenner', 'kendalljenner',
+  'kimkardashian', 'krisjenner', 'scottdisick',
 
-  // YouTube-to-TikTok crossovers
-  'mrbeast6000', 'airrack', 'yes.theory', 'klementieff', 'sidemenofficial',
-  'thecreatorclash', 'jessiesmiles', 'mango', 'feastables', 'beastphilanthropy',
-  'imjaystation', 'ricegum', 'itsalexclark', 'domicsanimations', 'theodd1sout',
-  'jaiden_animations', 'somethingelseyt', 'tabbes', 'rebeccaparham', 'lylasfive',
+  // YouTube crossovers
+  'airrack', 'sidemenofficial', 'ricegum', 'theodd1sout',
 
   // Comedy / viral
-  'dannyduncan', 'nelkboys', 'fullsend', 'steiny', 'bradmundo',
-  'jake.webber', 'dududuarte', 'juanpa.zurita', 'sebastianmoy', 'fazerug',
-  'fazeadapt', 'faze.clan', 'nickeh30', 'blazendary', 'swaggron',
+  'dannyduncan', 'nelkboys', 'juanpa.zurita', 'fazerug', 'fazeadapt',
 
-  // Cooking / food viral
-  'saltbae', 'nusretemre', 'tabitha.brown', 'moribyan', 'carlosmadethis',
-  'grilledcheesesocial', 'joshuaweissman', 'bingingwithbabish', 'mealsbymiri', 'noms',
-  'maangchi', 'emmymade', 'brad.leone', 'ethan.chlebowski', 'proHomechef',
+  // Cooking / food
+  'saltbae', 'moribyan', 'joshuaweissman', 'bingingwithbabish',
+  'maangchi', 'emmymade', 'ethan.chlebowski',
 
   // Fitness & wellness
-  'chrisheria', 'brendanercioli', 'laurendrainfit', 'gracefituk', 'krissy.cela',
-  'sydneycummings', 'growingannanas', 'ericalodon', 'brittne.babe', 'natacha.oceane',
-  'kelsey.wells', 'brittanyperille', 'alexia.clark', 'ashleykfit', 'kayla.itsines',
+  'chrisheria', 'laurendrainfit', 'gracefituk', 'krissy.cela',
+  'growingannanas', 'brittne.babe', 'ashleykfit',
 
   // Travel & adventure
-  'kara.and.nate', 'noel.philipps', 'lost.leblancs', 'sorelle.amore', 'onebag',
-  'chrisburkard', 'jackmorris', 'lernertwinz', 'geobeats', 'dianaplays',
-  'beeisforbeekeeper', 'abroadinJapan', 'tokidoki.traveller', 'nikkiphillippi',
+  'kara.and.nate', 'lost.leblancs', 'chrisburkard', 'jackmorris',
 
   // Sports & athletes
-  'bronny', 'juansorondo', 'overtime', 'dude.perfect', 'nightvision_bball',
-  'house_of_highlights', 'bleacherreport', 'espn', 'nhl', 'nfl',
-  'pgatour', 'ufc', 'worldstarhiphop', 'boxingking', 'sneakerheadhq',
+  'bronny', 'overtime', 'dude.perfect',
+  'house_of_highlights', 'bleacherreport', 'espn', 'nfl', 'ufc',
 
   // News & commentary
-  'hasanabi', 'thedailyshow', 'colbertlateshow', 'jimjefferies', 'trevornoah',
-  'johnoliver', 'ronnychieng', 'reidmiller', 'theyoungturks', 'secondthought',
-  'answerswithjoe', 'kurzgesagt', 'vox', 'businessinsider', 'wired',
+  'hasanabi', 'thedailyshow', 'trevornoah', 'johnoliver',
+  'kurzgesagt', 'vox', 'businessinsider',
 
   // Pets & animals
-  'jiffpom', 'noodleandbean', 'smoothiethecat', 'potatojet', 'tika.the.iggy',
-  'itsdougthepug', 'lil.bub', 'realgrumpycat', 'marniethedog', 'juniperfoxx',
-
-  // DIY & crafts
-  'moriah.elizabeth', 'simonscat', 'itsalexclarkart', 'bayashi.tiktok2', 'craftingeek',
-  'primitivebuilding', 'nickdissel', '5minutecrafts', 'diyjoy', 'hacksaholic',
+  'jiffpom', 'itsdougthepug', 'juniperfoxx',
 ];
 
 /**
@@ -250,6 +221,13 @@ async function discoverTikTokCreators() {
       console.log(`[${i + 1}/${usernamesToAdd.length}] Fetching ${username}...`);
 
       const profileData = await scrapeTikTokProfile(username);
+
+      // If followers is too low, it's the wrong account (impersonator or stale username)
+      // Real creators in this list should have at least 10K followers
+      if (profileData.followers < 10000) {
+        console.log(`   ⏭️  ${profileData.displayName} (@${profileData.username}): Only ${profileData.followers.toLocaleString()} followers — likely wrong account, skipping\n`);
+        continue;
+      }
 
       // Insert creator
       const { data: creator } = await supabase
