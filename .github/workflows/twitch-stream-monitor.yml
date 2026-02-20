@@ -2,10 +2,8 @@ name: Twitch Stream Monitor
 
 on:
   schedule:
-    # Run every 3 hours (8x daily) to save GitHub Actions minutes
-    # Was: every hour (24x daily) = 1,800 min/month
-    # Now: every 3 hours (8x daily) = 480 min/month
-    - cron: '0 0,3,6,9,12,15,18,21 * * *'
+    # Run every hour (24x daily) — public repo has unlimited minutes
+    - cron: '0 * * * *'
   workflow_dispatch: # Allow manual trigger
 
 jobs:

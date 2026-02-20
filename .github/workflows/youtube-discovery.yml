@@ -54,6 +54,12 @@ jobs:
           KICK_CLIENT_SECRET: ${{ secrets.KICK_CLIENT_SECRET }}
         run: node scripts/discoverKickCreators.js
 
+      - name: Discover TikTok creators
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/discoverTikTokCreators.js
+
       - name: Report completion
         if: success()
         run: echo "✅ Creator discovery completed successfully"
