@@ -503,8 +503,6 @@ export default function CreatorProfile() {
                         return `${diffDays} days ago`;
                       })()}
                     </span>
-                    <span className="text-gray-300">•</span>
-                    <span className="text-gray-300">Refreshed daily at 6 AM & 6 PM EST</span>
                   </div>
 
                   {/* Social Links */}
@@ -544,63 +542,57 @@ export default function CreatorProfile() {
                     {/* Additional social links for YouTube channels */}
                     {platform === 'youtube' && creator.platformId && (
                       <>
-                        <span className="text-gray-300">•</span>
                         <a
                           href={`https://www.youtube.com/channel/${creator.platformId}/about`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-300 hover:text-gray-100 text-sm"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
                         >
                           About
                         </a>
-                        <span className="text-gray-300">•</span>
                         <a
                           href={`https://www.youtube.com/channel/${creator.platformId}/videos`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-300 hover:text-gray-100 text-sm"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
                         >
                           Videos
                         </a>
-                        <span className="text-gray-300">•</span>
                         <a
                           href={`https://www.youtube.com/channel/${creator.platformId}/community`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-300 hover:text-gray-100 text-sm"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
                         >
                           Community
                         </a>
                       </>
                     )}
-                    
+
                     {/* Twitch-specific links */}
                     {platform === 'twitch' && (
                       <>
-                        <span className="text-gray-300">•</span>
                         <a
                           href={`https://twitch.tv/${creator.username}/videos`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-300 hover:text-gray-100 text-sm"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
                         >
                           Videos
                         </a>
-                        <span className="text-gray-300">•</span>
                         <a
                           href={`https://twitch.tv/${creator.username}/schedule`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-300 hover:text-gray-100 text-sm"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
                         >
                           Schedule
                         </a>
-                        <span className="text-gray-300">•</span>
                         <a
                           href={`https://twitch.tv/${creator.username}/about`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-300 hover:text-gray-100 text-sm"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
                         >
                           About
                         </a>
