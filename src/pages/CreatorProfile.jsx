@@ -191,6 +191,7 @@ export default function CreatorProfile() {
             // TikTok already fetched history above; other platforms do it here
             const dbCreator = await upsertCreator(channelData);
             setDbCreatorId(dbCreator.id);
+            setCreator(prev => ({ ...prev, dbCreatedAt: dbCreator.created_at }));
 
             // Run save + history fetch + hours watched in parallel
             const backgroundOps = [
@@ -652,7 +653,14 @@ export default function CreatorProfile() {
                 <StatCard
                   icon={Eye}
                   label="Hours Watched"
-                  value={creator.hoursWatchedMonth ? formatHoursWatched(creator.hoursWatchedMonth) : 'Tracking...'}
+                  value={
+                    creator.hoursWatchedMonth
+                      ? formatHoursWatched(creator.hoursWatchedMonth)
+                      : (creator.dbCreatedAt || creator.created_at) &&
+                        Date.now() - new Date(creator.dbCreatedAt || creator.created_at).getTime() > 30 * 24 * 60 * 60 * 1000
+                        ? '0'
+                        : 'Tracking...'
+                  }
                   sublabel="Last 30 days"
                 />
               ) : platform === 'youtube' ? (
