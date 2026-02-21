@@ -24,7 +24,9 @@
     "discover:kick": "node scripts/discoverKickCreators.js",
     "discover:tiktok": "node scripts/discoverTikTokCreators.js",
     "refresh:tiktok": "node scripts/refreshTikTokProfiles.js",
-    "seed:gear-blog": "node scripts/seedGearBlogPosts.js"
+    "seed:gear-blog": "node scripts/seedGearBlogPosts.js",
+    "generate:blog": "node scripts/generateBlogDraft.js",
+    "generate:blog:product": "node scripts/generateBlogDraft.js product"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",
@@ -38,11 +40,14 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "dotenv": "^17.2.3",
     "pg": "^8.18.0",
     "postcss": "^8.4.47",
+    "resend": "^6.9.2",
+    "rss-parser": "^3.13.0",
     "tailwindcss": "^3.4.1",
     "vite": "^7.3.1"
   }
