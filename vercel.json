@@ -5,7 +5,7 @@
   "redirects": [
     {
       "source": "/creator/:username",
-      "destination": "/youtube/:username",
+      "destination": "/search?q=:username",
       "statusCode": 301
     }
   ],
