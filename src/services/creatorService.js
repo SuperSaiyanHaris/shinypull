@@ -163,11 +163,10 @@ export const getHoursWatched = withErrorHandling(
       .eq('creator_id', creatorId)
       .gt('hours_watched_month', 0)
       .order('recorded_at', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
 
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
+    if (error) throw error;
+    return data?.[0] ?? null;
   },
   'creatorService.getHoursWatched'
 );
