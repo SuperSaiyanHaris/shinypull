@@ -648,7 +648,7 @@ function SearchableSlot({ onSelect, onRemove }) {
           <select
             value={searchPlatform}
             onChange={(e) => setSearchPlatform(e.target.value)}
-            className="px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-[16px] sm:text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           >
             <option value="youtube">YouTube</option>
             <option value="tiktok">TikTok</option>
@@ -662,7 +662,7 @@ function SearchableSlot({ onSelect, onRemove }) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search creator..."
-              className="w-full pl-9 pr-9 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full pl-9 pr-9 py-2 bg-gray-900 border border-gray-700 rounded-lg text-[16px] sm:text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
             {searchQuery && (
               <button
@@ -738,10 +738,11 @@ function InfoTooltip({ text, openDown = false, width = 'w-56' }) {
       {open && <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />}
       <button
         type="button"
-        className="relative z-30 focus:outline-none"
+        className="relative z-30 focus:outline-none -m-1 p-1"
         onClick={(e) => { e.stopPropagation(); setOpen(o => !o); }}
+        onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); setOpen(o => !o); }}
       >
-        <Info className="w-3.5 h-3.5 cursor-help text-gray-600 group-hover/tip:text-gray-400 transition-colors" />
+        <Info className="w-3.5 h-3.5 cursor-help text-gray-500 group-hover/tip:text-gray-300 transition-colors" />
       </button>
       <div className={`absolute ${openDown ? 'top-full left-0 mt-1' : 'bottom-full left-1/2 -translate-x-1/2 mb-2'} ${width} px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-300 transition-opacity z-30 whitespace-normal shadow-lg pointer-events-none ${open ? 'opacity-100' : 'opacity-0 group-hover/tip:opacity-100'}`}>
         {openDown
