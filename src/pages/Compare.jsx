@@ -378,24 +378,28 @@ export default function Compare() {
                       <ComparisonRow
                         label="Subscribers / Followers"
                         icon={Users}
+                        tooltip="YouTube = subscribers, Twitch & TikTok = followers. Kick shows paid subscribers only — not total followers."
                         values={filledCreators.map(c => formatNumber(c.subscribers || c.followers))}
                         highlight={getWinner(filledCreators.map(c => c.subscribers || c.followers))}
                       />
                       <ComparisonRow
                         label="Total Views"
                         icon={Eye}
+                        tooltip="For TikTok, shows total likes — TikTok doesn't expose a public view count per profile."
                         values={filledCreators.map(c => formatNumber(c.totalViews))}
                         highlight={getWinner(filledCreators.map(c => c.totalViews))}
                       />
                       <ComparisonRow
                         label="Videos / Content"
                         icon={Video}
+                        tooltip="For Twitch, shows current stream category instead of video count — Twitch doesn't expose a public video count."
                         values={filledCreators.map(c => c.platform === 'twitch' ? (c.category || '-') : formatNumber(c.totalPosts))}
                         highlight={filledCreators.every(c => c.platform !== 'twitch') ? getWinner(filledCreators.map(c => c.totalPosts)) : null}
                       />
                       <ComparisonRow
                         label="Avg Views per Video"
                         icon={TrendingUp}
+                        tooltip="Not available for Twitch. For TikTok, calculated as total likes ÷ videos."
                         values={filledCreators.map(c =>
                           c.platform === 'twitch' ? '-' :
                           c.totalPosts > 0 ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '-'
@@ -449,6 +453,7 @@ export default function Compare() {
                         <ComparisonRow
                           label="Est. Monthly Earnings"
                           icon={DollarSign}
+                          tooltip="YouTube only. Estimated from 30-day view growth at $2–$7 CPM. Actual earnings vary widely."
                           values={filledCreators.map(c => {
                             if (c.platform !== 'youtube') return '—';
                             const data = growthData[c.platformId];
