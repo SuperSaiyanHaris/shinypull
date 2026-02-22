@@ -31,9 +31,11 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 
-  // Rate limiting: 60 requests per minute
+  // Rate limiting: 300 requests per minute
+  // A single YouTube search legitimately generates ~50 calls (25 results × upsert + stats),
+  // so 60/min was too tight for normal usage. Primary abuse protection is the origin check above.
   const clientId = getClientIdentifier(req);
-  const rateLimit = checkRateLimit(`update-creator:${clientId}`, 60, 60000);
+  const rateLimit = checkRateLimit(`update-creator:${clientId}`, 300, 60000);
 
   if (!rateLimit.allowed) {
     return res.status(429).json({ error: 'Too many requests. Please try again later.' });
