@@ -102,10 +102,19 @@ export const PAGINATION = {
 
 // Blog categories
 export const BLOG_CATEGORIES = [
-  'Streaming Gear',
+  'Creator Economy',
+  'Industry News',
+  'Platform Updates',
+  'Analytics',
+  'Tips & Strategy',
   'Growth Tips',
   'Industry Insights',
+  'Streaming Gear',
   'Tutorials',
+  'YouTube News',
+  'Twitch Trends',
+  'Creator Spotlight',
+  'Rankings',
 ];
 
 // Platform identifiers
