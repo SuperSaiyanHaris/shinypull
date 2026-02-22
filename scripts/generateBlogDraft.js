@@ -133,7 +133,7 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
   "angle": "what unique angle to take for our creator-focused audience (1-2 sentences)",
   "keyFacts": ["fact 1", "fact 2", "fact 3"],
   "suggestedTitle": "catchy blog post title under 70 chars",
-  "suggestedCategory": "one of: Industry News, Platform Updates, Creator Economy, Analytics, Tips & Strategy"
+  "suggestedCategory": "one of: Creator Economy, Industry News, Platform Updates, Analytics, Tips & Strategy, Growth Tips, Industry Insights, Streaming Gear, Tutorials, YouTube News, Twitch Trends, Creator Spotlight, Rankings"
 }`,
       },
     ],
