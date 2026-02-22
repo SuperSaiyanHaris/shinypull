@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2, DollarSign, TrendingDown, Minus } from 'lucide-react';
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import { CompareCardSkeleton } from '../components/Skeleton';
@@ -299,6 +300,11 @@ export default function Compare() {
           {/* Comparison Section */}
           {!loadingFromUrl && filledCreators.length >= 2 && (
             <>
+              {/* Radar Chart */}
+              <div className="mb-6">
+                <ComparisonRadarChart creators={filledCreators} growthData={growthData} />
+              </div>
+
               {/* Desktop Table View */}
               <div className="hidden md:block bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-800">
@@ -818,6 +824,64 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function ComparisonRadarChart({ creators, growthData }) {
+  const CREATOR_COLORS = ['#818cf8', '#34d399', '#f59e0b'];
+
+  const metrics = [
+    { label: 'Followers',    getValue: (c) => c.subscribers || c.followers || 0 },
+    { label: 'Views',        getValue: (c) => c.totalViews || 0 },
+    { label: 'Avg/Video',    getValue: (c) => (c.platform !== 'twitch' && c.totalPosts > 0) ? c.totalViews / c.totalPosts : 0 },
+    { label: '7-Day Growth', getValue: (c) => Math.max(0, growthData[c.platformId]?.growth7Day || 0) },
+    { label: '30-Day Growth',getValue: (c) => Math.max(0, growthData[c.platformId]?.growth30Day || 0) },
+  ];
+
+  const radarData = metrics.map(({ label, getValue }) => {
+    const values = creators.map(getValue);
+    const max = Math.max(...values, 0.001);
+    const entry = { metric: label };
+    creators.forEach((c, i) => {
+      entry[c.displayName] = Math.round((values[i] / max) * 100);
+    });
+    return entry;
+  });
+
+  return (
+    <div className="bg-gray-900 rounded-2xl border border-gray-800 p-5">
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="text-sm font-semibold text-gray-100">Performance Overview</h3>
+        <span className="text-xs text-gray-300">100 = top among compared</span>
+      </div>
+      <ResponsiveContainer width="100%" height={300}>
+        <RadarChart data={radarData} margin={{ top: 10, right: 40, bottom: 10, left: 40 }}>
+          <PolarGrid stroke="#374151" />
+          <PolarAngleAxis dataKey="metric" tick={{ fill: '#9ca3af', fontSize: 11, fontWeight: 500 }} />
+          <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
+          {creators.map((c, i) => (
+            <Radar
+              key={c.platformId}
+              name={c.displayName}
+              dataKey={c.displayName}
+              stroke={CREATOR_COLORS[i % CREATOR_COLORS.length]}
+              fill={CREATOR_COLORS[i % CREATOR_COLORS.length]}
+              fillOpacity={0.12}
+              strokeWidth={2}
+            />
+          ))}
+          <Legend
+            formatter={(value) => <span style={{ color: '#d1d5db', fontSize: '12px' }}>{value}</span>}
+          />
+          <Tooltip
+            contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', borderRadius: '8px', padding: '8px 12px' }}
+            formatter={(value, name) => [`${value}/100`, name]}
+            labelStyle={{ color: '#9ca3af', fontSize: '11px', marginBottom: '4px' }}
+            itemStyle={{ color: '#d1d5db', fontSize: '12px' }}
+          />
+        </RadarChart>
+      </ResponsiveContainer>
     </div>
   );
 }
