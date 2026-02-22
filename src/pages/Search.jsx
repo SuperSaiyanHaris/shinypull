@@ -115,12 +115,11 @@ export default function Search() {
     // Clear request status when switching platforms
     setRequestStatus(null);
     setRequestMessage('');
-    // Sync URL with current typed query so back button works correctly
-    if (query.trim() && searchParams.get('q') !== query.trim()) {
-      setSearchParams({ q: query.trim() });
-      // useEffect will fire (searchParams changed) and handle the search
-    }
-    // If query matches URL, useEffect fires from selectedPlatform change
+    // Always write platform to URL so back-button restores it correctly
+    const q = query.trim() || searchParams.get('q') || '';
+    const newParams = { platform: platformId };
+    if (q) newParams.q = q;
+    setSearchParams(newParams);
   };
 
   const performSearch = async (searchQuery, platform = selectedPlatform) => {
@@ -170,7 +169,7 @@ export default function Search() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim()) {
-      setSearchParams({ q: query.trim() });
+      setSearchParams({ q: query.trim(), platform: selectedPlatform });
     }
   };
 
