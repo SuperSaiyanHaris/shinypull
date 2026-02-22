@@ -200,30 +200,30 @@ export default function CreatorProfile() {
             setDbCreatorId(dbCreator.id);
             setCreator(prev => ({ ...prev, dbCreatedAt: dbCreator.created_at }));
 
-            // Run save + history fetch + hours watched in parallel
-            const backgroundOps = [
-              saveCreatorStats(dbCreator.id, {
-                subscribers: channelData.subscribers || channelData.followers,
-                totalViews: channelData.totalViews,
-                totalPosts: channelData.totalPosts,
-              }),
-              getCreatorStats(dbCreator.id, 90),
-            ];
+            // Save stats first, then fetch history — must be sequential so the
+            // history query always sees the row we just wrote (race condition fix)
+            await saveCreatorStats(dbCreator.id, {
+              subscribers: channelData.subscribers || channelData.followers,
+              totalViews: channelData.totalViews,
+              totalPosts: channelData.totalPosts,
+            });
 
+            // Now fetch history + hours watched in parallel (both read-only)
+            const readOps = [getCreatorStats(dbCreator.id, 90)];
             if (platform === 'twitch' || platform === 'kick') {
-              backgroundOps.push(getHoursWatched(dbCreator.id));
+              readOps.push(getHoursWatched(dbCreator.id));
             }
 
-            const results = await Promise.allSettled(backgroundOps);
+            const results = await Promise.allSettled(readOps);
 
             // Update stats history (only if successful)
-            if (results[1].status === 'fulfilled') {
-              setStatsHistory(results[1].value || []);
+            if (results[0].status === 'fulfilled') {
+              setStatsHistory(results[0].value || []);
             }
 
             // Update hours watched data for Twitch/Kick (only if successful)
-            if ((platform === 'twitch' || platform === 'kick') && results[2]?.status === 'fulfilled' && results[2].value) {
-              const hoursWatchedData = results[2].value;
+            if ((platform === 'twitch' || platform === 'kick') && results[1]?.status === 'fulfilled' && results[1].value) {
+              const hoursWatchedData = results[1].value;
               setCreator(prev => ({
                 ...prev,
                 hoursWatchedDay: hoursWatchedData.hours_watched_day,
