@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2, DollarSign, TrendingDown, Minus } from 'lucide-react';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import KickIcon from '../components/KickIcon';
@@ -28,9 +28,28 @@ export default function Compare() {
   const [growthData, setGrowthData] = useState({});
   const [loadingGrowth, setLoadingGrowth] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const skipNextUrlLoad = useRef(false);
+
+  const updateUrl = (newCreators) => {
+    skipNextUrlLoad.current = true;
+    const filled = newCreators.filter(Boolean);
+    if (filled.length === 0) {
+      navigate('/compare', { replace: true });
+    } else {
+      const param = filled.map(c => `${c.platform}:${c.username}`).join(',');
+      navigate(`/compare?creators=${param}`, { replace: true });
+    }
+  };
 
   // Parse ?creators=platform:username,platform:username from URL
   useEffect(() => {
+    // Skip if we just set the URL ourselves (no need to re-fetch)
+    if (skipNextUrlLoad.current) {
+      skipNextUrlLoad.current = false;
+      return;
+    }
+
     const params = new URLSearchParams(location.search);
     const creatorsParam = params.get('creators');
 
@@ -111,6 +130,7 @@ export default function Compare() {
     const newCreators = [...creators];
     newCreators[index] = creator;
     setCreators(newCreators);
+    updateUrl(newCreators);
 
     // Track comparison when both slots are filled
     if (newCreators[0] && newCreators[1]) {
@@ -127,6 +147,7 @@ export default function Compare() {
     const newCreators = [...creators];
     newCreators[index] = null;
     setCreators(newCreators);
+    updateUrl(newCreators);
   };
 
   const addSlot = () => {
@@ -140,6 +161,7 @@ export default function Compare() {
       const newCreators = [...creators];
       newCreators.splice(index, 1);
       setCreators(newCreators);
+      updateUrl(newCreators);
     }
   };
 
@@ -174,10 +196,12 @@ export default function Compare() {
           const calc30Day = thirtyDaysBack?.subscribers
             ? ((latest.subscribers - thirtyDaysBack.subscribers) / thirtyDaysBack.subscribers * 100) : 0;
 
-          // Calculate estimated daily views for YouTube (for earnings)
-          let dailyViews = 0;
-          if (creator.platform === 'youtube' && creator.totalViews && creator.totalPosts > 0) {
-            dailyViews = Math.round(creator.totalViews / (creator.totalPosts * 30));
+          // Calculate actual 30-day view growth for YouTube earnings estimate
+          let monthlyViews = 0;
+          if (creator.platform === 'youtube') {
+            if (latest?.total_views != null && thirtyDaysBack?.total_views != null) {
+              monthlyViews = Math.max(0, latest.total_views - thirtyDaysBack.total_views);
+            }
           }
 
           growth[creator.platformId] = {
@@ -185,7 +209,7 @@ export default function Compare() {
             growth30Day: calc30Day,
             diff7Day: sevenDaysBack?.subscribers != null ? latest.subscribers - sevenDaysBack.subscribers : 0,
             diff30Day: thirtyDaysBack?.subscribers != null ? latest.subscribers - thirtyDaysBack.subscribers : 0,
-            dailyViews: dailyViews,
+            monthlyViews: monthlyViews,
           };
         } catch (err) {
           logger.warn(`Failed to fetch growth data for ${creator.username}:`, err);
@@ -220,11 +244,11 @@ export default function Compare() {
     return percentage > 0 ? 'text-emerald-400' : 'text-red-500';
   };
 
-  // Helper: Format earnings estimate (YouTube only)
-  const formatEarnings = (dailyViews) => {
-    if (!dailyViews || dailyViews === 0) return '—';
-    const monthlyLow = (dailyViews / 1000) * 0.25 * 30;
-    const monthlyHigh = (dailyViews / 1000) * 4.00 * 30;
+  // Helper: Format earnings estimate (YouTube only, based on actual 30-day views)
+  const formatEarnings = (monthlyViews) => {
+    if (!monthlyViews || monthlyViews === 0) return '—';
+    const monthlyLow = (monthlyViews / 1000) * 2;
+    const monthlyHigh = (monthlyViews / 1000) * 7;
 
     const formatCurrency = (amount) => {
       if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
@@ -265,6 +289,22 @@ export default function Compare() {
               {Array.from({ length: 3 }).map((_, i) => (
                 <CompareCardSkeleton key={i} />
               ))}
+            </div>
+          )}
+
+          {/* Clear All */}
+          {!loadingFromUrl && filledCreators.length > 0 && (
+            <div className="flex justify-end mb-3">
+              <button
+                onClick={() => {
+                  setCreators([null, null]);
+                  navigate('/compare', { replace: true });
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-red-400 hover:bg-red-950/20 rounded-lg transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+                Clear all
+              </button>
             </div>
           )}
 
@@ -365,7 +405,7 @@ export default function Compare() {
                       />
                       {/* Growth Rates */}
                       <ComparisonRow
-                        label="7-Day Growth"
+                        label="7-Day Sub Growth"
                         values={filledCreators.map(c => {
                           const data = growthData[c.platformId];
                           const percentage = data?.growth7Day || 0;
@@ -384,7 +424,7 @@ export default function Compare() {
                         highlight={getWinner(filledCreators.map(c => growthData[c.platformId]?.growth7Day || 0))}
                       />
                       <ComparisonRow
-                        label="30-Day Growth"
+                        label="30-Day Sub Growth"
                         values={filledCreators.map(c => {
                           const data = growthData[c.platformId];
                           const percentage = data?.growth30Day || 0;
@@ -410,7 +450,7 @@ export default function Compare() {
                           values={filledCreators.map(c => {
                             if (c.platform !== 'youtube') return '—';
                             const data = growthData[c.platformId];
-                            return formatEarnings(data?.dailyViews || 0);
+                            return formatEarnings(data?.monthlyViews || 0);
                           })}
                         />
                       )}
@@ -736,7 +776,7 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
       display: creators.map(c => [(c.platform !== 'twitch' && c.totalPosts > 0) ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—', null]),
     },
     {
-      label: '7-Day',
+      label: '7D Subs',
       isGrowth: true,
       nums: creators.map(c => growthData[c.platformId]?.growth7Day || 0),
       display: creators.map(c => {
@@ -753,7 +793,7 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
       colors: creators.map(c => getGrowthColor(growthData[c.platformId]?.growth7Day)),
     },
     {
-      label: '30-Day',
+      label: '30D Subs',
       isGrowth: true,
       nums: creators.map(c => growthData[c.platformId]?.growth30Day || 0),
       display: creators.map(c => {
@@ -775,8 +815,8 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
     rows.push({
       label: 'Mo. Est.',
       isEarnings: true,
-      nums: creators.map(c => growthData[c.platformId]?.dailyViews || 0),
-      display: creators.map(c => [c.platform === 'youtube' ? formatEarnings(growthData[c.platformId]?.dailyViews || 0) : '—', null]),
+      nums: creators.map(c => growthData[c.platformId]?.monthlyViews || 0),
+      display: creators.map(c => [c.platform === 'youtube' ? formatEarnings(growthData[c.platformId]?.monthlyViews || 0) : '—', null]),
       colors: creators.map(() => 'text-gray-100'),
     });
   }
