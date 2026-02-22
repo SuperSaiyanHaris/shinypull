@@ -308,6 +308,14 @@ export default function Compare() {
             </div>
           )}
 
+          {/* Hint - shown above slots when comparison not yet active */}
+          {!loadingFromUrl && filledCreators.length < 2 && (
+            <div className="flex items-center gap-3 mb-5 px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl">
+              <Users className="w-5 h-5 text-indigo-500 shrink-0" />
+              <p className="text-sm text-gray-300">Search for at least 2 creators below to start comparing.</p>
+            </div>
+          )}
+
           {/* Creator Slots */}
           {!loadingFromUrl && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -519,15 +527,6 @@ export default function Compare() {
             </>
           )}
 
-          {!loadingFromUrl && filledCreators.length < 2 && (
-            <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-12 text-center">
-              <div className="w-16 h-16 bg-indigo-950/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-indigo-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-100 mb-2">Select at least 2 creators</h3>
-              <p className="text-gray-300">Search for creators in the slots above to start comparing</p>
-            </div>
-          )}
         </div>
       </div>
     </>
