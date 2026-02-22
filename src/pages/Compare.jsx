@@ -737,12 +737,11 @@ function InfoTooltip({ text }) {
     e.stopPropagation();
     if (!open && btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
-      const tipWidth = 224; // 14rem
-      const rawLeft = rect.left + window.scrollX;
+      const tipWidth = 224; // 14rem — fixed positioning uses viewport coords, no scroll offset
       const left = (rect.left + tipWidth > window.innerWidth - 8)
         ? Math.max(8, window.innerWidth - tipWidth - 8)
-        : rawLeft;
-      setStyle({ top: rect.bottom + window.scrollY + 6, left });
+        : rect.left;
+      setStyle({ top: rect.bottom + 6, left });
     }
     setOpen(o => !o);
   };
