@@ -357,13 +357,11 @@ export default function Compare() {
               <div className="hidden md:block bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-800 flex items-center gap-2">
                   <h3 className="text-lg font-semibold text-gray-100">Comparison</h3>
-                  <button type="button" className="relative group/tip inline-flex focus:outline-none">
-                    <Info className="w-3.5 h-3.5 text-gray-600 cursor-help group-hover/tip:text-gray-400 group-focus/tip:text-gray-400 transition-colors" />
-                    <div className="absolute top-full left-0 mt-1 w-64 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-300 opacity-0 group-hover/tip:opacity-100 group-focus/tip:opacity-100 pointer-events-none transition-opacity z-30 whitespace-normal shadow-lg">
-                      <div className="absolute bottom-full left-4 border-4 border-transparent border-b-gray-700" />
-                      Some fields show dashes for newer creators. Growth and earnings need a few days of tracked data before they populate.
-                    </div>
-                  </button>
+                  <InfoTooltip
+                    text="Some fields show dashes for newer creators. Growth and earnings need a few days of tracked data before they populate."
+                    openDown
+                    width="w-64"
+                  />
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -733,6 +731,29 @@ function SearchableSlot({ onSelect, onRemove }) {
   );
 }
 
+function InfoTooltip({ text, openDown = false, width = 'w-56' }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative group/tip inline-flex">
+      {open && <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />}
+      <button
+        type="button"
+        className="relative z-30 focus:outline-none"
+        onClick={(e) => { e.stopPropagation(); setOpen(o => !o); }}
+      >
+        <Info className="w-3.5 h-3.5 cursor-help text-gray-600 group-hover/tip:text-gray-400 transition-colors" />
+      </button>
+      <div className={`absolute ${openDown ? 'top-full left-0 mt-1' : 'bottom-full left-1/2 -translate-x-1/2 mb-2'} ${width} px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-300 transition-opacity z-30 whitespace-normal shadow-lg pointer-events-none ${open ? 'opacity-100' : 'opacity-0 group-hover/tip:opacity-100'}`}>
+        {openDown
+          ? <div className="absolute bottom-full left-4 border-4 border-transparent border-b-gray-700" />
+          : <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700" />
+        }
+        {text}
+      </div>
+    </div>
+  );
+}
+
 function ComparisonRow({ label, icon: Icon, values, highlight, tooltip }) {
   return (
     <tr className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
@@ -740,15 +761,7 @@ function ComparisonRow({ label, icon: Icon, values, highlight, tooltip }) {
         <div className="flex items-center gap-2">
           {Icon && <Icon className="w-4 h-4 text-gray-300" />}
           {label}
-          {tooltip && (
-            <button type="button" className="relative group/tip inline-flex focus:outline-none">
-              <Info className="w-3.5 h-3.5 text-gray-600 cursor-help group-hover/tip:text-gray-400 group-focus/tip:text-gray-400 transition-colors" />
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-300 opacity-0 group-hover/tip:opacity-100 group-focus/tip:opacity-100 pointer-events-none transition-opacity z-20 whitespace-normal shadow-lg">
-                {tooltip}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700" />
-              </div>
-            </button>
-          )}
+          {tooltip && <InfoTooltip text={tooltip} />}
         </div>
       </td>
       {values.map((value, index) => (
