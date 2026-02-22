@@ -153,21 +153,56 @@ export default function Home() {
 
           <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-16 sm:pb-24">
             <div className="text-center max-w-4xl mx-auto">
-              {/* Platform chips - inline, above the heading */}
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10">
-                {platforms.map((platform) => {
-                  const Icon = platform.icon;
-                  return (
-                    <Link
-                      key={platform.id}
-                      to={`/search?platform=${platform.id}`}
-                      className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 ${platform.bgColor} rounded-full hover:ring-2 ${platform.ringColor} transition-all duration-200 group`}
-                    >
-                      <Icon className={`w-4 h-4 ${platform.textColor}`} />
-                      <span className={`text-xs sm:text-sm font-semibold ${platform.textColor}`}>{platform.name}</span>
-                    </Link>
-                  );
-                })}
+              {/* Platform chips - 3+2 on mobile, single row on desktop */}
+              <div className="mb-8 sm:mb-10">
+                {/* Mobile: row 1 — YouTube, TikTok, Twitch */}
+                <div className="flex sm:hidden items-center justify-center gap-2 mb-2">
+                  {platforms.slice(0, 3).map((platform) => {
+                    const Icon = platform.icon;
+                    return (
+                      <Link
+                        key={platform.id}
+                        to={`/search?platform=${platform.id}`}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 ${platform.bgColor} rounded-full hover:ring-2 ${platform.ringColor} transition-all duration-200`}
+                      >
+                        <Icon className={`w-4 h-4 ${platform.textColor}`} />
+                        <span className={`text-xs font-semibold ${platform.textColor}`}>{platform.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+                {/* Mobile: row 2 — Kick, Bluesky */}
+                <div className="flex sm:hidden items-center justify-center gap-6">
+                  {platforms.slice(3).map((platform) => {
+                    const Icon = platform.icon;
+                    return (
+                      <Link
+                        key={platform.id}
+                        to={`/search?platform=${platform.id}`}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 ${platform.bgColor} rounded-full hover:ring-2 ${platform.ringColor} transition-all duration-200`}
+                      >
+                        <Icon className={`w-4 h-4 ${platform.textColor}`} />
+                        <span className={`text-xs font-semibold ${platform.textColor}`}>{platform.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+                {/* Desktop: single row */}
+                <div className="hidden sm:flex items-center justify-center gap-3">
+                  {platforms.map((platform) => {
+                    const Icon = platform.icon;
+                    return (
+                      <Link
+                        key={platform.id}
+                        to={`/search?platform=${platform.id}`}
+                        className={`flex items-center gap-2 px-4 py-2 ${platform.bgColor} rounded-full hover:ring-2 ${platform.ringColor} transition-all duration-200`}
+                      >
+                        <Icon className={`w-4 h-4 ${platform.textColor}`} />
+                        <span className={`text-sm font-semibold ${platform.textColor}`}>{platform.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Typewriter heading */}
