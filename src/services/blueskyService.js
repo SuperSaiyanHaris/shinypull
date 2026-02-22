@@ -40,7 +40,13 @@ export async function searchBluesky(query, limit = 25) {
   }
 
   const data = await response.json();
-  return (data.actors || []).map(normalizeProfile);
+  const actors = data.actors || [];
+  if (actors.length === 0) return [];
+
+  // searchActors returns ProfileView — no follower counts.
+  // Batch-fetch full profiles (ProfileViewDetailed) to get followersCount.
+  const dids = actors.map(a => a.did);
+  return getBlueskyProfiles(dids.slice(0, 25));
 }
 
 /**
