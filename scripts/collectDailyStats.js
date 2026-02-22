@@ -15,6 +15,7 @@ const YOUTUBE_BATCH_SIZE = 50;  // YouTube allows up to 50 channel IDs per reque
 const TWITCH_BATCH_SIZE = 100;  // Twitch allows up to 100 logins per request
 const TWITCH_PARALLEL_FOLLOWERS = 10;  // Parallel follower requests
 const KICK_BATCH_SIZE = 50;    // Kick allows up to 50 slugs per request
+const BLUESKY_BATCH_SIZE = 25;  // AT Protocol getProfiles allows up to 25 actors per request
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
@@ -154,6 +155,34 @@ async function fetchTwitchVODViews(broadcasterId) {
   }
 }
 
+// ========== BLUESKY API HELPERS ==========
+
+/**
+ * Fetch Bluesky stats for multiple handles in one request (up to 25)
+ * Uses the fully public AT Protocol API — no auth required
+ */
+async function fetchBlueskyBatch(handles) {
+  const params = handles.map(h => `actors=${encodeURIComponent(h)}`).join('&');
+  const url = `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfiles?${params}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Bluesky API error: HTTP ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  // Map handle -> stats
+  const statsMap = new Map();
+  (data.profiles || []).forEach(profile => {
+    statsMap.set(profile.handle.toLowerCase(), {
+      followers: profile.followersCount ?? 0,
+      totalPosts: profile.postsCount ?? 0,
+    });
+  });
+  return statsMap;
+}
+
 // ========== KICK API HELPERS ==========
 let kickAccessToken = null;
 
@@ -278,12 +307,14 @@ async function collectDailyStats() {
   const youtubeCreators = creators.filter((c) => c.platform === 'youtube');
   const twitchCreators = creators.filter((c) => c.platform === 'twitch');
   const kickCreators = creators.filter((c) => c.platform === 'kick');
-  // TikTok is handled by local automation (refreshTikTokProfiles.js) - not via GitHub Actions
+  const blueskyCreators = creators.filter((c) => c.platform === 'bluesky');
+  // TikTok is handled by refreshTikTokProfiles.js via separate GitHub Actions workflow
 
   console.log(`Found ${creators.length} creators to update`);
   console.log(`   YouTube: ${youtubeCreators.length}`);
   console.log(`   Twitch: ${twitchCreators.length}`);
-  console.log(`   Kick: ${kickCreators.length}\n`);
+  console.log(`   Kick: ${kickCreators.length}`);
+  console.log(`   Bluesky: ${blueskyCreators.length}\n`);
 
   let successCount = 0;
   let errorCount = 0;
@@ -449,6 +480,53 @@ async function collectDailyStats() {
     }
   }
 
+  // ========== BLUESKY (batch by 25, no auth required) ==========
+  if (blueskyCreators.length > 0) {
+    console.log('\n🦋 Processing Bluesky creators...');
+    const blueskyBatches = chunk(blueskyCreators, BLUESKY_BATCH_SIZE);
+    console.log(`   ${blueskyBatches.length} batch(es) of up to ${BLUESKY_BATCH_SIZE} profiles\n`);
+
+    for (let i = 0; i < blueskyBatches.length; i++) {
+      const batch = blueskyBatches[i];
+      const handles = batch.map((c) => c.username.toLowerCase());
+
+      try {
+        const statsMap = await fetchBlueskyBatch(handles);
+
+        for (const creator of batch) {
+          const stats = statsMap.get(creator.username.toLowerCase());
+          if (stats && stats.followers > 0) {
+            statsToUpsert.push({
+              creator_id: creator.id,
+              recorded_at: today,
+              subscribers: stats.followers,
+              followers: stats.followers,
+              total_views: null,
+              total_posts: stats.totalPosts,
+            });
+            console.log(`   ✅ ${creator.display_name}: ${stats.followers.toLocaleString()} followers`);
+            successCount++;
+          } else if (stats && stats.followers === 0) {
+            // API returned 0 — could be a brand new or private account. Skip to avoid corrupting history.
+            console.log(`   ⚠️  ${creator.display_name}: Skipping — API returned 0 followers`);
+            errorCount++;
+          } else {
+            console.log(`   ❌ ${creator.display_name}: Profile not found`);
+            errorCount++;
+          }
+        }
+      } catch (error) {
+        console.error(`   ❌ Batch ${i + 1} failed: ${error.message}`);
+        errorCount += batch.length;
+      }
+
+      // Small delay between batches to be polite to the public API
+      if (i < blueskyBatches.length - 1) {
+        await new Promise((r) => setTimeout(r, 200));
+      }
+    }
+  }
+
   // ========== BULK UPSERT TO DATABASE ==========
   if (statsToUpsert.length > 0) {
     console.log(`\n💾 Saving ${statsToUpsert.length} stats entries to database...`);
@@ -480,12 +558,14 @@ async function collectDailyStats() {
     twitchUsers: Math.ceil(twitchCreators.length / TWITCH_BATCH_SIZE),
     twitchFollowers: twitchCreators.length,
     kick: Math.ceil(kickCreators.length / KICK_BATCH_SIZE),
+    bluesky: Math.ceil(blueskyCreators.length / BLUESKY_BATCH_SIZE),
   };
   console.log(`\n📡 API calls made:`);
   console.log(`   YouTube: ${apiCalls.youtube} (batched ${YOUTUBE_BATCH_SIZE}/request)`);
   console.log(`   Twitch Users: ${apiCalls.twitchUsers} (batched ${TWITCH_BATCH_SIZE}/request)`);
   console.log(`   Twitch Followers: ${apiCalls.twitchFollowers} (parallel ${TWITCH_PARALLEL_FOLLOWERS}x)`);
   console.log(`   Kick: ${apiCalls.kick} (batched ${KICK_BATCH_SIZE}/request)`);
+  console.log(`   Bluesky: ${apiCalls.bluesky} (batched ${BLUESKY_BATCH_SIZE}/request, no auth)`);
 }
 
 collectDailyStats().catch(console.error);

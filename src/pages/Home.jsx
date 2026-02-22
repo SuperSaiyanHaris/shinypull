@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Search, Youtube, Twitch, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, ShoppingBag, ExternalLink, X, Users, Eye, GitCompare } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
+import BlueskyIcon from '../components/BlueskyIcon';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
@@ -13,6 +14,7 @@ const platforms = [
   { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'from-pink-500 to-pink-600', bgColor: 'bg-pink-950/30', textColor: 'text-pink-400', ringColor: 'ring-pink-800', stats: '1B+ accounts', available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-950/30', textColor: 'text-purple-600', ringColor: 'ring-purple-800', stats: '7M+ channels', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-950/30', textColor: 'text-green-600', ringColor: 'ring-green-800', stats: '10M+ channels', available: true },
+  { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, color: 'from-sky-500 to-sky-600', bgColor: 'bg-sky-950/30', textColor: 'text-sky-400', ringColor: 'ring-sky-800', stats: '40M+ accounts', available: true },
 ];
 
 const typewriterWords = [
@@ -20,6 +22,7 @@ const typewriterWords = [
   { text: 'TikTok Star', color: 'text-pink-400' },
   { text: 'Twitch Streamer', color: 'text-purple-600' },
   { text: 'Kick Channel', color: 'text-green-500' },
+  { text: 'Bluesky Creator', color: 'text-sky-400' },
 ];
 
 export default function Home() {

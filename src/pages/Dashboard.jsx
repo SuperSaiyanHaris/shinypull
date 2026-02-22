@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown, Scale, Radio, Clock, ChevronRight, ChevronLeft, Check, X, Filter } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
+import BlueskyIcon from '../components/BlueskyIcon';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { getFollowedCreators } from '../services/followService';
@@ -18,6 +19,7 @@ const platformIcons = {
   tiktok: TikTokIcon,
   twitch: Twitch,
   kick: KickIcon,
+  bluesky: BlueskyIcon,
 };
 
 const platformColors = {
@@ -25,6 +27,7 @@ const platformColors = {
   tiktok: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400', border: 'border-pink-800', ring: 'ring-pink-800', bgLight: 'bg-pink-950/30' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-950/30', text: 'text-purple-600', border: 'border-purple-500', ring: 'ring-purple-800', bgLight: 'bg-purple-900/30' },
   kick: { bg: 'bg-green-600', light: 'bg-green-950/30', text: 'text-green-400', border: 'border-green-800', ring: 'ring-green-800', bgLight: 'bg-green-900/30' },
+  bluesky: { bg: 'bg-sky-500', light: 'bg-sky-950/30', text: 'text-sky-400', border: 'border-sky-800', ring: 'ring-sky-800', bgLight: 'bg-sky-900/30' },
 };
 
 export default function Dashboard() {
@@ -156,6 +159,7 @@ export default function Dashboard() {
     tiktok: followedCreators.filter(c => c.platform === 'tiktok').length,
     twitch: followedCreators.filter(c => c.platform === 'twitch').length,
     kick: followedCreators.filter(c => c.platform === 'kick').length,
+    bluesky: followedCreators.filter(c => c.platform === 'bluesky').length,
   };
 
   // Filter creators by selected platforms (OR logic - match ANY selected platform)
@@ -224,10 +228,10 @@ export default function Dashboard() {
                   </button>
 
                   {/* Platform Filters */}
-                  {['youtube', 'tiktok', 'twitch', 'kick'].map(platform => {
+                  {['youtube', 'tiktok', 'twitch', 'kick', 'bluesky'].map(platform => {
                     const Icon = platformIcons[platform];
                     const count = platformCounts[platform];
-                    const label = platform === 'youtube' ? 'YouTube' : platform === 'tiktok' ? 'TikTok' : platform === 'twitch' ? 'Twitch' : 'Kick';
+                    const label = platform === 'youtube' ? 'YouTube' : platform === 'tiktok' ? 'TikTok' : platform === 'twitch' ? 'Twitch' : platform === 'kick' ? 'Kick' : 'Bluesky';
                     const isActive = selectedPlatforms.includes(platform);
 
                     return (

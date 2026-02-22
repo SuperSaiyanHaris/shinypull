@@ -5,10 +5,12 @@ import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowR
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
+import BlueskyIcon from '../components/BlueskyIcon';
 import { CompareCardSkeleton } from '../components/Skeleton';
 import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { searchChannels as searchTwitch, getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { searchChannels as searchKick, getChannelByUsername as getKickChannel } from '../services/kickService';
+import { searchBluesky, getBlueskyProfile } from '../services/blueskyService';
 import { searchCreators, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
 import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
@@ -21,6 +23,7 @@ const platformConfig = {
   tiktok: { icon: TikTokIcon, color: 'text-pink-400', bg: 'bg-pink-950/30', border: 'border-pink-800' },
   twitch: { icon: Twitch, color: 'text-purple-400', bg: 'bg-purple-950/30', border: 'border-purple-800' },
   kick: { icon: KickIcon, color: 'text-green-400', bg: 'bg-green-950/30', border: 'border-green-800' },
+  bluesky: { icon: BlueskyIcon, color: 'text-sky-400', bg: 'bg-sky-950/30', border: 'border-sky-800' },
 };
 
 export default function Compare() {
@@ -95,6 +98,8 @@ export default function Compare() {
               return await getTwitchChannel(username);
             } else if (platform === 'kick') {
               return await getKickChannel(username);
+            } else if (platform === 'bluesky') {
+              return await getBlueskyProfile(username);
             }
           } catch (err) {
             // Skip creators that fail to load
@@ -378,12 +383,15 @@ export default function Compare() {
                     <tbody>
                       <ComparisonRow
                         label="Platform"
-                        values={filledCreators.map(c => (
-                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm ${platformConfig[c.platform]?.bg} ${platformConfig[c.platform]?.color}`}>
-                            {c.platform === 'youtube' ? <Youtube className="w-4 h-4" /> : <Twitch className="w-4 h-4" />}
-                            {c.platform}
-                          </span>
-                        ))}
+                        values={filledCreators.map(c => {
+                          const PlatformIcon = platformConfig[c.platform]?.icon;
+                          return (
+                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm ${platformConfig[c.platform]?.bg} ${platformConfig[c.platform]?.color}`}>
+                              {PlatformIcon && <PlatformIcon className="w-4 h-4" />}
+                              {c.platform}
+                            </span>
+                          );
+                        })}
                       />
                       <ComparisonRow
                         label="Subscribers / Followers"
@@ -557,12 +565,12 @@ function CreatorCard({ creator, onRemove }) {
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-gray-800/50 rounded-xl p-3">
-          <p className="text-xs text-gray-300 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' ? 'Followers' : 'Subs'}</p>
+          <p className="text-xs text-gray-300 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' ? 'Followers' : 'Subs'}</p>
           <p className="font-bold text-gray-100">{formatNumber(creator.subscribers || creator.followers)}</p>
         </div>
         <div className="bg-gray-800/50 rounded-xl p-3">
-          <p className="text-xs text-gray-300 mb-1">{creator.platform === 'tiktok' ? 'Likes' : 'Views'}</p>
-          <p className="font-bold text-gray-100">{formatNumber(creator.totalViews)}</p>
+          <p className="text-xs text-gray-300 mb-1">{creator.platform === 'tiktok' ? 'Likes' : creator.platform === 'bluesky' ? 'Posts' : 'Views'}</p>
+          <p className="font-bold text-gray-100">{formatNumber(creator.platform === 'bluesky' ? creator.totalPosts : creator.totalViews)}</p>
         </div>
       </div>
     </div>
@@ -614,6 +622,8 @@ function SearchableSlot({ onSelect, onRemove }) {
         results = await searchTwitch(searchQuery, 5);
       } else if (searchPlatform === 'kick') {
         results = await searchKick(searchQuery, 5);
+      } else if (searchPlatform === 'bluesky') {
+        results = await searchBluesky(searchQuery, 5);
       }
       setSearchResults(results);
     } catch (err) {
@@ -651,6 +661,7 @@ function SearchableSlot({ onSelect, onRemove }) {
             <option value="tiktok">TikTok</option>
             <option value="twitch">Twitch</option>
             <option value="kick">Kick</option>
+            <option value="bluesky">Bluesky</option>
           </select>
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
@@ -705,7 +716,7 @@ function SearchableSlot({ onSelect, onRemove }) {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-gray-100 truncate">{result.displayName}</p>
                   <p className="text-xs text-gray-300 truncate">
-                    {formatNumber(result.subscribers || result.followers)} {result.platform === 'twitch' ? 'followers' : 'subs'}
+                    {formatNumber(result.subscribers || result.followers)} {result.platform === 'twitch' || result.platform === 'bluesky' ? 'followers' : 'subs'}
                   </p>
                 </div>
                 <div className={`p-1 rounded ${platformConfig[result.platform]?.bg}`}>

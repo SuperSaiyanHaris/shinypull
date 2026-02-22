@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
+import BlueskyIcon from '../components/BlueskyIcon';
 import { TableSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
 import { getRankedCreators } from '../services/creatorService';
@@ -17,6 +18,7 @@ const platforms = [
   { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'bg-pink-600', hoverColor: 'hover:bg-pink-500', lightBg: 'bg-pink-950/30', textColor: 'text-pink-400', available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', hoverColor: 'hover:bg-purple-500', lightBg: 'bg-purple-950/30', textColor: 'text-purple-400', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'bg-green-600', hoverColor: 'hover:bg-green-500', lightBg: 'bg-green-950/30', textColor: 'text-green-400', available: true },
+  { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, color: 'bg-sky-500', hoverColor: 'hover:bg-sky-400', lightBg: 'bg-sky-950/30', textColor: 'text-sky-400', available: true },
 ];
 
 const topCounts = [50, 100, 500];
@@ -29,7 +31,7 @@ function getSeoData(platform, rankType, topCount) {
 
   const metricLabel = rankType === 'views' ? 'Most Viewed' :
     rankType === 'growth' ? 'Fastest Growing' :
-    pid === 'tiktok' || pid === 'twitch' ? 'Most Followed' :
+    pid === 'tiktok' || pid === 'twitch' || pid === 'bluesky' ? 'Most Followed' :
     pid === 'kick' ? 'Most Subscribed' : 'Most Subscribed';
 
   const title = `${countLabel} ${p} ${rankType === 'growth' ? 'Fastest Growing' : rankType === 'views' ? 'Most Viewed' : pid === 'youtube' ? 'YouTubers' : p + ' Creators'} (2026) - Live Rankings`;
@@ -39,6 +41,7 @@ function getSeoData(platform, rankType, topCount) {
     tiktok: `${countLabel} most followed TikTok creators ranked by followers, likes, and growth. Updated daily. See who has the most TikTok followers in 2026.`,
     twitch: `${countLabel} most followed Twitch streamers ranked by followers, watch hours, and growth. Updated daily. Find the most watched Twitch streamers in 2026.`,
     kick: `${countLabel} Kick streamers ranked by paid subscribers and growth. Updated daily. See the top Kick streamers in 2026.`,
+    bluesky: `${countLabel} most followed Bluesky accounts ranked by followers and growth. Updated daily. See who has the most Bluesky followers in 2026.`,
   };
 
   const keywords = {
@@ -46,6 +49,7 @@ function getSeoData(platform, rankType, topCount) {
     tiktok: `top tiktokers, top ${topCount} tiktokers, most followed tiktok, who has the most tiktok followers, most tiktok likes, biggest tiktok accounts 2026, tiktok rankings`,
     twitch: `top twitch streamers, top ${topCount} twitch streamers, most followed twitch, most watched twitch streamers, most hours watched twitch, biggest twitch channels 2026, twitch rankings`,
     kick: `top kick streamers, top ${topCount} kick streamers, most subscribed kick, biggest kick channels 2026, kick rankings`,
+    bluesky: `top bluesky accounts, top ${topCount} bluesky creators, most followed bluesky, biggest bluesky accounts 2026, bluesky rankings, bluesky statistics`,
   };
 
   return {
@@ -62,6 +66,7 @@ function getH1Text(platform, topCount) {
     tiktok: `Top ${topCount} TikTok Creators`,
     twitch: `Top ${topCount} Twitch Streamers`,
     kick: `Top ${topCount} Kick Streamers`,
+    bluesky: `Top ${topCount} Bluesky Accounts`,
   };
   return labels[pid] || `Top ${topCount} ${platform?.name} Creators`;
 }
@@ -73,6 +78,7 @@ function getSubheading(platform) {
     tiktok: 'Ranked by followers, likes, and growth. Updated daily.',
     twitch: 'Ranked by followers, watch hours, and growth. Updated daily.',
     kick: 'Ranked by paid subscribers and growth. Updated daily.',
+    bluesky: 'Ranked by followers and growth. Updated daily.',
   };
   return subs[pid] || 'Ranked by stats and growth. Updated daily.';
 }
@@ -140,9 +146,9 @@ function RankingsOverview() {
   return (
     <>
       <SEO
-        title="Creator Rankings - Top YouTubers, TikTokers, Twitch & Kick Streamers (2026)"
-        description="Live rankings of the top creators across YouTube, TikTok, Twitch, and Kick. Updated daily with subscriber counts, follower stats, and growth metrics."
-        keywords="top youtubers, top tiktokers, top twitch streamers, top kick streamers, creator rankings, most subscribers, most followers, live rankings 2026"
+        title="Creator Rankings - Top YouTubers, TikTokers, Twitch, Kick & Bluesky Creators (2026)"
+        description="Live rankings of the top creators across YouTube, TikTok, Twitch, Kick, and Bluesky. Updated daily with subscriber counts, follower stats, and growth metrics."
+        keywords="top youtubers, top tiktokers, top twitch streamers, top kick streamers, top bluesky accounts, creator rankings, most subscribers, most followers, live rankings 2026"
       />
       <div className="min-h-screen bg-gray-800/50">
         {/* Header */}
@@ -170,7 +176,7 @@ function RankingsOverview() {
               {platforms.map((platform) => {
                 const Icon = platform.icon;
                 const creators = platformData[platform.id] || [];
-                const follLabel = platform.id === 'tiktok' || platform.id === 'twitch' ? 'followers' : platform.id === 'kick' ? 'paid subs' : 'subscribers';
+                const follLabel = platform.id === 'tiktok' || platform.id === 'twitch' || platform.id === 'bluesky' ? 'followers' : platform.id === 'kick' ? 'paid subs' : 'subscribers';
 
                 return (
                   <div key={platform.id} className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
@@ -262,9 +268,9 @@ function PlatformRankings({ urlPlatform }) {
   const [sortDirection, setSortDirection] = useState('desc');
 
   const rankTypes = [
-    { id: 'subscribers', name: selectedPlatform === 'tiktok' ? 'Top Followers' : selectedPlatform === 'twitch' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
-    // Hide views for Kick and TikTok since APIs don't provide view data
-    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
+    { id: 'subscribers', name: selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
+    // Hide views for Kick, TikTok, and Bluesky since APIs don't provide view data
+    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
     { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
   ];
 
@@ -340,13 +346,13 @@ function PlatformRankings({ urlPlatform }) {
     if (!platformId) return;
     setSelectedPlatform(platformId);
     // Reset rank type if switching to a platform that doesn't support it
-    const noViews = platformId === 'kick' || platformId === 'tiktok';
+    const noViews = platformId === 'kick' || platformId === 'tiktok' || platformId === 'bluesky';
     if (selectedRankType === 'views' && noViews) setSelectedRankType('subscribers');
     navigate(`/rankings/${platformId}`);
     analytics.switchPlatform('rankings', platformId);
   };
 
-  const followerLabel = selectedPlatform === 'tiktok' ? 'Followers' : selectedPlatform === 'twitch' ? 'Followers' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
+  const followerLabel = selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' ? 'Followers' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
   const currentPlatform = platforms.find(p => p.id === selectedPlatform);
   const seoData = getSeoData(currentPlatform, selectedRankType, topCount);
   const listSchema = createRankingListSchema(rankings, currentPlatform, topCount);
@@ -460,7 +466,7 @@ function PlatformRankings({ urlPlatform }) {
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-800/50 border-b border-gray-800 text-sm font-semibold text-gray-300 uppercase tracking-wider">
               <div className="col-span-1">Rank</div>
-              <div className={selectedPlatform === 'kick' ? 'col-span-7' : 'col-span-5'}>Creator</div>
+              <div className={selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'col-span-7' : 'col-span-5'}>Creator</div>
               <button
                 onClick={() => handleSort('subscribers')}
                 className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-300 transition-colors cursor-pointer"
@@ -477,7 +483,7 @@ function PlatformRankings({ urlPlatform }) {
                   <SortIcon column="views" />
                 </button>
               )}
-              {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && (
+              {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
                 <button
                   onClick={() => handleSort('views')}
                   className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-300 transition-colors cursor-pointer"
@@ -501,6 +507,8 @@ function PlatformRankings({ urlPlatform }) {
                       ? 'Kick growth based on paid subscribers'
                       : selectedPlatform === 'tiktok'
                       ? 'TikTok growth based on followers'
+                      : selectedPlatform === 'bluesky'
+                      ? 'Bluesky growth based on followers'
                       : 'Twitch growth based on watch hours'}
                   </div>
                 </div>
@@ -555,7 +563,7 @@ function PlatformRankings({ urlPlatform }) {
                 </div>
 
                 {/* Creator Info */}
-                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' ? 'md:col-span-7' : 'md:col-span-5'}`}>
+                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-7' : 'md:col-span-5'}`}>
                   <img
                     src={creator.profile_image || '/placeholder-avatar.svg'}
                     alt={creator.display_name}
@@ -582,7 +590,7 @@ function PlatformRankings({ urlPlatform }) {
                     <span className="text-gray-300">{formatNumber(creator.totalViews)}</span>
                   </div>
                 )}
-                {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && (
+                {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
                   <div className="hidden md:block col-span-2 text-right">
                     <span className="text-gray-300">{formatNumber(creator.totalViews)}</span>
                   </div>
@@ -602,7 +610,7 @@ function PlatformRankings({ urlPlatform }) {
                     <span className="text-gray-300">
                       <span className="font-medium text-gray-100">{formatNumber(creator.totalLikes || creator.totalViews)}</span> likes
                     </span>
-                  ) : selectedPlatform !== 'kick' && (
+                  ) : selectedPlatform !== 'kick' && selectedPlatform !== 'bluesky' && (
                     <span className="text-gray-300">
                       <span className="font-medium text-gray-100">{formatNumber(creator.totalViews)}</span> views
                     </span>
@@ -668,6 +676,18 @@ function PlatformRankings({ urlPlatform }) {
                     <div>
                       <h3 className="font-semibold text-gray-100 mb-1">How are Kick rankings different from Twitch?</h3>
                       <p>Kick rankings are based on paid subscriber counts rather than free followers. This makes the numbers smaller but more meaningful in terms of direct creator support.</p>
+                    </div>
+                  </>
+                )}
+                {selectedPlatform === 'bluesky' && (
+                  <>
+                    <div>
+                      <h3 className="font-semibold text-gray-100 mb-1">Who has the most Bluesky followers?</h3>
+                      <p>{rankings[0]?.display_name} holds the top spot with {formatNumber(rankings[0]?.subscribers)} followers. We track major Bluesky accounts with daily updates via the AT Protocol API.</p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-100 mb-1">How are Bluesky rankings calculated?</h3>
+                      <p>We track follower counts and post activity for Bluesky accounts. Rankings are updated daily using the public AT Protocol API, which requires no authentication.</p>
                     </div>
                   </>
                 )}

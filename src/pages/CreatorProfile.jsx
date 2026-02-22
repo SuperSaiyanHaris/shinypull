@@ -3,11 +3,13 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import { Youtube, Twitch, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star, Play, ThumbsUp, MessageCircle } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
+import BlueskyIcon from '../components/BlueskyIcon';
 import FunErrorState from '../components/FunErrorState';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getChannelByUsername as getYouTubeChannel, getChannelById as getYouTubeChannelById, getLatestVideo as getYouTubeLatestVideo } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel, getLiveStreams as getTwitchLiveStreams } from '../services/twitchService';
 import { getChannelByUsername as getKickChannel, getLiveStreams as getKickLiveStreams } from '../services/kickService';
+import { getBlueskyProfile } from '../services/blueskyService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import { followCreator, unfollowCreator, isFollowing as checkIsFollowing } from '../services/followService';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,6 +25,7 @@ const platformIcons = {
   twitch: Twitch,
   kick: KickIcon,
   tiktok: TikTokIcon,
+  bluesky: BlueskyIcon,
 };
 
 const platformColors = {
@@ -30,6 +33,7 @@ const platformColors = {
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-950/30', text: 'text-purple-400', border: 'border-purple-800' },
   kick: { bg: 'bg-green-600', light: 'bg-green-950/30', text: 'text-green-400', border: 'border-green-800' },
   tiktok: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400', border: 'border-pink-800' },
+  bluesky: { bg: 'bg-sky-500', light: 'bg-sky-950/30', text: 'text-sky-400', border: 'border-sky-800' },
 };
 
 const platformUrls = {
@@ -37,6 +41,7 @@ const platformUrls = {
   twitch: (username) => `https://twitch.tv/${username}`,
   kick: (username) => `https://kick.com/${username}`,
   tiktok: (username) => `https://tiktok.com/@${username}`,
+  bluesky: (username) => `https://bsky.app/profile/${username}`,
 };
 
 export default function CreatorProfile() {
@@ -101,6 +106,8 @@ export default function CreatorProfile() {
         channelData = await getTwitchChannel(username);
       } else if (platform === 'kick') {
         channelData = await getKickChannel(username);
+      } else if (platform === 'bluesky') {
+        channelData = await getBlueskyProfile(username);
       } else if (platform === 'tiktok') {
         // TikTok: Load creator and latest stats from database in parallel
         const dbCreator = await getCreatorByUsername('tiktok', username);
@@ -614,12 +621,13 @@ export default function CreatorProfile() {
               platform === 'tiktok' ? 'grid-cols-3'
               : platform === 'kick' ? (creator.category ? 'grid-cols-2' : 'grid-cols-1 max-w-md')
               : platform === 'twitch' ? 'grid-cols-3'
+              : platform === 'bluesky' ? 'grid-cols-2'
               : 'grid-cols-2 lg:grid-cols-4'
             }`}>
               {/* Subscribers/Followers Card */}
               <StatCard
                 icon={Users}
-                label={platform === 'tiktok' ? 'Followers' : platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subscribers' : 'Subscribers'}
+                label={platform === 'tiktok' || platform === 'twitch' || platform === 'bluesky' ? 'Followers' : platform === 'kick' ? 'Paid Subscribers' : 'Subscribers'}
                 value={formatNumber(creator.subscribers || creator.followers)}
                 sublabel={creator.hiddenSubscribers ? '(hidden)' : platform === 'youtube' ? '(rounded by YouTube)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
               />
@@ -638,6 +646,15 @@ export default function CreatorProfile() {
                     value={formatNumber(creator.totalPosts || 0)}
                   />
                 </>
+              )}
+
+              {/* Bluesky: Show Posts count */}
+              {platform === 'bluesky' && (
+                <StatCard
+                  icon={Video}
+                  label="Posts"
+                  value={formatNumber(creator.totalPosts || 0)}
+                />
               )}
 
               {/* Hours Watched / Total Views */}
@@ -696,8 +713,8 @@ export default function CreatorProfile() {
               )}
             </div>
 
-            {/* Growth Rate Cards + Summary - Combined row for Twitch/Kick */}
-            {(platform === 'twitch' || platform === 'kick') && metrics && metrics.growthRates && statsHistory.length >= 7 && (
+            {/* Growth Rate Cards + Summary - Combined row for Twitch/Kick/Bluesky */}
+            {(platform === 'twitch' || platform === 'kick' || platform === 'bluesky') && metrics && metrics.growthRates && statsHistory.length >= 7 && (
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <GrowthRateCard
                   label="7-Day Growth"
@@ -718,8 +735,8 @@ export default function CreatorProfile() {
               </div>
             )}
 
-            {/* Fallback Summary for Twitch/Kick when not enough history for growth rates */}
-            {(platform === 'twitch' || platform === 'kick') && metrics && !(metrics.growthRates && statsHistory.length >= 7) && (
+            {/* Fallback Summary for Twitch/Kick/Bluesky when not enough history for growth rates */}
+            {(platform === 'twitch' || platform === 'kick' || platform === 'bluesky') && metrics && !(metrics.growthRates && statsHistory.length >= 7) && (
               <div className="grid grid-cols-1 max-w-xs gap-4 mb-6">
                 <SummaryCard
                   label={platform === 'kick' ? 'Paid Subscribers' : 'Followers'}
@@ -731,7 +748,7 @@ export default function CreatorProfile() {
             )}
 
             {/* Growth Rate Cards - Other platforms */}
-            {platform !== 'twitch' && platform !== 'kick' && metrics && metrics.growthRates && statsHistory.length >= 7 && (
+            {platform !== 'twitch' && platform !== 'kick' && platform !== 'bluesky' && metrics && metrics.growthRates && statsHistory.length >= 7 && (
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <GrowthRateCard
                   label="7-Day Growth"
@@ -746,8 +763,8 @@ export default function CreatorProfile() {
               </div>
             )}
 
-            {/* Growth Summary - Non Twitch/Kick platforms */}
-            {platform !== 'twitch' && platform !== 'kick' && (creator.subscribers || creator.followers) && (
+            {/* Growth Summary - Non Twitch/Kick/Bluesky platforms */}
+            {platform !== 'twitch' && platform !== 'kick' && platform !== 'bluesky' && (creator.subscribers || creator.followers) && (
               <div className={`grid gap-4 mb-6 ${
                 platform === 'youtube' ? 'grid-cols-2 lg:grid-cols-4'
                 : platform === 'tiktok' ? 'grid-cols-2'
@@ -879,8 +896,8 @@ export default function CreatorProfile() {
               </a>
             )}
 
-            {/* Live Counter Link - Hidden for TikTok (no real-time updates) */}
-            {platform !== 'tiktok' && (
+            {/* Live Counter Link - Hidden for TikTok and Bluesky (no real-time updates) */}
+            {platform !== 'tiktok' && platform !== 'bluesky' && (
               <Link
                 to={`/live/${platform}/${creator.username}`}
                 className="flex items-center justify-between bg-indigo-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:bg-indigo-500 transition-all group"
@@ -940,10 +957,11 @@ export default function CreatorProfile() {
                       <tr className="border-b border-gray-800 bg-gray-800/50 text-left">
                         <th className="px-6 py-4 font-semibold text-gray-300">Date</th>
                         <th className="px-6 py-4 font-semibold text-gray-300 text-right">
-                          {platform === 'tiktok' ? 'Followers' : platform === 'twitch' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : 'Subscribers'}
+                          {platform === 'tiktok' || platform === 'twitch' || platform === 'bluesky' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : 'Subscribers'}
                         </th>
                         {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Likes</th>}
                         {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Videos</th>}
+                        {platform === 'bluesky' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Posts</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Views</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Videos</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Est. Earnings</th>}
@@ -962,7 +980,7 @@ export default function CreatorProfile() {
                           <td className="px-6 py-4 text-right">
                             <div className="flex flex-col items-end">
                               <span className="font-medium text-gray-100">{formatNumber(stat.subscribers || stat.followers)}</span>
-                              {(platform === 'tiktok' || platform === 'twitch' || platform === 'kick') && stat.subsChange !== 0 && (
+                              {(platform === 'tiktok' || platform === 'twitch' || platform === 'kick' || platform === 'bluesky') && stat.subsChange !== 0 && (
                                 <span className={`text-xs ${stat.subsChange > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                                   {stat.subsChange > 0 ? '+' : ''}{formatNumber(stat.subsChange)}
                                 </span>
@@ -992,6 +1010,18 @@ export default function CreatorProfile() {
                                 </div>
                               </td>
                             </>
+                          )}
+                          {platform === 'bluesky' && (
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex flex-col items-end">
+                                <span className="font-medium text-gray-100">{formatNumber(stat.total_posts || 0)}</span>
+                                {stat.videosChange !== 0 && (
+                                  <span className={`text-xs ${stat.videosChange > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
+                                    {stat.videosChange > 0 ? '+' : ''}{stat.videosChange}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
                           )}
                           {platform === 'youtube' && (
                             <>
@@ -1237,7 +1267,7 @@ function GrowthRateCard({ label, value, platform }) {
   const iconColor = isPositive ? 'text-emerald-400' : isNegative ? 'text-red-500' : 'text-gray-300';
   const valueColor = isPositive ? 'text-emerald-400' : isNegative ? 'text-red-500' : 'text-gray-300';
 
-  const followerLabel = platform === 'tiktok' || platform === 'twitch' || platform === 'kick' ? 'Followers' : 'Subscribers';
+  const followerLabel = platform === 'tiktok' || platform === 'twitch' || platform === 'kick' || platform === 'bluesky' ? 'Followers' : 'Subscribers';
 
   return (
     <div className={`rounded-2xl border p-5 ${bgClass}`}>
@@ -1457,6 +1487,20 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       label: 'Subscriber Growth',
       dataKey: 'subscribers',
       color: '#6366f1'
+    });
+  } else if (platform === 'bluesky') {
+    // Bluesky: follower growth + posts count
+    metrics.push({
+      value: 'subscribers',
+      label: 'Follower Growth',
+      dataKey: 'subscribers',
+      color: '#0ea5e9'
+    });
+    metrics.push({
+      value: 'videos',
+      label: 'Post Count',
+      dataKey: 'videos',
+      color: '#38bdf8'
     });
   } else {
     // Other platforms

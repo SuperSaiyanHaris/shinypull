@@ -3,11 +3,13 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight, Clock, CheckCircle, X } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
+import BlueskyIcon from '../components/BlueskyIcon';
 import { CreatorRowSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import { searchChannels as searchKick } from '../services/kickService';
+import { searchBluesky } from '../services/blueskyService';
 import { upsertCreator, saveCreatorStats, searchCreators } from '../services/creatorService';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -21,6 +23,7 @@ const platformIcons = {
   tiktok: TikTokIcon,
   twitch: Twitch,
   kick: KickIcon,
+  bluesky: BlueskyIcon,
 };
 
 const platformColors = {
@@ -28,6 +31,7 @@ const platformColors = {
   tiktok: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400' },
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-950/30', text: 'text-purple-400' },
   kick: { bg: 'bg-green-600', light: 'bg-green-950/30', text: 'text-green-400' },
+  bluesky: { bg: 'bg-sky-500', light: 'bg-sky-950/30', text: 'text-sky-400' },
   instagram: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400' },
 };
 
@@ -36,6 +40,7 @@ const platforms = [
   { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, available: true },
   { id: 'twitch', name: 'Twitch', icon: Twitch, available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, available: true },
+  { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, available: true },
 ];
 
 // TikTok search function - searches database
@@ -72,7 +77,7 @@ async function searchTikTok(query, limit = 25) {
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
-  const validPlatforms = ['youtube', 'tiktok', 'twitch', 'kick', 'instagram'];
+  const validPlatforms = ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'instagram'];
   const initialPlatform = validPlatforms.includes(searchParams.get('platform')) ? searchParams.get('platform') : 'youtube';
   const [selectedPlatform, setSelectedPlatform] = useState(initialPlatform);
   const [results, setResults] = useState([]);
@@ -145,6 +150,8 @@ export default function Search() {
         channels = await searchTwitch(searchQuery, 25);
       } else if (platform === 'kick') {
         channels = await searchKick(searchQuery, 25);
+      } else if (platform === 'bluesky') {
+        channels = await searchBluesky(searchQuery, 25);
       }
       setResults(channels);
       // Pre-fill normalized username for TikTok request flow
@@ -451,7 +458,7 @@ export default function Search() {
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-gray-100 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
                         <p className="text-xs sm:text-sm text-gray-300">
-                          {creator.platform === 'twitch' || creator.platform === 'tiktok' ? 'followers' :
+                          {creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' ? 'followers' :
                            creator.platform === 'kick' ? 'paid subs' : 'subscribers'}
                         </p>
                       </div>

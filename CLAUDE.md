@@ -4,9 +4,9 @@
 
 ## Project Overview
 
-ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube, TikTok, Twitch, and Kick.
+ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube, TikTok, Twitch, Kick, and Bluesky.
 
-**Status:** YouTube, TikTok, Twitch, and Kick integrations fully working. Live subscriber/follower counts, historical charts, and automated data collection operational.
+**Status:** YouTube, TikTok, Twitch, Kick, and Bluesky integrations fully working. Live subscriber/follower counts, historical charts, and automated data collection operational.
 
 ## Critical Rules
 
@@ -189,6 +189,25 @@ products (id, slug, name, price, badge, description, features[], image, affiliat
   - 429 errors revert requests to `pending` (not `failed`) for retry on next run
   - Scalable queueing system prevents timeout issues
 
+**Bluesky:**
+- Uses the AT Protocol public API — zero authentication required, no API key, no approval process
+- Base URL: `https://public.api.bsky.app/xrpc/`
+- Key endpoints: `app.bsky.actor.getProfile` (single), `app.bsky.actor.searchActors` (search), `app.bsky.actor.getProfiles` (batch up to 25)
+- `platform_id` stores the DID (e.g. `did:plc:abc123`) — stable unique identifier
+- `username` stores the handle (e.g. `mosseri.bsky.social`)
+- `subscribers` field stores `followersCount`
+- `total_posts` stores `postsCount`
+- `total_views` is null (no profile-level views metric on Bluesky)
+- Service: `src/services/blueskyService.js`
+- Search is live from AT Protocol API (not database-only like TikTok)
+- No creator request system needed — API is fully public
+- No live stream support (Bluesky is not a streaming platform)
+- Custom `BlueskyIcon` SVG butterfly component (no lucide-react icon available)
+- Profile displays: Followers, Posts (2-card stats grid)
+- Daily Metrics Table columns: Date, Followers (with changes), Posts (with changes)
+- Collected in `collectDailyStats.js` with batch size of 25
+- Color scheme: sky-500 Tailwind palette (`text-sky-400`, `bg-sky-950/30`, `border-sky-800`)
+
 ## Commands
 
 ```bash
@@ -196,9 +215,10 @@ npm run dev                    # Dev server on port 3000
 npm run build                  # Production build
 npm run seed:top-creators      # Seed top creators
 npm run seed:kick              # Seed top Kick creators
+npm run seed:bluesky           # Seed top Bluesky accounts
 npm run seed:blog              # Seed blog posts
 npm run seed:products          # Seed affiliate products
-npm run collect:daily          # Collect daily stats (YouTube, Twitch, Kick)
+npm run collect:daily          # Collect daily stats (YouTube, Twitch, Kick, Bluesky)
 npm run monitor:twitch         # Monitor Twitch streams
 npm run monitor:kick           # Monitor Kick streams
 npm run aggregate:hours-watched # Aggregate hours watched
