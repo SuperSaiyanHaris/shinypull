@@ -396,39 +396,39 @@ export default function Compare() {
                       <ComparisonRow
                         label="Subscribers / Followers"
                         icon={Users}
-                        tooltip="YouTube = subscribers, Twitch and TikTok = followers. Kick shows paid subscribers only, not total followers."
+                        tooltip="YouTube and Kick track subscribers. Twitch, TikTok, and Bluesky track followers. Kick shows paid subscribers only, not total followers."
                         values={filledCreators.map(c => formatNumber(c.subscribers || c.followers))}
                         highlight={getWinner(filledCreators.map(c => c.subscribers || c.followers))}
                       />
                       <ComparisonRow
                         label="Total Views"
                         icon={Eye}
-                        tooltip="For TikTok, this shows total likes. TikTok doesn't make per-profile view counts public."
-                        values={filledCreators.map(c => formatNumber(c.totalViews))}
-                        highlight={getWinner(filledCreators.map(c => c.totalViews))}
+                        tooltip="For TikTok, this shows total likes. TikTok doesn't make per-profile view counts public. Bluesky has no views metric."
+                        values={filledCreators.map(c => c.platform === 'bluesky' ? '—' : formatNumber(c.totalViews))}
+                        highlight={getWinner(filledCreators.map(c => c.platform === 'bluesky' ? null : c.totalViews))}
                       />
                       <ComparisonRow
                         label="Videos / Content"
                         icon={Video}
-                        tooltip="For Twitch, this shows the current stream category. Twitch doesn't make video counts public."
+                        tooltip="For Twitch, video counts are not public. For Bluesky, this shows total posts."
                         values={filledCreators.map(c => c.platform === 'twitch' ? (c.category || '-') : formatNumber(c.totalPosts))}
                         highlight={filledCreators.every(c => c.platform !== 'twitch') ? getWinner(filledCreators.map(c => c.totalPosts)) : null}
                       />
                       <ComparisonRow
                         label="Avg Views per Video"
                         icon={TrendingUp}
-                        tooltip="Not available for Twitch. For TikTok, calculated as total likes ÷ videos."
+                        tooltip="Not available for Twitch or Bluesky. For TikTok, calculated as total likes ÷ videos."
                         values={filledCreators.map(c =>
-                          c.platform === 'twitch' ? '-' :
-                          c.totalPosts > 0 ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '-'
+                          (c.platform === 'twitch' || c.platform === 'bluesky') ? '—' :
+                          c.totalPosts > 0 ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—'
                         )}
-                        highlight={filledCreators.every(c => c.platform !== 'twitch') ?
+                        highlight={filledCreators.every(c => c.platform !== 'twitch' && c.platform !== 'bluesky') ?
                           getWinner(filledCreators.map(c => c.totalPosts > 0 ? c.totalViews / c.totalPosts : 0)) : null}
                       />
                       {/* Growth Rates */}
                       <ComparisonRow
                         label="7-Day Growth"
-                        tooltip="YouTube and Kick track subscribers. Twitch and TikTok track followers."
+                        tooltip="YouTube and Kick track subscriber growth. Twitch, TikTok, and Bluesky track follower growth."
                         values={filledCreators.map(c => {
                           const data = growthData[c.platformId];
                           const percentage = data?.growth7Day || 0;
@@ -448,7 +448,7 @@ export default function Compare() {
                       />
                       <ComparisonRow
                         label="30-Day Growth"
-                        tooltip="YouTube and Kick track subscribers. Twitch and TikTok track followers."
+                        tooltip="YouTube and Kick track subscriber growth. Twitch, TikTok, and Bluesky track follower growth."
                         values={filledCreators.map(c => {
                           const data = growthData[c.platformId];
                           const percentage = data?.growth30Day || 0;
@@ -820,31 +820,31 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
   const rows = [
     {
       label: 'Followers',
-      tooltip: 'YouTube = subscribers, Twitch and TikTok = followers. Kick shows paid subscribers only.',
+      tooltip: 'YouTube and Kick track subscribers. Twitch, TikTok, and Bluesky track followers. Kick shows paid subscribers only, not total followers.',
       nums: creators.map(c => c.subscribers || c.followers || 0),
       display: creators.map(c => [formatNumber(c.subscribers || c.followers || 0), null]),
     },
     {
       label: 'Views',
-      tooltip: 'For TikTok, this shows total likes. TikTok does not make per-profile view counts public.',
-      nums: creators.map(c => c.totalViews || 0),
-      display: creators.map(c => [formatNumber(c.totalViews || 0), null]),
+      tooltip: 'For TikTok, this shows total likes. TikTok does not make per-profile view counts public. Bluesky has no views metric.',
+      nums: creators.map(c => (c.platform === 'bluesky') ? null : (c.totalViews || 0)),
+      display: creators.map(c => (c.platform === 'bluesky') ? ['—', null] : [formatNumber(c.totalViews || 0), null]),
     },
     {
       label: 'Videos',
-      tooltip: 'For Twitch, this shows the current stream category. Video counts are not public on Twitch.',
+      tooltip: 'For Twitch, video counts are not public. For Bluesky, this shows total posts.',
       nums: creators.map(c => c.platform !== 'twitch' ? (c.totalPosts || 0) : null),
       display: creators.map(c => [c.platform !== 'twitch' ? formatNumber(c.totalPosts || 0) : '—', null]),
     },
     {
       label: 'Avg/Video',
-      tooltip: 'Not available for Twitch. For TikTok, calculated as total likes divided by videos.',
-      nums: creators.map(c => (c.platform !== 'twitch' && c.totalPosts > 0) ? Math.round(c.totalViews / c.totalPosts) : null),
-      display: creators.map(c => [(c.platform !== 'twitch' && c.totalPosts > 0) ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—', null]),
+      tooltip: 'Not available for Twitch or Bluesky. For TikTok, calculated as total likes divided by videos.',
+      nums: creators.map(c => (c.platform !== 'twitch' && c.platform !== 'bluesky' && c.totalPosts > 0) ? Math.round(c.totalViews / c.totalPosts) : null),
+      display: creators.map(c => [(c.platform !== 'twitch' && c.platform !== 'bluesky' && c.totalPosts > 0) ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—', null]),
     },
     {
       label: '7-Day',
-      tooltip: 'YouTube and Kick track subscribers. Twitch and TikTok track followers.',
+      tooltip: 'YouTube and Kick track subscriber growth. Twitch, TikTok, and Bluesky track follower growth.',
       isGrowth: true,
       nums: creators.map(c => growthData[c.platformId]?.growth7Day || 0),
       display: creators.map(c => {
@@ -862,7 +862,7 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
     },
     {
       label: '30-Day',
-      tooltip: 'YouTube and Kick track subscribers. Twitch and TikTok track followers.',
+      tooltip: 'YouTube and Kick track subscriber growth. Twitch, TikTok, and Bluesky track follower growth.',
       isGrowth: true,
       nums: creators.map(c => growthData[c.platformId]?.growth30Day || 0),
       display: creators.map(c => {
