@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2, DollarSign, TrendingDown, Minus } from 'lucide-react';
+import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2, DollarSign, TrendingDown, Minus, Info } from 'lucide-react';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -405,7 +405,8 @@ export default function Compare() {
                       />
                       {/* Growth Rates */}
                       <ComparisonRow
-                        label="7-Day Sub Growth"
+                        label="7-Day Growth"
+                        tooltip="YouTube & Kick track subscribers; Twitch & TikTok track followers"
                         values={filledCreators.map(c => {
                           const data = growthData[c.platformId];
                           const percentage = data?.growth7Day || 0;
@@ -424,7 +425,8 @@ export default function Compare() {
                         highlight={getWinner(filledCreators.map(c => growthData[c.platformId]?.growth7Day || 0))}
                       />
                       <ComparisonRow
-                        label="30-Day Sub Growth"
+                        label="30-Day Growth"
+                        tooltip="YouTube & Kick track subscribers; Twitch & TikTok track followers"
                         values={filledCreators.map(c => {
                           const data = growthData[c.platformId];
                           const percentage = data?.growth30Day || 0;
@@ -720,13 +722,22 @@ function SearchableSlot({ onSelect, onRemove }) {
   );
 }
 
-function ComparisonRow({ label, icon: Icon, values, highlight }) {
+function ComparisonRow({ label, icon: Icon, values, highlight, tooltip }) {
   return (
     <tr className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
       <td className="px-6 py-4 text-gray-300 font-medium">
         <div className="flex items-center gap-2">
           {Icon && <Icon className="w-4 h-4 text-gray-300" />}
           {label}
+          {tooltip && (
+            <div className="relative group/tip inline-flex">
+              <Info className="w-3.5 h-3.5 text-gray-600 cursor-help hover:text-gray-400 transition-colors" />
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-300 opacity-0 group-hover/tip:opacity-100 pointer-events-none transition-opacity z-20 whitespace-normal shadow-lg">
+                {tooltip}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700" />
+              </div>
+            </div>
+          )}
         </div>
       </td>
       {values.map((value, index) => (
@@ -776,7 +787,7 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
       display: creators.map(c => [(c.platform !== 'twitch' && c.totalPosts > 0) ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—', null]),
     },
     {
-      label: '7D Subs',
+      label: '7-Day',
       isGrowth: true,
       nums: creators.map(c => growthData[c.platformId]?.growth7Day || 0),
       display: creators.map(c => {
@@ -793,7 +804,7 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
       colors: creators.map(c => getGrowthColor(growthData[c.platformId]?.growth7Day)),
     },
     {
-      label: '30D Subs',
+      label: '30-Day',
       isGrowth: true,
       nums: creators.map(c => growthData[c.platformId]?.growth30Day || 0),
       display: creators.map(c => {
