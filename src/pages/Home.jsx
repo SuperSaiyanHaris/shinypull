@@ -154,7 +154,7 @@ export default function Home() {
           <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-16 sm:pb-24">
             <div className="text-center max-w-4xl mx-auto">
               {/* Platform chips - inline, above the heading */}
-              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10">
                 {platforms.map((platform) => {
                   const Icon = platform.icon;
                   return (
