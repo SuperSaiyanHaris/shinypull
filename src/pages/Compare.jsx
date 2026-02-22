@@ -378,21 +378,21 @@ export default function Compare() {
                       <ComparisonRow
                         label="Subscribers / Followers"
                         icon={Users}
-                        tooltip="YouTube = subscribers, Twitch & TikTok = followers. Kick shows paid subscribers only — not total followers."
+                        tooltip="YouTube = subscribers, Twitch and TikTok = followers. Kick shows paid subscribers only, not total followers."
                         values={filledCreators.map(c => formatNumber(c.subscribers || c.followers))}
                         highlight={getWinner(filledCreators.map(c => c.subscribers || c.followers))}
                       />
                       <ComparisonRow
                         label="Total Views"
                         icon={Eye}
-                        tooltip="For TikTok, shows total likes — TikTok doesn't expose a public view count per profile."
+                        tooltip="For TikTok, this shows total likes. TikTok doesn't make per-profile view counts public."
                         values={filledCreators.map(c => formatNumber(c.totalViews))}
                         highlight={getWinner(filledCreators.map(c => c.totalViews))}
                       />
                       <ComparisonRow
                         label="Videos / Content"
                         icon={Video}
-                        tooltip="For Twitch, shows current stream category instead of video count — Twitch doesn't expose a public video count."
+                        tooltip="For Twitch, this shows the current stream category. Twitch doesn't make video counts public."
                         values={filledCreators.map(c => c.platform === 'twitch' ? (c.category || '-') : formatNumber(c.totalPosts))}
                         highlight={filledCreators.every(c => c.platform !== 'twitch') ? getWinner(filledCreators.map(c => c.totalPosts)) : null}
                       />
@@ -410,7 +410,7 @@ export default function Compare() {
                       {/* Growth Rates */}
                       <ComparisonRow
                         label="7-Day Growth"
-                        tooltip="YouTube & Kick track subscribers; Twitch & TikTok track followers"
+                        tooltip="YouTube and Kick track subscribers. Twitch and TikTok track followers."
                         values={filledCreators.map(c => {
                           const data = growthData[c.platformId];
                           const percentage = data?.growth7Day || 0;
@@ -430,7 +430,7 @@ export default function Compare() {
                       />
                       <ComparisonRow
                         label="30-Day Growth"
-                        tooltip="YouTube & Kick track subscribers; Twitch & TikTok track followers"
+                        tooltip="YouTube and Kick track subscribers. Twitch and TikTok track followers."
                         values={filledCreators.map(c => {
                           const data = growthData[c.platformId];
                           const percentage = data?.growth30Day || 0;
@@ -453,7 +453,7 @@ export default function Compare() {
                         <ComparisonRow
                           label="Est. Monthly Earnings"
                           icon={DollarSign}
-                          tooltip="YouTube only. Estimated from 30-day view growth at $2–$7 CPM. Actual earnings vary widely."
+                          tooltip="YouTube only. Estimated from 30-day view growth at $2-$7 CPM. Actual earnings vary."
                           values={filledCreators.map(c => {
                             if (c.platform !== 'youtube') return '—';
                             const data = growthData[c.platformId];

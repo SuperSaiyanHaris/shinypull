@@ -27,6 +27,13 @@ Our creator stats are the entire reason this site exists. Every chart and table 
 - The only exception is the Terms of Service page for legal disclaimers
 - Keep the UI clean and professional like SocialBlade
 
+**WRITING STYLE - ALL USER-FACING COPY (tooltips, labels, descriptions, notifications, blog posts):**
+- NEVER use em dashes (—). Use commas or periods instead.
+- Write like a human. Short sentences. Direct. No corporate fluff.
+- No AI clichés: "game-changer", "landscape", "seamless", "robust", "leverage", "unlock"
+- No semicolons for dramatic effect. No "it's worth noting". No "importantly".
+- See the Blog Post Format section for the full list of patterns to avoid.
+
 **TIMEZONE:**
 - All dates use America/New_York timezone via `getTodayLocal()` helper
 - This prevents future-date issues when UTC is ahead of local time
