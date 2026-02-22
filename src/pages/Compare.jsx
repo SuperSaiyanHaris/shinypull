@@ -182,6 +182,8 @@ export default function Compare() {
           growth[creator.platformId] = {
             growth7Day: calc7Day,
             growth30Day: calc30Day,
+            diff7Day: sevenDaysBack?.subscribers != null ? latest.subscribers - sevenDaysBack.subscribers : 0,
+            diff30Day: thirtyDaysBack?.subscribers != null ? latest.subscribers - thirtyDaysBack.subscribers : 0,
             dailyViews: dailyViews,
           };
         } catch (err) {
@@ -361,11 +363,15 @@ export default function Compare() {
                         values={filledCreators.map(c => {
                           const data = growthData[c.platformId];
                           const percentage = data?.growth7Day || 0;
+                          const diff = data?.diff7Day || 0;
                           const GrowthIcon = getGrowthIcon(percentage);
                           return (
-                            <span className={`inline-flex items-center gap-1 ${getGrowthColor(percentage)}`}>
-                              <GrowthIcon className="w-4 h-4" />
-                              {formatGrowth(percentage)}
+                            <span className={`inline-flex flex-col items-center gap-0.5 ${getGrowthColor(percentage)}`}>
+                              <span className="inline-flex items-center gap-1">
+                                <GrowthIcon className="w-3.5 h-3.5" />
+                                {diff !== 0 ? `${diff > 0 ? '+' : ''}${formatNumber(Math.abs(diff))}` : formatGrowth(percentage)}
+                              </span>
+                              {diff !== 0 && <span className="text-xs opacity-60">{formatGrowth(percentage)}</span>}
                             </span>
                           );
                         })}
@@ -376,11 +382,15 @@ export default function Compare() {
                         values={filledCreators.map(c => {
                           const data = growthData[c.platformId];
                           const percentage = data?.growth30Day || 0;
+                          const diff = data?.diff30Day || 0;
                           const GrowthIcon = getGrowthIcon(percentage);
                           return (
-                            <span className={`inline-flex items-center gap-1 ${getGrowthColor(percentage)}`}>
-                              <GrowthIcon className="w-4 h-4" />
-                              {formatGrowth(percentage)}
+                            <span className={`inline-flex flex-col items-center gap-0.5 ${getGrowthColor(percentage)}`}>
+                              <span className="inline-flex items-center gap-1">
+                                <GrowthIcon className="w-3.5 h-3.5" />
+                                {diff !== 0 ? `${diff > 0 ? '+' : ''}${formatNumber(Math.abs(diff))}` : formatGrowth(percentage)}
+                              </span>
+                              {diff !== 0 && <span className="text-xs opacity-60">{formatGrowth(percentage)}</span>}
                             </span>
                           );
                         })}
@@ -419,62 +429,14 @@ export default function Compare() {
                 </div>
               </div>
 
-              {/* Mobile Stat-by-Stat View */}
-              <div className="md:hidden space-y-3">
-                <MobileComparisonCard
-                  label="Subscribers / Followers"
-                  icon={Users}
+              {/* Mobile Compact Table View */}
+              <div className="md:hidden space-y-4">
+                <MobileComparisonTable
                   creators={filledCreators}
-                  getValue={(c) => c.subscribers || c.followers}
-                  formatValue={(v) => formatNumber(v)}
+                  growthData={growthData}
+                  getGrowthColor={getGrowthColor}
+                  formatEarnings={formatEarnings}
                 />
-                <MobileComparisonCard
-                  label="Total Views"
-                  icon={Eye}
-                  creators={filledCreators}
-                  getValue={(c) => c.totalViews}
-                  formatValue={(v) => formatNumber(v)}
-                />
-                <MobileComparisonCard
-                  label="Videos"
-                  icon={Video}
-                  creators={filledCreators.filter(c => c.platform !== 'twitch')}
-                  getValue={(c) => c.totalPosts}
-                  formatValue={(v) => formatNumber(v)}
-                  hideIfEmpty
-                />
-                <MobileComparisonCard
-                  label="Avg Views per Video"
-                  icon={TrendingUp}
-                  creators={filledCreators.filter(c => c.platform !== 'twitch')}
-                  getValue={(c) => c.totalPosts > 0 ? c.totalViews / c.totalPosts : 0}
-                  formatValue={(v) => formatNumber(Math.round(v))}
-                  hideIfEmpty
-                />
-                <MobileComparisonCard
-                  label="7-Day Growth"
-                  icon={TrendingUp}
-                  creators={filledCreators}
-                  getValue={(c) => growthData[c.platformId]?.growth7Day || 0}
-                  formatValue={(v) => formatGrowth(v)}
-                />
-                <MobileComparisonCard
-                  label="30-Day Growth"
-                  icon={TrendingUp}
-                  creators={filledCreators}
-                  getValue={(c) => growthData[c.platformId]?.growth30Day || 0}
-                  formatValue={(v) => formatGrowth(v)}
-                />
-                {filledCreators.some(c => c.platform === 'youtube') && (
-                  <MobileComparisonCard
-                    label="Est. Monthly Earnings"
-                    icon={DollarSign}
-                    creators={filledCreators.filter(c => c.platform === 'youtube')}
-                    getValue={(c) => growthData[c.platformId]?.dailyViews || 0}
-                    formatValue={(v) => formatEarnings(v)}
-                    hideIfEmpty
-                  />
-                )}
 
                 {/* View Full Profiles - Mobile */}
                 <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4">
@@ -735,49 +697,127 @@ function ComparisonRow({ label, icon: Icon, values, highlight }) {
   );
 }
 
-function MobileComparisonCard({ label, icon: Icon, creators, getValue, formatValue, hideIfEmpty }) {
-  if (hideIfEmpty && creators.length === 0) return null;
+function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEarnings }) {
+  const gridStyle = { gridTemplateColumns: `minmax(68px, 0.85fr) repeat(${creators.length}, 1fr)` };
 
-  const values = creators.map(getValue);
-  const winner = getWinner(values);
+  const winnerOf = (nums) => {
+    const valid = nums.filter(n => n != null && !isNaN(n) && n > 0);
+    if (valid.length < 2) return null;
+    const max = Math.max(...valid);
+    const idx = nums.findIndex(n => n === max);
+    return nums.filter(n => n === max).length === 1 ? idx : null;
+  };
+
+  const rows = [
+    {
+      label: 'Followers',
+      nums: creators.map(c => c.subscribers || c.followers || 0),
+      display: creators.map(c => [formatNumber(c.subscribers || c.followers || 0), null]),
+    },
+    {
+      label: 'Views',
+      nums: creators.map(c => c.totalViews || 0),
+      display: creators.map(c => [formatNumber(c.totalViews || 0), null]),
+    },
+    {
+      label: 'Videos',
+      nums: creators.map(c => c.platform !== 'twitch' ? (c.totalPosts || 0) : null),
+      display: creators.map(c => [c.platform !== 'twitch' ? formatNumber(c.totalPosts || 0) : '—', null]),
+    },
+    {
+      label: 'Avg/Video',
+      nums: creators.map(c => (c.platform !== 'twitch' && c.totalPosts > 0) ? Math.round(c.totalViews / c.totalPosts) : null),
+      display: creators.map(c => [(c.platform !== 'twitch' && c.totalPosts > 0) ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—', null]),
+    },
+    {
+      label: '7-Day',
+      isGrowth: true,
+      nums: creators.map(c => growthData[c.platformId]?.growth7Day || 0),
+      display: creators.map(c => {
+        const data = growthData[c.platformId];
+        const pct = data?.growth7Day;
+        const diff = data?.diff7Day;
+        if (!pct || isNaN(pct)) return ['—', null];
+        const pctStr = `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`;
+        if (diff && diff !== 0) {
+          return [`${diff > 0 ? '+' : ''}${formatNumber(Math.abs(diff))}`, pctStr];
+        }
+        return [pctStr, null];
+      }),
+      colors: creators.map(c => getGrowthColor(growthData[c.platformId]?.growth7Day)),
+    },
+    {
+      label: '30-Day',
+      isGrowth: true,
+      nums: creators.map(c => growthData[c.platformId]?.growth30Day || 0),
+      display: creators.map(c => {
+        const data = growthData[c.platformId];
+        const pct = data?.growth30Day;
+        const diff = data?.diff30Day;
+        if (!pct || isNaN(pct)) return ['—', null];
+        const pctStr = `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`;
+        if (diff && diff !== 0) {
+          return [`${diff > 0 ? '+' : ''}${formatNumber(Math.abs(diff))}`, pctStr];
+        }
+        return [pctStr, null];
+      }),
+      colors: creators.map(c => getGrowthColor(growthData[c.platformId]?.growth30Day)),
+    },
+  ];
+
+  if (creators.some(c => c.platform === 'youtube')) {
+    rows.push({
+      label: 'Mo. Est.',
+      isEarnings: true,
+      nums: creators.map(c => growthData[c.platformId]?.dailyViews || 0),
+      display: creators.map(c => [c.platform === 'youtube' ? formatEarnings(growthData[c.platformId]?.dailyViews || 0) : '—', null]),
+      colors: creators.map(() => 'text-gray-100'),
+    });
+  }
 
   return (
-    <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4">
-      <div className="flex items-center gap-2 mb-3">
-        {Icon && <Icon className="w-4 h-4 text-gray-300" />}
-        <span className="text-sm font-medium text-gray-300">{label}</span>
+    <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+      {/* Creator header row */}
+      <div className="grid bg-gray-800/50 border-b border-gray-800" style={gridStyle}>
+        <div className="px-3 py-2 text-xs text-gray-300 flex items-end pb-3">Metric</div>
+        {creators.map(c => (
+          <div key={c.platformId} className="px-2 py-2 flex flex-col items-center gap-1.5 border-l border-gray-800">
+            <img src={c.profileImage} alt="" loading="lazy" className="w-10 h-10 rounded-xl object-cover" />
+            <p className="text-[11px] font-semibold text-gray-100 text-center leading-tight truncate w-full px-1">{c.displayName}</p>
+          </div>
+        ))}
       </div>
-      <div className="space-y-2">
-        {creators.map((creator, index) => {
-          const isWinner = winner === index;
-          const value = getValue(creator);
-          return (
-            <div
-              key={creator.platformId}
-              className={`flex items-center gap-3 p-3 rounded-xl ${
-                isWinner ? 'bg-emerald-950/30 ring-1 ring-emerald-200' : 'bg-gray-800/50'
-              }`}
-            >
-              <img
-                src={creator.profileImage}
-                alt={creator.displayName}
-                className="w-8 h-8 rounded-lg object-cover"
-              />
-              <span className="flex-1 font-medium text-gray-100 truncate text-sm">
-                {creator.displayName}
-              </span>
-              <span className={`font-bold ${isWinner ? 'text-emerald-400' : 'text-gray-100'}`}>
-                {formatValue(value)}
-              </span>
-              {isWinner && (
-                <span className="text-xs font-medium text-emerald-400 bg-emerald-900/30 px-2 py-0.5 rounded-full">
-                  ✓
-                </span>
-              )}
-            </div>
-          );
-        })}
-      </div>
+
+      {/* Metric rows */}
+      {rows.map((row, i) => {
+        const winnerIdx = !row.isGrowth && !row.isEarnings ? winnerOf(row.nums.map(n => n ?? 0)) : null;
+        return (
+          <div
+            key={row.label}
+            className={`grid border-b border-gray-800 last:border-0 ${i % 2 !== 0 ? 'bg-gray-800/20' : ''}`}
+            style={gridStyle}
+          >
+            <div className="px-3 py-3 text-xs font-medium text-gray-300 flex items-center">{row.label}</div>
+            {creators.map((c, idx) => {
+              const isWinner = winnerIdx === idx;
+              const [primary, secondary] = row.display[idx];
+              const color = (row.isGrowth || row.isEarnings) ? row.colors[idx] : (isWinner ? 'text-emerald-400' : 'text-gray-100');
+              return (
+                <div
+                  key={c.platformId}
+                  className={`px-2 py-3 flex flex-col items-center justify-center border-l border-gray-800 ${isWinner ? 'bg-emerald-950/30' : ''}`}
+                >
+                  <span className={`text-xs font-bold text-center leading-tight ${color}`}>{primary}</span>
+                  {secondary && (
+                    <span className={`text-[10px] text-center leading-tight mt-0.5 opacity-70 ${color}`}>{secondary}</span>
+                  )}
+                  {isWinner && <span className="text-[10px] text-emerald-400 mt-0.5">✓</span>}
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 }
