@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2, DollarSign, TrendingDown, Minus, Info } from 'lucide-react';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from 'recharts';
@@ -357,11 +358,7 @@ export default function Compare() {
               <div className="hidden md:block bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-800 flex items-center gap-2">
                   <h3 className="text-lg font-semibold text-gray-100">Comparison</h3>
-                  <InfoTooltip
-                    text="Some fields show dashes for newer creators. Growth and earnings need a few days of tracked data before they populate."
-                    openDown
-                    width="w-64"
-                  />
+                  <InfoTooltip text="Some fields show dashes for newer creators. Growth and earnings need a few days of tracked data before they populate." />
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -731,27 +728,47 @@ function SearchableSlot({ onSelect, onRemove }) {
   );
 }
 
-function InfoTooltip({ text, openDown = false, width = 'w-56' }) {
+function InfoTooltip({ text }) {
   const [open, setOpen] = useState(false);
+  const [style, setStyle] = useState({});
+  const btnRef = useRef(null);
+
+  const handleToggle = (e) => {
+    e.stopPropagation();
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      const tipWidth = 224; // 14rem
+      const rawLeft = rect.left + window.scrollX;
+      const left = (rect.left + tipWidth > window.innerWidth - 8)
+        ? Math.max(8, window.innerWidth - tipWidth - 8)
+        : rawLeft;
+      setStyle({ top: rect.bottom + window.scrollY + 6, left });
+    }
+    setOpen(o => !o);
+  };
+
   return (
-    <div className="relative group/tip inline-flex">
-      {open && <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />}
+    <>
+      {open && <div className="fixed inset-0 z-[998]" onClick={() => setOpen(false)} />}
       <button
+        ref={btnRef}
         type="button"
-        className="relative z-30 focus:outline-none -m-1 p-1"
-        onClick={(e) => { e.stopPropagation(); setOpen(o => !o); }}
-        onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); setOpen(o => !o); }}
+        className="focus:outline-none -m-1 p-1 flex-shrink-0"
+        onClick={handleToggle}
       >
-        <Info className="w-3.5 h-3.5 cursor-help text-gray-500 group-hover/tip:text-gray-300 transition-colors" />
+        <Info className="w-3.5 h-3.5 text-gray-500 hover:text-gray-300 transition-colors" />
       </button>
-      <div className={`absolute ${openDown ? 'top-full left-0 mt-1' : 'bottom-full left-1/2 -translate-x-1/2 mb-2'} ${width} px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-300 transition-opacity z-30 whitespace-normal shadow-lg pointer-events-none ${open ? 'opacity-100' : 'opacity-0 group-hover/tip:opacity-100'}`}>
-        {openDown
-          ? <div className="absolute bottom-full left-4 border-4 border-transparent border-b-gray-700" />
-          : <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700" />
-        }
-        {text}
-      </div>
-    </div>
+      {open && createPortal(
+        <div
+          className="fixed w-56 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-300 z-[999] whitespace-normal shadow-xl"
+          style={style}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {text}
+        </div>,
+        document.body
+      )}
+    </>
   );
 }
 
@@ -793,26 +810,31 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
   const rows = [
     {
       label: 'Followers',
+      tooltip: 'YouTube = subscribers, Twitch and TikTok = followers. Kick shows paid subscribers only.',
       nums: creators.map(c => c.subscribers || c.followers || 0),
       display: creators.map(c => [formatNumber(c.subscribers || c.followers || 0), null]),
     },
     {
       label: 'Views',
+      tooltip: 'For TikTok, this shows total likes. TikTok does not make per-profile view counts public.',
       nums: creators.map(c => c.totalViews || 0),
       display: creators.map(c => [formatNumber(c.totalViews || 0), null]),
     },
     {
       label: 'Videos',
+      tooltip: 'For Twitch, this shows the current stream category. Video counts are not public on Twitch.',
       nums: creators.map(c => c.platform !== 'twitch' ? (c.totalPosts || 0) : null),
       display: creators.map(c => [c.platform !== 'twitch' ? formatNumber(c.totalPosts || 0) : '—', null]),
     },
     {
       label: 'Avg/Video',
+      tooltip: 'Not available for Twitch. For TikTok, calculated as total likes divided by videos.',
       nums: creators.map(c => (c.platform !== 'twitch' && c.totalPosts > 0) ? Math.round(c.totalViews / c.totalPosts) : null),
       display: creators.map(c => [(c.platform !== 'twitch' && c.totalPosts > 0) ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—', null]),
     },
     {
       label: '7-Day',
+      tooltip: 'YouTube and Kick track subscribers. Twitch and TikTok track followers.',
       isGrowth: true,
       nums: creators.map(c => growthData[c.platformId]?.growth7Day || 0),
       display: creators.map(c => {
@@ -830,6 +852,7 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
     },
     {
       label: '30-Day',
+      tooltip: 'YouTube and Kick track subscribers. Twitch and TikTok track followers.',
       isGrowth: true,
       nums: creators.map(c => growthData[c.platformId]?.growth30Day || 0),
       display: creators.map(c => {
@@ -850,6 +873,7 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
   if (creators.some(c => c.platform === 'youtube')) {
     rows.push({
       label: 'Mo. Est.',
+      tooltip: 'YouTube only. Estimated from 30-day view growth at $2-$7 CPM. Actual earnings vary.',
       isEarnings: true,
       nums: creators.map(c => growthData[c.platformId]?.monthlyViews || 0),
       display: creators.map(c => [c.platform === 'youtube' ? formatEarnings(growthData[c.platformId]?.monthlyViews || 0) : '—', null]),
@@ -887,7 +911,10 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
             className={`grid border-b border-gray-800 last:border-0 ${i % 2 !== 0 ? 'bg-gray-800/20' : ''}`}
             style={gridStyle}
           >
-            <div className="px-3 py-3 text-xs font-medium text-gray-300 flex items-center">{row.label}</div>
+            <div className="px-3 py-3 text-xs font-medium text-gray-300 flex items-center gap-1">
+              <span>{row.label}</span>
+              {row.tooltip && <InfoTooltip text={row.tooltip} />}
+            </div>
             {creators.map((c, idx) => {
               const isWinner = winnerIdx === idx;
               const [primary, secondary] = row.display[idx];
