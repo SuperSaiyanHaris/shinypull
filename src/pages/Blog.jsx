@@ -307,7 +307,7 @@ export default function Blog() {
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">
                     Track Your Channel's Growth
                   </h2>
-                  <p className="text-indigo-800 mb-6 max-w-2xl mx-auto">
+                  <p className="text-white/80 mb-6 max-w-2xl mx-auto">
                     Use ShinyPull's free analytics to monitor your subscribers, views, and compare your growth with top creators.
                   </p>
                   <Link
