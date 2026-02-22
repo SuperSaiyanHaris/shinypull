@@ -849,12 +849,20 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
       {/* Creator header row */}
       <div className="grid bg-gray-800/50 border-b border-gray-800" style={gridStyle}>
         <div className="px-3 py-2 text-xs text-gray-300 flex items-end pb-3">Metric</div>
-        {creators.map(c => (
-          <div key={c.platformId} className="px-2 py-2 flex flex-col items-center gap-1.5 border-l border-gray-800">
-            <img src={c.profileImage} alt="" loading="lazy" className="w-10 h-10 rounded-xl object-cover" />
-            <p className="text-[11px] font-semibold text-gray-100 text-center leading-tight truncate w-full px-1">{c.displayName}</p>
-          </div>
-        ))}
+        {creators.map(c => {
+          const config = platformConfig[c.platform] || platformConfig.youtube;
+          const PlatformIcon = config.icon;
+          return (
+            <div key={c.platformId} className="px-2 py-2 flex flex-col items-center gap-1.5 border-l border-gray-800">
+              <img src={c.profileImage} alt="" loading="lazy" className="w-10 h-10 rounded-xl object-cover" />
+              <p className="text-[11px] font-semibold text-gray-100 text-center leading-tight truncate w-full px-1">{c.displayName}</p>
+              <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-medium ${config.bg} ${config.color}`}>
+                <PlatformIcon className="w-2.5 h-2.5" />
+                {c.platform}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
       {/* Metric rows */}
