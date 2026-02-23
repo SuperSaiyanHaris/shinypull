@@ -152,6 +152,7 @@ export default function Search() {
       } else if (platform === 'bluesky') {
         channels = await searchBluesky(searchQuery, 25);
       }
+      channels.sort((a, b) => (b.subscribers || b.followers || 0) - (a.subscribers || a.followers || 0));
       setResults(channels);
       // Pre-fill normalized username for TikTok request flow
       if (platform === 'tiktok') {
