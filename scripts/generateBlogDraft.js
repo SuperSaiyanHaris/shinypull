@@ -185,40 +185,55 @@ Available products:
 ${productList}`;
   }
 
-  const prompt = `You are writing a blog post for ShinyPull (shinypull.com), a creator analytics platform.
+  const context = `Research context:
+- Topic: ${research.suggestedTitle}
+- Angle for our audience: ${research.angle}
+- Key facts: ${research.keyFacts.join('; ')}
+- Source: ${research.source}`;
+
+  // Step 1: get metadata as JSON (no long string fields — avoids escaping issues)
+  const metaPrompt = `You are a blog editor for ShinyPull (shinypull.com), a creator analytics platform.
+
+${context}
+
+Return ONLY valid JSON (no markdown fences, no explanation):
+{
+  "title": "final post title under 70 chars",
+  "slug": "url-slug-from-title",
+  "description": "meta description 120-155 chars, no em dashes, no double-quotes inside",
+  "category": "${research.suggestedCategory}"
+}`;
+
+  const metaResponse = await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 512,
+    messages: [{ role: 'user', content: metaPrompt }],
+  });
+  const meta = safeParseJSON(metaResponse.content[0].text.trim());
+
+  await sleep(1000);
+
+  // Step 2: get content as plain markdown (no JSON wrapper — no escaping needed)
+  const contentPrompt = `You are writing a blog post for ShinyPull (shinypull.com), a creator analytics platform.
 
 ${styleGuide}
 
 ${blogFormat}
 ${productInstruction}
 
-Research context:
-- Topic: ${research.suggestedTitle}
-- Angle for our audience: ${research.angle}
-- Key facts: ${research.keyFacts.join('; ')}
-- Source: ${research.source}
+${context}
+Post title: ${meta.title}
 
-Write the full blog post now. Return ONLY valid JSON (no markdown fences, no explanation):
-{
-  "title": "final post title",
-  "slug": "url-slug-from-title",
-  "description": "meta description 120-155 chars, no em dashes, no quotes inside",
-  "category": "${research.suggestedCategory}",
-  "content": "full markdown content here with \\n for newlines"
-}`;
+Write the full blog post content now. Output ONLY the markdown content — no JSON, no code fences, no preamble, no title heading.`;
 
-  const response = await anthropic.messages.create({
+  const contentResponse = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 4096,
-    messages: [
-      { role: 'user', content: prompt },
-      { role: 'assistant', content: '{' },
-    ],
+    messages: [{ role: 'user', content: contentPrompt }],
   });
+  const content = contentResponse.content[0].text.trim();
 
-  // Prefill forces the model to start mid-JSON, so prepend the opening brace back
-  const text = '{' + response.content[0].text.trim();
-  const draft = safeParseJSON(text);
+  const draft = { ...meta, content };
   draft.readTime = estimateReadTime(draft.content);
   console.log(`✅ Draft: "${draft.title}" (~${draft.readTime})`);
   return draft;
