@@ -33,6 +33,13 @@ const RSS_FEEDS = [
 ];
 
 // --- Helpers ---
+function safeParseJSON(text) {
+  let cleaned = text.trim();
+  // Strip markdown code fences if the model wrapped output despite instructions
+  cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+  return JSON.parse(cleaned);
+}
+
 function getDayType() {
   // Allow override via CLI arg or env for testing
   const override = process.argv[2];
@@ -140,7 +147,7 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
   });
 
   const text = response.content[0].text.trim();
-  const research = JSON.parse(text);
+  const research = safeParseJSON(text);
   console.log(`✅ Research: "${research.suggestedTitle}"`);
   return research;
 }
@@ -202,12 +209,16 @@ Write the full blog post now. Return ONLY valid JSON (no markdown fences, no exp
 
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 2048,
-    messages: [{ role: 'user', content: prompt }],
+    max_tokens: 4096,
+    messages: [
+      { role: 'user', content: prompt },
+      { role: 'assistant', content: '{' },
+    ],
   });
 
-  const text = response.content[0].text.trim();
-  const draft = JSON.parse(text);
+  // Prefill forces the model to start mid-JSON, so prepend the opening brace back
+  const text = '{' + response.content[0].text.trim();
+  const draft = safeParseJSON(text);
   draft.readTime = estimateReadTime(draft.content);
   console.log(`✅ Draft: "${draft.title}" (~${draft.readTime})`);
   return draft;
@@ -254,7 +265,7 @@ Return ONLY valid JSON (no markdown fences, no explanation):
   });
 
   const text = response.content[0].text.trim();
-  const review = JSON.parse(text);
+  const review = safeParseJSON(text);
   review.approved = review.score >= REVIEW_SCORE_THRESHOLD;
   console.log(`📊 Review score: ${review.score}/10 — ${review.approved ? 'APPROVED' : 'NEEDS REWRITE'}`);
   if (review.violations.length > 0) {
