@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useRef } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
@@ -59,10 +59,32 @@ function PageLoader() {
   );
 }
 
+// Fires a GA4 page_view on every client-side navigation.
+// index.html already fires one on initial load, so we skip the first render.
+function RouteChangeTracker() {
+  const location = useLocation();
+  const isFirst = useRef(true);
+
+  useEffect(() => {
+    if (isFirst.current) {
+      isFirst.current = false;
+      return;
+    }
+    if (window.gtag) {
+      window.gtag('config', 'G-1KWMEM41YG', {
+        page_path: location.pathname + location.search,
+      });
+    }
+  }, [location]);
+
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
       <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+        <RouteChangeTracker />
         <ScrollToTop />
         <BackToTop />
         <Header />
