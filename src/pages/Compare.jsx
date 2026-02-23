@@ -650,38 +650,50 @@ function SearchableSlot({ onSelect, onRemove }) {
         </button>
       )}
 
-      <form onSubmit={handleSearch} className="space-y-3">
-        <div className="flex gap-2">
-          <select
-            value={searchPlatform}
-            onChange={(e) => setSearchPlatform(e.target.value)}
-            className="px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-[16px] sm:text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+      {/* Platform chips — replaces the select dropdown */}
+      <div className="flex gap-1.5 mb-3">
+        {[
+          { id: 'youtube',  Icon: Youtube,     color: 'text-red-400',    bg: 'bg-red-950/30',    ring: 'ring-red-700',    label: 'YouTube' },
+          { id: 'tiktok',   Icon: TikTokIcon,  color: 'text-pink-400',   bg: 'bg-pink-950/30',   ring: 'ring-pink-700',   label: 'TikTok' },
+          { id: 'twitch',   Icon: Twitch,      color: 'text-purple-400', bg: 'bg-purple-950/30', ring: 'ring-purple-700', label: 'Twitch' },
+          { id: 'kick',     Icon: KickIcon,    color: 'text-green-400',  bg: 'bg-green-950/30',  ring: 'ring-green-700',  label: 'Kick' },
+          { id: 'bluesky',  Icon: BlueskyIcon, color: 'text-sky-400',    bg: 'bg-sky-950/30',    ring: 'ring-sky-700',    label: 'Bluesky' },
+        ].map(({ id, Icon, color, bg, ring, label }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => { setSearchPlatform(id); setSearchResults([]); }}
+            className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-lg transition-all ${
+              searchPlatform === id
+                ? `${bg} ${color} ring-1 ${ring}`
+                : 'bg-gray-800/40 text-gray-500 hover:text-gray-400 hover:bg-gray-800/70'
+            }`}
           >
-            <option value="youtube">YouTube</option>
-            <option value="tiktok">TikTok</option>
-            <option value="twitch">Twitch</option>
-            <option value="kick">Kick</option>
-            <option value="bluesky">Bluesky</option>
-          </select>
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search creator..."
-              className="w-full pl-9 pr-9 py-2 bg-gray-900 border border-gray-700 rounded-lg text-[16px] sm:text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => { setSearchQuery(''); setSearchResults([]); }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-300 hover:text-gray-300 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+            <Icon className="w-4 h-4" />
+            <span className="text-[9px] font-medium leading-none">{label}</span>
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={handleSearch} className="space-y-2">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search creator..."
+            className="w-full pl-9 pr-9 py-2 bg-gray-800 border border-gray-700 rounded-lg text-[16px] sm:text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => { setSearchQuery(''); setSearchResults([]); }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-300 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
         <button
           type="submit"
@@ -699,8 +711,8 @@ function SearchableSlot({ onSelect, onRemove }) {
         </button>
       </form>
 
-      <div className="flex-1 mt-3 overflow-y-auto">
-        {searchResults.length > 0 ? (
+      {searchResults.length > 0 && (
+        <div className="flex-1 mt-3 overflow-y-auto">
           <div className="space-y-2">
             {searchResults.map((result) => (
               <button
@@ -728,13 +740,8 @@ function SearchableSlot({ onSelect, onRemove }) {
               </button>
             ))}
           </div>
-        ) : (
-          <div className="h-full flex flex-col items-center justify-center text-gray-300">
-            <Search className="w-8 h-8 mb-2" />
-            <span className="text-sm font-medium">Search for a creator</span>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
