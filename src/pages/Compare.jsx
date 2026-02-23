@@ -952,10 +952,19 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
 function ComparisonRadarChart({ creators, growthData }) {
   const CREATOR_COLORS = ['#818cf8', '#34d399', '#f59e0b'];
 
+  // When two creators share a display name (e.g. same person on YouTube + Bluesky),
+  // append the platform so chart keys and legend labels stay unique.
+  const nameCounts = {};
+  creators.forEach(c => { nameCounts[c.displayName] = (nameCounts[c.displayName] || 0) + 1; });
+  const creatorLabel = (c) =>
+    nameCounts[c.displayName] > 1
+      ? `${c.displayName} (${c.platform.charAt(0).toUpperCase() + c.platform.slice(1)})`
+      : c.displayName;
+
   const metrics = [
     { label: 'Followers',    getValue: (c) => c.subscribers || c.followers || 0 },
-    { label: 'Views',        getValue: (c) => c.totalViews || 0 },
-    { label: 'Avg/Video',    getValue: (c) => (c.platform !== 'twitch' && c.totalPosts > 0) ? c.totalViews / c.totalPosts : 0 },
+    { label: 'Views',        getValue: (c) => c.platform === 'bluesky' ? 0 : (c.totalViews || 0) },
+    { label: 'Avg/Video',    getValue: (c) => (c.platform !== 'twitch' && c.platform !== 'bluesky' && c.totalPosts > 0) ? c.totalViews / c.totalPosts : 0 },
     { label: '7-Day Growth', getValue: (c) => Math.max(0, growthData[c.platformId]?.growth7Day || 0) },
     { label: '30-Day Growth',getValue: (c) => Math.max(0, growthData[c.platformId]?.growth30Day || 0) },
   ];
@@ -965,7 +974,7 @@ function ComparisonRadarChart({ creators, growthData }) {
     const max = Math.max(...values, 0.001);
     const entry = { metric: label };
     creators.forEach((c, i) => {
-      entry[c.displayName] = Math.round((values[i] / max) * 100);
+      entry[creatorLabel(c)] = Math.round((values[i] / max) * 100);
     });
     return entry;
   });
@@ -984,8 +993,8 @@ function ComparisonRadarChart({ creators, growthData }) {
           {creators.map((c, i) => (
             <Radar
               key={c.platformId}
-              name={c.displayName}
-              dataKey={c.displayName}
+              name={creatorLabel(c)}
+              dataKey={creatorLabel(c)}
               stroke={CREATOR_COLORS[i % CREATOR_COLORS.length]}
               fill={CREATOR_COLORS[i % CREATOR_COLORS.length]}
               fillOpacity={0.12}
