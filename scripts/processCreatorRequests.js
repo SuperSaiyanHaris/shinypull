@@ -315,9 +315,13 @@ async function processRequest(request) {
       }
     }
 
-    // All attempts exhausted — delete the request (username doesn't exist)
-    await supabase.from('creator_requests').delete().eq('id', request.id);
-    console.log(`[${request.username}] 🗑️  Request deleted (no valid profile found after all attempts)`);
+    // All attempts exhausted — mark as failed (keeps row as tombstone so discovery
+    // won't re-queue this username on future runs)
+    await supabase
+      .from('creator_requests')
+      .update({ status: 'failed', error_message: error.message })
+      .eq('id', request.id);
+    console.log(`[${request.username}] 🗑️  Marked as failed (no valid profile found after all attempts)`);
     return { success: false, username: request.username, error: error.message, rateLimited: false, scrapeBlocked: false };
   }
 }
@@ -331,16 +335,16 @@ async function main() {
   console.log('==========================================\n');
 
   try {
-    // Clean up old completed/failed requests
+    // Clean up old completed requests (keep 'failed' rows as tombstones to prevent re-queuing)
     const { data: staleRequests, error: cleanupFetchError } = await supabase
       .from('creator_requests')
       .select('id')
-      .in('status', ['completed', 'failed']);
+      .in('status', ['completed']);
 
     if (!cleanupFetchError && staleRequests && staleRequests.length > 0) {
       const ids = staleRequests.map(r => r.id);
       await supabase.from('creator_requests').delete().in('id', ids);
-      console.log(`🧹 Cleaned up ${staleRequests.length} old completed/failed request(s)\n`);
+      console.log(`🧹 Cleaned up ${staleRequests.length} old completed request(s)\n`);
     }
 
     // Fetch pending requests
