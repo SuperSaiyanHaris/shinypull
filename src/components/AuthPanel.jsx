@@ -203,8 +203,8 @@ export default function AuthPanel({ isOpen, onClose, message: contextMessage }) 
                 <div className="flex items-start gap-3">
                   <Scale className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-100 font-medium">Save and Compare Creators</p>
-                    <p className="text-xs text-gray-300">Compare stats side-by-side across platforms</p>
+                    <p className="text-sm text-gray-100 font-medium">Save Comparisons</p>
+                    <p className="text-xs text-gray-300">Compare creators side-by-side and save them to your dashboard</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2, DollarSign, TrendingDown, Minus, Info } from 'lucide-react';
+import { Search, X, Plus, Youtube, Twitch, Users, Eye, Video, TrendingUp, ArrowRight, Scale, Loader2, DollarSign, TrendingDown, Minus, Info, Bookmark, Check } from 'lucide-react';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -12,10 +12,12 @@ import { searchChannels as searchTwitch, getChannelByUsername as getTwitchChanne
 import { searchChannels as searchKick, getChannelByUsername as getKickChannel } from '../services/kickService';
 import { searchBluesky, getBlueskyProfile } from '../services/blueskyService';
 import { searchCreators, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
+import { saveCompare } from '../services/compareService';
 import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
+import { useAuth } from '../contexts/AuthContext';
 import logger from '../lib/logger';
 
 const platformConfig = {
@@ -31,9 +33,14 @@ export default function Compare() {
   const [loadingFromUrl, setLoadingFromUrl] = useState(false);
   const [growthData, setGrowthData] = useState({});
   const [loadingGrowth, setLoadingGrowth] = useState(false);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [saveName, setSaveName] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const skipNextUrlLoad = useRef(false);
+  const { user, isAuthenticated } = useAuth();
 
   const updateUrl = (newCreators) => {
     skipNextUrlLoad.current = true;
@@ -229,6 +236,42 @@ export default function Compare() {
     fetchGrowthData();
   }, [creators]);
 
+  // Auto-generate compare name from creator display names
+  const buildDefaultName = (creatorsArr) => {
+    const names = creatorsArr.filter(Boolean).map(c => c.displayName);
+    if (names.length === 0) return '';
+    if (names.length === 1) return names[0];
+    const last = names.pop();
+    return `${names.join(', ')} vs ${last}`;
+  };
+
+  const handleOpenSave = () => {
+    if (!isAuthenticated) {
+      window.dispatchEvent(new CustomEvent('openAuthPanel', {
+        detail: { message: 'Sign in to save this comparison' },
+      }));
+      return;
+    }
+    setSaveName(buildDefaultName(creators));
+    setSaveDialogOpen(true);
+  };
+
+  const handleSaveCompare = async () => {
+    if (!saveName.trim() || !user) return;
+    setSaving(true);
+    try {
+      const param = creators.filter(Boolean).map(c => `${c.platform}:${c.username}`).join(',');
+      await saveCompare(user.id, saveName, param);
+      setSaveDialogOpen(false);
+      setSavedFlash(true);
+      setTimeout(() => setSavedFlash(false), 3000);
+    } catch (err) {
+      logger.error('Failed to save compare:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const filledCreators = creators.filter(Boolean);
 
   // Helper: Format growth percentage
@@ -298,13 +341,60 @@ export default function Compare() {
             </div>
           )}
 
-          {/* Clear All */}
+          {/* Clear All / Save row */}
           {!loadingFromUrl && filledCreators.length > 0 && (
-            <div className="flex justify-end mb-3">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                {filledCreators.length >= 2 && (
+                  savedFlash ? (
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-emerald-400 font-medium">
+                      <Check className="w-3.5 h-3.5" />
+                      Saved!
+                    </span>
+                  ) : (
+                    <button
+                      onClick={handleOpenSave}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-indigo-400 hover:text-indigo-300 hover:bg-indigo-950/30 rounded-lg transition-colors font-medium"
+                    >
+                      <Bookmark className="w-3.5 h-3.5" />
+                      Save comparison
+                    </button>
+                  )
+                )}
+                {/* Save Dialog */}
+                {saveDialogOpen && (
+                  <div className="flex items-center gap-2 bg-gray-900 border border-gray-700 rounded-xl px-3 py-2">
+                    <input
+                      type="text"
+                      value={saveName}
+                      onChange={(e) => setSaveName(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleSaveCompare(); if (e.key === 'Escape') setSaveDialogOpen(false); }}
+                      placeholder="Name this comparison..."
+                      maxLength={80}
+                      autoFocus
+                      className="bg-transparent text-sm text-gray-100 placeholder-gray-500 focus:outline-none w-52"
+                    />
+                    <button
+                      onClick={handleSaveCompare}
+                      disabled={saving || !saveName.trim()}
+                      className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors"
+                    >
+                      {saving ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      onClick={() => setSaveDialogOpen(false)}
+                      className="p-1 text-gray-400 hover:text-gray-300 transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={() => {
                   setCreators([null, null]);
                   navigate('/compare', { replace: true });
+                  setSaveDialogOpen(false);
                 }}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-red-400 hover:bg-red-950/20 rounded-lg transition-colors"
               >
