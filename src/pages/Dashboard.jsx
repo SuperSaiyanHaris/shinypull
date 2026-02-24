@@ -64,45 +64,47 @@ export default function Dashboard() {
     try {
       const creators = await getFollowedCreators(user.id);
       setFollowedCreators(creators);
+      setLoading(false); // Show the list immediately — stats/live load in background
 
-      // Load stats for each creator (get 2 data points for growth comparison)
+      if (creators.length === 0) return;
+
+      const twitchCreators = creators.filter(c => c.platform === 'twitch');
+      const kickCreators = creators.filter(c => c.platform === 'kick');
+
+      // Fan out: all stat queries + live checks fire in parallel
+      const [statsResults, twitchLive, kickLive] = await Promise.all([
+        Promise.all(
+          creators.map(creator =>
+            getCreatorStats(creator.id, 7)
+              .then(data => ({ id: creator.id, data: data || [] }))
+              .catch(() => ({ id: creator.id, data: [] }))
+          )
+        ),
+        twitchCreators.length > 0
+          ? getTwitchLiveStreams(twitchCreators.map(c => c.username)).catch(() => [])
+          : Promise.resolve([]),
+        kickCreators.length > 0
+          ? getKickLiveStreams(kickCreators.map(c => c.username)).catch(() => [])
+          : Promise.resolve([]),
+      ]);
+
+      // Process stats
       const stats = {};
-      for (const creator of creators) {
-        const creatorStatsData = await getCreatorStats(creator.id, 7);
-        if (creatorStatsData?.length > 0) {
-          stats[creator.id] = {
-            current: creatorStatsData[0],
-            previous: creatorStatsData[1] || null,
-          };
+      for (const { id, data } of statsResults) {
+        if (data.length > 0) {
+          stats[id] = { current: data[0], previous: data[1] || null };
         }
       }
       setCreatorStats(stats);
 
-      // Check live status for Twitch and Kick streamers
+      // Process live status
       const allLive = new Set();
-      const twitchCreators = creators.filter(c => c.platform === 'twitch');
-      const kickCreators = creators.filter(c => c.platform === 'kick');
-
-      if (twitchCreators.length > 0) {
-        try {
-          const liveData = await getTwitchLiveStreams(twitchCreators.map(c => c.username));
-          liveData.forEach(s => allLive.add(s.username.toLowerCase()));
-        } catch (e) {
-          logger.warn('Failed to check Twitch live status:', e);
-        }
-      }
-      if (kickCreators.length > 0) {
-        try {
-          const liveData = await getKickLiveStreams(kickCreators.map(c => c.username));
-          liveData.forEach(s => allLive.add(s.username.toLowerCase()));
-        } catch (e) {
-          logger.warn('Failed to check Kick live status:', e);
-        }
-      }
+      twitchLive.forEach(s => allLive.add(s.username.toLowerCase()));
+      kickLive.forEach(s => allLive.add(s.username.toLowerCase()));
       setLiveStreamers(allLive);
+
     } catch (error) {
       logger.error('Failed to load followed creators:', error);
-    } finally {
       setLoading(false);
     }
   }
