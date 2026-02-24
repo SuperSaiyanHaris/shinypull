@@ -12,7 +12,7 @@ async function ensureUserExists(userId) {
     .from('users')
     .select('id')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
   if (existingUser) return;
 
@@ -104,11 +104,9 @@ export const isFollowing = withErrorHandling(
       .select('id')
       .eq('user_id', userId)
       .eq('creator_id', creatorId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') {
-      throw error;
-    }
+    if (error) throw error;
 
     return !!data;
   },
