@@ -358,7 +358,7 @@ export default function Compare() {
                         className="flex items-center gap-1.5 px-3 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors font-medium"
                       >
                         <Bookmark className="w-3.5 h-3.5" />
-                        Save
+                        Save Comparison
                       </button>
                     )
                   )}

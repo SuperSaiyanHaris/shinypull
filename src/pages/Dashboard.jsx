@@ -197,35 +197,7 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold text-gray-100 mb-1">
               Welcome back, {displayName}
             </h1>
-            <p className="text-gray-400 text-sm mb-6">Your creator tracking hub.</p>
-
-            {/* Stats Row */}
-            <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-xl border border-gray-700">
-                <Star className="w-4 h-4 text-yellow-500" />
-                <span className="text-sm font-semibold text-gray-100">{followedCreators.length}</span>
-                <span className="text-sm text-gray-400">Following</span>
-              </div>
-              {liveCount > 0 && (
-                <button
-                  onClick={() => { setActiveTab('following'); setSelectedPlatform('live'); }}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-950/40 rounded-xl border border-red-800 hover:border-red-600 transition-colors"
-                >
-                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                  <span className="text-sm font-semibold text-red-400">{liveCount} Live Now</span>
-                </button>
-              )}
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-xl border border-gray-700">
-                <Scale className="w-4 h-4 text-indigo-400" />
-                <span className="text-sm font-semibold text-gray-100">{savedCompares.length}</span>
-                <span className="text-sm text-gray-400">Saved Compares</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-xl border border-gray-700">
-                <Clock className="w-4 h-4 text-gray-400" />
-                <span className="text-sm font-semibold text-gray-100">{recentlyViewed.length}</span>
-                <span className="text-sm text-gray-400">Recently Viewed</span>
-              </div>
-            </div>
+            <p className="text-gray-400 text-sm">Your creator tracking hub.</p>
           </div>
         </div>
 
