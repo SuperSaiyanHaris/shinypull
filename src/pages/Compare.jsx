@@ -343,64 +343,66 @@ export default function Compare() {
 
           {/* Clear All / Save row */}
           {!loadingFromUrl && filledCreators.length > 0 && (
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                {filledCreators.length >= 2 && (
-                  savedFlash ? (
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-emerald-400 font-medium">
-                      <Check className="w-3.5 h-3.5" />
-                      Saved!
-                    </span>
-                  ) : (
-                    <button
-                      onClick={handleOpenSave}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-indigo-400 hover:text-indigo-300 hover:bg-indigo-950/30 rounded-lg transition-colors font-medium"
-                    >
-                      <Bookmark className="w-3.5 h-3.5" />
-                      Save comparison
-                    </button>
-                  )
-                )}
-                {/* Save Dialog */}
-                {saveDialogOpen && (
-                  <div className="flex items-center gap-2 bg-gray-900 border border-gray-700 rounded-xl px-3 py-2">
-                    <input
-                      type="text"
-                      value={saveName}
-                      onChange={(e) => setSaveName(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') handleSaveCompare(); if (e.key === 'Escape') setSaveDialogOpen(false); }}
-                      placeholder="Name this comparison..."
-                      maxLength={80}
-                      autoFocus
-                      className="bg-transparent text-sm text-gray-100 placeholder-gray-500 focus:outline-none w-52"
-                    />
-                    <button
-                      onClick={handleSaveCompare}
-                      disabled={saving || !saveName.trim()}
-                      className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors"
-                    >
-                      {saving ? 'Saving...' : 'Save'}
-                    </button>
-                    <button
-                      onClick={() => setSaveDialogOpen(false)}
-                      className="p-1 text-gray-400 hover:text-gray-300 transition-colors"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
+            <div className="flex flex-col gap-2 mb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {filledCreators.length >= 2 && (
+                    savedFlash ? (
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-emerald-400 font-medium bg-emerald-950/30 border border-emerald-800 rounded-lg">
+                        <Check className="w-3.5 h-3.5" />
+                        Saved!
+                      </span>
+                    ) : (
+                      <button
+                        onClick={handleOpenSave}
+                        className="flex items-center gap-1.5 px-3 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors font-medium"
+                      >
+                        <Bookmark className="w-3.5 h-3.5" />
+                        Save
+                      </button>
+                    )
+                  )}
+                </div>
+                <button
+                  onClick={() => {
+                    setCreators([null, null]);
+                    navigate('/compare', { replace: true });
+                    setSaveDialogOpen(false);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-red-400 hover:bg-red-950/20 rounded-lg transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  Clear all
+                </button>
               </div>
-              <button
-                onClick={() => {
-                  setCreators([null, null]);
-                  navigate('/compare', { replace: true });
-                  setSaveDialogOpen(false);
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-red-400 hover:bg-red-950/20 rounded-lg transition-colors"
-              >
-                <X className="w-3.5 h-3.5" />
-                Clear all
-              </button>
+              {/* Save Dialog - own row */}
+              {saveDialogOpen && (
+                <div className="flex items-center gap-2 bg-gray-900 border border-gray-700 rounded-xl px-3 py-2">
+                  <input
+                    type="text"
+                    value={saveName}
+                    onChange={(e) => setSaveName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleSaveCompare(); if (e.key === 'Escape') setSaveDialogOpen(false); }}
+                    placeholder="Name this comparison..."
+                    maxLength={80}
+                    autoFocus
+                    className="bg-transparent text-sm text-gray-100 placeholder-gray-500 focus:outline-none flex-1 min-w-0"
+                  />
+                  <button
+                    onClick={handleSaveCompare}
+                    disabled={saving || !saveName.trim()}
+                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors shrink-0"
+                  >
+                    {saving ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    onClick={() => setSaveDialogOpen(false)}
+                    className="p-1 text-gray-400 hover:text-gray-300 transition-colors shrink-0"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
