@@ -49,6 +49,7 @@ const ResetPassword = lazyWithRetry(() => import('./pages/ResetPassword'));
 const Calculator = lazyWithRetry(() => import('./pages/Calculator'));
 const Gear = lazyWithRetry(() => import('./pages/Gear'));
 const Support = lazyWithRetry(() => import('./pages/Support'));
+const Account = lazyWithRetry(() => import('./pages/Account'));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -103,6 +104,7 @@ function App() {
             <Route path="/:platform/:username" element={<CreatorProfile />} />
             <Route path="/auth/reset" element={<ResetPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/account" element={<Account />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<Privacy />} />
