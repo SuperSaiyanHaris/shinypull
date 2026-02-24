@@ -1267,7 +1267,9 @@ function GrowthRateCard({ label, value, platform }) {
   const iconColor = isPositive ? 'text-emerald-400' : isNegative ? 'text-red-500' : 'text-gray-300';
   const valueColor = isPositive ? 'text-emerald-400' : isNegative ? 'text-red-500' : 'text-gray-300';
 
-  const followerLabel = platform === 'tiktok' || platform === 'twitch' || platform === 'kick' || platform === 'bluesky' ? 'Followers' : 'Subscribers';
+  const followerLabel = platform === 'kick' ? 'Paid Subscribers'
+    : platform === 'tiktok' || platform === 'twitch' || platform === 'bluesky' ? 'Followers'
+    : 'Subscribers';
 
   return (
     <div className={`rounded-2xl border p-5 ${bgClass}`}>
@@ -1301,23 +1303,26 @@ function formatHoursWatched(hours) {
 }
 
 function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
+  // Dynamic milestones starting from 1K so small creators see realistic targets
   const followerMilestones = [
+    1000, 2000, 5000,
+    10000, 25000, 50000, 75000,
     100000, 250000, 500000, 750000,
     1000000, 2000000, 5000000, 10000000,
-    25000000, 50000000, 75000000, 100000000,
-    150000000, 200000000, 250000000, 300000000
+    25000000, 50000000, 100000000, 250000000, 500000000,
   ];
 
   const viewMilestones = [
     1000000, 5000000, 10000000, 25000000,
     50000000, 100000000, 250000000, 500000000,
     1000000000, 2500000000, 5000000000, 10000000000,
-    25000000000, 50000000000, 100000000000, 250000000000,
-    500000000000, 1000000000000
+    25000000000, 50000000000, 100000000000,
   ];
 
   const milestones = platform === 'youtube' ? viewMilestones : followerMilestones;
-  const metricLabel = platform === 'youtube' ? 'views' : 'followers';
+  const metricLabel = platform === 'youtube' ? 'views'
+    : platform === 'kick' ? 'paid subscribers'
+    : 'followers';
 
   // Find next milestones (up to 3)
   const nextMilestones = milestones
