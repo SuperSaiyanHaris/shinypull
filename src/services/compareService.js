@@ -32,6 +32,22 @@ export async function saveCompare(userId, name, creatorsParam) {
 }
 
 /**
+ * Find a saved comparison by creators_param for a user
+ * Normalizes the param (sorts entries) so order doesn't matter
+ */
+export async function findSavedCompare(userId, creatorsParam) {
+  const normalized = creatorsParam.split(',').sort().join(',');
+  const { data, error } = await supabase
+    .from('saved_compares')
+    .select('*')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  // Normalize each saved entry's param and compare
+  return (data || []).find(row => row.creators_param.split(',').sort().join(',') === normalized) || null;
+}
+
+/**
  * Delete a saved comparison
  */
 export async function deleteSavedCompare(id) {

@@ -12,7 +12,7 @@ import { searchChannels as searchTwitch, getChannelByUsername as getTwitchChanne
 import { searchChannels as searchKick, getChannelByUsername as getKickChannel } from '../services/kickService';
 import { searchBluesky, getBlueskyProfile } from '../services/blueskyService';
 import { searchCreators, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
-import { saveCompare } from '../services/compareService';
+import { saveCompare, findSavedCompare, deleteSavedCompare } from '../services/compareService';
 import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
@@ -37,6 +37,8 @@ export default function Compare() {
   const [saveName, setSaveName] = useState('');
   const [saving, setSaving] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [existingSave, setExistingSave] = useState(null); // { id, name } if already saved
+  const [removing, setRemoving] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const skipNextUrlLoad = useRef(false);
@@ -236,6 +238,25 @@ export default function Compare() {
     fetchGrowthData();
   }, [creators]);
 
+  // Check if this comparison is already saved
+  useEffect(() => {
+    const checkExisting = async () => {
+      const filled = creators.filter(Boolean);
+      if (!isAuthenticated || !user || filled.length < 2) {
+        setExistingSave(null);
+        return;
+      }
+      try {
+        const param = filled.map(c => `${c.platform}:${c.username}`).join(',');
+        const existing = await findSavedCompare(user.id, param);
+        setExistingSave(existing);
+      } catch (err) {
+        setExistingSave(null);
+      }
+    };
+    checkExisting();
+  }, [creators, user, isAuthenticated]);
+
   // Auto-generate compare name from creator display names
   const buildDefaultName = (creatorsArr) => {
     const names = creatorsArr.filter(Boolean).map(c => c.displayName);
@@ -261,14 +282,28 @@ export default function Compare() {
     setSaving(true);
     try {
       const param = creators.filter(Boolean).map(c => `${c.platform}:${c.username}`).join(',');
-      await saveCompare(user.id, saveName, param);
+      const saved = await saveCompare(user.id, saveName, param);
       setSaveDialogOpen(false);
+      setExistingSave(saved);
       setSavedFlash(true);
       setTimeout(() => setSavedFlash(false), 3000);
     } catch (err) {
       logger.error('Failed to save compare:', err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleRemoveSave = async () => {
+    if (!existingSave) return;
+    setRemoving(true);
+    try {
+      await deleteSavedCompare(existingSave.id);
+      setExistingSave(null);
+    } catch (err) {
+      logger.error('Failed to remove saved compare:', err);
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -352,6 +387,15 @@ export default function Compare() {
                         <Check className="w-3.5 h-3.5" />
                         Saved!
                       </span>
+                    ) : existingSave ? (
+                      <button
+                        onClick={handleRemoveSave}
+                        disabled={removing}
+                        className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-300 bg-gray-800 hover:bg-red-950/40 hover:text-red-400 border border-gray-700 hover:border-red-800 rounded-lg transition-colors font-medium"
+                      >
+                        <Bookmark className="w-3.5 h-3.5 fill-current" />
+                        {removing ? 'Removing...' : 'Saved'}
+                      </button>
                     ) : (
                       <button
                         onClick={handleOpenSave}
