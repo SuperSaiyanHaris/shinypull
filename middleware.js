@@ -72,7 +72,7 @@ function getMeta(pathname, searchParams) {
     };
   }
 
-  // /live/:platform/:username
+  // /live/:platform/:username — noindex (transient real-time pages, not useful for search)
   const liveMatch = pathname.match(/^\/live\/(\w+)\/([^/]+)$/);
   if (liveMatch && PLATFORM_NAMES[liveMatch[1]]) {
     const platform = PLATFORM_NAMES[liveMatch[1]];
@@ -80,6 +80,7 @@ function getMeta(pathname, searchParams) {
     return {
       title: `${username} Live Count - ShinyPull`,
       description: `Real-time live ${platform} subscriber and follower count for ${username}.`,
+      noindex: true,
     };
   }
 
@@ -124,12 +125,19 @@ export default async function middleware(request) {
   }
 
   // Inject page-specific values via string replacement
+  const canonicalUrl = `https://shinypull.com${url.pathname}`;
   html = html
     .replace(/(<title>)[^<]*(<\/title>)/, `$1${meta.title}$2`)
     .replace(/(<meta property="og:title" content=")[^"]*(")/,       `$1${meta.title}$2`)
     .replace(/(<meta property="og:description" content=")[^"]*(")/,  `$1${meta.description}$2`)
     .replace(/(<meta name="twitter:title" content=")[^"]*(")/,       `$1${meta.title}$2`)
-    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${meta.description}$2`);
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${meta.description}$2`)
+    .replace(/(<link rel="canonical" href=")[^"]*(")/,               `$1${canonicalUrl}$2`);
+
+  // For live pages, add noindex so they don't appear in search results
+  if (meta.noindex) {
+    html = html.replace('</head>', '  <meta name="robots" content="noindex, follow" />\n  </head>');
+  }
 
   return new Response(html, {
     headers: {
