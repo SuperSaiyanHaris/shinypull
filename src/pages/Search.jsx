@@ -55,7 +55,7 @@ async function searchTikTok(query, limit = 25) {
         .eq('creator_id', creator.id)
         .order('recorded_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       return {
         platform: 'tiktok',

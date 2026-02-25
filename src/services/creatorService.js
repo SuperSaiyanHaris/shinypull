@@ -172,32 +172,27 @@ export const getHoursWatched = withErrorHandling(
 );
 
 /**
- * Search creators in database
+ * Search creators in database (fuzzy: dots, underscores, dashes are ignored)
  */
 export const searchCreators = withErrorHandling(
   async (query, platform = null) => {
-    // Build OR conditions: match on raw query + normalized (spaces/special chars stripped)
-    // Sanitize query to prevent PostgREST filter injection
-    const sanitized = query.replace(/[,%()\\]/g, '');
-    const normalized = sanitized.replace(/[^a-zA-Z0-9._]/g, '').toLowerCase();
-    const conditions = [`username.ilike.%${sanitized}%,display_name.ilike.%${sanitized}%`];
-    if (normalized && normalized !== sanitized.toLowerCase()) {
-      conditions[0] += `,username.ilike.%${normalized}%`;
-    }
+    // Sanitize query to prevent injection via RPC params
+    const sanitized = query.replace(/[,%()\\]/g, '').trim();
+    if (!sanitized) return [];
 
-    let dbQuery = supabase
-      .from('creators')
-      .select('*')
-      .or(conditions[0]);
+    // If stripping all separators leaves fewer than 2 chars, the RPC would
+    // match everything or nothing useful — skip the round-trip.
+    const stripped = sanitized.replace(/[._\-\s]/g, '');
+    if (stripped.length < 2) return [];
 
-    if (platform) {
-      dbQuery = dbQuery.eq('platform', platform);
-    }
-
-    const { data, error } = await dbQuery.limit(20);
+    const { data, error } = await supabase.rpc('search_creators_fuzzy', {
+      p_query: sanitized,
+      p_platform: platform,
+      p_limit: 20,
+    });
 
     if (error) throw error;
-    return data;
+    return data || [];
   },
   'creatorService.searchCreators'
 );

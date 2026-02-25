@@ -125,49 +125,45 @@ async function getChannelBySlug(slug) {
 }
 
 async function searchChannels(query, maxResults = 25) {
-  // Kick API doesn't have a search endpoint, so we search our database first
-  // If nothing found, fallback to direct API lookup by slug
+  // Kick has no search API — search our database with fuzzy matching,
+  // then fall back to a direct slug lookup if nothing found.
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-  
-  const searchTerm = query.toLowerCase().trim().replace(/[,%()\\]/g, '');
-  
-  // Step 1: Search for creators in database with matching usernames
-  const { data: creators, error } = await supabase
-    .from('creators')
-    .select('*')
-    .eq('platform', 'kick')
-    .or(`username.ilike.%${searchTerm}%,display_name.ilike.%${searchTerm}%`)
-    .limit(maxResults);
-  
-  if (error) {
-    console.error('Database search error:', error);
-    // Don't return early, try API fallback
-  }
-  
-  // Step 2: If database returned results, use them
-  if (creators && creators.length > 0) {
-    // Get latest stats for each creator
-    const creatorIds = creators.map(c => c.id);
-    const { data: stats } = await supabase
-      .from('creator_stats')
-      .select('*')
-      .in('creator_id', creatorIds)
-      .order('recorded_at', { ascending: false });
-    
-    // Map stats to creators (get latest for each)
-    const statsMap = new Map();
-    if (stats) {
-      for (const stat of stats) {
-        if (!statsMap.has(stat.creator_id)) {
-          statsMap.set(stat.creator_id, stat);
+
+  const sanitized = query.toLowerCase().trim().replace(/[,%()\\]/g, '');
+  if (!sanitized) return [];
+
+  // Skip the RPC round-trip if the stripped query is too short to be useful
+  const stripped = sanitized.replace(/[._\-\s]/g, '');
+  if (stripped.length >= 2) {
+    // Step 1: Fuzzy search — same function used for TikTok and other DB platforms
+    const { data: creators, error } = await supabase.rpc('search_creators_fuzzy', {
+      p_query: sanitized,
+      p_platform: 'kick',
+      p_limit: maxResults,
+    });
+
+    if (error) {
+      console.error('Database fuzzy search error:', error);
+      // Fall through to API fallback below
+    } else if (creators && creators.length > 0) {
+      // Step 2: Fetch latest stats for matched creators
+      const creatorIds = creators.map(c => c.id);
+      const { data: stats } = await supabase
+        .from('creator_stats')
+        .select('creator_id, subscribers, recorded_at')
+        .in('creator_id', creatorIds)
+        .order('recorded_at', { ascending: false });
+
+      const statsMap = new Map();
+      if (stats) {
+        for (const stat of stats) {
+          if (!statsMap.has(stat.creator_id)) {
+            statsMap.set(stat.creator_id, stat);
+          }
         }
       }
-    }
-    
-    // Transform to expected format
-    return creators.map(creator => {
-      const latestStats = statsMap.get(creator.id) || {};
-      return {
+
+      return creators.map(creator => ({
         platform: 'kick',
         platformId: creator.platform_id,
         username: creator.username,
@@ -175,30 +171,28 @@ async function searchChannels(query, maxResults = 25) {
         profileImage: creator.profile_image,
         description: creator.description || '',
         category: creator.category,
-        subscribers: latestStats.subscribers || 0,
-        isLive: false, // We don't track live status in database
+        subscribers: statsMap.get(creator.id)?.subscribers || 0,
+        isLive: false,
         viewerCount: 0,
         streamTitle: null,
-      };
-    });
+      }));
+    }
   }
-  
-  // Step 3: No database results - try Kick API as fallback (treat query as exact slug)
+
+  // Step 3: No database results — try Kick API as a direct slug lookup
+  // Use sanitized (not stripped) so "kai-cenat" stays as "kai-cenat"
   try {
-    const slug = searchTerm.replace(/[^a-z0-9_-]/g, '');
+    const slug = sanitized.replace(/[^a-z0-9_-]/g, '');
     if (!slug) return [];
 
     const channel = await getChannelBySlug(slug);
     if (channel) {
-      // SECURITY: Don't save to database from frontend-facing API
-      // Frontend should call /api/update-creator if it wants to save the creator
-      // This follows our RLS security model (read-only frontend, write-only server)
       return [channel];
     }
   } catch (apiError) {
     console.error('Kick API fallback error:', apiError);
   }
-  
+
   return [];
 }
 
