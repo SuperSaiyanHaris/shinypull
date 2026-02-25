@@ -256,30 +256,76 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features Section - Minimal, integrated */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-900 border-t border-gray-800">
-          <div className="max-w-5xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
-              <Link to="/search" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-800/50 transition-all duration-200">
-                <div className="w-12 h-12 bg-indigo-950/50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
-                  <Search className="w-6 h-6 text-indigo-600" />
+        {/* Features Section */}
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-[#0a0a0f]">
+          <div className="max-w-6xl mx-auto">
+            {/* Section header */}
+            <div className="text-center mb-12 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100">Everything you need to track creators</h2>
+              <p className="mt-3 text-gray-400 text-base sm:text-lg">Real data. No guessing. Updated daily.</p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-5 sm:gap-6">
+              {/* Card 1 — Search */}
+              <Link
+                to="/search"
+                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-indigo-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-indigo-500/10"
+              >
+                {/* glow blob */}
+                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
+                {/* card number */}
+                <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">01</span>
+
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform duration-300">
+                    <Search className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-100 mb-2">Find Any Creator</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-6">Search across YouTube, TikTok, Twitch, Kick, and Bluesky. Real profiles with live stats.</p>
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-400 group-hover:gap-3 transition-all duration-200">
+                    Search now <ArrowRight className="w-4 h-4" />
+                  </span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-100 mb-2">Search Creators</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">Find any creator across YouTube, TikTok, Twitch, and Kick instantly.</p>
               </Link>
-              <Link to="/rankings" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-800/50 transition-all duration-200">
-                <div className="w-12 h-12 bg-indigo-950/50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
-                  <TrendingUp className="w-6 h-6 text-indigo-600" />
+
+              {/* Card 2 — Rankings */}
+              <Link
+                to="/rankings"
+                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-amber-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-amber-500/10"
+              >
+                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-colors duration-500" />
+                <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">02</span>
+
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-amber-500/30 group-hover:scale-105 transition-transform duration-300">
+                    <BarChart3 className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-100 mb-2">Top Rankings</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-6">See who's growing the fastest. Leaderboards updated daily across every platform.</p>
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-400 group-hover:gap-3 transition-all duration-200">
+                    View rankings <ArrowRight className="w-4 h-4" />
+                  </span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-100 mb-2">Track Growth</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">Daily, weekly, and monthly stats with historical charts and trends.</p>
               </Link>
-              <Link to="/compare" className="group text-center sm:text-left p-6 sm:p-8 rounded-2xl hover:bg-gray-800/50 transition-all duration-200">
-                <div className="w-12 h-12 bg-indigo-950/50 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0 group-hover:scale-110 transition-transform">
-                  <BarChart3 className="w-6 h-6 text-indigo-600" />
+
+              {/* Card 3 — Compare */}
+              <Link
+                to="/compare"
+                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-emerald-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-emerald-500/10"
+              >
+                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors duration-500" />
+                <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">03</span>
+
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-300">
+                    <GitCompare className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-100 mb-2">Compare Creators</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-6">Put any creators head to head. Subscribers, views, and growth. All in one chart.</p>
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400 group-hover:gap-3 transition-all duration-200">
+                    Compare now <ArrowRight className="w-4 h-4" />
+                  </span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-100 mb-2">Compare & Rank</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">Side-by-side comparisons and rankings across all platforms.</p>
               </Link>
             </div>
           </div>
