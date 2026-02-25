@@ -1324,9 +1324,10 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
     : platform === 'kick' ? 'paid subscribers'
     : 'followers';
 
-  // Find next milestones (up to 3)
+  // Only show milestones reachable within ~5 years — anything beyond that isn't useful
+  const MAX_DAYS = 1825;
   const nextMilestones = milestones
-    .filter(m => m > currentCount)
+    .filter(m => m > currentCount && dailyGrowth > 0 && Math.ceil((m - currentCount) / dailyGrowth) <= MAX_DAYS)
     .slice(0, 3);
 
   if (nextMilestones.length === 0 || dailyGrowth <= 0) {

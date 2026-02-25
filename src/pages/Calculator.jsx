@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calculator as CalcIcon, DollarSign, TrendingUp, Youtube, Search, Loader2, Info, ArrowRight, ExternalLink } from 'lucide-react';
 import { searchChannels } from '../services/youtubeService';
+import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
 import { formatNumber } from '../lib/utils';
 
@@ -42,6 +43,32 @@ export default function Calculator() {
   const [selectedCreator, setSelectedCreator] = useState(null);
   const [showResults, setShowResults] = useState(false);
 
+  // Restore state when user hits Back from a creator profile they navigated to from here
+  useEffect(() => {
+    const navType = performance.getEntriesByType('navigation')[0]?.type;
+    if (navType === 'back_forward') {
+      try {
+        const saved = sessionStorage.getItem('calc_state');
+        if (saved) {
+          const state = JSON.parse(saved);
+          if (state.selectedCreator) setSelectedCreator(state.selectedCreator);
+          if (state.dailyViews) setDailyViews(state.dailyViews);
+          if (state.rpmLow) setRpmLow(state.rpmLow);
+          if (state.rpmHigh) setRpmHigh(state.rpmHigh);
+        }
+      } catch {}
+    }
+  }, []);
+
+  // Persist current creator state to sessionStorage whenever it changes
+  useEffect(() => {
+    if (selectedCreator) {
+      sessionStorage.setItem('calc_state', JSON.stringify({ selectedCreator, dailyViews, rpmLow, rpmHigh }));
+    } else {
+      sessionStorage.removeItem('calc_state');
+    }
+  }, [selectedCreator, dailyViews, rpmLow, rpmHigh]);
+
   // Calculate earnings
   const calculateEarnings = (views, rpm) => {
     return (views / 1000) * rpm * currency.rate;
@@ -79,33 +106,66 @@ export default function Calculator() {
     }
   };
 
-  const selectCreator = (creator) => {
+  const selectCreator = async (creator) => {
     setSelectedCreator(creator);
     setShowResults(false);
     setSearchQuery('');
 
-    // Calculate estimated daily views from total views / channel age
-    if (creator.totalViews && creator.totalPosts > 0) {
-      // Rough estimate: total views / (videos * 30 days average)
-      const estimatedDailyViews = Math.round(creator.totalViews / (creator.totalPosts * 30));
-      setDailyViews(Math.max(1000, Math.min(10000000, estimatedDailyViews)));
-    }
-
     // Set RPM based on category/niche (estimated ranges)
     const category = creator.category?.toLowerCase() || '';
-    if (category.includes('gaming') || category.includes('entertainment')) {
-      setRpmLow(0.25);
-      setRpmHigh(2.00);
-    } else if (category.includes('finance') || category.includes('tech') || category.includes('business')) {
-      setRpmLow(3.00);
-      setRpmHigh(7.00);
+    let newRpmLow, newRpmHigh;
+    if (category.includes('finance') || category.includes('tech') || category.includes('business')) {
+      newRpmLow = 3.00; newRpmHigh = 7.00;
     } else if (category.includes('education') || category.includes('how-to')) {
-      setRpmLow(1.50);
-      setRpmHigh(5.00);
+      newRpmLow = 1.50; newRpmHigh = 5.00;
     } else {
-      // Default/general content
-      setRpmLow(1.00);
-      setRpmHigh(4.00);
+      // Gaming, entertainment, general — use same range as profile page
+      newRpmLow = 2.00; newRpmHigh = 7.00;
+    }
+    setRpmLow(newRpmLow);
+    setRpmHigh(newRpmHigh);
+
+    // Try to get real daily views from our database first
+    let gotRealViews = false;
+    if (creator.platformId) {
+      try {
+        const { data: dbCreator } = await supabase
+          .from('creators')
+          .select('id')
+          .eq('platform', 'youtube')
+          .eq('platform_id', creator.platformId)
+          .single();
+
+        if (dbCreator) {
+          const { data: recentStats } = await supabase
+            .from('creator_stats')
+            .select('total_views, recorded_at')
+            .eq('creator_id', dbCreator.id)
+            .order('recorded_at', { ascending: false })
+            .limit(14);
+
+          if (recentStats && recentStats.length >= 2) {
+            const latest = recentStats[0];
+            const oldest = recentStats[recentStats.length - 1];
+            const days = Math.max(1, Math.round(
+              (new Date(latest.recorded_at) - new Date(oldest.recorded_at)) / (1000 * 60 * 60 * 24)
+            ));
+            const realDailyViews = Math.round((latest.total_views - oldest.total_views) / days);
+            if (realDailyViews > 0) {
+              setDailyViews(Math.max(1000, Math.min(10000000, realDailyViews)));
+              gotRealViews = true;
+            }
+          }
+        }
+      } catch (err) {
+        console.error('DB lookup failed:', err);
+      }
+    }
+
+    if (!gotRealViews && creator.totalViews && creator.totalPosts > 0) {
+      // Fallback: rough estimate — total views divided by videos * 365 (1-year avg video lifespan)
+      const estimatedDailyViews = Math.round(creator.totalViews / (creator.totalPosts * 365));
+      setDailyViews(Math.max(1000, Math.min(10000000, estimatedDailyViews)));
     }
   };
 
