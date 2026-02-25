@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, TrendingUp, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, ShoppingBag, ExternalLink, X, Users, Eye, GitCompare } from 'lucide-react';
+import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, X, GitCompare } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { getAllPosts } from '../services/blogService';
-import { getActiveProducts } from '../services/productsService';
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-950/30', textColor: 'text-red-600', ringColor: 'ring-red-800', stats: '72M+ channels', available: true },
@@ -28,7 +27,6 @@ const typewriterWords = [
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [latestPosts, setLatestPosts] = useState([]);
-  const [featuredProducts, setFeaturedProducts] = useState([]);
   const navigate = useNavigate();
 
   // Typewriter effect
@@ -61,73 +59,6 @@ export default function Home() {
 
   useEffect(() => {
     getAllPosts().then(posts => setLatestPosts(posts.slice(0, 3)));
-    getActiveProducts().then(products => {
-      // Categorize products (same logic as Gear page)
-      const categorizeProduct = (product) => {
-        const name = (product.name || '').toLowerCase();
-        const slug = (product.slug || '').toLowerCase();
-        
-        if (name.includes('microphone') || name.includes('mic ') || slug.includes('mic') || name.includes('sm7b') || name.includes('k669')) {
-          return 'microphones';
-        }
-        if (name.includes('camera') || name.includes('webcam') || slug.includes('cam') || name.includes('zv-1') || name.includes('zv1') || name.includes('kiyo')) {
-          return 'cameras';
-        }
-        if (name.includes('light') || name.includes('softbox') || name.includes('ring light') || slug.includes('light') || slug.includes('green-screen')) {
-          return 'lighting';
-        }
-        if (name.includes('audio interface') || name.includes('xlr') || name.includes('mixer') || name.includes('goxlr') || name.includes('rodecaster') || name.includes('cloudlifter') || name.includes('scarlett') || name.includes('beacn') || slug.includes('wave-xlr')) {
-          return 'audio';
-        }
-        if (name.includes('capture card') || name.includes('cam link') || slug.includes('hd60') || slug.includes('cam-link') || slug.includes('gamer-mini')) {
-          return 'capture';
-        }
-        return 'accessories';
-      };
-      
-      // Group products by category
-      const byCategory = {};
-      products.forEach(product => {
-        const category = categorizeProduct(product);
-        if (!byCategory[category]) byCategory[category] = [];
-        byCategory[category].push(product);
-      });
-      
-      // Daily rotation with category diversity
-      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-      
-      // Simple hash function using date as seed
-      const hashWithSeed = (str, seed) => {
-        let hash = seed;
-        for (let i = 0; i < str.length; i++) {
-          hash = ((hash << 5) - hash) + str.charCodeAt(i);
-          hash = hash & hash;
-        }
-        return Math.abs(hash);
-      };
-      
-      const seed = hashWithSeed(today, 0);
-      
-      // Get categories with products, shuffle them daily
-      const categories = Object.keys(byCategory).sort((a, b) => {
-        return hashWithSeed(a, seed) - hashWithSeed(b, seed);
-      });
-      
-      // Pick one product from each of the first 4 categories
-      const selected = [];
-      for (let i = 0; i < Math.min(4, categories.length); i++) {
-        const categoryProducts = byCategory[categories[i]];
-        // Shuffle products within category and pick first one
-        const shuffled = [...categoryProducts].sort((a, b) => {
-          const hashA = hashWithSeed(a.id || a.slug, seed);
-          const hashB = hashWithSeed(b.id || b.slug, seed);
-          return hashA - hashB;
-        });
-        selected.push(shuffled[0]);
-      }
-      
-      setFeaturedProducts(selected);
-    });
   }, []);
 
   const handleSearch = (e) => {
@@ -371,85 +302,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Recommended Gear */}
-        {featuredProducts.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-800/50">
-            <div className="max-w-6xl mx-auto">
-              <div className="flex items-center justify-between mb-12">
-                <div>
-                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-100 mb-2">
-                    Recommended Gear
-                  </h2>
-                  <p className="text-lg text-gray-300">
-                    Top picks for streamers and content creators
-                  </p>
-                </div>
-                <Link
-                  to="/gear"
-                  className="hidden sm:flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-300 transition-colors"
-                >
-                  View all gear <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-                {featuredProducts.map(product => {
-                  const affiliateLink = product.affiliate_link || product.affiliateLink;
-                  const hasImage = product.image && product.image.trim() !== '';
-
-                  return (
-                    <div key={product.id} className="bg-gray-900 rounded-xl border border-gray-700 p-4 hover:shadow-lg hover:border-indigo-700 transition-all flex flex-col group">
-                      <div className="w-full aspect-square bg-gray-800/50 rounded-lg flex items-center justify-center overflow-hidden mb-3">
-                        {hasImage ? (
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            loading="lazy"
-                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-indigo-900/30 to-purple-900/30 flex items-center justify-center">
-                            <ShoppingBag className="w-8 h-8 text-indigo-300" />
-                          </div>
-                        )}
-                      </div>
-                      {product.badge && (
-                        <span className="inline-block self-start px-2 py-0.5 bg-indigo-900/50 text-indigo-300 text-xs font-semibold rounded-full mb-2">
-                          {product.badge}
-                        </span>
-                      )}
-                      <h3 className="text-sm font-semibold text-gray-100 line-clamp-2 leading-snug mb-2">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center justify-between mt-auto">
-                        <p className="text-lg font-bold text-indigo-600">{product.price}</p>
-                        {affiliateLink ? (
-                          <a
-                            href={affiliateLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors"
-                          >
-                            Buy <ExternalLink className="w-3 h-3" />
-                          </a>
-                        ) : (
-                          <span className="px-3 py-1.5 bg-gray-800 text-gray-300 text-sm font-medium rounded-lg">Soon</span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <Link
-                to="/gear"
-                className="mt-8 flex sm:hidden items-center justify-center gap-2 text-indigo-600 font-medium hover:text-indigo-300 transition-colors"
-              >
-                View all gear <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </section>
-        )}
 
         {/* Latest Blog Posts */}
         {latestPosts.length > 0 && (
@@ -491,9 +343,6 @@ export default function Home() {
 
                     {/* Content */}
                     <div className="relative p-6 flex flex-col flex-1">
-                      {/* Ghost number */}
-                      <span className="absolute bottom-5 right-6 text-5xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors leading-none">0{index + 1}</span>
-
                       <span className="inline-block px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-full mb-3 self-start">
                         {post.category}
                       </span>
