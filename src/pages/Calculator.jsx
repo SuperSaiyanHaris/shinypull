@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigationType } from 'react-router-dom';
 import { Calculator as CalcIcon, DollarSign, TrendingUp, Youtube, Search, Loader2, Info, ArrowRight, ExternalLink } from 'lucide-react';
 import { searchChannels } from '../services/youtubeService';
 import { supabase } from '../lib/supabase';
@@ -30,6 +30,8 @@ const DEFAULT_RPM_LOW = 0.25;
 const DEFAULT_RPM_HIGH = 4.00;
 
 export default function Calculator() {
+  const navigationType = useNavigationType(); // 'POP' = back/forward, 'PUSH' = Link click
+
   const [mode, setMode] = useState('creator'); // 'creator' or 'personal'
   const [dailyViews, setDailyViews] = useState(10000);
   const [rpmLow, setRpmLow] = useState(DEFAULT_RPM_LOW);
@@ -43,10 +45,10 @@ export default function Calculator() {
   const [selectedCreator, setSelectedCreator] = useState(null);
   const [showResults, setShowResults] = useState(false);
 
-  // Restore state when user hits Back from a creator profile they navigated to from here
+  // Restore state when user hits Back from a creator profile they navigated to from here.
+  // React Router uses 'POP' for back/forward navigation (not the browser's performance API type).
   useEffect(() => {
-    const navType = performance.getEntriesByType('navigation')[0]?.type;
-    if (navType === 'back_forward') {
+    if (navigationType === 'POP') {
       try {
         const saved = sessionStorage.getItem('calc_state');
         if (saved) {

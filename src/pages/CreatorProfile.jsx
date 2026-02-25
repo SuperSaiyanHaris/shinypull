@@ -1303,20 +1303,20 @@ function formatHoursWatched(hours) {
 }
 
 function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
-  // Dynamic milestones starting from 1K so small creators see realistic targets
   const followerMilestones = [
     1000, 2000, 5000,
     10000, 25000, 50000, 75000,
     100000, 250000, 500000, 750000,
     1000000, 2000000, 5000000, 10000000,
-    25000000, 50000000, 100000000, 250000000, 500000000,
+    15000000, 20000000, 25000000, 30000000, 40000000, 50000000,
+    75000000, 100000000, 250000000, 500000000,
   ];
 
   const viewMilestones = [
     1000000, 5000000, 10000000, 25000000,
     50000000, 100000000, 250000000, 500000000,
-    1000000000, 2500000000, 5000000000, 10000000000,
-    25000000000, 50000000000, 100000000000,
+    1000000000, 2000000000, 3000000000, 4000000000, 5000000000,
+    10000000000, 25000000000, 50000000000, 100000000000,
   ];
 
   const milestones = platform === 'youtube' ? viewMilestones : followerMilestones;
@@ -1324,34 +1324,69 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
     : platform === 'kick' ? 'paid subscribers'
     : 'followers';
 
-  // Only show milestones reachable within ~5 years — anything beyond that isn't useful
+  if (dailyGrowth <= 0) return null;
+
+  // Step 1: Find milestones from the static list within 5 years
   const MAX_DAYS = 1825;
-  const nextMilestones = milestones
-    .filter(m => m > currentCount && dailyGrowth > 0 && Math.ceil((m - currentCount) / dailyGrowth) <= MAX_DAYS)
+  const fromList = milestones
+    .filter(m => m > currentCount && Math.ceil((m - currentCount) / dailyGrowth) <= MAX_DAYS)
     .slice(0, 3);
 
-  if (nextMilestones.length === 0 || dailyGrowth <= 0) {
-    return null;
+  let nextMilestones;
+
+  if (fromList.length === 0) {
+    // No static milestone reachable within 5 years (large slow-growing creator).
+    // Generate 3 synthetic milestones at ~3 months, ~1 year, and ~2 years out.
+    // Round each delta UP to 1 significant figure so numbers look clean.
+    const roundDeltaUp = (delta) => {
+      if (delta <= 0) return delta;
+      const mag = Math.pow(10, Math.floor(Math.log10(delta)));
+      return Math.ceil(delta / mag) * mag;
+    };
+    const used = new Set();
+    const synthetics = [];
+    for (const days of [90, 365, 730, 180, 500, 1000, 1500]) {
+      if (synthetics.length >= 3) break;
+      const rounded = currentCount + roundDeltaUp(dailyGrowth * days);
+      if (rounded > currentCount && !used.has(rounded)) {
+        used.add(rounded);
+        synthetics.push(rounded);
+      }
+    }
+    nextMilestones = synthetics.sort((a, b) => a - b);
+  } else if (fromList.length < 3) {
+    // Have 1-2 real milestones — fill remaining slots with the next ones from the static list
+    // (no time cap, so they may be long-term goals, but at least they're clean round numbers)
+    const alreadyUsed = new Set(fromList);
+    const extras = milestones
+      .filter(m => m > currentCount && !alreadyUsed.has(m))
+      .slice(0, 3 - fromList.length);
+    nextMilestones = [...fromList, ...extras];
+  } else {
+    nextMilestones = fromList;
   }
+
+  if (nextMilestones.length === 0) return null;
 
   const predictions = nextMilestones.map(milestone => {
     const needed = milestone - currentCount;
     const daysNeeded = Math.ceil(needed / dailyGrowth);
     const estimatedDate = new Date();
     estimatedDate.setDate(estimatedDate.getDate() + daysNeeded);
-
-    return {
-      milestone,
-      needed,
-      daysNeeded,
-      estimatedDate,
-    };
+    return { milestone, needed, daysNeeded, estimatedDate };
   });
 
+  // Show decimal places for non-round values (e.g. 2.79B from synthetic milestones)
   const formatMilestone = (num) => {
-    if (num >= 1000000000000) return (num / 1000000000000).toFixed(0) + 'T';
-    if (num >= 1000000000) return (num / 1000000000).toFixed(0) + 'B';
-    if (num >= 1000000) return (num / 1000000).toFixed(0) + 'M';
+    if (num >= 1e12) return (num / 1e12).toFixed(0) + 'T';
+    if (num >= 1e9) {
+      const v = num / 1e9;
+      return (Number.isInteger(v) ? v.toFixed(0) : parseFloat(v.toFixed(2)).toString()) + 'B';
+    }
+    if (num >= 1e6) {
+      const v = num / 1e6;
+      return (Number.isInteger(v) ? v.toFixed(0) : parseFloat(v.toFixed(1)).toString()) + 'M';
+    }
     if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
     return num.toLocaleString();
   };
