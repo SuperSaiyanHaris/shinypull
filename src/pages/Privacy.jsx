@@ -10,7 +10,7 @@ export default function Privacy() {
 
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Hero */}
-        <div className="relative overflow-hidden border-b border-gray-800/60 py-16 bg-gradient-to-b from-gray-900/80 to-transparent">
+        <div className="relative overflow-hidden border-b border-gray-800/60 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Privacy Policy</h1>
             <p className="text-gray-400">Last updated: February 11, 2026</p>

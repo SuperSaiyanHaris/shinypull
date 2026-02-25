@@ -92,7 +92,7 @@ export default function Gear() {
 
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Hero */}
-        <section className="relative overflow-hidden border-b border-gray-800/60 bg-gradient-to-b from-gray-900/80 to-transparent">
+        <section className="relative overflow-hidden border-b border-gray-800/60">
           <div className="w-full px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-12 sm:pb-16">
             <div className="text-center max-w-4xl mx-auto">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-950/50 border border-indigo-800 rounded-full text-sm font-medium text-indigo-400 mb-6">
