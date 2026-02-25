@@ -267,31 +267,27 @@ export default function Home() {
           <div className="max-w-6xl mx-auto">
             <Link
               to="/youtube/money-calculator"
-              className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-yellow-500/50 rounded-2xl p-7 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-yellow-500/10"
+              className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-yellow-500/50 rounded-2xl p-7 sm:p-10 flex flex-col sm:flex-row items-start gap-6 sm:gap-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-yellow-500/10"
             >
               {/* Glow blobs */}
               <div className="pointer-events-none absolute -top-16 -left-16 w-56 h-56 bg-yellow-500/10 rounded-full blur-3xl group-hover:bg-yellow-500/20 transition-colors duration-500" />
               <div className="pointer-events-none absolute -bottom-16 -right-16 w-56 h-56 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/15 transition-colors duration-500" />
 
-              {/* Ghost label */}
-              <span className="pointer-events-none absolute top-5 right-7 text-6xl sm:text-8xl font-black text-gray-800 select-none leading-none group-hover:text-gray-700 transition-colors">$$$</span>
+              {/* Ghost label — bottom right, away from content */}
+              <span className="pointer-events-none absolute bottom-5 right-7 text-6xl sm:text-8xl font-black text-gray-800 select-none leading-none group-hover:text-gray-700 transition-colors">$$$</span>
 
               {/* Icon box */}
               <div className="relative flex-shrink-0 w-16 h-16 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/30 group-hover:scale-105 transition-transform duration-300">
                 <DollarSign className="w-8 h-8 text-white" />
               </div>
 
-              {/* Text */}
+              {/* Text + CTA */}
               <div className="relative flex-1 min-w-0">
                 <p className="text-yellow-400 text-xs font-semibold uppercase tracking-widest mb-1">Free Tool</p>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-2">YouTube Money Calculator</h2>
-                <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-lg">
+                <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-lg mb-6">
                   Estimate how much any YouTuber earns from their videos. Enter a channel and get a real earnings range based on view counts and CPM data.
                 </p>
-              </div>
-
-              {/* CTA */}
-              <div className="relative flex-shrink-0">
                 <span className="inline-flex items-center gap-2.5 px-6 py-3 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 font-bold rounded-xl group-hover:bg-yellow-500/20 group-hover:border-yellow-500/50 group-hover:gap-4 transition-all duration-200 whitespace-nowrap">
                   <Calculator className="w-5 h-5" />
                   Try Calculator
@@ -305,7 +301,7 @@ export default function Home() {
 
         {/* Latest Blog Posts */}
         {latestPosts.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-gray-900">
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-[#0a0a0f]">
             <div className="max-w-6xl mx-auto">
               {/* Section header */}
               <div className="flex items-end justify-between mb-12 sm:mb-16">
@@ -377,21 +373,27 @@ export default function Home() {
         )}
 
         {/* CTA Section */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-800/50 border-t border-gray-800">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-3">
-              Ready to dive in?
-            </h2>
-            <p className="text-gray-300 mb-8 max-w-lg mx-auto">
-              Search for any creator and get real-time analytics instantly.
-            </p>
-            <Link
-              to="/search"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-500 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-            >
-              Get Started
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-[#0a0a0f]">
+          <div className="max-w-6xl mx-auto">
+            <div className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-indigo-500/40 rounded-2xl p-10 sm:p-14 text-center transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10">
+              {/* Glow blobs */}
+              <div className="pointer-events-none absolute -top-20 -left-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
+              <div className="pointer-events-none absolute -bottom-20 -right-20 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors duration-500" />
+
+              <div className="relative">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-3">Ready to dive in?</h2>
+                <p className="text-gray-400 mb-8 max-w-lg mx-auto text-base sm:text-lg">
+                  Search for any creator and get real-time analytics instantly.
+                </p>
+                <Link
+                  to="/search"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5"
+                >
+                  Get Started
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
       </div>
