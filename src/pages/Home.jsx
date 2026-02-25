@@ -242,18 +242,18 @@ export default function Home() {
               {/* Card 3 — Compare */}
               <Link
                 to="/compare"
-                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-emerald-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-emerald-500/10"
+                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-cyan-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-cyan-500/10"
               >
-                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors duration-500" />
+                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-colors duration-500" />
                 <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">03</span>
 
                 <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-300">
+                  <div className="w-14 h-14 bg-gradient-to-br from-cyan-400 to-sky-500 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-transform duration-300">
                     <GitCompare className="w-7 h-7 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-100 mb-2">Compare Creators</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-6">Put any creators head to head. Subscribers, views, and growth. All in one chart.</p>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400 group-hover:gap-3 transition-all duration-200">
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-400 group-hover:gap-3 transition-all duration-200">
                     Compare now <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
@@ -267,28 +267,28 @@ export default function Home() {
           <div className="max-w-6xl mx-auto">
             <Link
               to="/youtube/money-calculator"
-              className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-yellow-500/50 rounded-2xl p-7 sm:p-10 flex flex-col sm:flex-row items-start gap-6 sm:gap-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-yellow-500/10"
+              className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-emerald-500/50 rounded-2xl p-7 sm:p-10 flex flex-col sm:flex-row items-start gap-6 sm:gap-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10"
             >
               {/* Glow blobs */}
-              <div className="pointer-events-none absolute -top-16 -left-16 w-56 h-56 bg-yellow-500/10 rounded-full blur-3xl group-hover:bg-yellow-500/20 transition-colors duration-500" />
-              <div className="pointer-events-none absolute -bottom-16 -right-16 w-56 h-56 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/15 transition-colors duration-500" />
+              <div className="pointer-events-none absolute -top-16 -left-16 w-56 h-56 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors duration-500" />
+              <div className="pointer-events-none absolute -bottom-16 -right-16 w-56 h-56 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/15 transition-colors duration-500" />
 
               {/* Ghost label — bottom right, away from content */}
               <span className="pointer-events-none absolute bottom-5 right-7 text-6xl sm:text-8xl font-black text-gray-800 select-none leading-none group-hover:text-gray-700 transition-colors">$$$</span>
 
               {/* Icon box */}
-              <div className="relative flex-shrink-0 w-16 h-16 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/30 group-hover:scale-105 transition-transform duration-300">
+              <div className="relative flex-shrink-0 w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-300">
                 <DollarSign className="w-8 h-8 text-white" />
               </div>
 
               {/* Text + CTA */}
               <div className="relative flex-1 min-w-0">
-                <p className="text-yellow-400 text-xs font-semibold uppercase tracking-widest mb-1">Free Tool</p>
+                <p className="text-emerald-400 text-xs font-semibold uppercase tracking-widest mb-1">Free Tool</p>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-2">YouTube Money Calculator</h2>
                 <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-lg mb-6">
                   Estimate how much any YouTuber earns from their videos. Enter a channel and get a real earnings range based on view counts and CPM data.
                 </p>
-                <span className="inline-flex items-center gap-2.5 px-6 py-3 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 font-bold rounded-xl group-hover:bg-yellow-500/20 group-hover:border-yellow-500/50 group-hover:gap-4 transition-all duration-200 whitespace-nowrap">
+                <span className="inline-flex items-center gap-2.5 px-6 py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold rounded-xl group-hover:bg-emerald-500/20 group-hover:border-emerald-500/50 group-hover:gap-4 transition-all duration-200 whitespace-nowrap">
                   <Calculator className="w-5 h-5" />
                   Try Calculator
                   <ArrowRight className="w-4 h-4" />
