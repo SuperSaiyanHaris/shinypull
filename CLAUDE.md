@@ -415,82 +415,20 @@ When you need to update a blog post with large content changes:
 
 2. **Schema/DDL/RLS changes:** Use the Supabase Management API SQL endpoint. This can run ANY SQL including CREATE POLICY, ALTER TABLE, etc.
 
-**Management API setup (for DDL/RLS changes):**
-- Project ref: `ziiqqbfcncjdewjkbvyq`
-- Endpoint: `POST https://api.supabase.com/v1/projects/{ref}/database/query`
-- Auth: `Bearer <access_token>` (NOT the service_role key)
-- Body: `{ "query": "YOUR SQL HERE" }`
-- The access token is stored in **Windows Credential Manager** under `Supabase CLI:supabase`
+**Running DDL/schema SQL — use the built-in helper script:**
+```bash
+node scripts/run-sql.js "YOUR SQL HERE"
 
-**Extracting the access token (PowerShell — copy-paste ready):**
-```powershell
-powershell.exe -Command "
-$code = @'
-using System;
-using System.Runtime.InteropServices;
-using System.Text;
-public class CredManager {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    private struct CREDENTIAL {
-        public int Flags; public int Type;
-        [MarshalAs(UnmanagedType.LPWStr)] public string TargetName;
-        [MarshalAs(UnmanagedType.LPWStr)] public string Comment;
-        public long LastWritten; public int CredentialBlobSize;
-        public IntPtr CredentialBlob; public int Persist;
-        public int AttributeCount; public IntPtr Attributes;
-        [MarshalAs(UnmanagedType.LPWStr)] public string TargetAlias;
-        [MarshalAs(UnmanagedType.LPWStr)] public string UserName;
-    }
-    [DllImport(\"advapi32.dll\", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern bool CredRead(string target, int type, int reservedFlag, out IntPtr credentialPtr);
-    [DllImport(\"advapi32.dll\")]
-    private static extern void CredFree(IntPtr buffer);
-    public static string GetCredential(string target) {
-        IntPtr ptr;
-        if (CredRead(target, 1, 0, out ptr)) {
-            var cred = (CREDENTIAL)Marshal.PtrToStructure(ptr, typeof(CREDENTIAL));
-            byte[] bytes = new byte[cred.CredentialBlobSize];
-            Marshal.Copy(cred.CredentialBlob, bytes, 0, cred.CredentialBlobSize);
-            CredFree(ptr);
-            return Encoding.UTF8.GetString(bytes);
-        }
-        return null;
-    }
-}
-'@
-Add-Type -TypeDefinition \$code
-[CredManager]::GetCredential('Supabase CLI:supabase')
-"
+# Examples:
+node scripts/run-sql.js "SELECT tablename, policyname FROM pg_policies WHERE schemaname = 'public'"
+node scripts/run-sql.js "CREATE INDEX CONCURRENTLY ..."
+node scripts/run-sql.js "ALTER TABLE creators ADD COLUMN ..."
+node scripts/run-sql.js "$(cat my-migration.sql)"
 ```
 
-**Complete Node.js example for running SQL:**
-```js
-// Pass the access token as argv[2]
-const ACCESS_TOKEN = process.argv[2];
-const PROJECT_REF = 'ziiqqbfcncjdewjkbvyq';
+`scripts/run-sql.js` reads the Supabase CLI access token from Windows Credential Manager at runtime (stored there by `npx supabase login`). No credentials are in the file — it is safe to commit. If it fails with a token error, run `npx supabase login` to re-authenticate.
 
-async function runSQL(sql) {
-  const res = await fetch(
-    `https://api.supabase.com/v1/projects/${PROJECT_REF}/database/query`,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${ACCESS_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ query: sql }),
-    }
-  );
-  if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`);
-  return res.json();
-}
-
-// Example: inspect policies
-const policies = await runSQL(`
-  SELECT tablename, policyname, roles, cmd
-  FROM pg_policies WHERE schemaname = 'public'
-`);
-```
+**NEVER write `.ps1` files to the repo** to extract the token manually. That's what `run-sql.js` is for. The repo has `*.ps1` in `.gitignore` as a safeguard.
 
 **Important notes:**
 - `npx supabase db dump`, `db pull`, and `db diff` all require Docker (not installed) — do NOT use them
@@ -562,4 +500,4 @@ All tables have RLS enabled. Here are the current policies:
 
 ---
 
-*Last updated: 2026-02-19*
+*Last updated: 2026-02-24*
