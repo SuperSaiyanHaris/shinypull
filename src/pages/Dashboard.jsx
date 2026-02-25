@@ -249,7 +249,8 @@ export default function Dashboard() {
                         onClick={() => setSelectedPlatform(p)}
                         label={PLATFORM_LABELS[p]}
                         count={platformCounts[p]}
-                        icon={<Icon className={`w-3.5 h-3.5 ${platformColors[p].text}`} />}
+                        platform={p}
+                        icon={<Icon className={`w-3.5 h-3.5 ${selectedPlatform === p ? 'text-white' : platformColors[p].text}`} />}
                       />
                     );
                   })}
@@ -566,15 +567,27 @@ export default function Dashboard() {
   );
 }
 
-function FilterChip({ active, onClick, label, count, icon, live }) {
+const CHIP_ACTIVE_STYLES = {
+  youtube: 'bg-red-600 border-red-600 text-white shadow-lg',
+  tiktok: 'bg-pink-600 border-pink-600 text-white shadow-lg',
+  twitch: 'bg-purple-600 border-purple-600 text-white shadow-lg',
+  kick: 'bg-green-600 border-green-600 text-white shadow-lg',
+  bluesky: 'bg-sky-500 border-sky-500 text-white shadow-lg',
+};
+
+function FilterChip({ active, onClick, label, count, icon, live, platform }) {
+  const activeClass = live
+    ? 'bg-red-950/40 border-red-700 text-red-400'
+    : platform && CHIP_ACTIVE_STYLES[platform]
+      ? CHIP_ACTIVE_STYLES[platform]
+      : 'bg-indigo-600 border-indigo-600 text-white shadow-lg';
+
   return (
     <button
       onClick={onClick}
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border ${
         active
-          ? live
-            ? 'bg-red-950/40 border-red-700 text-red-400'
-            : 'bg-indigo-600 border-indigo-600 text-white'
+          ? activeClass
           : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-gray-200 hover:border-gray-600'
       }`}
     >
