@@ -237,19 +237,19 @@ export default function Search() {
         description="Search for social media creators to view their statistics and analytics."
       />
 
-      <div className="min-h-screen bg-gray-800/50">
-        {/* Header - Light */}
-        <div className="bg-gray-900 border-b border-gray-800">
-          <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="min-h-screen bg-[#0a0a0f]">
+        {/* Header */}
+        <div className="border-b border-gray-800/60">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
-              <SearchIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-100">Search Creators</h1>
+              <SearchIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-400" />
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-100">Search Creators</h1>
             </div>
-            <p className="text-sm sm:text-base text-gray-300">Find any creator and view their detailed statistics</p>
+            <p className="text-sm sm:text-base text-gray-400">Find any creator and view their detailed statistics</p>
           </div>
         </div>
 
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Platform Tabs */}
           <div className="flex flex-wrap gap-2 mb-6">
             {platforms.map((platform) => {
@@ -266,8 +266,8 @@ export default function Search() {
                     isSelected
                       ? `${colors.bg} text-white shadow-lg`
                       : platform.available
-                      ? 'bg-gray-900 text-gray-300 border border-gray-700 hover:border-gray-600 hover:shadow-md'
-                      : 'bg-gray-800 text-gray-300 cursor-not-allowed'
+                      ? 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-gray-200 transition-colors'
+                      : 'bg-gray-900/50 text-gray-600 border border-gray-800 cursor-not-allowed'
                   }`}
                 >
                   {Icon && <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -386,21 +386,21 @@ export default function Search() {
                   )}
 
                   {requestStatus === 'success' && (
-                    <div className="mt-6 max-w-md mx-auto p-4 bg-green-950/30 border border-green-200 rounded-xl">
-                      <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                      <p className="text-sm text-green-800 font-medium mb-1">Request Submitted!</p>
-                      <p className="text-sm text-green-700">{requestMessage}</p>
+                    <div className="mt-6 max-w-md mx-auto p-4 bg-green-950/30 border border-green-800/50 rounded-xl">
+                      <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                      <p className="text-sm text-green-300 font-medium mb-1">Request Submitted!</p>
+                      <p className="text-sm text-green-400">{requestMessage}</p>
                     </div>
                   )}
 
                   {requestStatus === 'error' && (
                     <div className="mt-6 max-w-md mx-auto p-4 bg-red-950/30 border border-red-800 rounded-xl">
                       <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
-                      <p className="text-sm text-red-800 font-medium mb-1">Request Failed</p>
-                      <p className="text-sm text-red-700">{requestMessage}</p>
+                      <p className="text-sm text-red-300 font-medium mb-1">Request Failed</p>
+                      <p className="text-sm text-red-400">{requestMessage}</p>
                       <button
                         onClick={() => handleRequestCreator()}
-                        className="mt-3 text-sm text-red-700 hover:text-red-800 font-medium underline"
+                        className="mt-3 text-sm text-red-400 hover:text-red-300 font-medium underline"
                       >
                         Try Again
                       </button>
@@ -421,7 +421,7 @@ export default function Search() {
           {/* Results */}
           {results.length > 0 && (
             <div className="mb-8">
-              <p className="text-gray-300 mb-4">{results.length} creators found</p>
+              <p className="text-gray-500 text-sm mb-4">{results.length} creators found</p>
               <div className="space-y-3">
                 {results.map((creator) => {
                   const Icon = platformIcons[creator.platform] || User;
@@ -432,7 +432,7 @@ export default function Search() {
                       key={creator.platformId}
                       to={`/${creator.platform}/${creator.username}`}
                       state={{ platformId: creator.platformId }}
-                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900 border border-gray-800 rounded-2xl hover:shadow-lg hover:border-gray-700 transition-all duration-200 group"
+                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900 border border-gray-800 rounded-2xl hover:border-indigo-500/40 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-200 group"
                     >
                       <img
                         src={creator.profileImage || '/placeholder-avatar.svg'}
@@ -462,7 +462,7 @@ export default function Search() {
                            creator.platform === 'kick' ? 'paid subs' : 'subscribers'}
                         </p>
                       </div>
-                      <ArrowRight className="hidden sm:block w-5 h-5 text-gray-300 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="hidden sm:block w-5 h-5 text-gray-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
                     </Link>
                   );
                 })}
