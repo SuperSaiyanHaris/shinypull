@@ -331,32 +331,43 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Calculator Promo Banner */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-14 bg-gradient-to-r from-indigo-600 to-purple-600">
+        {/* Calculator Promo */}
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-[#0a0a0f]">
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="flex items-center gap-6">
-                <div className="w-20 h-20 bg-indigo-600/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                  <DollarSign className="w-10 h-10 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                    YouTube Money Calculator
-                  </h3>
-                  <p className="text-indigo-100 text-lg">
-                    Estimate how much YouTubers earn from their videos
-                  </p>
-                </div>
+            <Link
+              to="/youtube/money-calculator"
+              className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-yellow-500/50 rounded-2xl p-7 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-yellow-500/10"
+            >
+              {/* Glow blobs */}
+              <div className="pointer-events-none absolute -top-16 -left-16 w-56 h-56 bg-yellow-500/10 rounded-full blur-3xl group-hover:bg-yellow-500/20 transition-colors duration-500" />
+              <div className="pointer-events-none absolute -bottom-16 -right-16 w-56 h-56 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/15 transition-colors duration-500" />
+
+              {/* Ghost label */}
+              <span className="pointer-events-none absolute top-5 right-7 text-6xl sm:text-8xl font-black text-gray-800 select-none leading-none group-hover:text-gray-700 transition-colors">$$$</span>
+
+              {/* Icon box */}
+              <div className="relative flex-shrink-0 w-16 h-16 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/30 group-hover:scale-105 transition-transform duration-300">
+                <DollarSign className="w-8 h-8 text-white" />
               </div>
-              <Link
-                to="/youtube/money-calculator"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-indigo-300 font-bold rounded-xl hover:bg-indigo-950/50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-              >
-                <Calculator className="w-5 h-5" />
-                Try Calculator
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
+
+              {/* Text */}
+              <div className="relative flex-1 min-w-0">
+                <p className="text-yellow-400 text-xs font-semibold uppercase tracking-widest mb-1">Free Tool</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-2">YouTube Money Calculator</h2>
+                <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-lg">
+                  Estimate how much any YouTuber earns from their videos. Enter a channel and get a real earnings range based on view counts and CPM data.
+                </p>
+              </div>
+
+              {/* CTA */}
+              <div className="relative flex-shrink-0">
+                <span className="inline-flex items-center gap-2.5 px-6 py-3 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 font-bold rounded-xl group-hover:bg-yellow-500/20 group-hover:border-yellow-500/50 group-hover:gap-4 transition-all duration-200 whitespace-nowrap">
+                  <Calculator className="w-5 h-5" />
+                  Try Calculator
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </div>
+            </Link>
           </div>
         </section>
 
@@ -442,69 +453,75 @@ export default function Home() {
 
         {/* Latest Blog Posts */}
         {latestPosts.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-900 border-t border-gray-800">
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-gray-900">
             <div className="max-w-6xl mx-auto">
-              <div className="flex items-center justify-between mb-12">
+              {/* Section header */}
+              <div className="flex items-end justify-between mb-12 sm:mb-16">
                 <div>
-                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-100 mb-2">
-                    Latest from the Blog
-                  </h2>
-                  <p className="text-lg text-gray-300">
-                    Tips, guides, and insights for creators
-                  </p>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100">Latest from the Blog</h2>
+                  <p className="mt-3 text-gray-400 text-base sm:text-lg">Tips, guides, and insights for creators</p>
                 </div>
                 <Link
                   to="/blog"
-                  className="hidden sm:flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-300 transition-colors"
+                  className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-400 hover:gap-3 transition-all duration-200"
                 >
-                  View all posts <ChevronRight className="w-4 h-4" />
+                  View all <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6">
-                {latestPosts.map(post => (
+              <div className="grid md:grid-cols-3 gap-5 sm:gap-6">
+                {latestPosts.map((post, index) => (
                   <Link
                     key={post.slug}
                     to={`/blog/${post.slug}`}
-                    className="group"
+                    className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-indigo-500/60 rounded-2xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-indigo-500/10 flex flex-col"
                   >
-                    <article className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+                    {/* Glow blob */}
+                    <div className="pointer-events-none absolute -bottom-10 -right-10 w-36 h-36 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
+
+                    {/* Image */}
+                    <div className="overflow-hidden flex-shrink-0">
                       <img
                         src={post.image}
                         alt={post.title}
                         loading="lazy"
-                        className="w-full h-48 object-cover"
+                        className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="p-6 flex flex-col flex-1">
-                        <span className="text-indigo-600 font-medium text-sm mb-2">
-                          {post.category}
+                    </div>
+
+                    {/* Content */}
+                    <div className="relative p-6 flex flex-col flex-1">
+                      {/* Ghost number */}
+                      <span className="absolute bottom-5 right-6 text-5xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors leading-none">0{index + 1}</span>
+
+                      <span className="inline-block px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-full mb-3 self-start">
+                        {post.category}
+                      </span>
+                      <h3 className="text-lg font-bold text-gray-100 mb-2 line-clamp-2 group-hover:text-indigo-300 transition-colors duration-200">
+                        {post.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm leading-relaxed mb-5 line-clamp-2 flex-1">
+                        {post.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-1.5 text-xs text-gray-500">
+                          <Clock className="w-3.5 h-3.5" />
+                          {post.read_time}
                         </span>
-                        <h3 className="text-lg font-bold text-gray-100 mb-2 group-hover:text-indigo-400 transition-colors line-clamp-2">
-                          {post.title}
-                        </h3>
-                        <p className="text-gray-300 text-sm mb-4 line-clamp-2 flex-1">
-                          {post.description}
-                        </p>
-                        <div className="flex items-center justify-between text-sm text-gray-300">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {post.read_time}
-                          </span>
-                          <span className="text-indigo-600 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                            Read more <ChevronRight className="w-4 h-4" />
-                          </span>
-                        </div>
+                        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-400 group-hover:gap-3 transition-all duration-200">
+                          Read more <ArrowRight className="w-4 h-4" />
+                        </span>
                       </div>
-                    </article>
+                    </div>
                   </Link>
                 ))}
               </div>
 
               <Link
                 to="/blog"
-                className="mt-8 flex sm:hidden items-center justify-center gap-2 text-indigo-600 font-medium hover:text-indigo-300 transition-colors"
+                className="mt-8 flex sm:hidden items-center justify-center gap-2 text-indigo-400 font-medium hover:gap-4 transition-all"
               >
-                View all posts <ChevronRight className="w-4 h-4" />
+                View all posts <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </section>

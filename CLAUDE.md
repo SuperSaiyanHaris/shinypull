@@ -38,6 +38,23 @@ Our creator stats are the entire reason this site exists. Every chart and table 
 - All dates use America/New_York timezone via `getTodayLocal()` helper
 - This prevents future-date issues when UTC is ahead of local time
 
+**DESIGN STYLE - PREFERRED CARD PATTERN (apply this to all new sections and redesigns):**
+
+The user loves the dark-card style introduced in the Features Section on the home page. Use it for all new UI sections and when redesigning existing ones. Key patterns:
+
+- **Section backgrounds:** `bg-[#0a0a0f]` (deep black) or `bg-gray-900` (alternating for visual rhythm)
+- **Card base:** `bg-gray-900 border border-gray-800 rounded-2xl`
+- **Hover state:** `hover:border-{color}-500/60 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-{color}-500/10` — always pair border glow + lift + shadow
+- **Glow blob:** `pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-{color}-500/10 rounded-full blur-3xl group-hover:bg-{color}-500/20 transition-colors duration-500`
+- **Ghost numbers/labels:** `absolute top-6 right-7 text-3xl font-black text-gray-800 select-none` — subtle watermarks (01, 02, 03 or $$$)
+- **Icon box:** `w-14 h-14 bg-gradient-to-br from-{color1} to-{color2} rounded-xl flex items-center justify-center shadow-lg shadow-{color}-500/30 group-hover:scale-105 transition-transform duration-300`
+- **Section header:** `text-2xl sm:text-3xl font-extrabold text-gray-100` title + `mt-3 text-gray-400 text-base sm:text-lg` subtitle, centered with `text-center mb-12 sm:mb-16`
+- **Inline CTA:** `inline-flex items-center gap-1.5 text-sm font-semibold text-{color}-400 group-hover:gap-3 transition-all duration-200` with ArrowRight icon
+- **Category labels:** small uppercase pill — `px-2.5 py-1 bg-{color}-500/10 border border-{color}-500/20 text-{color}-400 text-xs font-semibold rounded-full`
+- **Color identity per section:** each card/section gets a unique accent (indigo/purple, amber/orange, emerald/teal, yellow/amber). Never reuse the same color twice in a single view.
+- **Never** use flat solid gradient banners (`bg-gradient-to-r from-X to-Y`) for promo sections. Use the dark card pattern instead.
+- All cards use `group` on the container so child elements can use `group-hover:` utilities.
+
 ## Tech Stack
 
 - **Frontend:** React 18 + Vite
