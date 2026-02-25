@@ -47,9 +47,9 @@ export default function Contact() {
         description="Get in touch with the ShinyPull team. We're here to help with questions, feedback, and support."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f]">
+      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Hero */}
-        <div className="border-b border-gray-800/60 py-16">
+        <div className="relative overflow-hidden border-b border-gray-800/60 py-16 bg-gradient-to-b from-gray-900/80 to-transparent">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Contact Us</h1>
             <p className="text-xl text-gray-400">

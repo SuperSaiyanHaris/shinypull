@@ -29,14 +29,14 @@ export default function Support() {
         description="Help keep ShinyPull free and support the development of new features. Buy the developer a coffee!"
       />
 
-      <div className="min-h-screen bg-gray-800/50">
+      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Hero */}
-        <div className="bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 border-b border-gray-800 text-white py-16">
+        <div className="relative overflow-hidden border-b border-gray-800/60 py-16 bg-gradient-to-b from-indigo-950/60 to-transparent">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <div className="w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-indigo-500/30">
               <Heart className="w-8 h-8 text-indigo-400" />
             </div>
-            <h1 className="text-4xl font-bold mb-4">Support ShinyPull</h1>
+            <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Support ShinyPull</h1>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
               ShinyPull is free to use for everyone. Your support helps keep it that way and funds new features.
             </p>
@@ -68,7 +68,7 @@ export default function Support() {
               {supportReasons.map((reason) => (
                 <div key={reason.title} className="text-center p-6 bg-gray-800/50 rounded-xl">
                   <div className="w-12 h-12 bg-indigo-900/50 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <reason.icon className="w-6 h-6 text-indigo-600" />
+                    <reason.icon className="w-6 h-6 text-indigo-400" />
                   </div>
                   <h3 className="font-semibold text-gray-100 mb-2">{reason.title}</h3>
                   <p className="text-sm text-gray-300">{reason.description}</p>
@@ -101,7 +101,7 @@ export default function Support() {
           {/* Mission Statement & Data Transparency */}
           <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Target className="w-6 h-6 text-indigo-600" />
+              <Target className="w-6 h-6 text-indigo-400" />
               <h2 className="text-2xl font-bold text-gray-100">Our Mission</h2>
             </div>
             <p className="text-gray-400 text-center max-w-2xl mx-auto mb-8">

@@ -149,7 +149,7 @@ export default function Dashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0f] dot-grid flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
       </div>
     );
@@ -189,10 +189,10 @@ export default function Dashboard() {
         description="Track your favorite creators and see their latest statistics."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f]">
+      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
 
         {/* Page Header */}
-        <div className="border-b border-gray-800/60">
+        <div className="relative overflow-hidden border-b border-gray-800/60 bg-gradient-to-b from-gray-900/80 to-transparent">
           <div className="max-w-5xl mx-auto px-4 py-8">
             <h1 className="text-2xl font-extrabold text-gray-100 mb-1">
               Welcome back, {displayName}

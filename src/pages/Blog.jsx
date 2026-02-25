@@ -61,7 +61,7 @@ export default function Blog() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0f] dot-grid flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
       </div>
     );
@@ -136,9 +136,9 @@ export default function Blog() {
         description="Expert guides on streaming equipment, YouTube growth strategies, and creator economy insights. Grow your channel with data-driven advice."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f]">
+      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Header */}
-        <div className="border-b border-gray-800/60">
+        <div className="relative overflow-hidden border-b border-gray-800/60 bg-gradient-to-b from-gray-900/80 to-transparent">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
             <div className="max-w-6xl mx-auto text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3">

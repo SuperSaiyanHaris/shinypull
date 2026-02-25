@@ -150,9 +150,9 @@ function RankingsOverview() {
         description="Live rankings of the top creators across YouTube, TikTok, Twitch, Kick, and Bluesky. Updated daily with subscriber counts, follower stats, and growth metrics."
         keywords="top youtubers, top tiktokers, top twitch streamers, top kick streamers, top bluesky accounts, creator rankings, most subscribers, most followers, live rankings 2026"
       />
-      <div className="min-h-screen bg-[#0a0a0f]">
+      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Header */}
-        <div className="border-b border-gray-800/60">
+        <div className="relative overflow-hidden border-b border-gray-800/60 bg-gradient-to-b from-gray-900/80 to-transparent">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
@@ -366,9 +366,9 @@ function PlatformRankings({ urlPlatform }) {
       />
       {listSchema && <StructuredData schema={listSchema} />}
 
-      <div className="min-h-screen bg-[#0a0a0f]">
+      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Header */}
-        <div className="border-b border-gray-800/60">
+        <div className="relative overflow-hidden border-b border-gray-800/60 bg-gradient-to-b from-gray-900/80 to-transparent">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
