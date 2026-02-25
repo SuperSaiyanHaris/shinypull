@@ -125,9 +125,9 @@ export default function Account() {
         />
       )}
 
-      <div className="min-h-screen bg-gray-800/50">
+      <div className="min-h-screen bg-[#0a0a0f]">
         {/* Page header */}
-        <div className="bg-gray-900 border-b border-gray-800">
+        <div className="border-b border-gray-800/60">
           <div className="max-w-2xl mx-auto px-4 py-8">
             <Link
               to="/dashboard"
@@ -136,8 +136,8 @@ export default function Account() {
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Link>
-            <h1 className="text-2xl font-bold text-gray-100">Account Settings</h1>
-            <p className="text-gray-300 text-sm mt-1">{user.email}</p>
+            <h1 className="text-2xl font-extrabold text-gray-100">Account Settings</h1>
+            <p className="text-gray-400 text-sm mt-1">{user.email}</p>
           </div>
         </div>
 

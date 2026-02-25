@@ -90,19 +90,19 @@ export default function Gear() {
         keywords="best streaming gear, streaming setup, streaming microphone, streaming camera, streaming lights, capture card, audio interface, streamer equipment 2026"
       />
 
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-[#0a0a0f]">
+      <div className="min-h-screen bg-[#0a0a0f]">
         {/* Hero */}
-        <section className="bg-gray-900 border-b border-gray-800">
+        <section className="border-b border-gray-800/60">
           <div className="w-full px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-12 sm:pb-16">
             <div className="text-center max-w-4xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-950/50 border border-indigo-800 rounded-full text-sm font-medium text-indigo-600 mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-950/50 border border-indigo-800 rounded-full text-sm font-medium text-indigo-400 mb-6">
                 <ShoppingBag className="w-4 h-4" />
                 Hand-picked by the ShinyPull team
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-100 mb-4 tracking-tight">
                 Recommended Streaming Gear
               </h1>
-              <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
                 The best equipment for YouTube, Twitch, and Kick creators at every budget. We use and recommend these products.
               </p>
             </div>
@@ -138,10 +138,10 @@ export default function Gear() {
                           <div className="flex items-center gap-3">
                             <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                               isActive
-                                ? 'bg-gray-900 border-gray-800'
+                                ? 'bg-white/20 border-white/30'
                                 : 'border-gray-600'
                             }`}>
-                              {isActive && <Check className="w-3 h-3 text-indigo-600" />}
+                              {isActive && <Check className="w-3 h-3 text-white" />}
                             </div>
                             <span>{cat.label}</span>
                           </div>
@@ -235,7 +235,7 @@ export default function Gear() {
                 {loading ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {Array.from({ length: 8 }).map((_, i) => (
-                      <div key={i} className="bg-gray-900 rounded-xl border border-gray-700 p-4 animate-pulse">
+                      <div key={i} className="bg-gray-900 rounded-2xl border border-gray-800 p-4 animate-pulse">
                         <div className="w-full aspect-square bg-gray-800 rounded-lg mb-3"></div>
                         <div className="h-4 bg-gray-800 rounded mb-2 w-3/4"></div>
                         <div className="h-6 bg-gray-800 rounded w-1/3"></div>
@@ -254,7 +254,7 @@ export default function Gear() {
                   const hasImage = product.image && product.image.trim() !== '';
 
                   return (
-                    <div key={product.id} className="bg-gray-900 rounded-xl border border-gray-700 p-3 sm:p-4 hover:shadow-lg hover:border-indigo-700 transition-all flex flex-col group">
+                    <div key={product.id} className="bg-gray-900 rounded-2xl border border-gray-800 p-3 sm:p-4 hover:border-indigo-500/50 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 flex flex-col group">
                       {/* Image */}
                       <div className="w-full aspect-square bg-gray-800/50 rounded-lg flex items-center justify-center overflow-hidden mb-2 sm:mb-3">
                         {hasImage ? (
@@ -285,14 +285,14 @@ export default function Gear() {
 
                       {/* Description - Hidden on mobile */}
                       {product.description && (
-                        <p className="hidden sm:block text-xs text-gray-300 line-clamp-2 mb-3">
+                        <p className="hidden sm:block text-xs text-gray-400 line-clamp-2 mb-3">
                           {product.description}
                         </p>
                       )}
 
                       {/* Price + Button */}
                       <div className="flex items-center justify-between mt-auto pt-1 sm:pt-2">
-                        <p className="text-base sm:text-lg font-bold text-indigo-600">
+                        <p className="text-base sm:text-lg font-bold text-indigo-400">
                           {product.price}
                         </p>
                         {affiliateLink ? (
@@ -320,20 +320,26 @@ export default function Gear() {
         </section>
 
         {/* Blog Posts CTA */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gray-900 border-t border-gray-800">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4">
-              Need help choosing?
-            </h2>
-            <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-              Check out our in-depth gear guides and comparison articles to find the perfect setup for your budget.
-            </p>
-            <Link
-              to="/blog"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-500/20"
-            >
-              Read Our Gear Guides
-            </Link>
+        <section className="w-full px-4 sm:px-6 lg:px-8 py-16">
+          <div className="max-w-4xl mx-auto">
+            <div className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-indigo-500/40 rounded-2xl p-8 md:p-12 text-center transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10">
+              <div className="pointer-events-none absolute -top-16 -left-16 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
+              <div className="pointer-events-none absolute -bottom-16 -right-16 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors duration-500" />
+              <div className="relative">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-4">
+                  Need help choosing?
+                </h2>
+                <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
+                  Check out our in-depth gear guides and comparison articles to find the perfect setup for your budget.
+                </p>
+                <Link
+                  to="/blog"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-500/20"
+                >
+                  Read Our Gear Guides
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
       </div>

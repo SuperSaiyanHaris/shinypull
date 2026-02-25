@@ -61,7 +61,7 @@ export default function Blog() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-800/50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
       </div>
     );
@@ -136,16 +136,16 @@ export default function Blog() {
         description="Expert guides on streaming equipment, YouTube growth strategies, and creator economy insights. Grow your channel with data-driven advice."
       />
 
-      <div className="min-h-screen bg-gray-800/50">
+      <div className="min-h-screen bg-[#0a0a0f]">
         {/* Header */}
-        <div className="bg-gray-900 border-b border-gray-800">
+        <div className="border-b border-gray-800/60">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
             <div className="max-w-6xl mx-auto text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3">
-                <BookOpen className="w-7 h-7 sm:w-9 sm:h-9 text-indigo-600" />
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-100">Creator Resources</h1>
+                <BookOpen className="w-7 h-7 sm:w-9 sm:h-9 text-indigo-400" />
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-100">Creator Resources</h1>
               </div>
-              <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto">
                 Expert guides on streaming gear, growth strategies, and industry insights to help you succeed as a creator
               </p>
             </div>
@@ -223,7 +223,7 @@ export default function Blog() {
                     to={`/blog/${filteredPosts[0].slug}`}
                     className="block mb-8 group"
                   >
-                    <article className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
+                    <article className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden hover:border-indigo-500/50 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
                       <div className="md:flex">
                         <div className="md:w-1/2">
                           <img
@@ -233,7 +233,7 @@ export default function Blog() {
                           />
                         </div>
                         <div className="md:w-1/2 p-8 flex flex-col justify-center">
-                          <span className="text-indigo-600 font-medium text-sm mb-2">
+                          <span className="text-indigo-400 font-medium text-sm mb-2">
                             {filteredPosts[0].category}
                           </span>
                           <h2 className="text-2xl md:text-3xl font-bold text-gray-100 mb-3 group-hover:text-indigo-400 transition-colors">
@@ -270,7 +270,7 @@ export default function Blog() {
                       to={`/blog/${post.slug}`}
                       className="group"
                     >
-                      <article className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+                      <article className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden hover:border-indigo-500/50 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 h-full flex flex-col">
                         <img
                           src={post.image}
                           alt={post.title}
@@ -278,13 +278,13 @@ export default function Blog() {
                           className="w-full h-48 object-cover"
                         />
                         <div className="p-6 flex flex-col flex-1">
-                          <span className="text-indigo-600 font-medium text-sm mb-2">
+                          <span className="text-indigo-400 font-medium text-sm mb-2">
                             {post.category}
                           </span>
                           <h3 className="text-lg font-bold text-gray-100 mb-2 group-hover:text-indigo-400 transition-colors line-clamp-2">
                             {post.title}
                           </h3>
-                          <p className="text-gray-300 text-sm mb-4 line-clamp-2 flex-1">
+                          <p className="text-gray-400 text-sm mb-4 line-clamp-2 flex-1">
                             {post.description}
                           </p>
                           <div className="flex items-center justify-between text-sm text-gray-300">
@@ -292,7 +292,7 @@ export default function Blog() {
                               <Clock className="w-4 h-4" />
                               {post.read_time}
                             </span>
-                            <span className="text-indigo-600 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                            <span className="text-indigo-400 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
                               Read more <ChevronRight className="w-4 h-4" />
                             </span>
                           </div>
@@ -303,19 +303,23 @@ export default function Blog() {
                 </div>
 
                 {/* CTA Section */}
-                <div className="mt-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 md:p-12 text-center text-white">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                    Track Your Channel's Growth
-                  </h2>
-                  <p className="text-white/80 mb-6 max-w-2xl mx-auto">
-                    Use ShinyPull's free analytics to monitor your subscribers, views, and compare your growth with top creators.
-                  </p>
-                  <Link
-                    to="/search"
-                    className="inline-block px-8 py-3 bg-gray-900 text-indigo-300 font-semibold rounded-xl hover:bg-indigo-950/50 transition-colors"
-                  >
-                    Search Creators
-                  </Link>
+                <div className="mt-16 group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-indigo-500/40 rounded-2xl p-8 md:p-12 text-center transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10">
+                  <div className="pointer-events-none absolute -top-16 -left-16 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
+                  <div className="pointer-events-none absolute -bottom-16 -right-16 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors duration-500" />
+                  <div className="relative">
+                    <h2 className="text-2xl md:text-3xl font-extrabold text-gray-100 mb-4">
+                      Track Your Channel's Growth
+                    </h2>
+                    <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
+                      Use ShinyPull's free analytics to monitor your subscribers, views, and compare your growth with top creators.
+                    </p>
+                    <Link
+                      to="/search"
+                      className="inline-flex items-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-500/20"
+                    >
+                      Search Creators
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>

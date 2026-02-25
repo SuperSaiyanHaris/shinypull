@@ -10,12 +10,12 @@ export default function About() {
         description="Learn about ShinyPull - the leading social media analytics platform for tracking YouTube, Twitch, and other creator statistics."
       />
 
-      <div className="min-h-screen bg-gray-800/50">
+      <div className="min-h-screen bg-[#0a0a0f]">
         {/* Hero */}
-        <div className="bg-gray-900 border-b border-gray-800 py-16">
+        <div className="border-b border-gray-800/60 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-bold text-gray-100 mb-4">About ShinyPull</h1>
-            <p className="text-xl text-gray-300">
+            <h1 className="text-4xl font-extrabold text-gray-100 mb-4">About ShinyPull</h1>
+            <p className="text-xl text-gray-400">
               Comprehensive social media analytics for creators and fans
             </p>
           </div>
@@ -60,7 +60,7 @@ export default function About() {
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 p-4 bg-gray-800/50 rounded-xl">
                   <div className="w-10 h-10 bg-indigo-900/50 rounded-lg flex items-center justify-center">
-                    <item.icon className="w-5 h-5 text-indigo-600" />
+                    <item.icon className="w-5 h-5 text-indigo-400" />
                   </div>
                   <span className="text-gray-300">{item.text}</span>
                 </div>

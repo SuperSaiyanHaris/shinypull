@@ -132,16 +132,16 @@ export default function Calculator() {
         keywords="youtube money calculator, youtube earnings calculator, how much do youtubers make, youtube income estimator, youtube revenue calculator, youtuber salary, youtube ad revenue, RPM calculator"
       />
 
-      <div className="min-h-screen bg-gray-800/50">
+      <div className="min-h-screen bg-[#0a0a0f]">
         {/* Header */}
-        <div className="bg-gray-900 border-b border-gray-800">
+        <div className="border-b border-gray-800/60">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2">
                 <CalcIcon className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-400" />
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-100">YouTube Money Calculator</h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-100">YouTube Money Calculator</h1>
               </div>
-              <p className="text-base sm:text-lg text-gray-300 mb-6">
+              <p className="text-base sm:text-lg text-gray-400 mb-6">
                 {mode === 'creator'
                   ? 'Estimate a creator\'s earnings based on real data'
                   : 'Estimate your own potential earnings'}

@@ -76,9 +76,9 @@ export default function Home() {
         keywords="youtube statistics, tiktok statistics, twitch statistics, kick statistics, subscriber count, follower count, social blade alternative, creator analytics, earnings calculator"
       />
 
-      <div className="min-h-screen bg-gray-900">
-        {/* Hero Section - Clean Light with Typewriter */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-gray-900 to-[#0a0a0f]">
+      <div className="min-h-screen bg-[#0a0a0f]">
+        {/* Hero Section */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-gray-900/80 to-[#0a0a0f]">
           {/* Subtle dot pattern */}
           <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-[size:24px_24px] opacity-50"></div>
 

@@ -150,15 +150,15 @@ function RankingsOverview() {
         description="Live rankings of the top creators across YouTube, TikTok, Twitch, Kick, and Bluesky. Updated daily with subscriber counts, follower stats, and growth metrics."
         keywords="top youtubers, top tiktokers, top twitch streamers, top kick streamers, top bluesky accounts, creator rankings, most subscribers, most followers, live rankings 2026"
       />
-      <div className="min-h-screen bg-gray-800/50">
+      <div className="min-h-screen bg-[#0a0a0f]">
         {/* Header */}
-        <div className="bg-gray-900 border-b border-gray-800">
+        <div className="border-b border-gray-800/60">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-100">Creator Rankings</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-100">Creator Rankings</h1>
             </div>
-            <p className="text-sm sm:text-base text-gray-300">Top creators across all platforms. Updated daily.</p>
+            <p className="text-sm sm:text-base text-gray-400">Top creators across all platforms. Updated daily.</p>
           </div>
         </div>
 
@@ -190,7 +190,7 @@ function RankingsOverview() {
                       </div>
                       <Link
                         to={`/rankings/${platform.id}`}
-                        className="text-sm font-medium text-indigo-600 hover:text-indigo-300 transition-colors"
+                        className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
                       >
                         View All &rarr;
                       </Link>
@@ -366,9 +366,9 @@ function PlatformRankings({ urlPlatform }) {
       />
       {listSchema && <StructuredData schema={listSchema} />}
 
-      <div className="min-h-screen bg-gray-800/50">
+      <div className="min-h-screen bg-[#0a0a0f]">
         {/* Header */}
-        <div className="bg-gray-900 border-b border-gray-800">
+        <div className="border-b border-gray-800/60">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />

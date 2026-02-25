@@ -47,12 +47,12 @@ export default function Contact() {
         description="Get in touch with the ShinyPull team. We're here to help with questions, feedback, and support."
       />
 
-      <div className="min-h-screen bg-gray-800/50">
+      <div className="min-h-screen bg-[#0a0a0f]">
         {/* Hero */}
-        <div className="bg-gray-900 border-b border-gray-800 py-16">
+        <div className="border-b border-gray-800/60 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-bold text-gray-100 mb-4">Contact Us</h1>
-            <p className="text-xl text-gray-300">
+            <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Contact Us</h1>
+            <p className="text-xl text-gray-400">
               We'd love to hear from you
             </p>
           </div>
