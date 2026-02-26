@@ -73,6 +73,26 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Retry wrapper for Anthropic API calls — handles 529 overloaded + 503/502 transient errors.
+// SDK auto-retries 429s, but NOT 529s, so we handle those manually here.
+async function callWithRetry(fn, retries = 3) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const status = err.status || 0;
+      const isRetryable = status === 529 || status === 503 || status === 502;
+      if (isRetryable && attempt < retries) {
+        const delaySec = 60 * attempt; // 60s, 120s
+        console.warn(`⚠️  API ${status} overloaded (attempt ${attempt}/${retries}), retrying in ${delaySec}s...`);
+        await sleep(delaySec * 1000);
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 // --- RSS Fetching ---
 async function fetchArticles() {
   const parser = new Parser({ timeout: 10000 });
@@ -111,7 +131,7 @@ async function researchAgent(articles) {
     .map((a, i) => `${i + 1}. [${a.source}] ${a.title}\n   ${a.description}`)
     .join('\n\n');
 
-  const response = await anthropic.messages.create({
+  const response = await callWithRetry(() => anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,
     messages: [
@@ -144,7 +164,7 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
 }`,
       },
     ],
-  });
+  }));
 
   const text = response.content[0].text.trim();
   const research = safeParseJSON(text);
@@ -204,11 +224,11 @@ Return ONLY valid JSON (no markdown fences, no explanation):
   "category": "${research.suggestedCategory}"
 }`;
 
-  const metaResponse = await anthropic.messages.create({
+  const metaResponse = await callWithRetry(() => anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 512,
     messages: [{ role: 'user', content: metaPrompt }],
-  });
+  }));
   const meta = safeParseJSON(metaResponse.content[0].text.trim());
 
   await sleep(1000);
@@ -226,11 +246,11 @@ Post title: ${meta.title}
 
 Write the full blog post content now. Output ONLY the markdown content — no JSON, no code fences, no preamble, no title heading.`;
 
-  const contentResponse = await anthropic.messages.create({
+  const contentResponse = await callWithRetry(() => anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 4096,
     messages: [{ role: 'user', content: contentPrompt }],
-  });
+  }));
   const content = contentResponse.content[0].text.trim();
 
   const draft = { ...meta, content };
@@ -243,7 +263,7 @@ Write the full blog post content now. Output ONLY the markdown content — no JS
 async function reviewAgent(draft) {
   console.log('🔎 Review Agent: auditing draft...');
 
-  const response = await anthropic.messages.create({
+  const response = await callWithRetry(() => anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,
     messages: [
@@ -277,7 +297,7 @@ Return ONLY valid JSON (no markdown fences, no explanation):
 }`,
       },
     ],
-  });
+  }));
 
   const text = response.content[0].text.trim();
   const review = safeParseJSON(text);
@@ -295,7 +315,7 @@ async function rewriteAgent(draft, review) {
 
   const issueList = [...review.violations, ...review.warnings].join('\n- ');
 
-  const response = await anthropic.messages.create({
+  const response = await callWithRetry(() => anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 2048,
     messages: [
@@ -314,7 +334,7 @@ Original content:
 ${draft.content}`,
       },
     ],
-  });
+  }));
 
   draft.content = response.content[0].text.trim();
   draft.readTime = estimateReadTime(draft.content);
