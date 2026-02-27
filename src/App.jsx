@@ -10,16 +10,18 @@ import { AuthProvider } from './contexts/AuthContext';
 // Eagerly load the homepage (critical path)
 import Home from './pages/Home';
 
-// Auto-reload on chunk load failure (happens after new deployments)
+// Auto-reload on chunk load failure (happens after new deployments).
+// Returns a never-resolving promise after reload() so JS execution stops
+// and doesn't nuke the sessionStorage flag before the page unloads.
 function lazyWithRetry(importFn) {
   return lazy(() =>
     importFn().catch(() => {
-      // Chunk not found — new deploy invalidated old filenames. Reload once.
       if (!sessionStorage.getItem('chunk_reload')) {
         sessionStorage.setItem('chunk_reload', '1');
         window.location.reload();
+        return new Promise(() => {}); // halt — page is reloading
       }
-      // If already reloaded once and still failing, let error boundary handle it
+      // Already reloaded once and still failing — let ErrorBoundary handle it
       sessionStorage.removeItem('chunk_reload');
       return importFn();
     })
