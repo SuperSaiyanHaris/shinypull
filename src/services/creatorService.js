@@ -86,29 +86,44 @@ export const saveCreatorStats = withErrorHandling(
   'creatorService.saveCreatorStats'
 );
 
+// Creator profile metadata changes rarely (avatar, description updates).
+// Cache per (platform, username) with stale-while-revalidate.
+const _creatorByUsernameCache = new Map();
+const CREATOR_PROFILE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function _fetchCreatorByUsername(platform, username) {
+  // Multiple creators can share a username (e.g. MrBeast / MrBeast Gaming).
+  // Return the most recently updated one (likely the main/active channel).
+  const { data, error } = await supabase
+    .from('creators')
+    .select('*')
+    .eq('platform', platform)
+    .eq('username', username.toLowerCase())
+    .order('updated_at', { ascending: false })
+    .limit(1);
+  if (error && error.code !== 'PGRST116') throw error;
+  return (data && data.length > 0) ? data[0] : null;
+}
+
 /**
  * Get creator by platform and username
  */
 export const getCreatorByUsername = withErrorHandling(
   async (platform, username) => {
-    // Note: Multiple creators can have the same username (e.g., MrBeast main channel, MrBeast Gaming, etc.)
-    // Query all matching creators and return the most recently updated one (likely the main/active channel)
-    const { data, error } = await supabase
-      .from('creators')
-      .select('*')
-      .eq('platform', platform)
-      .eq('username', username.toLowerCase())
-      .order('updated_at', { ascending: false })
-      .limit(1);
-
-    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
-
-    if (!data || data.length === 0) {
-      return null;
+    const key = `${platform}:${username.toLowerCase()}`;
+    const hit = _creatorByUsernameCache.get(key);
+    const now = Date.now();
+    if (hit) {
+      if (now - hit.ts > CREATOR_PROFILE_TTL) {
+        _fetchCreatorByUsername(platform, username)
+          .then(data => _creatorByUsernameCache.set(key, { data, ts: Date.now() }))
+          .catch(() => {});
+      }
+      return hit.data;
     }
-
-    // Return the most recently updated creator
-    return data[0];
+    const data = await _fetchCreatorByUsername(platform, username);
+    _creatorByUsernameCache.set(key, { data, ts: now });
+    return data;
   },
   'creatorService.getCreatorByUsername'
 );
@@ -131,22 +146,42 @@ export const getCreatorByPlatformId = withErrorHandling(
   'creatorService.getCreatorByPlatformId'
 );
 
+// Stats history changes 2x/day — 10-min TTL balances freshness vs round-trips.
+// Key includes `days` so switching chart ranges fetches correctly.
+const _creatorStatsCache = new Map();
+const CREATOR_STATS_TTL = 10 * 60 * 1000; // 10 minutes
+
+async function _fetchCreatorStats(creatorId, days) {
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  const { data, error } = await supabase
+    .from('creator_stats')
+    .select('*')
+    .eq('creator_id', creatorId)
+    .gte('recorded_at', startDate.toISOString().split('T')[0])
+    .order('recorded_at', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
 /**
  * Get creator stats history
  */
 export const getCreatorStats = withErrorHandling(
   async (creatorId, days = 30) => {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
-
-    const { data, error } = await supabase
-      .from('creator_stats')
-      .select('*')
-      .eq('creator_id', creatorId)
-      .gte('recorded_at', startDate.toISOString().split('T')[0])
-      .order('recorded_at', { ascending: true });
-
-    if (error) throw error;
+    const key = `${creatorId}:${days}`;
+    const hit = _creatorStatsCache.get(key);
+    const now = Date.now();
+    if (hit) {
+      if (now - hit.ts > CREATOR_STATS_TTL) {
+        _fetchCreatorStats(creatorId, days)
+          .then(data => _creatorStatsCache.set(key, { data, ts: Date.now() }))
+          .catch(() => {});
+      }
+      return hit.data;
+    }
+    const data = await _fetchCreatorStats(creatorId, days);
+    _creatorStatsCache.set(key, { data, ts: now });
     return data;
   },
   'creatorService.getCreatorStats'
@@ -197,20 +232,39 @@ export const searchCreators = withErrorHandling(
   'creatorService.searchCreators'
 );
 
+// Latest stat row — used for the odometer display, same TTL as stats history.
+const _latestStatsCache = new Map();
+const LATEST_STATS_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function _fetchLatestStats(creatorId) {
+  const { data, error } = await supabase
+    .from('creator_stats')
+    .select('*')
+    .eq('creator_id', creatorId)
+    .order('recorded_at', { ascending: false })
+    .limit(1)
+    .single();
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}
+
 /**
  * Get latest stats for a creator
  */
 export const getLatestStats = withErrorHandling(
   async (creatorId) => {
-    const { data, error } = await supabase
-      .from('creator_stats')
-      .select('*')
-      .eq('creator_id', creatorId)
-      .order('recorded_at', { ascending: false })
-      .limit(1)
-      .single();
-
-    if (error && error.code !== 'PGRST116') throw error;
+    const hit = _latestStatsCache.get(creatorId);
+    const now = Date.now();
+    if (hit) {
+      if (now - hit.ts > LATEST_STATS_TTL) {
+        _fetchLatestStats(creatorId)
+          .then(data => _latestStatsCache.set(creatorId, { data, ts: Date.now() }))
+          .catch(() => {});
+      }
+      return hit.data;
+    }
+    const data = await _fetchLatestStats(creatorId);
+    _latestStatsCache.set(creatorId, { data, ts: now });
     return data;
   },
   'creatorService.getLatestStats'
