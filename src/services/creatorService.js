@@ -216,39 +216,64 @@ export const getLatestStats = withErrorHandling(
   'creatorService.getLatestStats'
 );
 
+// Module-level rankings cache — survives component unmounts and SPA navigation.
+// Data changes at most 2x/day, so 10-minute TTL is conservative and safe.
+// Pattern: stale-while-revalidate — serve cached data instantly, refresh in background.
+const _rankingsCache = new Map(); // key → { data, ts }
+const RANKINGS_TTL = 10 * 60 * 1000; // 10 minutes
+
+async function _fetchRankings(platform, rankType, limit) {
+  const { data, error } = await supabase.rpc('get_ranked_creators', {
+    p_platform: platform,
+    p_rank_type: rankType,
+    p_limit: limit,
+  });
+  if (error) throw error;
+  return (data || []).map((creator) => ({
+    ...creator,
+    latestStats: {
+      subscribers: creator.subscribers,
+      followers: creator.subscribers,
+      total_views: creator.total_views,
+      total_posts: creator.total_posts,
+      hours_watched_day: creator.hours_watched_day,
+      hours_watched_week: creator.hours_watched_week,
+      hours_watched_month: creator.hours_watched_month,
+    },
+    subscribers: creator.subscribers,
+    totalViews: creator.total_views,
+    totalPosts: creator.total_posts,
+    growth30d: creator.growth_30d,
+    sortValue: rankType === 'views' ? creator.total_views
+      : rankType === 'growth' ? creator.growth_30d
+      : creator.subscribers,
+  }));
+}
+
 /**
- * Get ranked creators with latest stats
+ * Get ranked creators with latest stats.
+ * Cached per (platform, rankType, limit) with stale-while-revalidate.
  */
 export const getRankedCreators = withErrorHandling(
   async (platform, rankType = 'subscribers', limit = 50) => {
-    const { data, error } = await supabase.rpc('get_ranked_creators', {
-      p_platform: platform,
-      p_rank_type: rankType,
-      p_limit: limit,
-    });
+    const key = `${platform}:${rankType}:${limit}`;
+    const hit = _rankingsCache.get(key);
+    const now = Date.now();
 
-    if (error) throw error;
+    if (hit) {
+      // Serve stale data immediately; refresh in background if TTL expired
+      if (now - hit.ts > RANKINGS_TTL) {
+        _fetchRankings(platform, rankType, limit)
+          .then(data => _rankingsCache.set(key, { data, ts: Date.now() }))
+          .catch(() => {}); // keep serving stale on background failure
+      }
+      return hit.data;
+    }
 
-    // Map DB column names to the format Rankings.jsx expects
-    return (data || []).map((creator) => ({
-      ...creator,
-      latestStats: {
-        subscribers: creator.subscribers,
-        followers: creator.subscribers,
-        total_views: creator.total_views,
-        total_posts: creator.total_posts,
-        hours_watched_day: creator.hours_watched_day,
-        hours_watched_week: creator.hours_watched_week,
-        hours_watched_month: creator.hours_watched_month,
-      },
-      subscribers: creator.subscribers,
-      totalViews: creator.total_views,
-      totalPosts: creator.total_posts,
-      growth30d: creator.growth_30d,
-      sortValue: rankType === 'views' ? creator.total_views
-        : rankType === 'growth' ? creator.growth_30d
-        : creator.subscribers,
-    }));
+    // Cold cache — must fetch synchronously
+    const data = await _fetchRankings(platform, rankType, limit);
+    _rankingsCache.set(key, { data, ts: now });
+    return data;
   },
   'creatorService.getRankedCreators'
 );
