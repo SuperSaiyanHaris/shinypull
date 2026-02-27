@@ -45,15 +45,24 @@ const platforms = [
 
 // Relevance + popularity score for sorting search results.
 // Ensures big creators who "contain" the query beat tiny channels that "start with" it.
+// Normalizes away spaces/underscores/dashes so "nick mercs" matches "NICKMERCS",
+// "peanut butter gamer" matches "peanutbuttergamer", etc.
 function searchScore(creator, query) {
   const q = query.toLowerCase();
+  const qn = q.replace(/[\s_\-]/g, '');
   const uname = (creator.username || '').toLowerCase();
   const dname = (creator.displayName || '').toLowerCase();
+  const unamen = uname.replace(/[\s_\-]/g, '');
+  const dnamen = dname.replace(/[\s_\-]/g, '');
   const count = creator.subscribers || creator.followers || 0;
   let bonus = 0;
-  if (uname === q || dname === q) bonus = 1_000_000_000;
-  else if (uname.startsWith(q) || dname.startsWith(q)) bonus = 1_000_000;
-  else if (uname.includes(q) || dname.includes(q)) bonus = 1_000;
+  if (uname === q || dname === q || unamen === qn || dnamen === qn) {
+    bonus = 1_000_000_000;
+  } else if (uname.startsWith(q) || dname.startsWith(q) || unamen.startsWith(qn) || dnamen.startsWith(qn)) {
+    bonus = 1_000_000;
+  } else if (uname.includes(q) || dname.includes(q) || unamen.includes(qn) || dnamen.includes(qn)) {
+    bonus = 1_000;
+  }
   return bonus + count;
 }
 
