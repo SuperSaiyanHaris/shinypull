@@ -43,6 +43,20 @@ const platforms = [
   { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, available: true },
 ];
 
+// Relevance + popularity score for sorting search results.
+// Ensures big creators who "contain" the query beat tiny channels that "start with" it.
+function searchScore(creator, query) {
+  const q = query.toLowerCase();
+  const uname = (creator.username || '').toLowerCase();
+  const dname = (creator.displayName || '').toLowerCase();
+  const count = creator.subscribers || creator.followers || 0;
+  let bonus = 0;
+  if (uname === q || dname === q) bonus = 1_000_000_000;
+  else if (uname.startsWith(q) || dname.startsWith(q)) bonus = 1_000_000;
+  else if (uname.includes(q) || dname.includes(q)) bonus = 1_000;
+  return bonus + count;
+}
+
 // TikTok search function - searches database
 async function searchTikTok(query, limit = 25) {
   const results = await searchCreators(query, 'tiktok');
@@ -72,6 +86,38 @@ async function searchTikTok(query, limit = 25) {
   );
 
   return withStats.slice(0, limit);
+}
+
+// Twitch DB search - supplements the live Twitch API results with creators we
+// already track. Twitch's own search ranks by recent activity, so a big channel
+// that hasn't streamed in a while (e.g. TheBurntPeanut) can be missing from the
+// first 25 results even though they have 2M followers.
+async function searchTwitchFromDB(query) {
+  const results = await searchCreators(query, 'twitch');
+
+  const withStats = await Promise.all(
+    results.map(async (creator) => {
+      const { data: stats } = await supabase
+        .from('creator_stats')
+        .select('subscribers')
+        .eq('creator_id', creator.id)
+        .order('recorded_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      return {
+        platform: 'twitch',
+        platformId: creator.platform_id,
+        username: creator.username,
+        displayName: creator.display_name || creator.username,
+        profileImage: creator.profile_image,
+        description: creator.description,
+        followers: stats?.subscribers || 0,
+      };
+    })
+  );
+
+  return withStats;
 }
 
 export default function Search() {
@@ -146,14 +192,29 @@ export default function Search() {
         // Search TikTok creators from database
         channels = await searchTikTok(searchQuery, 25);
       } else if (platform === 'twitch') {
-        channels = await searchTwitch(searchQuery, 25);
+        // Fetch Twitch API results and our DB in parallel, then merge.
+        // The Twitch API sorts by recent activity — big channels that haven't
+        // streamed lately can be missing from the first 25 results entirely.
+        const [apiResults, dbResults] = await Promise.all([
+          searchTwitch(searchQuery, 25),
+          searchTwitchFromDB(searchQuery),
+        ]);
+        const seen = new Set();
+        channels = [];
+        for (const c of [...apiResults, ...dbResults]) {
+          const key = (c.username || '').toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            channels.push(c);
+          }
+        }
       } else if (platform === 'kick') {
         channels = await searchKick(searchQuery, 25);
       } else if (platform === 'bluesky') {
         channels = await searchBluesky(searchQuery, 25);
       }
-      channels.sort((a, b) => (b.subscribers || b.followers || 0) - (a.subscribers || a.followers || 0));
-      setResults(channels);
+      channels.sort((a, b) => searchScore(b, searchQuery) - searchScore(a, searchQuery));
+      setResults(channels.slice(0, 25));
       // Pre-fill normalized username for TikTok request flow
       if (platform === 'tiktok') {
         setNormalizedUsername(normalizeToUsername(searchQuery));
