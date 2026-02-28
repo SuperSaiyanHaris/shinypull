@@ -125,6 +125,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/refunds" className="text-gray-300 hover:text-indigo-400 transition-colors">
+                  Refund Policy
+                </Link>
+              </li>
+              <li>
                 <Link to="/support" className="text-gray-300 hover:text-indigo-400 transition-colors">
                   Support Us
                 </Link>

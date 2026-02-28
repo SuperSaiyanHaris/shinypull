@@ -53,6 +53,7 @@ const Calculator = lazyWithRetry(() => import('./pages/Calculator'));
 const Support = lazyWithRetry(() => import('./pages/Support'));
 const Account = lazyWithRetry(() => import('./pages/Account'));
 const Pricing = lazyWithRetry(() => import('./pages/Pricing'));
+const Refunds = lazyWithRetry(() => import('./pages/Refunds'));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -114,6 +115,7 @@ function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/support" element={<Support />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/refunds" element={<Refunds />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/admin" element={<BlogAdmin />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
