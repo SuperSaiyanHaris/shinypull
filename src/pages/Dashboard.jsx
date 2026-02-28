@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import {
   Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown,
   Scale, Clock, ChevronRight, ChevronLeft, Check, X, Trash2,
-  ExternalLink, BookmarkX,
+  ExternalLink, BookmarkX, Download, Lock,
 } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
+import { useSubscription } from '../contexts/SubscriptionContext';
 import { getFollowedCreators } from '../services/followService';
 import { getSavedCompares, deleteSavedCompare } from '../services/compareService';
 import { getCreatorStats } from '../services/creatorService';
@@ -41,6 +42,7 @@ const PLATFORM_LABELS = {
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
+  const { tier } = useSubscription();
 
   // Data
   const [followedCreators, setFollowedCreators] = useState([]);
@@ -157,6 +159,33 @@ export default function Dashboard() {
 
   if (!user) return null;
 
+  const handleBulkExport = () => {
+    if (!followedCreators.length) return;
+    const headers = ['Name', 'Platform', 'Username', 'Subscribers/Followers', 'Views/Likes/Posts', 'Profile URL'];
+    const rows = followedCreators.map(c => {
+      const stat = creatorStats[c.id]?.current;
+      const primaryMetric = stat?.subscribers ?? stat?.followers ?? '';
+      const secondaryMetric = stat?.total_views ?? stat?.total_posts ?? '';
+      const profileUrl = `https://shinypull.com/${c.platform}/${c.username}`;
+      return [
+        `"${(c.display_name || c.username).replace(/"/g, '""')}"`,
+        c.platform,
+        c.username,
+        primaryMetric,
+        secondaryMetric,
+        profileUrl,
+      ];
+    });
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `shinypull-followed-creators.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User';
   const liveCount = followedCreators.filter(c =>
     (c.platform === 'twitch' || c.platform === 'kick') && liveStreamers.has(c.username.toLowerCase())
@@ -230,7 +259,29 @@ export default function Dashboard() {
           {/* ── FOLLOWING TAB ── */}
           {activeTab === 'following' && (
             <div>
-              {/* Platform Filter Chips */}
+              {/* Platform Filter Chips + Bulk Export */}
+              {followedCreators.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 mb-5">
+                  {tier === 'mod' ? (
+                    <button
+                      onClick={handleBulkExport}
+                      className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-950/40 hover:bg-amber-950/60 text-amber-400 border border-amber-800/60 transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Export All CSV
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => window.dispatchEvent(new CustomEvent('openUpgradePanel', { detail: { feature: 'export' } }))}
+                      className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-800/50 text-gray-600 border border-gray-800 cursor-pointer hover:text-gray-500 transition-colors"
+                      title="Bulk CSV export requires Mod plan"
+                    >
+                      <Lock className="w-3.5 h-3.5" />
+                      Export All CSV
+                    </button>
+                  )}
+                </div>
+              )}
               {followedCreators.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-5">
                   <FilterChip

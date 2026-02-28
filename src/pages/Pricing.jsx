@@ -39,7 +39,7 @@ const TIERS = [
       '20 saved comparisons',
       'CSV export for any creator',
       'No ads',
-      'Dashboard with growth feed',
+      'Personal dashboard',
     ],
     priceKey: 'sub',
   },

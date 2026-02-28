@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { Youtube, Twitch, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star, Play, ThumbsUp, MessageCircle } from 'lucide-react';
+import { Youtube, Twitch, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star, Play, ThumbsUp, MessageCircle, Download, Lock } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
@@ -49,7 +49,7 @@ export default function CreatorProfile() {
   const { platform, username } = useParams();
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
-  const { maxFollows, historyDays, openUpgradePanel } = useSubscription();
+  const { maxFollows, historyDays, hasExport, openUpgradePanel } = useSubscription();
   const [creator, setCreator] = useState(null);
   const [statsHistory, setStatsHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -298,6 +298,47 @@ export default function CreatorProfile() {
 
   const Icon = platformIcons[platform];
   const colors = platformColors[platform] || platformColors.youtube;
+
+  const handleExportCSV = () => {
+    if (!hasExport) {
+      openUpgradePanel('export');
+      return;
+    }
+    if (!statsHistory.length) return;
+
+    const sorted = [...statsHistory].sort((a, b) => new Date(a.recorded_at) - new Date(b.recorded_at));
+    const creatorName = creator?.display_name || creator?.username || username;
+
+    let headers, rows;
+    if (platform === 'youtube') {
+      headers = ['Date', 'Subscribers', 'Total Views', 'Videos'];
+      rows = sorted.map(s => [s.recorded_at, s.subscribers ?? '', s.total_views ?? '', s.total_posts ?? '']);
+    } else if (platform === 'tiktok') {
+      headers = ['Date', 'Followers', 'Likes', 'Videos'];
+      rows = sorted.map(s => [s.recorded_at, s.followers ?? '', s.total_views ?? '', s.total_posts ?? '']);
+    } else if (platform === 'twitch') {
+      headers = ['Date', 'Followers', 'Hours Watched', 'Peak Viewers', 'Avg Viewers'];
+      rows = sorted.map(s => [s.recorded_at, s.followers ?? '', s.hours_watched_day ?? '', s.peak_viewers_day ?? '', s.avg_viewers_day ?? '']);
+    } else if (platform === 'kick') {
+      headers = ['Date', 'Paid Subscribers', 'Hours Watched', 'Peak Viewers', 'Avg Viewers'];
+      rows = sorted.map(s => [s.recorded_at, s.subscribers ?? '', s.hours_watched_day ?? '', s.peak_viewers_day ?? '', s.avg_viewers_day ?? '']);
+    } else if (platform === 'bluesky') {
+      headers = ['Date', 'Followers', 'Posts'];
+      rows = sorted.map(s => [s.recorded_at, s.subscribers ?? '', s.total_posts ?? '']);
+    } else {
+      headers = ['Date', 'Followers'];
+      rows = sorted.map(s => [s.recorded_at, s.followers ?? s.subscribers ?? '']);
+    }
+
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${platform}-${creatorName}-stats.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const calculateGrowthMetrics = () => {
     if (statsHistory.length < 2) return null;
@@ -964,8 +1005,20 @@ export default function CreatorProfile() {
             {/* Daily Metrics Table */}
             {metrics ? (
               <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-800">
+                <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-gray-100">Daily Channel Metrics</h3>
+                  <button
+                    onClick={handleExportCSV}
+                    title={hasExport ? 'Export as CSV' : 'CSV export requires Sub or Mod plan'}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      hasExport
+                        ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-gray-100 border border-gray-700'
+                        : 'bg-gray-800/50 text-gray-600 border border-gray-800 cursor-pointer'
+                    }`}
+                  >
+                    {hasExport ? <Download className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                    Export CSV
+                  </button>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
