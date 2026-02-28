@@ -99,11 +99,6 @@ export default function Footer() {
                   Blog
                 </Link>
               </li>
-              <li>
-                <Link to="/gear" className="text-gray-300 hover:text-indigo-400 transition-colors">
-                  Gear
-                </Link>
-              </li>
             </ul>
           </div>
 
