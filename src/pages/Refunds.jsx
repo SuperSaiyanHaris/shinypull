@@ -30,73 +30,40 @@ export default function Refunds() {
           <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8">
             <div className="prose max-w-none">
 
-              <Section title="Overview">
+              <Section title="No Refunds">
                 <p>
-                  ShinyPull offers monthly subscriptions (Sub at $6/month, Mod at $20/month). This policy
-                  explains when you can get a refund and how to request one.
-                </p>
-              </Section>
-
-              <Section title="7-Day Refund Window">
-                <p>
-                  If you subscribed for the first time and aren't satisfied, you can request a full refund
-                  within 7 days of your initial payment. No questions asked.
+                  All purchases on ShinyPull are final. We do not offer refunds on monthly subscription
+                  charges, partial billing periods, or renewals.
                 </p>
                 <p>
-                  This applies to your first subscription purchase only. Renewals and plan upgrades are
-                  not eligible for the 7-day window.
+                  By subscribing, you acknowledge that you are purchasing access to a digital service
+                  that is made available immediately upon payment.
                 </p>
               </Section>
 
               <Section title="Cancellations">
                 <p>
                   You can cancel your subscription at any time from your Account page. When you cancel,
-                  your plan stays active until the end of the current billing period. You won't be charged
-                  again after that.
+                  your plan stays active until the end of the current billing period. You won't be
+                  charged again after that.
                 </p>
                 <p>
-                  Cancelling mid-cycle does not trigger a partial refund. Your access continues until
-                  the period you already paid for ends.
-                </p>
-              </Section>
-
-              <Section title="Renewals">
-                <p>
-                  Monthly renewals are not refundable once the billing date has passed and access for
-                  that period has been granted.
-                </p>
-                <p>
-                  If you forgot to cancel before a renewal, contact us within 48 hours and we'll
-                  review it on a case-by-case basis.
+                  Cancelling mid-cycle does not entitle you to a refund for the remaining days. Your
+                  access continues until the period you already paid for ends.
                 </p>
               </Section>
 
-              <Section title="Exceptions">
+              <Section title="Technical Issues">
                 <p>
-                  We'll consider refunds outside the standard window if there was a technical issue on
-                  our end that prevented you from using the service. Reach out and describe the problem.
-                </p>
-                <p>
-                  We don't issue refunds if you simply stopped using the service, forgot you had a
-                  subscription, or found you didn't need the features.
-                </p>
-              </Section>
-
-              <Section title="How to Request a Refund">
-                <p>
-                  Email us at <a href="mailto:shinypull@proton.me" className="text-indigo-400 hover:text-indigo-300">shinypull@proton.me</a> with
-                  the subject line "Refund Request" and include the email address on your account.
-                  We'll respond within 2 business days.
-                </p>
-                <p>
-                  Approved refunds are processed back to your original payment method. Stripe typically
-                  takes 5 to 10 business days to post the credit.
+                  If a verified technical failure on our end prevented you from accessing the service
+                  for an extended period, contact us and we'll review it. These cases are handled
+                  individually.
                 </p>
               </Section>
 
               <Section title="Contact">
                 <p>
-                  Questions? Reach us at <a href="mailto:shinypull@proton.me" className="text-indigo-400 hover:text-indigo-300">shinypull@proton.me</a>.
+                  Questions? Email <a href="mailto:shinypull@proton.me" className="text-indigo-400 hover:text-indigo-300">shinypull@proton.me</a>.
                 </p>
               </Section>
 
