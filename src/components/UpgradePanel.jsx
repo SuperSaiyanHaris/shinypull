@@ -249,6 +249,10 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
                     <button disabled className="w-full py-2.5 rounded-xl text-sm font-semibold bg-gray-800 text-gray-500 cursor-default">
                       You're on this plan
                     </button>
+                  ) : t.id === 'lurker' ? (
+                    <button disabled className="w-full py-2.5 rounded-xl text-sm font-semibold bg-gray-800/50 text-gray-600 cursor-default">
+                      Free tier
+                    </button>
                   ) : (
                     <button
                       onClick={() => handleUpgrade(t.priceKey)}

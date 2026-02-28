@@ -300,42 +300,116 @@ export default function CreatorProfile() {
   const colors = platformColors[platform] || platformColors.youtube;
 
   const handleExportCSV = () => {
-    if (!hasExport) {
-      openUpgradePanel('export');
-      return;
-    }
+    if (!hasExport) { openUpgradePanel('export'); return; }
     if (!statsHistory.length) return;
 
     const sorted = [...statsHistory].sort((a, b) => new Date(a.recorded_at) - new Date(b.recorded_at));
     const creatorName = creator?.display_name || creator?.username || username;
+    const exportDate = new Date().toISOString().split('T')[0];
+
+    // Compute daily deltas for every row
+    const withChanges = sorted.map((s, i) => {
+      const prev = sorted[i - 1];
+      return {
+        ...s,
+        subsChange: prev != null ? (s.subscribers || s.followers || 0) - (prev.subscribers || prev.followers || 0) : null,
+        viewsChange: prev != null ? (s.total_views || 0) - (prev.total_views || 0) : null,
+        postsChange: prev != null ? (s.total_posts || 0) - (prev.total_posts || 0) : null,
+      };
+    });
+
+    const fmtDate = (d) => d ? d.split('T')[0] : '';
+    const fmtDelta = (n) => n === null || n === undefined ? '' : (n >= 0 ? `+${n}` : `${n}`);
+    const esc = (v) => {
+      const s = String(v ?? '');
+      return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+
+    const PLATFORM_LABELS = { youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky' };
+
+    const meta = [
+      ['ShinyPull Stats Export'],
+      ['Creator', creatorName],
+      ['Platform', PLATFORM_LABELS[platform] || platform],
+      ['Exported', exportDate],
+      ['Profile URL', `https://shinypull.com/${platform}/${username}`],
+      [],
+    ];
 
     let headers, rows;
     if (platform === 'youtube') {
-      headers = ['Date', 'Subscribers', 'Total Views', 'Videos'];
-      rows = sorted.map(s => [s.recorded_at, s.subscribers ?? '', s.total_views ?? '', s.total_posts ?? '']);
+      headers = ['Date', 'Subscribers', 'Total Views', 'Daily Views', 'Videos', 'Video Change', 'Est Daily Revenue Low ($)', 'Est Daily Revenue High ($)', 'Est Monthly Revenue Low ($)', 'Est Monthly Revenue High ($)'];
+      rows = withChanges.map(s => {
+        const dv = s.viewsChange;
+        const hasViews = dv != null && dv > 0;
+        return [
+          fmtDate(s.recorded_at),
+          s.subscribers ?? '',
+          s.total_views ?? '',
+          fmtDelta(s.viewsChange),
+          s.total_posts ?? '',
+          fmtDelta(s.postsChange),
+          hasViews ? (dv * 2 / 1000).toFixed(2) : '',
+          hasViews ? (dv * 7 / 1000).toFixed(2) : '',
+          hasViews ? (dv * 30 * 2 / 1000).toFixed(2) : '',
+          hasViews ? (dv * 30 * 7 / 1000).toFixed(2) : '',
+        ];
+      });
     } else if (platform === 'tiktok') {
-      headers = ['Date', 'Followers', 'Likes', 'Videos'];
-      rows = sorted.map(s => [s.recorded_at, s.followers ?? '', s.total_views ?? '', s.total_posts ?? '']);
+      headers = ['Date', 'Followers', 'Follower Change', 'Total Likes', 'Daily Likes', 'Videos', 'Video Change'];
+      rows = withChanges.map(s => [
+        fmtDate(s.recorded_at),
+        s.followers ?? s.subscribers ?? '',
+        fmtDelta(s.subsChange),
+        s.total_views ?? '',
+        fmtDelta(s.viewsChange),
+        s.total_posts ?? '',
+        fmtDelta(s.postsChange),
+      ]);
     } else if (platform === 'twitch') {
-      headers = ['Date', 'Followers', 'Hours Watched', 'Peak Viewers', 'Avg Viewers'];
-      rows = sorted.map(s => [s.recorded_at, s.followers ?? '', s.hours_watched_day ?? '', s.peak_viewers_day ?? '', s.avg_viewers_day ?? '']);
+      headers = ['Date', 'Followers', 'Follower Change', 'Hours Watched', 'Peak Viewers', 'Avg Viewers'];
+      rows = withChanges.map(s => [
+        fmtDate(s.recorded_at),
+        s.followers ?? s.subscribers ?? '',
+        fmtDelta(s.subsChange),
+        s.hours_watched_day ?? '',
+        s.peak_viewers_day ?? '',
+        s.avg_viewers_day ?? '',
+      ]);
     } else if (platform === 'kick') {
-      headers = ['Date', 'Paid Subscribers', 'Hours Watched', 'Peak Viewers', 'Avg Viewers'];
-      rows = sorted.map(s => [s.recorded_at, s.subscribers ?? '', s.hours_watched_day ?? '', s.peak_viewers_day ?? '', s.avg_viewers_day ?? '']);
+      headers = ['Date', 'Paid Subscribers', 'Sub Change', 'Hours Watched', 'Peak Viewers', 'Avg Viewers'];
+      rows = withChanges.map(s => [
+        fmtDate(s.recorded_at),
+        s.subscribers ?? '',
+        fmtDelta(s.subsChange),
+        s.hours_watched_day ?? '',
+        s.peak_viewers_day ?? '',
+        s.avg_viewers_day ?? '',
+      ]);
     } else if (platform === 'bluesky') {
-      headers = ['Date', 'Followers', 'Posts'];
-      rows = sorted.map(s => [s.recorded_at, s.subscribers ?? '', s.total_posts ?? '']);
+      headers = ['Date', 'Followers', 'Follower Change', 'Posts', 'Post Change'];
+      rows = withChanges.map(s => [
+        fmtDate(s.recorded_at),
+        s.subscribers ?? '',
+        fmtDelta(s.subsChange),
+        s.total_posts ?? '',
+        fmtDelta(s.postsChange),
+      ]);
     } else {
-      headers = ['Date', 'Followers'];
-      rows = sorted.map(s => [s.recorded_at, s.followers ?? s.subscribers ?? '']);
+      headers = ['Date', 'Followers', 'Follower Change'];
+      rows = withChanges.map(s => [
+        fmtDate(s.recorded_at),
+        s.followers ?? s.subscribers ?? '',
+        fmtDelta(s.subsChange),
+      ]);
     }
 
-    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const csvStr = '\uFEFF' + [...meta, headers, ...rows].map(r => r.map(esc).join(',')).join('\r\n');
+    const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${platform}-${creatorName}-stats.csv`;
+    a.download = `shinypull-${platform}-${creator?.username || username}-${exportDate}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
