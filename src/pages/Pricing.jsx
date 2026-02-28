@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Check, Zap, Crown, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription, TIER_DISPLAY } from '../contexts/SubscriptionContext';
+import { supabase } from '../lib/supabase';
 
 const TIERS = [
   {
@@ -93,17 +95,42 @@ const FAQS = [
 export default function Pricing() {
   const { isAuthenticated } = useAuth();
   const { tier } = useSubscription();
+  const [upgrading, setUpgrading] = useState(null);
+  const [error, setError] = useState('');
 
-  function handleUpgradeClick(priceKey) {
+  async function handleUpgradeClick(priceKey) {
     if (!isAuthenticated) {
       window.dispatchEvent(new CustomEvent('openAuthPanel', {
-        detail: { message: 'Create a free account first, then upgrade to Sub or Mod.' },
+        detail: { message: 'Create a free account first, then upgrade.', returnTo: '/pricing' },
       }));
       return;
     }
-    window.dispatchEvent(new CustomEvent('openUpgradePanel', {
-      detail: { feature: 'pricing' },
-    }));
+
+    setUpgrading(priceKey);
+    setError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Not authenticated');
+
+      const res = await fetch('/api/stripe-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          priceKey,
+          returnUrl: `${window.location.origin}/account?upgrade=success`,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Checkout failed');
+      window.location.href = data.url;
+    } catch (err) {
+      setError(err.message || 'Something went wrong. Please try again.');
+      setUpgrading(null);
+    }
   }
 
   return (
@@ -210,16 +237,24 @@ export default function Pricing() {
                   ) : (
                     <button
                       onClick={() => handleUpgradeClick(t.priceKey)}
-                      className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${colors.btn}`}
+                      disabled={upgrading === t.priceKey}
+                      className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${colors.btn}`}
                     >
-                      Upgrade to {t.name}
-                      <ArrowRight className="w-4 h-4" />
+                      {upgrading === t.priceKey ? 'Redirecting...' : `Upgrade to ${t.name}`}
+                      {upgrading !== t.priceKey && <ArrowRight className="w-4 h-4" />}
                     </button>
                   )}
                 </div>
               );
             })}
           </div>
+
+          {/* Error */}
+          {error && (
+            <div className="mt-6 max-w-md mx-auto bg-red-950/30 border border-red-800 text-red-400 px-4 py-3 rounded-xl text-sm text-center">
+              {error}
+            </div>
+          )}
 
           {/* Comparison note */}
           <p className="text-center text-sm text-gray-500 mt-8">
