@@ -10,7 +10,7 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 border-t border-gray-800 mt-auto">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
@@ -50,6 +50,11 @@ export default function Footer() {
                   Money Calculator
                 </Link>
               </li>
+              <li>
+                <Link to="/blog" className="text-gray-300 hover:text-indigo-400 transition-colors">
+                  Blog
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -85,18 +90,6 @@ export default function Footer() {
                 <Link to="/rankings/bluesky" className="text-gray-300 hover:text-indigo-400 transition-colors flex items-center gap-2">
                   <BlueskyIcon className="w-4 h-4" />
                   Bluesky Stats
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="font-semibold mb-4 text-gray-100">Resources</h3>
-            <ul className="space-y-3 text-sm">
-              <li>
-                <Link to="/blog" className="text-gray-300 hover:text-indigo-400 transition-colors">
-                  Blog
                 </Link>
               </li>
             </ul>
