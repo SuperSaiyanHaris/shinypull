@@ -11,8 +11,9 @@ import { getChannelByUsername as getTwitchChannel, getLiveStreams as getTwitchLi
 import { getChannelByUsername as getKickChannel, getLiveStreams as getKickLiveStreams } from '../services/kickService';
 import { getBlueskyProfile } from '../services/blueskyService';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
-import { followCreator, unfollowCreator, isFollowing as checkIsFollowing } from '../services/followService';
+import { followCreator, unfollowCreator, isFollowing as checkIsFollowing, getFollowedCreators } from '../services/followService';
 import { useAuth } from '../contexts/AuthContext';
+import { useSubscription } from '../contexts/SubscriptionContext';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
@@ -48,6 +49,7 @@ export default function CreatorProfile() {
   const { platform, username } = useParams();
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
+  const { maxFollows, historyDays, openUpgradePanel } = useSubscription();
   const [creator, setCreator] = useState(null);
   const [statsHistory, setStatsHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -259,7 +261,6 @@ export default function CreatorProfile() {
 
   const handleFollowToggle = async () => {
     if (!isAuthenticated) {
-      // Trigger auth panel with a helpful message
       window.dispatchEvent(new CustomEvent('openAuthPanel', {
         detail: { message: 'Sign in to follow creators and see their latest stats quicker!' }
       }));
@@ -277,6 +278,14 @@ export default function CreatorProfile() {
         await unfollowCreator(user.id, dbCreatorId);
         setIsFollowing(false);
       } else {
+        // Check follow limit before adding
+        if (isFinite(maxFollows)) {
+          const followed = await getFollowedCreators(user.id);
+          if (followed.length >= maxFollows) {
+            openUpgradePanel('follow');
+            return;
+          }
+        }
         await followCreator(user.id, dbCreatorId);
         setIsFollowing(true);
       }
@@ -935,13 +944,20 @@ export default function CreatorProfile() {
               <GrowthChart
                 data={statsHistory}
                 range={chartRange}
-                onRangeChange={setChartRange}
+                onRangeChange={(val) => {
+                  if (isFinite(historyDays) && val > historyDays) {
+                    openUpgradePanel('history');
+                    return;
+                  }
+                  setChartRange(val);
+                }}
                 metric={chartMetric}
                 onMetricChange={(metric) => {
                   setChartMetric(metric);
                   analytics.changeChartMetric(metric);
                 }}
                 platform={platform}
+                maxHistoryDays={historyDays}
               />
             )}
 
@@ -1421,13 +1437,16 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
   );
 }
 
-function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platform }) {
+function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platform, maxHistoryDays }) {
   const ranges = [
     { label: '30D', value: 30 },
     { label: '60D', value: 60 },
     { label: '90D', value: 90 },
     { label: 'All', value: 9999 },
-  ];
+  ].map((r) => ({
+    ...r,
+    locked: isFinite(maxHistoryDays) && r.value > maxHistoryDays,
+  }));
 
   // Build metrics array based on platform
   // For YouTube: Views first (accurate), then Subscribers (rounded), then Videos
@@ -1619,12 +1638,19 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
             <button
               key={r.value}
               onClick={() => onRangeChange(r.value)}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                range === r.value
+              className={`relative flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                r.locked
+                  ? 'text-gray-600 cursor-pointer hover:text-gray-500'
+                  : range === r.value
                   ? 'bg-gray-900 text-indigo-600 shadow-sm'
                   : 'text-gray-300 hover:text-gray-100'
               }`}
             >
+              {r.locked && (
+                <svg className="w-2.5 h-2.5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+              )}
               {r.label}
             </button>
           ))}

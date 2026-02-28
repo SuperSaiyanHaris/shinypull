@@ -6,6 +6,7 @@ import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AuthProvider } from './contexts/AuthContext';
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
 
 // Eagerly load the homepage (critical path)
 import Home from './pages/Home';
@@ -51,6 +52,7 @@ const ResetPassword = lazyWithRetry(() => import('./pages/ResetPassword'));
 const Calculator = lazyWithRetry(() => import('./pages/Calculator'));
 const Support = lazyWithRetry(() => import('./pages/Support'));
 const Account = lazyWithRetry(() => import('./pages/Account'));
+const Pricing = lazyWithRetry(() => import('./pages/Pricing'));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -85,6 +87,7 @@ function RouteChangeTracker() {
 function App() {
   return (
     <AuthProvider>
+      <SubscriptionProvider>
       <div className="min-h-screen bg-gray-900 text-white flex flex-col">
         <RouteChangeTracker />
         <ScrollToTop />
@@ -110,6 +113,7 @@ function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/support" element={<Support />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/admin" element={<BlogAdmin />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
@@ -119,6 +123,7 @@ function App() {
         </main>
         <Footer />
       </div>
+      </SubscriptionProvider>
     </AuthProvider>
   );
 }

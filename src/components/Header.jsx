@@ -3,12 +3,15 @@ import { Link, useLocation } from 'react-router-dom';
 import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthPanel from './AuthPanel';
+import UpgradePanel from './UpgradePanel';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [authPanelMessage, setAuthPanelMessage] = useState('');
+  const [upgradePanelOpen, setUpgradePanelOpen] = useState(false);
+  const [upgradePanelFeature, setUpgradePanelFeature] = useState(null);
   const location = useLocation();
   const { user, signOut, isAuthenticated } = useAuth();
   const mobileMenuRef = useRef(null);
@@ -42,6 +45,16 @@ export default function Header() {
     };
     window.addEventListener('openAuthPanel', handleOpenAuthPanel);
     return () => window.removeEventListener('openAuthPanel', handleOpenAuthPanel);
+  }, []);
+
+  // Listen for custom event to open upgrade panel
+  useEffect(() => {
+    const handleOpenUpgradePanel = (e) => {
+      setUpgradePanelFeature(e.detail?.feature || null);
+      setUpgradePanelOpen(true);
+    };
+    window.addEventListener('openUpgradePanel', handleOpenUpgradePanel);
+    return () => window.removeEventListener('openUpgradePanel', handleOpenUpgradePanel);
   }, []);
 
   const isActive = (path) => {
@@ -273,13 +286,23 @@ export default function Header() {
       </div>
 
       {/* Auth Panel */}
-      <AuthPanel 
-        isOpen={authPanelOpen} 
+      <AuthPanel
+        isOpen={authPanelOpen}
         onClose={() => {
           setAuthPanelOpen(false);
           setAuthPanelMessage('');
-        }} 
+        }}
         message={authPanelMessage}
+      />
+
+      {/* Upgrade Panel */}
+      <UpgradePanel
+        isOpen={upgradePanelOpen}
+        onClose={() => {
+          setUpgradePanelOpen(false);
+          setUpgradePanelFeature(null);
+        }}
+        feature={upgradePanelFeature}
       />
     </header>
   );

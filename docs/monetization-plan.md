@@ -22,29 +22,37 @@ Skip Ezoic — bad reputation for destroying PageSpeed scores. ShinyPull is at m
 
 ## Revenue Stream 1: User Subscriptions (B2C)
 
-### Free
+**Tier names (streaming culture):**
+- Free → **Lurker** (watchers who don't pay)
+- Pro (~$6/mo) → **Sub** (paying subscribers)
+- Agency (~$20/mo) → **Mod** (power users, trusted elite)
+
+### Lurker (Free)
 - Follow up to **5 creators**
 - Compare **2 creators** at a time
 - **30 days** of stat history on charts
+- **3** saved comparisons
 - View rankings (with display ads + sponsored slots)
 - Basic search
 
-### Pro — ~$6/month
+### Sub — ~$6/month
 The analytics nerd tier.
 - **No ads**
 - Follow up to **100 creators**
 - Compare up to **5 creators**
 - **1 year** of stat history
+- **20** saved comparisons
 - **CSV export** of any creator's stats
 - **Milestone alerts** — email when a followed creator hits a round number
 - Dashboard with followed creator feed
 
-### Agency — ~$20/month
+### Mod — ~$20/month
 Targets creator managers, MCNs, brand partnership teams.
 - **No ads**
 - **Unlimited** follows
 - Compare up to **10 creators**
 - **Full history** (everything we have)
+- **Unlimited** saved comparisons
 - **1 featured listing slot** per month (bundled in)
 - Bulk CSV export (multiple creators at once)
 - White-label shareable profile links (clean URL, no nav)

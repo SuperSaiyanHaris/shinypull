@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Mail, Lock, Calendar, Star, CheckCircle, AlertCircle, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, Calendar, Star, CheckCircle, AlertCircle, Eye, EyeOff, ArrowLeft, Zap, Crown, ExternalLink } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useSubscription, TIER_DISPLAY, TIER_LIMITS } from '../contexts/SubscriptionContext';
 import { getFollowedCreators } from '../services/followService';
 import SEO from '../components/SEO';
 
@@ -29,6 +30,8 @@ function Toast({ message, type, onDismiss }) {
 
 export default function Account() {
   const { user, signOut } = useAuth();
+  const { tier, status: subStatus } = useSubscription();
+  const [managingBilling, setManagingBilling] = useState(false);
 
   // Display name
   const [displayName, setDisplayName] = useState('');
@@ -110,6 +113,28 @@ export default function Account() {
     }
   };
 
+  const handleManageBilling = async () => {
+    setManagingBilling(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch('/api/stripe-portal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ returnUrl: window.location.href }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to open billing portal');
+      window.location.href = data.url;
+    } catch (err) {
+      showToast(err.message || 'Could not open billing portal.', 'error');
+      setManagingBilling(false);
+    }
+  };
+
   return (
     <>
       <SEO
@@ -142,6 +167,69 @@ export default function Account() {
         </div>
 
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+
+          {/* Subscription */}
+          <div className={`bg-gray-900 rounded-2xl border p-6 ${
+            tier === 'mod' ? 'border-amber-800/60' : tier === 'sub' ? 'border-indigo-800/60' : 'border-gray-800'
+          }`}>
+            <div className="flex items-center gap-2 mb-1">
+              {tier === 'mod' ? <Crown className="w-4 h-4 text-amber-400" /> : <Zap className="w-4 h-4 text-indigo-400" />}
+              <h2 className="text-base font-semibold text-gray-100">Subscription</h2>
+            </div>
+
+            <div className="flex items-center gap-3 mt-4 mb-4">
+              <span className={`px-3 py-1 rounded-full text-sm font-bold ${TIER_DISPLAY[tier]?.bg} ${TIER_DISPLAY[tier]?.color} border ${TIER_DISPLAY[tier]?.border}`}>
+                {TIER_DISPLAY[tier]?.label}
+              </span>
+              {subStatus === 'past_due' && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-950/40 text-red-400 border border-red-800">
+                  Payment past due
+                </span>
+              )}
+            </div>
+
+            {tier === 'lurker' ? (
+              <div>
+                <p className="text-sm text-gray-400 mb-4">
+                  Free plan. Follow up to 5 creators, compare 2 at a time, 30 days of history.
+                </p>
+                <div className="flex gap-3 flex-wrap">
+                  <button
+                    onClick={() => window.dispatchEvent(new CustomEvent('openUpgradePanel', { detail: { feature: 'pricing' } }))}
+                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-colors"
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                    Upgrade to Sub
+                  </button>
+                  <Link
+                    to="/pricing"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-sm font-medium rounded-xl transition-colors"
+                  >
+                    Compare plans
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <ul className="text-sm text-gray-400 space-y-1 mb-5">
+                  <li>Follow up to {TIER_LIMITS[tier].maxFollows === Infinity ? 'unlimited' : TIER_LIMITS[tier].maxFollows} creators</li>
+                  <li>Compare up to {TIER_LIMITS[tier].maxCompare} creators</li>
+                  <li>{TIER_LIMITS[tier].historyDays === Infinity ? 'Full history' : `${TIER_LIMITS[tier].historyDays} days of history`}</li>
+                  <li>Ad-free experience</li>
+                  {tier === 'mod' && <li>1 featured listing slot per month</li>}
+                </ul>
+                <button
+                  onClick={handleManageBilling}
+                  disabled={managingBilling}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-sm font-medium rounded-xl transition-colors disabled:opacity-50"
+                >
+                  {managingBilling ? 'Opening...' : 'Manage Subscription'}
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Account overview */}
           <div className="bg-gray-900 rounded-2xl border border-gray-800 p-6">
