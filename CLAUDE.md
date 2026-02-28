@@ -260,15 +260,13 @@ Scripts use `dotenv` to load `.env` automatically.
 
 ## GitHub Actions
 
-**Optimized for 2,000 minutes/month budget:**
-- **Daily Stats Collection:** Runs 2x daily (6 AM, 6 PM UTC) — collects YouTube, Twitch, and Kick stats (API-only)
-- **TikTok Profile Refresh:** Runs 2x daily (2 AM, 2 PM UTC / 9 PM, 9 AM EST) — scrapes all TikTok creator profiles
+**Public repo — unlimited GitHub Actions minutes:**
+- **Daily Stats Collection:** Runs 3x daily (1 AM, 9 AM, 5 PM EST) — collects YouTube, Twitch, Kick, and Bluesky stats
+- **TikTok Profile Refresh:** Runs 4x daily (9 PM, 3 AM, 9 AM, 3 PM EST) — scrapes all TikTok creator profiles
 - **Creator Request Processor:** Runs 4x daily (every 6 hours) — processes pending TikTok creator requests
 - **Creator Discovery:** Runs 4x daily (every 6 hours) — discovers new creators across all platforms
 - **Twitch Stream Monitor:** Runs every 3 hours (8x daily) — tracks live streams and hours watched
 - **Kick Stream Monitor:** Runs every 3 hours (8x daily, offset) — tracks live streams and hours watched
-
-**Monthly usage:** ~1,200 minutes (within 2,000 min free tier)
 
 **Note:** TikTok scraping works from GitHub Actions IPs (confirmed Feb 2026). Local scripts kept as fallback only.
 
