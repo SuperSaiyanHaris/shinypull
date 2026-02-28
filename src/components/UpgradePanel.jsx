@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Check, Zap, Crown, Lock } from 'lucide-react';
 import { useSubscription, TIER_DISPLAY } from '../contexts/SubscriptionContext';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 
 const FEATURE_MESSAGES = {
   compare: "You've hit the compare limit for your plan.",
@@ -119,9 +120,16 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
     setError('');
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Not authenticated');
+
       const res = await fetch('/api/stripe-checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({
           priceKey,
           returnUrl: `${window.location.origin}/account?upgrade=success`,
