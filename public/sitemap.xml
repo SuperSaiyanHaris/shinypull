@@ -2,103 +2,97 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://shinypull.com/</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>1</priority>
   </url>
   <url>
     <loc>https://shinypull.com/blog</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings/youtube</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings/twitch</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings/kick</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings/tiktok</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings/bluesky</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/compare</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/gear</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/youtube/money-calculator</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://shinypull.com/search</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://shinypull.com/about</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://shinypull.com/contact</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://shinypull.com/support</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://shinypull.com/privacy</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://shinypull.com/terms</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
@@ -229,1261 +223,643 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/tiktok/masonramsey</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/ondreazlopez</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/noahbeck</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/caseyneistat</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/arianagrande</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/babyariel</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/rosalia</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/spencerx</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/jasonderulo</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/justinbieber</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/willsmith</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/selenagomez</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/tiktok</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/kimberly.loaiza</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/zachking</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/addisonre</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/xkarentorresx</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/chefclub</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/cookingwithlynja</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/feelgoodfoodie</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/newt</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/gordonramsayofficial</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/jonathandaviss</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/usainbolt</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/tombrady</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/neymarjr</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/charlidamelio</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/bretmanrock</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/nikkietutorials</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/jamescharles</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/lilyachty</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/dojacat</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/amauryguichon</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/sabrinacarpenter</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/shawnmendes</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/postmalone</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/vini_jr</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/travisscott</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/nfrealmusic</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/kingbach</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/chrisklemens</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/jacksepticeye</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/nickelodeon</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/starwars</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/marvel</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/disney</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/mlb</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/nfl</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/ufc</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/f1</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/bundesliga</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/inter</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/acmilan</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/arsenal</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/chelseafc</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/fallontonight</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/fcbayern</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/ibaillanos</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/alexisomman</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/vilfreim</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/iamcardib</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/angelomarasigan</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/vilmeijuga</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/natalie_reynolds</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/zacherydereniowski</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/zohranmamdani</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/meganskiendiel</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/mariahcarey</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/tatumbrandt</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/okcool</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/gracebeverley</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/briarcochran</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/rorysutherland</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/shwinnabego</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/chatlabs_</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/rauwalejandro</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/livbedumb</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/hollielouisezive</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/tiktok/farronclark</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/thepeanutinstitute</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/theprintedpeanut5711</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/thepeanutbutterconspiracy-topic</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/theburntpeanutshorts</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/hkpeanutscom</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/lulutho_sinxoto</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/studiopeanutbutter</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanutpotteryllc9267</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanutdadon-topic</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanutbuttersofficial</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/thepeanutvlogs</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanutlivefrom215</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/theburntpeanut</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanutamongus</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanutbutterrrr_</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanutgoldenretriever</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanutbutterpn</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanutbuttergamer</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanut77</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/user-eb6xi7wp5s</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/kick/shiedabro</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/peanut1</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanutoons</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/peanut_ssbu</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/pinatchie</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/kick/nick3l</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/kick/papita</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/konnorlobo</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/illusions93</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/skullvolver</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/kick/basilekun</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/jedith</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/kick/nicha6666596</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/archit3ct</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/kick/dedecimkk3</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/on1c_</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/kick/fzx_44</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/moomooclover</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/koffingsonriente</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/yasmiinis</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/cammytft</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/meetthemyth</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/ayaakahane</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/kiskachan</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/tortedelini</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/xyzoom</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/spitzz</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/ayemari</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/rykomastery_</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/gems</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/hakaisinnkotaro</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/sabsthesav</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/esdesu</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/othergun</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/jabiertzo</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/spottman</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/qtzynderella</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/skybilz</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/voicezan</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/emilyuwo</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/paulinho52ot</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/maystine</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/niklasjahn6</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/earthtosteph</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/luuluts</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/shilbiainu</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/jessamesa</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/kruzer</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/title_tft</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/justhatemeeecatq</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/skullsnightshade</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/xocheergurlox</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/leo__king</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/canerkrd</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/nukeri</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/ali</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/ry6kagop</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/branuel</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/twitchreo</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/pumaplow</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/askeldan</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/syslov171</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/mcdev_tv</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/krytous_cs</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/anarcocapitalista12</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/smokeyspo</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/bzzisperfect</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/atinycherry</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/grimz</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/gtlive</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/jnny</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/jpw03</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/junicats</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/sevy</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/nelk0r</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/pelle981</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/blackrabbit342</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/vswed</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/autdany</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/pariid</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/onikana</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/wolfercs</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/b0rsuq</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/polloskitzo</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/le_radis_irradie</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/jogabilidade</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/airlinerslive</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/masae</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/rixqwoz2</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/jonblazelive</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/samoylov___</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/beribug</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/trollzinha</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/mrquarate</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/morttimer11</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/youcifer1</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/clean_killl</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/oboeshoesgames</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/thetacticalbrit</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/vampykinz</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/mmgeneral</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/jayleeto</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/epidemy</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/alvina</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/butters</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/pazpeaceful</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/umichanloveti</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/captain_domo</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/inariiroha_</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/kamicakes1</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/eevochka</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/eeveelinh</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/jimcarona</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/duncancantdie</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/kanseru_tyan</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/papamutt</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/fluffy</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/pengwin</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/contv</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/fatty</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/omrfilo</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/entoanthepack</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/ftyaaaan</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/vulpixie</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/guibees559</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/soolking</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/jvindahouse</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/thecallofdutydj</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/test40228</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/ayofatnap</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/spicy_fr</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/its_bunnii</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/raythis</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/dunlol</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/igortjuh</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/lettersr6s</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/2twistedtv</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/yuy_ix</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/kusa</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/danielthedemon</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/kritikal</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/bilal</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/vrauixo</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/lyss</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/imocktor</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/berdydaft</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/zirotv</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/artskill</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/czargy</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/gabssf</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/miketrollinski</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/giwi</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/fragstube</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/heavenfox</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/zhenya_dota2</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/mukluk</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/francescopardinivgc</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/1zezao</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/barbe___douce</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/taydertot</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/drifty</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/senvale</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/attursson</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/montoyatr</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/vizicsacsi</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/masamitzu</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/tabula</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/jojosolos</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/maihopawango</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/nawk_</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/waffwlwolf</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/palmbee</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/shomaru7</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/filiperaaamos</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/dennsen86</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/supelpr</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/qaws_1109</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/nathanpereirao</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/aimlul</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/dotodoya</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/verybadscav</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/frankystrings</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/markstrom</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/marifpss</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/shevronin</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/m3rkmus1c</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/headtr1ckk</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/marzzzzy</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/elquaria</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/rosedoodle</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/bearki</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/btsbrasilfps</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/ettnix</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/ducksauce</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/god_lita</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/marcomerrino</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/barb0sxd</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/grandpoobear</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/highkeyhateme</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/lobosjr</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/kyul365</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/alpharad</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/at0mium</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/jakenbakelive</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/suzyroxx</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/polispol1</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/cydonia_chiara</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/twitch/lebouseuh</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/hinas3</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/youtube/kidslearningchannelofficial07</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/heitir</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/youtube/all.highlights</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/tobinatorlp</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://shinypull.com/youtube/coachrhodes</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/sabaku_no_sutoriimaa</loc>
+    <loc>https://shinypull.com/tiktok/cr7fragrances</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/twitch/ksonsouchou</loc>
+    <loc>https://shinypull.com/tiktok/bookclubradio</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -1496,606 +872,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/tiktok/nichlmao</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/twitch/dream</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/twitch/clix</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/twitch/caseoh_</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/twitch/bugha</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/twitch/auronplay</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/twitch/alanzoka</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/zeon</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/xposed</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/xmerghani</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/wtcn</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/westcol</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/tuna</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/trainwreckstv</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/syztmz</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/sxb</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/swaggybark</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/rraenee</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/roshtein</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/restt</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/rampagejackson</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/paymoneywubby</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/odablock</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/niter</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/nickmercs</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/neexcsgo</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/mrstiventc</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/lospollostv</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/lordkebun</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/loochy</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/korekore_ch</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/kinocasinogaming</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/jahrein</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/ilkerfirat</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/hype</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/husamviyuviyu</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/haiset</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/flygun</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/fattypillow</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/elmiillor</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/dvm_medja</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/drchubzdpt</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/drb7h</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/dobrodziej</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/cyberrulztv</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/batuhanfurkan5</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/ayezee</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/atadogann</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/astatoro</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/asmongold</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/andypsx</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/agraelus</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/adinross</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/absi</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/weratedogs.com</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/washingtonpost.com</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/timothysnyder.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/theonion.com</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/theguardian.com</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/thedailyshow.com</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/stephenking.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/sanders.senate.gov</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/ronfilipkowski.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/rbreich.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/propublica.org</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/petebuttigieg.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/pattonoswalt.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/nytimes.com</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/npr.org</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/muellershewrote.com</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/mollyjongfast.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/mmpadellan.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/meidastouch.com</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/mehdirhasan.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/mcuban.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/markhamillofficial.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/marcelias.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/lincolnproject.us</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/levarburton.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/katiephang.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/just-jack-1.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/joncooper-us.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/jojofromjerz.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/jay.bsky.team</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/jamellebouie.net</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/hcrichardson.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/hankgreen.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/gtconway.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/governorwalz.mn.gov</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/georgetakei.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/dril.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/dieworkwear.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/cnn.com</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/briantylercohen.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/bencollins.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/barackobama.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/atrupar.com</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/aoc.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/altnps.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/acyn.bsky.social</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/bluesky/aaronparnas.bsky.social</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -4987,6 +3763,2778 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://shinypull.com/tiktok/masonramsey</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/ondreazlopez</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/noahbeck</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/caseyneistat</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/arianagrande</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/babyariel</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/rosalia</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/spencerx</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/jasonderulo</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/justinbieber</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/willsmith</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/selenagomez</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/tiktok</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/kimberly.loaiza</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/zachking</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/addisonre</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/xkarentorresx</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/chefclub</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/cookingwithlynja</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/feelgoodfoodie</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/newt</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/gordonramsayofficial</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/jonathandaviss</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/usainbolt</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/tombrady</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/neymarjr</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/charlidamelio</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/bretmanrock</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/nikkietutorials</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/jamescharles</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/lilyachty</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/dojacat</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/amauryguichon</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/sabrinacarpenter</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/shawnmendes</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/postmalone</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/vini_jr</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/travisscott</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/nfrealmusic</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/kingbach</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/chrisklemens</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/jacksepticeye</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/nickelodeon</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/starwars</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/marvel</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/disney</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/mlb</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/nfl</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/ufc</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/f1</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/bundesliga</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/inter</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/acmilan</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/arsenal</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/chelseafc</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/fallontonight</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/fcbayern</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/ibaillanos</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/alexisomman</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/vilfreim</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/iamcardib</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/angelomarasigan</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/vilmeijuga</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/natalie_reynolds</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/zacherydereniowski</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/zohranmamdani</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/meganskiendiel</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/mariahcarey</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/tatumbrandt</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/okcool</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/gracebeverley</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/briarcochran</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/rorysutherland</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/shwinnabego</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/chatlabs_</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/rauwalejandro</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/livbedumb</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/hollielouisezive</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/tiktok/farronclark</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/jesusito110</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/velgolas</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/profesorklakier</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/jowko-m</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/guilty</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/durpee82</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/iulia_slays</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/asds__games</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/pepe</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/slender_gs</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/clempsrpg</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/juniorhealy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/norianne</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/levi_thomas_evans</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/blacksky88888</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/crownycro</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/morsy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/ozarustones</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/gevorchoo</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/hyliandescent</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/hanataba_yuiha</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/questron</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/watchfultvc</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/tankelit</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/tyron18</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/graword</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/yoshikava69</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/nightmarevc</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/jaypokerman</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/weeesty</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/sherman_s</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/futbol_fantasy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/oldskool</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/horoberth</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/tady_lukas_</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kackstift33</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/riopaser</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/jarkofn</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kentsumeshi_heyoo</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/xgodwar</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/tl_nero</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/delacroix22</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/xadrr</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/fusrobya</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/gordeteefn</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kozyrbek</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/suhoyq</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/neythox</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/giornogaming</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/dave_aoe</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/luckyohneluke</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/holladiewaldfee</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/cyberlivearena1</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/ilsantu_futuniverse</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/theholomovement</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/aelris_</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/elisaseidel</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/by_mandero</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/theremedylive</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/davanat</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/2fast</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/mugretnug</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/the_klyde</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/gouvy10</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/cabramaravilla</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/mythicalsausage</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/lilimaruriri</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/arteemoov</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/lizagrimm</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/fitzadri</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/samsungodyssey</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/sramaravilha</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/frozeado0</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/mirlol</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/stal</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/gagod</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/lotusasakura</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/dydy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/degrastream</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/rosieriver</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/nikovolk</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/sfgameofficial</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/char</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/timit</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/totochelechef</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/sxpz7</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/goldenjet_</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/motherv3</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/mactics</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/reidboyy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/corrupt0s</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/soon</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/mrmalfoy07</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kabam</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/terenas</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/rachtaz</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/migbizzy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/zkmushroom</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/baz1221</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kotton</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/faux</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/angryjoeshow</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/realkraftyy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/shxtou</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/johnbishopcomedy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/channel4comedy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/techburner</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/clip.poster925</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/igrind8535</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/viralclipgang</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickymercsbestclips6731</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/cwhatimsayin_official</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/warzonec1ips186</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/westcoast2856</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mmoney2010</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mercsmoments</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/dynamitenickmercs5297</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/off-brandnickmercs6083</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/xxnickmercsxx8017</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/morenickmercs</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercsplug6864</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercsvlog3760</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercsforehead8036</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercsshorts</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercs3642</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercs9682</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeast</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/totallynotmrbeast</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercs8998</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercs1176</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/moremrbeastgaming</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/beastreacts</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercs1046</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeastlive</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeast-topic</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercs1747</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeastchennai</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercs5284</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/notmrbeast</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/nickmercs</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/krefix</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeastgaming</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeastgamingbrasil</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeastenfranais</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/karl</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeastgamingenespaol</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeastbrasil</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeastenespaol</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/beastphilanthropy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeast2</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/poriyawest</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/beastreactsportuguese</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/thepeanutinstitute</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/theprintedpeanut5711</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/thepeanutbutterconspiracy-topic</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/theburntpeanutshorts</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/hkpeanutscom</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/lulutho_sinxoto</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/studiopeanutbutter</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanutpotteryllc9267</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanutdadon-topic</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanutbuttersofficial</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/thepeanutvlogs</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanutlivefrom215</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/theburntpeanut</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanutamongus</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanutbutterrrr_</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanutgoldenretriever</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanutbutterpn</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanutbuttergamer</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanut77</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/user-eb6xi7wp5s</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanut1</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanutoons</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/peanut_ssbu</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/pinatchie</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/papita</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/konnorlobo</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/illusions93</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/basilekun</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/nicha6666596</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/dedecimkk3</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/fzx_44</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/koffingsonriente</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/cammytft</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/ayaakahane</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/tortedelini</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/spitzz</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/rykomastery_</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/hakaisinnkotaro</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/esdesu</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/jabiertzo</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/qtzynderella</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/voicezan</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/paulinho52ot</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/niklasjahn6</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/luuluts</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/jessamesa</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/title_tft</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/skullsnightshade</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/leo__king</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/nukeri</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/ry6kagop</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/twitchreo</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/askeldan</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/mcdev_tv</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/anarcocapitalista12</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/bzzisperfect</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/grimz</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/jnny</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/junicats</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/nelk0r</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/blackrabbit342</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/autdany</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/onikana</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/b0rsuq</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/le_radis_irradie</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/airlinerslive</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/rixqwoz2</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/samoylov___</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/trollzinha</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/morttimer11</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/clean_killl</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/thetacticalbrit</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/mmgeneral</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/epidemy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/butters</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/umichanloveti</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/inariiroha_</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/eevochka</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/jimcarona</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kanseru_tyan</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/fluffy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/contv</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/omrfilo</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/ftyaaaan</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/guibees559</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/jvindahouse</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/test40228</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/spicy_fr</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/raythis</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/igortjuh</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/2twistedtv</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kusa</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kritikal</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/vrauixo</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/imocktor</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/zirotv</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/czargy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/miketrollinski</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/fragstube</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/zhenya_dota2</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/francescopardinivgc</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/barbe___douce</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/drifty</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/attursson</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/vizicsacsi</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/tabula</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/maihopawango</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/waffwlwolf</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/shomaru7</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/dennsen86</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/qaws_1109</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/aimlul</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/verybadscav</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/markstrom</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/shevronin</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/headtr1ckk</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/elquaria</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/bearki</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/ettnix</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/god_lita</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/barb0sxd</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/highkeyhateme</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kyul365</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/at0mium</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/suzyroxx</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/cydonia_chiara</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/hinas3</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/heitir</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/tobinatorlp</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/sabaku_no_sutoriimaa</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/ksonsouchou</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/dream</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/clix</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/caseoh_</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/bugha</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/auronplay</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/alanzoka</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/zeon</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/xposed</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/xmerghani</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/wtcn</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/westcol</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/tuna</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/trainwreckstv</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/syztmz</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/sxb</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/swaggybark</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/rraenee</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/roshtein</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/restt</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/rampagejackson</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/paymoneywubby</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/odablock</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/niter</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/nickmercs</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/neexcsgo</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/mrstiventc</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/lospollostv</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/lordkebun</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/loochy</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/korekore_ch</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/kinocasinogaming</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/jahrein</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/ilkerfirat</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/hype</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/husamviyuviyu</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/haiset</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/flygun</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/fattypillow</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/elmiillor</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/dvm_medja</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/drchubzdpt</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/drb7h</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/dobrodziej</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/cyberrulztv</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/batuhanfurkan5</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/ayezee</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/atadogann</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/astatoro</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/asmongold</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/andypsx</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/agraelus</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/adinross</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/absi</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/weratedogs.com</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/washingtonpost.com</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/timothysnyder.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/theonion.com</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/theguardian.com</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/thedailyshow.com</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/stephenking.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/sanders.senate.gov</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/ronfilipkowski.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/rbreich.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/propublica.org</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/petebuttigieg.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/pattonoswalt.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/nytimes.com</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/npr.org</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/muellershewrote.com</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/mollyjongfast.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/mmpadellan.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/meidastouch.com</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/mehdirhasan.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/mcuban.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/markhamillofficial.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/marcelias.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/lincolnproject.us</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/levarburton.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/katiephang.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/just-jack-1.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/joncooper-us.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/jojofromjerz.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/jay.bsky.team</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/jamellebouie.net</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/hcrichardson.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/hankgreen.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/gtconway.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/governorwalz.mn.gov</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/georgetakei.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/dril.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/dieworkwear.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/cnn.com</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/briantylercohen.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/bencollins.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/barackobama.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/atrupar.com</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/aoc.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/altnps.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/acyn.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/aaronparnas.bsky.social</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://shinypull.com/kick/asanyf</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>daily</changefreq>
@@ -5725,157 +7273,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/mrbeast</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/igrind8535</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/clip.poster925</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/viralclipgang</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickymercsbestclips6731</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/cwhatimsayin_official</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/warzonec1ips186</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/westcoast2856</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/youtube/burntpeanutunhinged</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mmoney2010</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mercsmoments</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/dynamitenickmercs5297</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/off-brandnickmercs6083</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/morenickmercs</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercsplug6864</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercsvlog3760</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercsforehead8036</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercsshorts</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercs9682</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercs3642</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercs8998</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercs1176</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercs1046</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercs1747</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercs5284</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/nickmercs</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -6421,115 +7819,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/mrbeastlive</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeast-topic</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeastchennai</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/notmrbeast</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/moremrbeastgaming</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/poriyawest</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/beastreactsportuguese</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeastgaming</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeastgamingbrasil</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeastenfranais</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/krefix</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeastgamingenespaol</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeastbrasil</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/karl</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/youtube/beastanimations</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeastenespaol</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/beastphilanthropy</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/beastreacts</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/mrbeast2</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -16730,12 +18020,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/youtube/kingwoolzgames</loc>
-    <lastmod>2026-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/totallynotmrbeast</loc>
     <lastmod>2026-02-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>

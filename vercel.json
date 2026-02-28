@@ -7,6 +7,11 @@
       "source": "/creator/:username",
       "destination": "/search?q=:username",
       "statusCode": 301
+    },
+    {
+      "source": "/gear",
+      "destination": "/blog",
+      "statusCode": 301
     }
   ],
   "headers": [

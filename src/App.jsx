@@ -49,7 +49,6 @@ const BlogPost = lazyWithRetry(() => import('./pages/BlogPost'));
 const BlogAdmin = lazyWithRetry(() => import('./pages/BlogAdmin'));
 const ResetPassword = lazyWithRetry(() => import('./pages/ResetPassword'));
 const Calculator = lazyWithRetry(() => import('./pages/Calculator'));
-const Gear = lazyWithRetry(() => import('./pages/Gear'));
 const Support = lazyWithRetry(() => import('./pages/Support'));
 const Account = lazyWithRetry(() => import('./pages/Account'));
 
@@ -101,7 +100,6 @@ function App() {
             <Route path="/rankings/:platform" element={<Rankings />} />
             <Route path="/compare" element={<Compare />} />
             <Route path="/youtube/money-calculator" element={<Calculator />} />
-            <Route path="/gear" element={<Gear />} />
             <Route path="/live/:platform/:username" element={<LiveCount />} />
             <Route path="/:platform/:username" element={<CreatorProfile />} />
             <Route path="/auth/reset" element={<ResetPassword />} />
