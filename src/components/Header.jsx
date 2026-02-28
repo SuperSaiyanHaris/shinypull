@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthPanel from './AuthPanel';
@@ -10,9 +10,11 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [authPanelMessage, setAuthPanelMessage] = useState('');
+  const [authPanelReturnTo, setAuthPanelReturnTo] = useState(null);
   const [upgradePanelOpen, setUpgradePanelOpen] = useState(false);
   const [upgradePanelFeature, setUpgradePanelFeature] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, signOut, isAuthenticated } = useAuth();
   const mobileMenuRef = useRef(null);
 
@@ -41,11 +43,20 @@ export default function Header() {
   useEffect(() => {
     const handleOpenAuthPanel = (e) => {
       setAuthPanelMessage(e.detail?.message || '');
+      setAuthPanelReturnTo(e.detail?.returnTo || null);
       setAuthPanelOpen(true);
     };
     window.addEventListener('openAuthPanel', handleOpenAuthPanel);
     return () => window.removeEventListener('openAuthPanel', handleOpenAuthPanel);
   }, []);
+
+  // Navigate to returnTo after successful login
+  useEffect(() => {
+    if (isAuthenticated && authPanelReturnTo) {
+      navigate(authPanelReturnTo);
+      setAuthPanelReturnTo(null);
+    }
+  }, [isAuthenticated, authPanelReturnTo, navigate]);
 
   // Listen for custom event to open upgrade panel
   useEffect(() => {

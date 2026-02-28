@@ -111,7 +111,7 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
     if (!isAuthenticated) {
       onClose();
       window.dispatchEvent(new CustomEvent('openAuthPanel', {
-        detail: { message: 'Sign in to upgrade your plan' },
+        detail: { message: 'Sign in to upgrade your plan', returnTo: '/pricing' },
       }));
       return;
     }
