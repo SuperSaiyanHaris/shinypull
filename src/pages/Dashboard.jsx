@@ -304,9 +304,9 @@ export default function Dashboard() {
     : followedCreators.filter(c => c.platform === selectedPlatform);
 
   const tabs = [
-    { id: 'following', label: 'Following', icon: Star, count: followedCreators.length },
-    { id: 'compares', label: 'Saved Compares', icon: Scale, count: savedCompares.length },
-    { id: 'recent', label: 'Recently Viewed', icon: Clock, count: recentlyViewed.length },
+    { id: 'following', label: 'Following', shortLabel: 'Following', icon: Star, count: followedCreators.length },
+    { id: 'compares', label: 'Saved Compares', shortLabel: 'Compares', icon: Scale, count: savedCompares.length },
+    { id: 'recent', label: 'Recently Viewed', shortLabel: 'Recent', icon: Clock, count: recentlyViewed.length },
   ];
 
   return (
@@ -368,7 +368,7 @@ export default function Dashboard() {
           <div className="flex gap-8 items-start">
 
             {/* Sidebar nav (desktop) */}
-            <aside className="hidden md:flex flex-col w-48 flex-shrink-0">
+            <aside className="hidden md:flex flex-col w-56 flex-shrink-0">
               <nav className="space-y-0.5">
                 {tabs.map(tab => {
                   const Icon = tab.icon;
@@ -384,7 +384,7 @@ export default function Dashboard() {
                       }`}
                     >
                       <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-indigo-400' : ''}`} />
-                      <span className="flex-1 truncate">{tab.label}</span>
+                      <span className="flex-1">{tab.label}</span>
                       {tab.count > 0 && (
                         <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0 ${
                           isActive ? 'bg-indigo-500/30 text-indigo-300' : 'bg-gray-700 text-gray-400'
@@ -421,25 +421,26 @@ export default function Dashboard() {
             {/* Main content */}
             <div className="flex-1 min-w-0">
 
-              {/* Mobile tab pills */}
-              <div className="flex md:hidden gap-1.5 mb-6 overflow-x-auto pb-0.5 -mx-1 px-1">
+              {/* Mobile tabs — fixed 3-column segmented control, no scroll */}
+              <div className="flex md:hidden mb-6 bg-gray-900 border border-gray-800 rounded-xl p-1 gap-1">
                 {tabs.map(tab => {
                   const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
                   return (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap flex-shrink-0 transition-all ${
-                        activeTab === tab.id
-                          ? 'bg-gray-700 text-gray-100'
-                          : 'bg-gray-900 border border-gray-800 text-gray-400 hover:border-gray-700 hover:text-gray-300'
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-1 rounded-lg text-xs font-semibold transition-all ${
+                        isActive
+                          ? 'bg-indigo-600 text-white shadow-sm'
+                          : 'text-gray-400 hover:text-gray-200'
                       }`}
                     >
-                      <Icon className="w-3.5 h-3.5" />
-                      {tab.label}
+                      <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span>{tab.shortLabel}</span>
                       {tab.count > 0 && (
-                        <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
-                          activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-700 text-gray-400'
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold leading-none ${
+                          isActive ? 'bg-white/20 text-white' : 'bg-gray-700 text-gray-400'
                         }`}>
                           {tab.count}
                         </span>
