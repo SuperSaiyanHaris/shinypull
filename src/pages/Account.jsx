@@ -63,16 +63,13 @@ export default function Account() {
 
   const loadFeaturedListings = useCallback(async () => {
     if (!user) return;
-    // Delete any orphaned pending rows (abandoned Stripe checkouts) before loading
-    await supabase
-      .from('featured_listings')
-      .delete()
-      .eq('purchased_by_user_id', user.id)
-      .eq('status', 'pending');
+    // Only load active/canceled rows — pending rows are never created with the new flow
+    // (listing is created by the webhook after payment, never before)
     const { data } = await supabase
       .from('featured_listings')
       .select('id, platform, status, active_from, active_until, is_mod_free, creators(display_name, username, profile_image, platform)')
       .eq('purchased_by_user_id', user.id)
+      .neq('status', 'pending')
       .order('created_at', { ascending: false });
     setFeaturedListings(data || []);
   }, [user]);
