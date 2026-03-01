@@ -648,7 +648,7 @@ export default function Account() {
                               setAlreadyListed(false);
                             }}
                             placeholder={`Search ${PLATFORM_LABELS[listingPlatform]} creators...`}
-                            className="flex-1 bg-transparent text-gray-100 placeholder-gray-500 text-sm focus:outline-none"
+                            className="flex-1 bg-transparent text-gray-100 placeholder-gray-500 text-[16px] sm:text-sm focus:outline-none"
                           />
                           {listingQuery && (
                             <button
