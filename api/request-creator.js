@@ -121,6 +121,7 @@ export default async function handler(req, res) {
       }
 
       const u = userInfo.user;
+      const s = userInfo.stats;
       const displayName = u.nickname || normalized;
 
       const { data: newCreator, error: upsertError } = await supabase
@@ -140,6 +141,22 @@ export default async function handler(req, res) {
       if (upsertError) {
         console.error('Failed to upsert TikTok creator:', upsertError);
         return res.status(500).json({ error: 'Failed to save creator. Try again.' });
+      }
+
+      // Insert initial stats row — only if we have real data (not zeros from a failed scrape)
+      const followerCount = s.followerCount || 0;
+      if (followerCount > 0) {
+        const today = new Date().toLocaleDateString('sv', { timeZone: 'America/New_York' });
+        await supabase
+          .from('creator_stats')
+          .upsert({
+            creator_id: newCreator.id,
+            recorded_at: today,
+            followers: followerCount,
+            total_views: s.heart || s.heartCount || 0,  // TikTok repurposes total_views for likes
+            total_posts: s.videoCount || 0,
+          }, { onConflict: 'creator_id,recorded_at' });
+        // Stats failure is non-fatal — creator record is already saved
       }
 
       return res.status(200).json({ success: true, creator: newCreator });
