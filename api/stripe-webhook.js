@@ -72,28 +72,37 @@ export default async function handler(req, res) {
 
   try {
     switch (event.type) {
-      // Featured listing: activate the pending listing row when checkout completes
+      // Featured listing: create and activate the row only after payment succeeds.
+      // Creator info is passed via checkout session metadata — no pre-created pending rows.
       case 'checkout.session.completed': {
         const session = event.data.object;
-        const listingId = session.metadata?.listingId;
-        if (!listingId) break; // not a featured listing checkout
+        const creatorId = session.metadata?.featuredCreatorId;
+        const platform = session.metadata?.featuredPlatform;
+        const userId = session.metadata?.supabase_user_id;
+        if (!creatorId || !platform || !userId) break; // not a featured listing checkout
 
         const activeFrom = new Date();
         const activeUntil = new Date(activeFrom);
         activeUntil.setDate(activeUntil.getDate() + 30);
 
-        await supabase
+        const { data: listing } = await supabase
           .from('featured_listings')
-          .update({
+          .insert({
+            creator_id: creatorId,
+            platform,
+            placement_tier: 'basic',
             status: 'active',
+            purchased_by_user_id: userId,
             active_from: activeFrom.toISOString(),
             active_until: activeUntil.toISOString(),
             stripe_payment_id: session.payment_intent || null,
             stripe_subscription_id: session.subscription || null,
+            is_mod_free: false,
           })
-          .eq('id', listingId);
+          .select('id')
+          .single();
 
-        console.log(`Activated featured listing ${listingId}`);
+        console.log(`Created and activated featured listing ${listing?.id} for user ${userId}`);
         break;
       }
 

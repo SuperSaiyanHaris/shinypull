@@ -76,13 +76,14 @@ export default async function handler(req, res) {
     let successUrl = (returnUrl || `${origin}/account`) + '?upgrade=success';
     let cancelUrl = `${origin}/pricing`;
 
-    // Featured listing: pre-create pending row, pass listingId in metadata
+    // Featured listing: validate creator then pass IDs in metadata.
+    // The webhook creates+activates the row only after payment succeeds —
+    // no DB row is created here so abandoned checkouts leave no orphan records.
     if (priceKey === 'featured') {
       if (!creatorId || !platform) {
         return res.status(400).json({ error: 'Missing creatorId or platform for featured listing' });
       }
 
-      // Validate creator exists
       const { data: creator } = await supabase
         .from('creators')
         .select('id')
@@ -91,27 +92,8 @@ export default async function handler(req, res) {
         .maybeSingle();
       if (!creator) return res.status(400).json({ error: 'Creator not found' });
 
-      const activeFrom = new Date();
-      const activeUntil = new Date(activeFrom);
-      activeUntil.setDate(activeUntil.getDate() + 30);
-
-      const { data: listing, error: listingError } = await supabase
-        .from('featured_listings')
-        .insert({
-          creator_id: creatorId,
-          platform,
-          placement_tier: 'basic',
-          status: 'pending',
-          purchased_by_user_id: user.id,
-          active_from: activeFrom.toISOString(),
-          active_until: activeUntil.toISOString(),
-          is_mod_free: false,
-        })
-        .select('id')
-        .single();
-      if (listingError) throw listingError;
-
-      sessionMetadata.listingId = listing.id;
+      sessionMetadata.featuredCreatorId = creatorId;
+      sessionMetadata.featuredPlatform = platform;
       successUrl = (returnUrl || `${origin}/account`) + '?featured=success';
       cancelUrl = `${origin}/account`;
     }

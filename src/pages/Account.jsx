@@ -63,6 +63,12 @@ export default function Account() {
 
   const loadFeaturedListings = useCallback(async () => {
     if (!user) return;
+    // Delete any orphaned pending rows (abandoned Stripe checkouts) before loading
+    await supabase
+      .from('featured_listings')
+      .delete()
+      .eq('purchased_by_user_id', user.id)
+      .eq('status', 'pending');
     const { data } = await supabase
       .from('featured_listings')
       .select('id, platform, status, active_from, active_until, is_mod_free, creators(display_name, username, profile_image, platform)')
