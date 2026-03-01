@@ -117,25 +117,37 @@ export default function Rankings() {
 function RankingsOverview() {
   const navigate = useNavigate();
   const [platformData, setPlatformData] = useState({});
+  const [sponsoredByPlatform, setSponsoredByPlatform] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadAll = async () => {
       setLoading(true);
       try {
-        const results = await Promise.all(
-          platforms.map(async (p) => {
+        const [rankResults, sponsoredResults] = await Promise.all([
+          Promise.all(platforms.map(async (p) => {
             try {
               const data = await getRankedCreators(p.id, 'subscribers', 10);
               return { platform: p.id, data };
             } catch {
               return { platform: p.id, data: [] };
             }
-          })
-        );
+          })),
+          Promise.all(platforms.map(async (p) => {
+            try {
+              const listings = await getFeaturedListings(p.id);
+              return { platform: p.id, listings };
+            } catch {
+              return { platform: p.id, listings: [] };
+            }
+          })),
+        ]);
         const map = {};
-        results.forEach(r => { map[r.platform] = r.data; });
+        rankResults.forEach(r => { map[r.platform] = r.data; });
         setPlatformData(map);
+        const sMap = {};
+        sponsoredResults.forEach(r => { sMap[r.platform] = r.listings; });
+        setSponsoredByPlatform(sMap);
       } finally {
         setLoading(false);
       }
@@ -200,39 +212,84 @@ function RankingsOverview() {
                     <div className="divide-y divide-gray-800/70">
                       {creators.length === 0 ? (
                         <div className="px-5 py-8 text-center text-gray-300 text-sm">No data available</div>
-                      ) : (
-                        creators.map((creator, index) => (
-                          <Link
-                            key={creator.id}
-                            to={`/${creator.platform}/${creator.username}`}
-                            className="flex items-center gap-3 px-5 py-3 hover:bg-gray-800/50 transition-colors group"
-                          >
-                            <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                              index === 0 ? 'bg-yellow-900/30 text-yellow-400' :
-                              index === 1 ? 'bg-gray-800 text-gray-300' :
-                              index === 2 ? 'bg-orange-900/30 text-orange-400' :
-                              'bg-gray-800/50 text-gray-300'
-                            }`}>
-                              {index + 1}
-                            </span>
-                            <img
-                              src={creator.profile_image || '/placeholder-avatar.svg'}
-                              alt={creator.display_name}
-                              loading="lazy"
-                              className="w-8 h-8 rounded-lg object-cover bg-gray-800 flex-shrink-0"
-                              onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
-                            />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
-                                {creator.display_name}
-                              </p>
-                            </div>
-                            <span className="text-sm font-medium text-gray-300 flex-shrink-0">
-                              {formatNumber(creator.subscribers)} {follLabel}
-                            </span>
-                          </Link>
-                        ))
-                      )}
+                      ) : (() => {
+                        const listings = sponsoredByPlatform[platform.id] || [];
+                        const premiumListing = listings.find(l => l.placement_tier === 'premium');
+                        const items = [];
+                        creators.forEach((creator, index) => {
+                          // Inject premium slot between rank 4 and 5
+                          if (index === 4) {
+                            if (premiumListing) {
+                              const c = premiumListing.creators;
+                              items.push(
+                                <Link
+                                  key="premium-ad"
+                                  to={`/${c?.platform}/${c?.username}`}
+                                  className="flex items-center gap-3 px-5 py-3 bg-amber-950/15 hover:bg-amber-950/25 transition-colors group"
+                                >
+                                  <span className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 bg-amber-900/30 text-amber-500">Ad</span>
+                                  <img src={c?.profile_image || '/placeholder-avatar.svg'} alt={c?.display_name} loading="lazy" className="w-8 h-8 rounded-lg object-cover bg-gray-800 flex-shrink-0" onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }} />
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-amber-300 transition-colors">{c?.display_name}</p>
+                                  </div>
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex-shrink-0">⭐ Premium</span>
+                                </Link>
+                              );
+                            } else {
+                              items.push(
+                                <Link
+                                  key="premium-ghost"
+                                  to="/pricing"
+                                  className="flex items-center gap-3 px-5 py-3 bg-amber-950/5 hover:bg-amber-950/15 border-y border-dashed border-amber-800/30 transition-colors group"
+                                >
+                                  <div className="w-6 h-6 rounded-md bg-gray-800/60 border border-dashed border-gray-700 flex-shrink-0 flex items-center justify-center">
+                                    <span className="text-gray-600 text-[10px]">?</span>
+                                  </div>
+                                  <div className="w-8 h-8 rounded-lg bg-gray-800/60 border border-dashed border-gray-700 flex-shrink-0 flex items-center justify-center">
+                                    <span className="text-gray-600 text-sm">?</span>
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-semibold text-gray-600 group-hover:text-amber-500 transition-colors">This could be you</p>
+                                  </div>
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20 flex-shrink-0">Premium spot</span>
+                                </Link>
+                              );
+                            }
+                          }
+                          items.push(
+                            <Link
+                              key={creator.id}
+                              to={`/${creator.platform}/${creator.username}`}
+                              className="flex items-center gap-3 px-5 py-3 hover:bg-gray-800/50 transition-colors group"
+                            >
+                              <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                                index === 0 ? 'bg-yellow-900/30 text-yellow-400' :
+                                index === 1 ? 'bg-gray-800 text-gray-300' :
+                                index === 2 ? 'bg-orange-900/30 text-orange-400' :
+                                'bg-gray-800/50 text-gray-300'
+                              }`}>
+                                {index + 1}
+                              </span>
+                              <img
+                                src={creator.profile_image || '/placeholder-avatar.svg'}
+                                alt={creator.display_name}
+                                loading="lazy"
+                                className="w-8 h-8 rounded-lg object-cover bg-gray-800 flex-shrink-0"
+                                onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
+                              />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
+                                  {creator.display_name}
+                                </p>
+                              </div>
+                              <span className="text-sm font-medium text-gray-300 flex-shrink-0">
+                                {formatNumber(creator.subscribers)} {follLabel}
+                              </span>
+                            </Link>
+                          );
+                        });
+                        return items;
+                      })()
                     </div>
 
                     {/* View Full Rankings Button */}
@@ -342,7 +399,7 @@ function PlatformRankings({ urlPlatform }) {
     });
   }, [rankings, sortColumn, sortDirection]);
 
-  // Inject premium slots between ranks 4-5 and 9-10, basic slots from rank 11 every 5.
+  // Inject premium slots between ranks 4-5 and 9-10, basic slots from rank 15 every 5.
   // Ghost placeholders fill empty premium slots to promote the product.
   // If a slot-holder cancels, the next advertiser automatically moves up.
   const displayList = useMemo(() => {
@@ -352,7 +409,7 @@ function PlatformRankings({ urlPlatform }) {
     const result = [];
     let premiumIdx = 0;
     let basicIdx = 0;
-    let nextBasicSlot = 10; // 0-indexed: inject before organic index 10 (after rank 10)
+    let nextBasicSlot = 14; // 0-indexed: inject before organic index 14 (between rank 14 and 15)
 
     for (let i = 0; i < sortedRankings.length; i++) {
       // Premium slot 1: between rank 4 and 5 (before organic index 4)
@@ -382,7 +439,7 @@ function PlatformRankings({ urlPlatform }) {
         }
         premiumIdx++;
       }
-      // Basic slots: starting at organic index 10, every 5
+      // Basic slots: starting at organic index 14 (between rank 14-15), every 5
       if (basicIdx < basicListings.length && i === nextBasicSlot) {
         const listing = basicListings[basicIdx];
         const c = listing.creators;
@@ -634,7 +691,6 @@ function PlatformRankings({ urlPlatform }) {
                               Premium spot available
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600">Top 10 placement · $149/mo</p>
                         </div>
                       </div>
                       <div className="hidden md:block col-span-2 text-right" />

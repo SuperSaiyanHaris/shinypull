@@ -82,7 +82,7 @@ const FAQS = [
   },
   {
     q: "What is a featured listing?",
-    a: "A sponsored spot in the rankings. Basic listings appear starting at position 11, then every 5 rows after that (11, 16, 21...). Premium listings appear between ranks 4-5 and 9-10 for maximum visibility. Slots are first come, first served. Cancel and the next advertiser moves up automatically.",
+    a: "A sponsored spot in the rankings. Basic listings appear starting at position 15, then every 5 rows after that (15, 20, 25...). Premium listings appear between ranks 4-5 and 9-10 for maximum visibility. Slots are first come, first served. Cancel and the next advertiser moves up automatically.",
   },
   {
     q: "How many premium spots are there?",
@@ -108,7 +108,7 @@ export default function Pricing() {
       }));
       return;
     }
-    navigate('/account');
+    navigate('/account?tab=listings');
   }
 
   async function handleUpgradeClick(priceKey) {
@@ -294,7 +294,6 @@ export default function Pricing() {
             {/* Basic listing */}
             <div className="group relative bg-gray-900 border border-gray-800 rounded-2xl p-7 flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:border-indigo-500/60 hover:shadow-2xl hover:shadow-indigo-500/10">
               <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/15 transition-colors duration-500" />
-              <div className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none">$$$</div>
 
               <div className="mb-5">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-full mb-4">
@@ -337,7 +336,6 @@ export default function Pricing() {
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold bg-amber-600 text-white whitespace-nowrap">
                 Top 10 placement
               </div>
-              <div className="absolute top-6 right-7 text-3xl font-black text-amber-900/40 select-none">$$$</div>
 
               <div className="mb-5">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold rounded-full mb-4">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   User, Mail, Lock, Calendar, Star, CheckCircle, AlertCircle,
   Eye, EyeOff, ArrowLeft, Zap, Crown, ExternalLink, Megaphone,
@@ -46,7 +46,11 @@ const PLATFORM_PILL_ACTIVE = { youtube: 'bg-red-600', tiktok: 'bg-pink-600', twi
 export default function Account() {
   const { user, signOut } = useAuth();
   const { tier, status: subStatus } = useSubscription();
-  const [activeTab, setActiveTab] = useState('subscription');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = searchParams.get('tab');
+    return TABS.some(t => t.id === tab) ? tab : 'subscription';
+  });
   const [managingBilling, setManagingBilling] = useState(false);
 
   // Display name
@@ -542,14 +546,17 @@ export default function Account() {
                     <div className="flex items-center gap-2 mb-1">
                       <Megaphone className="w-4 h-4 text-amber-400" />
                       <h2 className="text-base font-semibold text-gray-100">Featured Listings</h2>
-                      <span className="ml-auto px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">$49/mo</span>
                     </div>
-                    <p className="text-sm text-gray-400 mt-1 mb-5">
-                      Your creator profile appears as a sponsored row in rankings pages, ahead of the organic list.
-                      {tier === 'mod' && !modFreeUsedThisMonth && (
-                        <span className="ml-2 text-amber-400 font-medium">You have 1 free listing available this month.</span>
-                      )}
-                    </p>
+                    <div className="mt-2 mb-5 space-y-2">
+                      <div className="flex items-start gap-3 px-3 py-2.5 bg-gray-800/50 rounded-xl border border-gray-700/50">
+                        <span className="mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex-shrink-0">Basic</span>
+                        <p className="text-xs text-gray-400">$49/mo. Your creator appears starting at rank 15, then every 5 rows (15, 20, 25...). Works across all platform rankings.{tier === 'mod' && !modFreeUsedThisMonth && <span className="ml-1 text-amber-400 font-medium">1 free listing available this month.</span>}</p>
+                      </div>
+                      <div className="flex items-start gap-3 px-3 py-2.5 bg-amber-950/20 rounded-xl border border-amber-700/30">
+                        <span className="mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex-shrink-0">Premium</span>
+                        <p className="text-xs text-gray-400">$149/mo. Your creator appears between ranks 4-5 and 9-10 for maximum visibility. Only 2 slots per platform, first come first served.</p>
+                      </div>
+                    </div>
 
                     {/* Existing listings */}
                     {featuredListings.length > 0 && (
