@@ -13,7 +13,7 @@ export default function Terms() {
         <div className="relative overflow-hidden border-b border-gray-800/60 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Terms of Service</h1>
-            <p className="text-gray-400">Last updated: February 11, 2026</p>
+            <p className="text-gray-400">Last updated: March 1, 2026</p>
           </div>
         </div>
 
@@ -203,6 +203,38 @@ export default function Terms() {
                 </p>
               </Section>
 
+              <Section title="Subscription Plans and Historical Data">
+                <p className="mb-4">
+                  ShinyPull offers paid subscription plans (Sub and Mod) that include access to historical
+                  statistics. The availability of historical data depends on two factors: when ShinyPull
+                  launched data collection, and when a specific creator was first added to the platform.
+                </p>
+                <p className="mb-4">
+                  ShinyPull launched data collection in February 2026. No historical data exists prior to
+                  that date, regardless of subscription tier. Additionally, individual creators are tracked
+                  from the date they first appear in ShinyPull search results or when their profile page is
+                  first viewed on the platform. A creator added in June 2026 will only have data from June
+                  2026 onward, even for Mod subscribers.
+                </p>
+                <p className="mb-4">
+                  Subscription plan descriptions referencing "1 year of history" or "full history" refer to
+                  the maximum data range ShinyPull will make available as data accumulates over time, not a
+                  guarantee that data exists for any specific creator or prior time period.
+                </p>
+                <p className="mb-4">
+                  As the platform matures and more data is collected, longer historical ranges will become
+                  available to subscribers at or above the applicable tier. ShinyPull makes no representation
+                  that historical data predating the platform's launch or a creator's first appearance on
+                  ShinyPull will ever be available.
+                </p>
+                <p>
+                  Subscriptions are sold based on access to features and data ranges as they exist and grow
+                  over time. No refunds will be issued solely because historical data does not yet span the
+                  full range described in a plan or because a specific creator was not yet tracked when a
+                  subscription began.
+                </p>
+              </Section>
+
               <Section title="Amazon Associates Disclosure">
                 <p className="mb-4">
                   ShinyPull is a participant in the Amazon Services LLC Associates Program, an affiliate
@@ -229,7 +261,7 @@ export default function Terms() {
               </Section>
 
               <p className="text-sm text-gray-300 mt-8">
-                This Document is Effective as of February 11, 2026.
+                This Document is Effective as of March 1, 2026.
               </p>
             </div>
           </div>

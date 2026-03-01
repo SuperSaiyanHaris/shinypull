@@ -195,7 +195,7 @@ export default function Search() {
       if (platform === 'youtube') {
         channels = await searchYouTube(searchQuery, 25);
         if (channels.length > 0) {
-          void persistYouTubeResults(channels);
+          void persistSearchResults(channels);
         }
       } else if (platform === 'tiktok') {
         // Search TikTok creators from database
@@ -217,10 +217,19 @@ export default function Search() {
             channels.push(c);
           }
         }
+        if (channels.length > 0) {
+          void persistSearchResults(channels);
+        }
       } else if (platform === 'kick') {
         channels = await searchKick(searchQuery, 25);
+        if (channels.length > 0) {
+          void persistSearchResults(channels);
+        }
       } else if (platform === 'bluesky') {
         channels = await searchBluesky(searchQuery, 25);
+        if (channels.length > 0) {
+          void persistSearchResults(channels);
+        }
       }
       channels.sort((a, b) => searchScore(b, searchQuery) - searchScore(a, searchQuery));
       setResults(channels.slice(0, 25));
@@ -244,7 +253,7 @@ export default function Search() {
     }
   };
 
-  const persistYouTubeResults = async (channels) => {
+  const persistSearchResults = async (channels) => {
     for (const channel of channels) {
       try {
         const dbCreator = await upsertCreator(channel);
