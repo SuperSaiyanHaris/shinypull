@@ -72,9 +72,38 @@ export default async function handler(req, res) {
     const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
     if (authError || !user) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { priceKey, returnUrl, creatorId, platform } = req.body;
-    if (!priceKey || (!PRICE_IDS[priceKey] && priceKey !== 'featured-free')) {
+    const { priceKey, returnUrl, creatorId, platform, listingId } = req.body;
+    if (!priceKey || (!PRICE_IDS[priceKey] && priceKey !== 'featured-free' && priceKey !== 'cancel-listing')) {
       return res.status(400).json({ error: 'Invalid price key' });
+    }
+
+    // Cancel a featured listing — works for both mod-free (direct DB) and paid (Stripe cancel)
+    if (priceKey === 'cancel-listing') {
+      if (!listingId) return res.status(400).json({ error: 'Missing listingId' });
+
+      const { data: listing } = await supabase
+        .from('featured_listings')
+        .select('id, stripe_subscription_id, status, purchased_by_user_id')
+        .eq('id', listingId)
+        .eq('purchased_by_user_id', user.id)
+        .maybeSingle();
+
+      if (!listing) return res.status(404).json({ error: 'Listing not found' });
+      if (listing.status !== 'active') return res.status(400).json({ error: 'Listing is not active' });
+
+      if (listing.stripe_subscription_id) {
+        // Paid listing — cancel Stripe subscription; webhook will set status to 'canceled'
+        await stripe.subscriptions.cancel(listing.stripe_subscription_id);
+      } else {
+        // Mod free — no Stripe, update DB directly via service role
+        const { error: updateError } = await supabase
+          .from('featured_listings')
+          .update({ status: 'canceled' })
+          .eq('id', listingId);
+        if (updateError) throw updateError;
+      }
+
+      return res.status(200).json({ success: true });
     }
 
     // Validate returnUrl to prevent open redirects

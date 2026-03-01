@@ -170,16 +170,20 @@ export default function Account() {
   };
 
   const handleCancelListing = async (listingId) => {
-    const { error } = await supabase
-      .from('featured_listings')
-      .update({ status: 'canceled' })
-      .eq('id', listingId)
-      .eq('purchased_by_user_id', user.id);
-    if (error) {
-      showToast('Could not cancel listing.', 'error');
-    } else {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch('/api/stripe-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ priceKey: 'cancel-listing', listingId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not cancel listing');
       showToast('Listing canceled.');
       loadFeaturedListings();
+    } catch (err) {
+      showToast(err.message || 'Could not cancel listing.', 'error');
     }
   };
 
@@ -499,7 +503,7 @@ export default function Account() {
                               }`}>
                                 {listing.status}
                               </span>
-                              {isActive && !listing.is_mod_free && !isPending && (
+                              {isActive && !isPending && (
                                 <button
                                   onClick={() => handleCancelListing(listing.id)}
                                   className="p-1.5 text-gray-500 hover:text-red-400 transition-colors flex-shrink-0"

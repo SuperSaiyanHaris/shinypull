@@ -82,7 +82,7 @@ const FAQS = [
   },
   {
     q: "What is a featured listing?",
-    a: "A sponsored slot in the rankings pages. Your creator profile appears every 5th row with a small 'Sponsored' badge. It's native to the product, not a banner ad. Great for creators who want visibility with analytics-minded fans.",
+    a: "A sponsored spot in the rankings. Your creator profile shows up between the organic results with a 'Sponsored' badge. Each platform has 3 available slots at positions 10, 20, and 30. The fewer active listings on a platform, the earlier your placement. If you're the only advertiser, you always land at position 10.",
   },
   {
     q: "What counts as 'full history' on Mod?",
