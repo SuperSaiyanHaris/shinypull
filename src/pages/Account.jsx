@@ -9,7 +9,6 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription, TIER_DISPLAY, TIER_LIMITS } from '../contexts/SubscriptionContext';
 import { getFollowedCreators } from '../services/followService';
-import { validateFeaturedCreatorUrl } from '../services/creatorService';
 import SEO from '../components/SEO';
 
 function Toast({ message, type, onDismiss }) {
@@ -40,6 +39,9 @@ const TABS = [
   { id: 'security', label: 'Security', icon: Shield },
 ];
 
+const LISTING_PLATFORMS = ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky'];
+const PLATFORM_LABELS = { youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky' };
+
 export default function Account() {
   const { user, signOut } = useAuth();
   const { tier, status: subStatus } = useSubscription();
@@ -65,10 +67,12 @@ export default function Account() {
 
   // Featured listings
   const [featuredListings, setFeaturedListings] = useState([]);
-  const [featuredUrl, setFeaturedUrl] = useState('');
-  const [validatingUrl, setValidatingUrl] = useState(false);
-  const [pendingCreator, setPendingCreator] = useState(null);
-  const [urlError, setUrlError] = useState('');
+  const [listingPlatform, setListingPlatform] = useState('youtube');
+  const [listingQuery, setListingQuery] = useState('');
+  const [listingResults, setListingResults] = useState([]);
+  const [listingSearching, setListingSearching] = useState(false);
+  const [selectedCreator, setSelectedCreator] = useState(null);
+  const [alreadyListed, setAlreadyListed] = useState(false);
   const [purchasingListing, setPurchasingListing] = useState(false);
   const [activatingFree, setActivatingFree] = useState(false);
 
@@ -97,27 +101,50 @@ export default function Account() {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   });
 
-  const handleValidateUrl = async () => {
-    setUrlError('');
-    setPendingCreator(null);
-    if (!featuredUrl.trim()) return;
-    setValidatingUrl(true);
-    try {
-      const creator = await validateFeaturedCreatorUrl(featuredUrl.trim());
-      if (!creator) {
-        setUrlError('Creator not found. Make sure the URL is a valid ShinyPull profile (e.g. https://shinypull.com/youtube/mrbeast).');
-      } else {
-        setPendingCreator(creator);
-      }
-    } catch {
-      setUrlError('Could not validate that URL. Try again.');
-    } finally {
-      setValidatingUrl(false);
+  // Debounced creator search for listings
+  useEffect(() => {
+    if (!listingQuery.trim() || listingQuery.length < 2 || selectedCreator) {
+      if (!selectedCreator) setListingResults([]);
+      return;
     }
+    const timer = setTimeout(async () => {
+      setListingSearching(true);
+      try {
+        const q = listingQuery.trim();
+        const { data } = await supabase
+          .from('creators')
+          .select('id, username, display_name, profile_image, platform')
+          .eq('platform', listingPlatform)
+          .or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
+          .limit(6);
+        setListingResults(data || []);
+      } catch {
+        setListingResults([]);
+      } finally {
+        setListingSearching(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [listingQuery, listingPlatform, selectedCreator]);
+
+  const handleSelectCreator = async (creator) => {
+    setSelectedCreator(creator);
+    setListingQuery(creator.display_name || creator.username);
+    setListingResults([]);
+    setAlreadyListed(false);
+    const now = new Date().toISOString();
+    const { data } = await supabase
+      .from('featured_listings')
+      .select('id')
+      .eq('creator_id', creator.id)
+      .eq('status', 'active')
+      .gt('active_until', now)
+      .limit(1);
+    setAlreadyListed(!!(data && data.length > 0));
   };
 
   const handleActivateModFree = async () => {
-    if (!pendingCreator) return;
+    if (!selectedCreator) return;
     setActivatingFree(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -127,15 +154,15 @@ export default function Account() {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
           priceKey: 'featured-free',
-          creatorId: pendingCreator.id,
-          platform: pendingCreator.platform,
+          creatorId: selectedCreator.id,
+          platform: selectedCreator.platform,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to activate listing');
       showToast('Featured listing activated. Your profile will appear in rankings within a few minutes.');
-      setFeaturedUrl('');
-      setPendingCreator(null);
+      setSelectedCreator(null);
+      setListingQuery('');
       loadFeaturedListings();
     } catch (err) {
       showToast(err.message || 'Failed to activate listing.', 'error');
@@ -145,7 +172,7 @@ export default function Account() {
   };
 
   const handlePurchaseListing = async () => {
-    if (!pendingCreator) return;
+    if (!selectedCreator) return;
     setPurchasingListing(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -155,8 +182,8 @@ export default function Account() {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
           priceKey: 'featured',
-          creatorId: pendingCreator.id,
-          platform: pendingCreator.platform,
+          creatorId: selectedCreator.id,
+          platform: selectedCreator.platform,
           returnUrl: window.location.href,
         }),
       });
@@ -521,54 +548,116 @@ export default function Account() {
                     {/* Add new listing */}
                     <div className="space-y-3">
                       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Add a listing</p>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={featuredUrl}
-                          onChange={e => { setFeaturedUrl(e.target.value); setPendingCreator(null); setUrlError(''); }}
-                          onKeyDown={e => e.key === 'Enter' && handleValidateUrl()}
-                          placeholder="https://shinypull.com/youtube/mrbeast"
-                          className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-sm"
-                        />
-                        <button
-                          onClick={handleValidateUrl}
-                          disabled={validatingUrl || !featuredUrl.trim()}
-                          className="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-gray-100 font-medium rounded-xl transition-colors text-sm flex items-center gap-2"
-                        >
-                          {validatingUrl ? <Loader className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                          Check
-                        </button>
+
+                      {/* Platform selector */}
+                      <div className="flex flex-wrap gap-2">
+                        {LISTING_PLATFORMS.map(p => (
+                          <button
+                            key={p}
+                            onClick={() => {
+                              setListingPlatform(p);
+                              setSelectedCreator(null);
+                              setListingQuery('');
+                              setListingResults([]);
+                              setAlreadyListed(false);
+                            }}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                              listingPlatform === p
+                                ? 'bg-amber-600 text-white'
+                                : 'bg-gray-800 text-gray-400 hover:text-gray-200 border border-gray-700'
+                            }`}
+                          >
+                            {PLATFORM_LABELS[p]}
+                          </button>
+                        ))}
                       </div>
 
-                      {urlError && <p className="text-xs text-red-400">{urlError}</p>}
+                      {/* Search input with dropdown */}
+                      <div className="relative">
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl focus-within:ring-2 focus-within:ring-amber-500/50 focus-within:border-transparent">
+                          {listingSearching
+                            ? <Loader className="w-4 h-4 text-gray-500 animate-spin flex-shrink-0" />
+                            : <Search className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                          }
+                          <input
+                            type="text"
+                            value={listingQuery}
+                            onChange={e => {
+                              setListingQuery(e.target.value);
+                              setSelectedCreator(null);
+                              setAlreadyListed(false);
+                            }}
+                            placeholder={`Search ${PLATFORM_LABELS[listingPlatform]} creators...`}
+                            className="flex-1 bg-transparent text-gray-100 placeholder-gray-500 text-sm focus:outline-none"
+                          />
+                          {listingQuery && (
+                            <button
+                              onClick={() => { setListingQuery(''); setSelectedCreator(null); setListingResults([]); setAlreadyListed(false); }}
+                              className="text-gray-500 hover:text-gray-300"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
 
-                      {pendingCreator && (
-                        <div className="flex items-center gap-3 p-3.5 bg-amber-950/20 border border-amber-800/40 rounded-xl">
-                          {pendingCreator.profile_image && (
-                            <img src={pendingCreator.profile_image} alt={pendingCreator.display_name} className="w-10 h-10 rounded-lg object-cover bg-gray-700 flex-shrink-0" onError={e => { e.target.style.display = 'none'; }} />
+                        {/* Dropdown results */}
+                        {listingResults.length > 0 && !selectedCreator && (
+                          <div className="absolute top-full mt-1 left-0 right-0 z-10 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
+                            {listingResults.map(c => (
+                              <button
+                                key={c.id}
+                                onClick={() => handleSelectCreator(c)}
+                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-800 transition-colors text-left"
+                              >
+                                {c.profile_image && (
+                                  <img src={c.profile_image} alt={c.display_name} className="w-8 h-8 rounded-lg object-cover bg-gray-700 flex-shrink-0" onError={e => { e.target.style.display = 'none'; }} />
+                                )}
+                                <div className="min-w-0">
+                                  <p className="text-sm font-semibold text-gray-100 truncate">{c.display_name}</p>
+                                  <p className="text-xs text-gray-400">@{c.username}</p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Selected creator card */}
+                      {selectedCreator && (
+                        <div className={`flex items-center gap-3 p-3.5 rounded-xl border ${
+                          alreadyListed ? 'bg-gray-800/50 border-gray-700' : 'bg-amber-950/20 border-amber-800/40'
+                        }`}>
+                          {selectedCreator.profile_image && (
+                            <img src={selectedCreator.profile_image} alt={selectedCreator.display_name} className="w-10 h-10 rounded-lg object-cover bg-gray-700 flex-shrink-0" onError={e => { e.target.style.display = 'none'; }} />
                           )}
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold text-gray-100 truncate">{pendingCreator.display_name}</p>
-                            <p className="text-xs text-gray-400">@{pendingCreator.username} · {pendingCreator.platform}</p>
+                            <p className="text-sm font-semibold text-gray-100 truncate">{selectedCreator.display_name}</p>
+                            <p className="text-xs text-gray-400">@{selectedCreator.username} · {selectedCreator.platform}</p>
                           </div>
-                          <div className="flex gap-2 flex-shrink-0">
-                            {tier === 'mod' && !modFreeUsedThisMonth && (
+                          {alreadyListed ? (
+                            <span className="px-3 py-1.5 bg-gray-700 text-gray-400 text-xs font-semibold rounded-lg flex-shrink-0">
+                              Already listed
+                            </span>
+                          ) : (
+                            <div className="flex gap-2 flex-shrink-0">
+                              {tier === 'mod' && !modFreeUsedThisMonth && (
+                                <button
+                                  onClick={handleActivateModFree}
+                                  disabled={activatingFree}
+                                  className="px-3 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors"
+                                >
+                                  {activatingFree ? 'Activating...' : 'Use Free Listing'}
+                                </button>
+                              )}
                               <button
-                                onClick={handleActivateModFree}
-                                disabled={activatingFree}
-                                className="px-3 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors"
+                                onClick={handlePurchaseListing}
+                                disabled={purchasingListing}
+                                className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors"
                               >
-                                {activatingFree ? 'Activating...' : 'Use Free Listing'}
+                                {purchasingListing ? 'Redirecting...' : tier === 'mod' && !modFreeUsedThisMonth ? 'Pay $49/mo' : 'Add for $49/mo'}
                               </button>
-                            )}
-                            <button
-                              onClick={handlePurchaseListing}
-                              disabled={purchasingListing}
-                              className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors"
-                            >
-                              {purchasingListing ? 'Redirecting...' : tier === 'mod' && !modFreeUsedThisMonth ? 'Pay $49/mo' : 'Add for $49/mo'}
-                            </button>
-                          </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

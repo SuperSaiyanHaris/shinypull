@@ -157,6 +157,17 @@ export default async function handler(req, res) {
         .maybeSingle();
       if (!creator) return res.status(400).json({ error: 'Creator not found' });
 
+      // Prevent duplicate: block if this creator already has an active listing (globally)
+      const { count: dupCount } = await supabase
+        .from('featured_listings')
+        .select('id', { count: 'exact', head: true })
+        .eq('creator_id', creatorId)
+        .eq('status', 'active')
+        .gt('active_until', new Date().toISOString());
+      if (dupCount > 0) {
+        return res.status(409).json({ error: 'This creator already has an active featured listing' });
+      }
+
       const activeFrom = new Date();
       const activeUntil = new Date(activeFrom);
       activeUntil.setDate(activeUntil.getDate() + 30);
@@ -218,6 +229,17 @@ export default async function handler(req, res) {
         .eq('platform', platform)
         .maybeSingle();
       if (!creator) return res.status(400).json({ error: 'Creator not found' });
+
+      // Prevent duplicate: block if this creator already has an active listing (globally)
+      const { count: dupCount } = await supabase
+        .from('featured_listings')
+        .select('id', { count: 'exact', head: true })
+        .eq('creator_id', creatorId)
+        .eq('status', 'active')
+        .gt('active_until', new Date().toISOString());
+      if (dupCount > 0) {
+        return res.status(409).json({ error: 'This creator already has an active featured listing' });
+      }
 
       sessionMetadata.featuredCreatorId = creatorId;
       sessionMetadata.featuredPlatform = platform;
