@@ -1,5 +1,5 @@
 /**
- * Create a Stripe Checkout session.
+ * Create a Stripe Checkout session, or activate a Mod free featured listing.
  *
  * POST /api/stripe-checkout
  * Headers: Authorization: Bearer <supabase-jwt>
@@ -9,7 +9,12 @@
  *
  * Featured listing ($49/mo):
  *   Body: { priceKey: 'featured', creatorId: string, platform: string, returnUrl: string }
- *   Pre-creates a pending featured_listings row; webhook activates it on payment success.
+ *   Webhook creates+activates the row after payment — no pre-created rows.
+ *
+ * Mod free featured listing (1/month perk, no Stripe payment):
+ *   Body: { priceKey: 'featured-free', creatorId: string, platform: string }
+ *   Server verifies Mod tier and monthly usage, then inserts active row directly.
+ *   Returns { success: true } — no Stripe redirect.
  */
 
 import Stripe from 'stripe';
@@ -46,8 +51,68 @@ export default async function handler(req, res) {
     if (authError || !user) return res.status(401).json({ error: 'Unauthorized' });
 
     const { priceKey, returnUrl, creatorId, platform } = req.body;
-    if (!priceKey || !PRICE_IDS[priceKey]) {
+    if (!priceKey || (!PRICE_IDS[priceKey] && priceKey !== 'featured-free')) {
       return res.status(400).json({ error: 'Invalid price key' });
+    }
+
+    // Mod free featured listing — no Stripe payment, server-side only
+    if (priceKey === 'featured-free') {
+      if (!creatorId || !platform) {
+        return res.status(400).json({ error: 'Missing creatorId or platform' });
+      }
+
+      // Verify user is on Mod tier
+      const { data: userRecord } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (userRecord?.subscription_tier !== 'mod') {
+        return res.status(403).json({ error: 'Mod plan required for free featured listing' });
+      }
+
+      // Verify not already used this calendar month
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      const { count } = await supabase
+        .from('featured_listings')
+        .select('id', { count: 'exact', head: true })
+        .eq('purchased_by_user_id', user.id)
+        .eq('is_mod_free', true)
+        .gte('created_at', startOfMonth.toISOString());
+      if (count > 0) {
+        return res.status(400).json({ error: 'Free listing already used this month' });
+      }
+
+      // Validate creator exists
+      const { data: creator } = await supabase
+        .from('creators')
+        .select('id')
+        .eq('id', creatorId)
+        .eq('platform', platform)
+        .maybeSingle();
+      if (!creator) return res.status(400).json({ error: 'Creator not found' });
+
+      const activeFrom = new Date();
+      const activeUntil = new Date(activeFrom);
+      activeUntil.setDate(activeUntil.getDate() + 30);
+
+      const { error: insertError } = await supabase
+        .from('featured_listings')
+        .insert({
+          creator_id: creatorId,
+          platform,
+          placement_tier: 'basic',
+          status: 'active',
+          purchased_by_user_id: user.id,
+          active_from: activeFrom.toISOString(),
+          active_until: activeUntil.toISOString(),
+          is_mod_free: true,
+        });
+      if (insertError) throw insertError;
+
+      return res.status(200).json({ success: true });
     }
 
     // Get or create Stripe customer

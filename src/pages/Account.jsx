@@ -112,20 +112,19 @@ export default function Account() {
     if (!pendingCreator) return;
     setActivatingFree(true);
     try {
-      const activeFrom = new Date();
-      const activeUntil = new Date(activeFrom);
-      activeUntil.setDate(activeUntil.getDate() + 30);
-      const { error } = await supabase.from('featured_listings').insert({
-        creator_id: pendingCreator.id,
-        platform: pendingCreator.platform,
-        placement_tier: 'basic',
-        status: 'active',
-        purchased_by_user_id: user.id,
-        active_from: activeFrom.toISOString(),
-        active_until: activeUntil.toISOString(),
-        is_mod_free: true,
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch('/api/stripe-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          priceKey: 'featured-free',
+          creatorId: pendingCreator.id,
+          platform: pendingCreator.platform,
+        }),
       });
-      if (error) throw error;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to activate listing');
       showToast('Featured listing activated. Your profile will appear in rankings within a few minutes.');
       setFeaturedUrl('');
       setPendingCreator(null);
