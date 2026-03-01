@@ -303,12 +303,12 @@ export default function Pricing() {
                   <span className="text-4xl font-black text-gray-100">$49</span>
                   <span className="text-gray-400 text-sm">/month</span>
                 </div>
-                <p className="text-sm text-gray-400">Your creator in sponsored rows throughout rankings. Position 11 and beyond, unlimited platforms.</p>
+                <p className="text-sm text-gray-400">Your creator in sponsored rows throughout rankings. Position 15 and beyond, unlimited platforms.</p>
               </div>
 
               <ul className="space-y-2.5 flex-1 mb-8">
                 {[
-                  'Appears starting at rank 11, every 5 rows',
+                  'Appears starting at rank 15, every 5 rows',
                   'Works across Top 50, 100, and 500',
                   'All platforms supported',
                   'Clearly labeled as sponsored',
