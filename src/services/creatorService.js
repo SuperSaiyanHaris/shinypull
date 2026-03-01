@@ -306,7 +306,8 @@ async function _fetchRankings(platform, rankType, limit) {
 
 /**
  * Get active featured listings for a platform.
- * Returns listings with joined creator data, shuffled for fair rotation.
+ * Returns listings ordered by created_at ascending — first come, first served.
+ * Earliest listing gets the best slot (position 11), later ones fill every 5th row after.
  */
 export async function getFeaturedListings(platform) {
   const now = new Date().toISOString();
@@ -315,15 +316,10 @@ export async function getFeaturedListings(platform) {
     .select('id, platform, placement_tier, is_mod_free, active_until, creators(id, username, display_name, profile_image, platform)')
     .eq('platform', platform)
     .eq('status', 'active')
-    .gt('active_until', now);
+    .gt('active_until', now)
+    .order('created_at', { ascending: true });
   if (error) throw error;
-  // Shuffle for fair rotation (different users see different sponsored creators)
-  const arr = data || [];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+  return data || [];
 }
 
 /**

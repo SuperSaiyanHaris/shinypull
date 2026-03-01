@@ -342,30 +342,29 @@ function PlatformRankings({ urlPlatform }) {
     });
   }, [rankings, sortColumn, sortDirection]);
 
-  // Inject sponsored rows at positions 10, 20, 30 (max 3 slots)
-  const MAX_SPONSORED = 3;
-  const INJECT_AT = [9, 19, 29]; // 0-indexed positions in organic list
-
+  // Inject sponsored rows after rank 10, then every 5 organic ranks — first come first served.
+  // Top 10 stays clean (reserved for premium placements).
+  // If a slot-holder cancels, the next advertiser automatically moves up.
   const displayList = useMemo(() => {
     if (!sponsoredListings.length) return sortedRankings;
-    const slots = sponsoredListings.slice(0, MAX_SPONSORED);
     const result = [];
     let sponsorIdx = 0;
+    let nextSlot = 10; // 0-indexed: inject before organic index 10 (after rank 10)
     for (let i = 0; i < sortedRankings.length; i++) {
-      if (sponsorIdx < slots.length && INJECT_AT[sponsorIdx] === i) {
-        const listing = slots[sponsorIdx];
+      if (sponsorIdx < sponsoredListings.length && i === nextSlot) {
+        const listing = sponsoredListings[sponsorIdx];
         const c = listing.creators;
         result.push({
           ...c,
           isSponsored: true,
           listingId: listing.id,
-          // Map creator fields to the shape Rankings expects
           display_name: c?.display_name,
           username: c?.username,
           profile_image: c?.profile_image,
           platform: c?.platform,
         });
         sponsorIdx++;
+        nextSlot += 5; // next slot every 5 organic ranks
       }
       result.push(sortedRankings[i]);
     }

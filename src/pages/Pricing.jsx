@@ -82,7 +82,7 @@ const FAQS = [
   },
   {
     q: "What is a featured listing?",
-    a: "A sponsored spot in the rankings. Your creator profile shows up between the organic results with a 'Sponsored' badge. Each platform has 3 available slots at positions 10, 20, and 30. The fewer active listings on a platform, the earlier your placement. If you're the only advertiser, you always land at position 10.",
+    a: "A sponsored spot in the rankings. Your creator profile appears between organic results with an 'Ad' badge, starting at position 11 and then every 5 rows after that (11, 16, 21...). Slots are first come, first served — cancel your listing and the next advertiser automatically moves up. Works across Top 50, Top 100, and Top 500.",
   },
   {
     q: "What counts as 'full history' on Mod?",
