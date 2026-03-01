@@ -342,29 +342,55 @@ function PlatformRankings({ urlPlatform }) {
     });
   }, [rankings, sortColumn, sortDirection]);
 
-  // Inject sponsored rows after rank 10, then every 5 organic ranks — first come first served.
-  // Top 10 stays clean (reserved for premium placements).
+  // Inject premium slots between ranks 4-5 and 9-10, basic slots from rank 11 every 5.
+  // Ghost placeholders fill empty premium slots to promote the product.
   // If a slot-holder cancels, the next advertiser automatically moves up.
   const displayList = useMemo(() => {
-    if (!sponsoredListings.length) return sortedRankings;
+    const premiumListings = sponsoredListings.filter(l => l.placement_tier === 'premium');
+    const basicListings = sponsoredListings.filter(l => l.placement_tier !== 'premium');
+
     const result = [];
-    let sponsorIdx = 0;
-    let nextSlot = 10; // 0-indexed: inject before organic index 10 (after rank 10)
+    let premiumIdx = 0;
+    let basicIdx = 0;
+    let nextBasicSlot = 10; // 0-indexed: inject before organic index 10 (after rank 10)
+
     for (let i = 0; i < sortedRankings.length; i++) {
-      if (sponsorIdx < sponsoredListings.length && i === nextSlot) {
-        const listing = sponsoredListings[sponsorIdx];
+      // Premium slot 1: between rank 4 and 5 (before organic index 4)
+      if (i === 4) {
+        if (premiumIdx < premiumListings.length) {
+          const listing = premiumListings[premiumIdx];
+          const c = listing.creators;
+          result.push({ ...c, isSponsored: true, isPremium: true, listingId: listing.id,
+            display_name: c?.display_name, username: c?.username,
+            profile_image: c?.profile_image, platform: c?.platform });
+        } else {
+          // Ghost slot — promotes the product to potential buyers
+          result.push({ isSponsored: true, isPremium: true, isGhost: true, listingId: 'ghost-1' });
+        }
+        premiumIdx++;
+      }
+      // Premium slot 2: between rank 9 and 10 (before organic index 9)
+      if (i === 9) {
+        if (premiumIdx < premiumListings.length) {
+          const listing = premiumListings[premiumIdx];
+          const c = listing.creators;
+          result.push({ ...c, isSponsored: true, isPremium: true, listingId: listing.id,
+            display_name: c?.display_name, username: c?.username,
+            profile_image: c?.profile_image, platform: c?.platform });
+        } else {
+          result.push({ isSponsored: true, isPremium: true, isGhost: true, listingId: 'ghost-2' });
+        }
+        premiumIdx++;
+      }
+      // Basic slots: starting at organic index 10, every 5
+      if (basicIdx < basicListings.length && i === nextBasicSlot) {
+        const listing = basicListings[basicIdx];
         const c = listing.creators;
-        result.push({
-          ...c,
-          isSponsored: true,
-          listingId: listing.id,
-          display_name: c?.display_name,
-          username: c?.username,
-          profile_image: c?.profile_image,
-          platform: c?.platform,
-        });
-        sponsorIdx++;
-        nextSlot += 5; // next slot every 5 organic ranks
+        result.push({ ...c, isSponsored: true, isPremium: false, listingId: listing.id,
+          display_name: c?.display_name, username: c?.username,
+          profile_image: c?.profile_image, platform: c?.platform });
+        basicIdx++;
+        nextBasicSlot += 5;
       }
       result.push(sortedRankings[i]);
     }
@@ -582,13 +608,57 @@ function PlatformRankings({ urlPlatform }) {
             {/* Rankings List */}
             {!loading && !error && displayList.map((creator, index) => {
               if (creator.isSponsored) {
+                // Ghost slot — no real advertiser, promotes the premium product
+                if (creator.isGhost) {
+                  return (
+                    <Link
+                      key={creator.listingId}
+                      to="/pricing"
+                      className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-dashed border-amber-800/30 bg-amber-950/5 hover:bg-amber-950/15 transition-colors group"
+                    >
+                      <div className="col-span-2 md:col-span-1 flex items-center">
+                        <span className="inline-flex items-center px-2 py-1 rounded-lg bg-amber-900/20 border border-amber-800/30 text-amber-600 text-xs font-bold tracking-wide">
+                          Ad
+                        </span>
+                      </div>
+                      <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-7' : 'md:col-span-5'}`}>
+                        <div className="w-12 h-12 rounded-xl bg-gray-800/60 border border-dashed border-gray-700 flex-shrink-0 flex items-center justify-center">
+                          <span className="text-gray-600 text-lg">?</span>
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-gray-600 group-hover:text-amber-500 transition-colors">
+                              This could be you
+                            </p>
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20 flex-shrink-0">
+                              Premium spot available
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600">Top 10 placement · $149/mo</p>
+                        </div>
+                      </div>
+                      <div className="hidden md:block col-span-2 text-right" />
+                      {selectedPlatform !== 'kick' && selectedPlatform !== 'bluesky' && (
+                        <div className="hidden md:block col-span-2 text-right" />
+                      )}
+                      <div className="hidden md:block col-span-2 text-right" />
+                    </Link>
+                  );
+                }
+
+                // Real sponsored row — premium gets slightly brighter gold treatment
+                const isPremium = creator.isPremium;
                 return (
                   <Link
                     key={`sponsored-${creator.listingId}`}
                     to={`/${creator.platform}/${creator.username}`}
-                    className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-amber-900/30 bg-amber-950/10 hover:bg-amber-950/20 transition-colors group"
+                    className={`grid grid-cols-12 gap-4 px-6 py-4 items-center border-b transition-colors group ${
+                      isPremium
+                        ? 'border-amber-800/50 bg-amber-950/20 hover:bg-amber-950/30'
+                        : 'border-amber-900/30 bg-amber-950/10 hover:bg-amber-950/20'
+                    }`}
                   >
-                    {/* "Ad" badge in rank column — always visible on mobile and desktop */}
+                    {/* "Ad" badge in rank column */}
                     <div className="col-span-2 md:col-span-1 flex items-center">
                       <span className="inline-flex items-center px-2 py-1 rounded-lg bg-amber-900/40 border border-amber-800/50 text-amber-400 text-xs font-bold tracking-wide">
                         Ad
@@ -606,11 +676,15 @@ function PlatformRankings({ urlPlatform }) {
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="font-semibold text-gray-100 truncate group-hover:text-amber-400 transition-colors">
+                          <p className={`font-semibold truncate transition-colors ${isPremium ? 'text-gray-100 group-hover:text-amber-300' : 'text-gray-100 group-hover:text-amber-400'}`}>
                             {creator.display_name}
                           </p>
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20 flex-shrink-0">
-                            Sponsored
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold flex-shrink-0 ${
+                            isPremium
+                              ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                              : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                          }`}>
+                            {isPremium ? '⭐ Premium' : 'Sponsored'}
                           </span>
                         </div>
                         <p className="text-sm text-gray-300 truncate">@{creator.username}</p>

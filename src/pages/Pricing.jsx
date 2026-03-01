@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Check, Zap, Crown, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Check, Zap, Crown, ArrowRight, Star } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription, TIER_DISPLAY } from '../contexts/SubscriptionContext';
@@ -82,7 +82,11 @@ const FAQS = [
   },
   {
     q: "What is a featured listing?",
-    a: "A sponsored spot in the rankings. Your creator profile appears between organic results with an 'Ad' badge, starting at position 11 and then every 5 rows after that (11, 16, 21...). Slots are first come, first served — cancel your listing and the next advertiser automatically moves up. Works across Top 50, Top 100, and Top 500.",
+    a: "A sponsored spot in the rankings. Basic listings appear starting at position 11, then every 5 rows after that (11, 16, 21...). Premium listings appear between ranks 4-5 and 9-10 for maximum visibility. Slots are first come, first served. Cancel and the next advertiser moves up automatically.",
+  },
+  {
+    q: "How many premium spots are there?",
+    a: "Two per platform. Once they're filled, the next available slot opens when an existing advertiser cancels. You can see live slot availability on your Account page before purchasing.",
   },
   {
     q: "What counts as 'full history' on Mod?",
@@ -95,6 +99,17 @@ export default function Pricing() {
   const { tier } = useSubscription();
   const [upgrading, setUpgrading] = useState(null);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  function handleFeaturedClick() {
+    if (!isAuthenticated) {
+      window.dispatchEvent(new CustomEvent('openAuthPanel', {
+        detail: { message: 'Sign in to purchase a featured listing.', returnTo: '/account' },
+      }));
+      return;
+    }
+    navigate('/account');
+  }
 
   async function handleUpgradeClick(priceKey) {
     if (!isAuthenticated) {
@@ -257,6 +272,111 @@ export default function Pricing() {
           {/* Comparison note */}
           <p className="text-center text-sm text-gray-500 mt-8">
             All plans include access to YouTube, TikTok, Twitch, Kick, and Bluesky stats. Billed monthly, cancel anytime.
+          </p>
+        </div>
+
+        {/* Featured Listings B2B */}
+        <div className="max-w-5xl mx-auto px-4 pb-24">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
+              <Star className="w-3.5 h-3.5" />
+              Advertise on ShinyPull
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-3">
+              Featured Listings
+            </h2>
+            <p className="text-gray-400 max-w-xl mx-auto text-base">
+              Get a creator in front of people actively searching for talent. Sponsored placements in rankings, clearly labeled, first come first served.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {/* Basic listing */}
+            <div className="group relative bg-gray-900 border border-gray-800 rounded-2xl p-7 flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:border-indigo-500/60 hover:shadow-2xl hover:shadow-indigo-500/10">
+              <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/15 transition-colors duration-500" />
+              <div className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none">$$$</div>
+
+              <div className="mb-5">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-full mb-4">
+                  Featured Listing
+                </span>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-4xl font-black text-gray-100">$49</span>
+                  <span className="text-gray-400 text-sm">/month</span>
+                </div>
+                <p className="text-sm text-gray-400">Your creator in sponsored rows throughout rankings. Position 11 and beyond, unlimited platforms.</p>
+              </div>
+
+              <ul className="space-y-2.5 flex-1 mb-8">
+                {[
+                  'Appears starting at rank 11, every 5 rows',
+                  'Works across Top 50, 100, and 500',
+                  'All platforms supported',
+                  'Clearly labeled as sponsored',
+                  'Cancel anytime',
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
+                    <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-indigo-400" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={handleFeaturedClick}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 bg-indigo-600 hover:bg-indigo-500 text-white"
+              >
+                Get a listing
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Premium listing */}
+            <div className="group relative bg-amber-950/20 border border-amber-700/40 rounded-2xl p-7 flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/10">
+              <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-colors duration-500" />
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold bg-amber-600 text-white whitespace-nowrap">
+                Top 10 placement
+              </div>
+              <div className="absolute top-6 right-7 text-3xl font-black text-amber-900/40 select-none">$$$</div>
+
+              <div className="mb-5">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold rounded-full mb-4">
+                  Premium Featured Listing
+                </span>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-4xl font-black text-gray-100">$149</span>
+                  <span className="text-gray-400 text-sm">/month</span>
+                </div>
+                <p className="text-sm text-gray-400">Your creator between the top 10. Only 2 slots exist per platform, so availability is limited.</p>
+              </div>
+
+              <ul className="space-y-2.5 flex-1 mb-8">
+                {[
+                  'Appears between ranks 4-5 and 9-10',
+                  'Only 2 slots available per platform',
+                  'Highest visibility placement on the page',
+                  'Clearly labeled as sponsored',
+                  'Cancel anytime',
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
+                    <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-400" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={handleFeaturedClick}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 bg-amber-600 hover:bg-amber-500 text-white"
+              >
+                Get a premium listing
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-gray-500 mt-8">
+            Featured listings are managed from your Account page. Check live slot availability before purchasing.
           </p>
         </div>
 

@@ -34,6 +34,7 @@ const PRICE_TIER_MAP = {
 
 const FEATURED_PRICE_IDS = new Set([
   process.env.STRIPE_FEATURED_BASIC_PRICE_ID,
+  process.env.STRIPE_FEATURED_PREMIUM_PRICE_ID,
 ].filter(Boolean));
 
 function isFeaturedSubscription(subscription) {
@@ -81,6 +82,7 @@ export default async function handler(req, res) {
         const userId = session.metadata?.supabase_user_id;
         if (!creatorId || !platform || !userId) break; // not a featured listing checkout
 
+        const placementTier = session.metadata?.featuredPlacementTier || 'basic';
         const activeFrom = new Date();
         const activeUntil = new Date(activeFrom);
         activeUntil.setDate(activeUntil.getDate() + 30);
@@ -90,7 +92,7 @@ export default async function handler(req, res) {
           .insert({
             creator_id: creatorId,
             platform,
-            placement_tier: 'basic',
+            placement_tier: placementTier,
             status: 'active',
             purchased_by_user_id: userId,
             active_from: activeFrom.toISOString(),

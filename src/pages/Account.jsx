@@ -75,7 +75,9 @@ export default function Account() {
   const [selectedCreator, setSelectedCreator] = useState(null);
   const [alreadyListed, setAlreadyListed] = useState(false);
   const [purchasingListing, setPurchasingListing] = useState(false);
+  const [purchasingPremiumListing, setPurchasingPremiumListing] = useState(false);
   const [activatingFree, setActivatingFree] = useState(false);
+  const [premiumSlotsLeft, setPremiumSlotsLeft] = useState(2);
   const [tikTokAdding, setTikTokAdding] = useState(false);
   const [tikTokAddError, setTikTokAddError] = useState('');
 
@@ -135,15 +137,17 @@ export default function Account() {
     setListingQuery(creator.display_name || creator.username);
     setListingResults([]);
     setAlreadyListed(false);
+    setPremiumSlotsLeft(2);
     const now = new Date().toISOString();
-    const { data } = await supabase
-      .from('featured_listings')
-      .select('id')
-      .eq('creator_id', creator.id)
-      .eq('status', 'active')
-      .gt('active_until', now)
-      .limit(1);
-    setAlreadyListed(!!(data && data.length > 0));
+    const [{ data: existing }, { count: premiumCount }] = await Promise.all([
+      supabase.from('featured_listings').select('id')
+        .eq('creator_id', creator.id).eq('status', 'active').gt('active_until', now).limit(1),
+      supabase.from('featured_listings').select('id', { count: 'exact', head: true })
+        .eq('platform', creator.platform).eq('placement_tier', 'premium')
+        .eq('status', 'active').gt('active_until', now),
+    ]);
+    setAlreadyListed(!!(existing && existing.length > 0));
+    setPremiumSlotsLeft(Math.max(0, 2 - (premiumCount || 0)));
   };
 
   const handleTikTokInstantAdd = async () => {
@@ -216,6 +220,31 @@ export default function Account() {
     } catch (err) {
       showToast(err.message || 'Could not start checkout.', 'error');
       setPurchasingListing(false);
+    }
+  };
+
+  const handlePurchasePremiumListing = async () => {
+    if (!selectedCreator) return;
+    setPurchasingPremiumListing(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch('/api/stripe-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          priceKey: 'featured-premium',
+          creatorId: selectedCreator.id,
+          platform: selectedCreator.platform,
+          returnUrl: window.location.href,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to start checkout');
+      window.location.href = data.url;
+    } catch (err) {
+      showToast(err.message || 'Could not start checkout.', 'error');
+      setPurchasingPremiumListing(false);
     }
   };
 
@@ -664,39 +693,58 @@ export default function Account() {
                       )}
                       {tikTokAddError && <p className="text-xs text-red-400 px-1">{tikTokAddError}</p>}
 
-                      {/* Selected creator card */}
+                      {/* Selected creator card + purchase options */}
                       {selectedCreator && (
-                        <div className={`flex items-center gap-3 p-3.5 rounded-xl border ${
-                          alreadyListed ? 'bg-gray-800/50 border-gray-700' : 'bg-amber-950/20 border-amber-800/40'
-                        }`}>
-                          {selectedCreator.profile_image && (
-                            <img src={selectedCreator.profile_image} alt={selectedCreator.display_name} className="w-10 h-10 rounded-lg object-cover bg-gray-700 flex-shrink-0" onError={e => { e.target.style.display = 'none'; }} />
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold text-gray-100 truncate">{selectedCreator.display_name}</p>
-                            <p className="text-xs text-gray-400">@{selectedCreator.username} · {selectedCreator.platform}</p>
+                        <div className="space-y-2">
+                          {/* Creator info */}
+                          <div className="flex items-center gap-3 p-3.5 bg-gray-800/60 border border-gray-700/60 rounded-xl">
+                            {selectedCreator.profile_image && (
+                              <img src={selectedCreator.profile_image} alt={selectedCreator.display_name} className="w-10 h-10 rounded-lg object-cover bg-gray-700 flex-shrink-0" onError={e => { e.target.style.display = 'none'; }} />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-gray-100 truncate">{selectedCreator.display_name}</p>
+                              <p className="text-xs text-gray-400">@{selectedCreator.username} · {selectedCreator.platform}</p>
+                            </div>
+                            {alreadyListed && (
+                              <span className="px-3 py-1.5 bg-gray-700 text-gray-400 text-xs font-semibold rounded-lg flex-shrink-0">
+                                Already listed
+                              </span>
+                            )}
                           </div>
-                          {alreadyListed ? (
-                            <span className="px-3 py-1.5 bg-gray-700 text-gray-400 text-xs font-semibold rounded-lg flex-shrink-0">
-                              Already listed
-                            </span>
-                          ) : (
-                            <div className="flex gap-2 flex-shrink-0">
-                              {tier === 'mod' && !modFreeUsedThisMonth && (
-                                <button
-                                  onClick={handleActivateModFree}
-                                  disabled={activatingFree}
-                                  className="px-3 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors"
-                                >
-                                  {activatingFree ? 'Activating...' : 'Use Free Listing'}
-                                </button>
-                              )}
+
+                          {/* Tier selection */}
+                          {!alreadyListed && (
+                            <div className="grid grid-cols-2 gap-2">
+                              {/* Basic tile */}
                               <button
-                                onClick={handlePurchaseListing}
-                                disabled={purchasingListing}
-                                className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors"
+                                onClick={tier === 'mod' && !modFreeUsedThisMonth ? handleActivateModFree : handlePurchaseListing}
+                                disabled={activatingFree || purchasingListing}
+                                className="flex flex-col items-start gap-0.5 px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 disabled:opacity-50 rounded-xl transition-colors text-left"
                               >
-                                {purchasingListing ? 'Redirecting...' : tier === 'mod' && !modFreeUsedThisMonth ? 'Pay $49/mo' : 'Add for $49/mo'}
+                                <span className="text-xs font-bold text-gray-200">Basic</span>
+                                <span className="text-sm font-semibold text-indigo-400">
+                                  {activatingFree ? 'Activating...' : purchasingListing ? 'Redirecting...' : tier === 'mod' && !modFreeUsedThisMonth ? 'Free this month' : '$49/mo'}
+                                </span>
+                                <span className="text-[10px] text-gray-500 mt-0.5">Rank 11 and beyond</span>
+                              </button>
+
+                              {/* Premium tile */}
+                              <button
+                                onClick={premiumSlotsLeft > 0 ? handlePurchasePremiumListing : undefined}
+                                disabled={premiumSlotsLeft === 0 || purchasingPremiumListing}
+                                className={`flex flex-col items-start gap-0.5 px-4 py-3 rounded-xl border transition-colors text-left ${
+                                  premiumSlotsLeft > 0
+                                    ? 'bg-amber-950/30 hover:bg-amber-950/50 border-amber-700/50'
+                                    : 'bg-gray-800/40 border-gray-700 opacity-50 cursor-not-allowed'
+                                }`}
+                              >
+                                <span className="text-xs font-bold text-amber-300">⭐ Premium</span>
+                                <span className={`text-sm font-semibold ${premiumSlotsLeft > 0 ? 'text-amber-400' : 'text-gray-500'}`}>
+                                  {purchasingPremiumListing ? 'Redirecting...' : premiumSlotsLeft > 0 ? '$149/mo' : 'Sold out'}
+                                </span>
+                                <span className="text-[10px] text-gray-500 mt-0.5">
+                                  {premiumSlotsLeft > 0 ? `Top 10 · ${premiumSlotsLeft} slot${premiumSlotsLeft === 1 ? '' : 's'} left` : '0 of 2 slots available'}
+                                </span>
                               </button>
                             </div>
                           )}

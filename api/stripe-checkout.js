@@ -25,6 +25,7 @@ const PRICE_IDS = {
   sub: process.env.STRIPE_SUB_PRICE_ID,
   mod: process.env.STRIPE_MOD_PRICE_ID,
   featured: process.env.STRIPE_FEATURED_BASIC_PRICE_ID,
+  'featured-premium': process.env.STRIPE_FEATURED_PREMIUM_PRICE_ID,
 };
 
 const VALID_PLATFORMS = new Set(['youtube', 'tiktok', 'twitch', 'kick', 'bluesky']);
@@ -214,10 +215,12 @@ export default async function handler(req, res) {
     let successUrl = (returnUrl || `${origin}/account`) + '?upgrade=success';
     let cancelUrl = `${origin}/pricing`;
 
-    // Featured listing: validate creator then pass IDs in metadata.
+    // Featured listing (basic or premium): validate creator then pass IDs in metadata.
     // The webhook creates+activates the row only after payment succeeds —
     // no DB row is created here so abandoned checkouts leave no orphan records.
-    if (priceKey === 'featured') {
+    if (priceKey === 'featured' || priceKey === 'featured-premium') {
+      const placementTier = priceKey === 'featured-premium' ? 'premium' : 'basic';
+
       if (!creatorId || !platform) {
         return res.status(400).json({ error: 'Missing creatorId or platform for featured listing' });
       }
@@ -230,7 +233,7 @@ export default async function handler(req, res) {
         .maybeSingle();
       if (!creator) return res.status(400).json({ error: 'Creator not found' });
 
-      // Prevent duplicate: block if this creator already has an active listing (globally)
+      // Prevent duplicate: block if this creator already has any active listing
       const { count: dupCount } = await supabase
         .from('featured_listings')
         .select('id', { count: 'exact', head: true })
@@ -241,8 +244,23 @@ export default async function handler(req, res) {
         return res.status(409).json({ error: 'This creator already has an active featured listing' });
       }
 
+      // Premium: enforce maximum 2 slots per platform
+      if (placementTier === 'premium') {
+        const { count: premiumCount } = await supabase
+          .from('featured_listings')
+          .select('id', { count: 'exact', head: true })
+          .eq('platform', platform)
+          .eq('placement_tier', 'premium')
+          .eq('status', 'active')
+          .gt('active_until', new Date().toISOString());
+        if (premiumCount >= 2) {
+          return res.status(409).json({ error: 'All premium spots for this platform are taken. Try again later.' });
+        }
+      }
+
       sessionMetadata.featuredCreatorId = creatorId;
       sessionMetadata.featuredPlatform = platform;
+      sessionMetadata.featuredPlacementTier = placementTier;
       successUrl = (returnUrl || `${origin}/account`) + '?featured=success';
       cancelUrl = `${origin}/account`;
     }
