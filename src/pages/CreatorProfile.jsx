@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { Youtube, Twitch, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star, Play, ThumbsUp, MessageCircle, Download, Lock, Share2, Check } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
@@ -63,7 +63,10 @@ export default function CreatorProfile() {
   const [isLive, setIsLive] = useState(false);
   const [liveStreamInfo, setLiveStreamInfo] = useState(null);
   const [latestVideo, setLatestVideo] = useState(null);
-  const [copied, setCopied] = useState(false);
+  const [showSharePanel, setShowSharePanel] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState(false);
+  const [copiedEmbed, setCopiedEmbed] = useState(false);
+  const shareRef = useRef(null);
 
   useEffect(() => {
     loadCreator();
@@ -297,17 +300,41 @@ export default function CreatorProfile() {
     }
   };
 
-  const handleShare = () => {
+  const shareUrl = `${window.location.origin}/s/${platform}/${creator?.username || username}`;
+  const embedCode = `<iframe src="${shareUrl}" width="520" height="400" frameborder="0" style="border-radius:16px;border:1px solid #1f2937" allowfullscreen></iframe>`;
+
+  useEffect(() => {
+    if (!showSharePanel) return;
+    const handleClickOutside = (e) => {
+      if (shareRef.current && !shareRef.current.contains(e.target)) {
+        setShowSharePanel(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSharePanel]);
+
+  const handleShareClick = () => {
     if (tier !== 'mod') {
       window.dispatchEvent(new CustomEvent('openUpgradePanel', {
         detail: { feature: 'share' },
       }));
       return;
     }
-    const url = `${window.location.origin}/s/${platform}/${creator?.username || username}`;
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+    setShowSharePanel(prev => !prev);
+  };
+
+  const handleCopyUrl = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2000);
+    });
+  };
+
+  const handleCopyEmbed = () => {
+    navigator.clipboard.writeText(embedCode).then(() => {
+      setCopiedEmbed(true);
+      setTimeout(() => setCopiedEmbed(false), 2000);
     });
   };
 
@@ -585,19 +612,62 @@ export default function CreatorProfile() {
             {/* Profile Header */}
             <div className={`bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4 sm:p-6 md:p-8 mb-6 relative z-10 ${creator.bannerImage ? '-mt-16' : ''}`}>
               {/* Action Buttons - Top Right */}
-              <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-2">
-                {/* Share button */}
-                <button
-                  onClick={handleShare}
-                  className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm shadow-lg border ${
-                    copied
-                      ? 'bg-emerald-900/40 border-emerald-700 text-emerald-400'
-                      : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500 hover:text-gray-100'
-                  }`}
-                >
-                  {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
-                  <span className="hidden sm:inline">{copied ? 'Copied!' : 'Share'}</span>
-                </button>
+              <div ref={shareRef} className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-2">
+                {/* Share button + panel */}
+                <div className="relative">
+                  <button
+                    onClick={handleShareClick}
+                    className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm shadow-lg border ${
+                      showSharePanel
+                        ? 'bg-gray-800 border-gray-600 text-gray-100'
+                        : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500 hover:text-gray-100'
+                    }`}
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span className="hidden sm:inline">Share</span>
+                  </button>
+
+                  {/* Share panel dropdown */}
+                  {showSharePanel && (
+                    <div className="absolute top-full right-0 mt-2 w-80 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-4 z-30">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Share link</p>
+                      <div className="flex items-center gap-2 mb-4">
+                        <input
+                          readOnly
+                          value={shareUrl}
+                          className="flex-1 min-w-0 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-200 font-mono truncate"
+                        />
+                        <button
+                          onClick={handleCopyUrl}
+                          className={`flex-shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                            copiedUrl ? 'bg-emerald-700 text-emerald-100' : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                          }`}
+                        >
+                          {copiedUrl ? 'Copied!' : 'Copy'}
+                        </button>
+                      </div>
+
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Embed code</p>
+                      <div className="flex items-center gap-2 mb-3">
+                        <input
+                          readOnly
+                          value={embedCode}
+                          className="flex-1 min-w-0 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-200 font-mono truncate"
+                        />
+                        <button
+                          onClick={handleCopyEmbed}
+                          className={`flex-shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                            copiedEmbed ? 'bg-emerald-700 text-emerald-100' : 'bg-gray-700 hover:bg-gray-600 text-white'
+                          }`}
+                        >
+                          {copiedEmbed ? 'Copied!' : 'Copy'}
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500">Works in Notion, websites, and anywhere iframes are supported.</p>
+                    </div>
+                  )}
+                </div>
+
                 {/* Follow button */}
                 <button
                   onClick={handleFollowToggle}
