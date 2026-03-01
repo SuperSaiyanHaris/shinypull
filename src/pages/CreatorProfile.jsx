@@ -64,6 +64,7 @@ export default function CreatorProfile() {
   const [liveStreamInfo, setLiveStreamInfo] = useState(null);
   const [latestVideo, setLatestVideo] = useState(null);
   const [showSharePanel, setShowSharePanel] = useState(false);
+  const [copiedProfile, setCopiedProfile] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedEmbed, setCopiedEmbed] = useState(false);
   const shareRef = useRef(null);
@@ -300,8 +301,10 @@ export default function CreatorProfile() {
     }
   };
 
+  const profileUrl = `${window.location.origin}/${platform}/${creator?.username || username}`;
   const shareUrl = `${window.location.origin}/s/${platform}/${creator?.username || username}`;
   const embedCode = `<iframe src="${shareUrl}" width="520" height="400" frameborder="0" style="border-radius:16px;border:1px solid #1f2937" allowfullscreen></iframe>`;
+  const isMod = tier === 'mod';
 
   useEffect(() => {
     if (!showSharePanel) return;
@@ -314,14 +317,13 @@ export default function CreatorProfile() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showSharePanel]);
 
-  const handleShareClick = () => {
-    if (tier !== 'mod') {
-      window.dispatchEvent(new CustomEvent('openUpgradePanel', {
-        detail: { feature: 'share' },
-      }));
-      return;
-    }
-    setShowSharePanel(prev => !prev);
+  const handleShareClick = () => setShowSharePanel(prev => !prev);
+
+  const handleCopyProfile = () => {
+    navigator.clipboard.writeText(profileUrl).then(() => {
+      setCopiedProfile(true);
+      setTimeout(() => setCopiedProfile(false), 2000);
+    });
   };
 
   const handleCopyUrl = () => {
@@ -630,40 +632,89 @@ export default function CreatorProfile() {
                   {/* Share panel dropdown */}
                   {showSharePanel && (
                     <div className="absolute top-full right-0 mt-2 w-80 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-4 z-30">
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Share link</p>
+
+                      {/* Profile URL — everyone */}
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Profile URL</p>
                       <div className="flex items-center gap-2 mb-4">
                         <input
                           readOnly
-                          value={shareUrl}
+                          value={profileUrl}
                           className="flex-1 min-w-0 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-200 font-mono truncate"
                         />
                         <button
-                          onClick={handleCopyUrl}
+                          onClick={handleCopyProfile}
                           className={`flex-shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
-                            copiedUrl ? 'bg-emerald-700 text-emerald-100' : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                            copiedProfile ? 'bg-emerald-700 text-emerald-100' : 'bg-indigo-600 hover:bg-indigo-500 text-white'
                           }`}
                         >
-                          {copiedUrl ? 'Copied!' : 'Copy'}
+                          {copiedProfile ? 'Copied!' : 'Copy'}
                         </button>
                       </div>
 
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Embed code</p>
+                      {/* Clean share link — Mod only */}
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Clean share link</p>
+                        {!isMod && <span className="text-xs font-semibold text-amber-500 uppercase tracking-wider">Mod</span>}
+                      </div>
+                      <div className="flex items-center gap-2 mb-4">
+                        <input
+                          readOnly
+                          value={isMod ? shareUrl : '∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙'}
+                          className={`flex-1 min-w-0 px-3 py-2 border rounded-lg text-xs font-mono truncate ${
+                            isMod ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-gray-800/40 border-gray-800 text-gray-600 select-none'
+                          }`}
+                        />
+                        {isMod ? (
+                          <button
+                            onClick={handleCopyUrl}
+                            className={`flex-shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                              copiedUrl ? 'bg-emerald-700 text-emerald-100' : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                            }`}
+                          >
+                            {copiedUrl ? 'Copied!' : 'Copy'}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => { setShowSharePanel(false); window.dispatchEvent(new CustomEvent('openUpgradePanel', { detail: { feature: 'share' } })); }}
+                            className="flex-shrink-0 px-3 py-2 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-500 text-white transition-colors"
+                          >
+                            Upgrade
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Embed code — Mod only */}
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Embed code</p>
+                        {!isMod && <span className="text-xs font-semibold text-amber-500 uppercase tracking-wider">Mod</span>}
+                      </div>
                       <div className="flex items-center gap-2 mb-3">
                         <input
                           readOnly
-                          value={embedCode}
-                          className="flex-1 min-w-0 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-200 font-mono truncate"
-                        />
-                        <button
-                          onClick={handleCopyEmbed}
-                          className={`flex-shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
-                            copiedEmbed ? 'bg-emerald-700 text-emerald-100' : 'bg-gray-700 hover:bg-gray-600 text-white'
+                          value={isMod ? embedCode : '∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙'}
+                          className={`flex-1 min-w-0 px-3 py-2 border rounded-lg text-xs font-mono truncate ${
+                            isMod ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-gray-800/40 border-gray-800 text-gray-600 select-none'
                           }`}
-                        >
-                          {copiedEmbed ? 'Copied!' : 'Copy'}
-                        </button>
+                        />
+                        {isMod ? (
+                          <button
+                            onClick={handleCopyEmbed}
+                            className={`flex-shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                              copiedEmbed ? 'bg-emerald-700 text-emerald-100' : 'bg-gray-700 hover:bg-gray-600 text-white'
+                            }`}
+                          >
+                            {copiedEmbed ? 'Copied!' : 'Copy'}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => { setShowSharePanel(false); window.dispatchEvent(new CustomEvent('openUpgradePanel', { detail: { feature: 'share' } })); }}
+                            className="flex-shrink-0 px-3 py-2 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-500 text-white transition-colors"
+                          >
+                            Upgrade
+                          </button>
+                        )}
                       </div>
-                      <p className="text-xs text-gray-500">Works in Notion, websites, and anywhere iframes are supported.</p>
+                      {isMod && <p className="text-xs text-gray-500">Embed works in Notion, websites, and anywhere iframes are supported.</p>}
                     </div>
                   )}
                 </div>
