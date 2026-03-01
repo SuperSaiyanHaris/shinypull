@@ -1,12 +1,12 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown, Megaphone } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
 import { TableSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
-import { getRankedCreators } from '../services/creatorService';
+import { getRankedCreators, getFeaturedListings } from '../services/creatorService';
 import SEO from '../components/SEO';
 import StructuredData from '../components/StructuredData';
 import { analytics } from '../lib/analytics';
@@ -266,6 +266,7 @@ function PlatformRankings({ urlPlatform }) {
   const [error, setError] = useState(null);
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('desc');
+  const [sponsoredListings, setSponsoredListings] = useState([]);
 
   const rankTypes = [
     { id: 'subscribers', name: selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
@@ -283,6 +284,12 @@ function PlatformRankings({ urlPlatform }) {
   useEffect(() => {
     loadRankings();
   }, [selectedPlatform, selectedRankType, topCount]);
+
+  useEffect(() => {
+    getFeaturedListings(selectedPlatform)
+      .then(setSponsoredListings)
+      .catch(() => setSponsoredListings([]));
+  }, [selectedPlatform]);
 
   const loadRankings = async () => {
     setLoading(true);
@@ -334,6 +341,36 @@ function PlatformRankings({ urlPlatform }) {
       return sortDirection === 'desc' ? bVal - aVal : aVal - bVal;
     });
   }, [rankings, sortColumn, sortDirection]);
+
+  // Inject sponsored rows at positions 10, 20, 30 (max 3 slots)
+  const MAX_SPONSORED = 3;
+  const INJECT_AT = [9, 19, 29]; // 0-indexed positions in organic list
+
+  const displayList = useMemo(() => {
+    if (!sponsoredListings.length) return sortedRankings;
+    const slots = sponsoredListings.slice(0, MAX_SPONSORED);
+    const result = [];
+    let sponsorIdx = 0;
+    for (let i = 0; i < sortedRankings.length; i++) {
+      if (sponsorIdx < slots.length && INJECT_AT[sponsorIdx] === i) {
+        const listing = slots[sponsorIdx];
+        const c = listing.creators;
+        result.push({
+          ...c,
+          isSponsored: true,
+          listingId: listing.id,
+          // Map creator fields to the shape Rankings expects
+          display_name: c?.display_name,
+          username: c?.username,
+          profile_image: c?.profile_image,
+          platform: c?.platform,
+        });
+        sponsorIdx++;
+      }
+      result.push(sortedRankings[i]);
+    }
+    return result;
+  }, [sortedRankings, sponsoredListings]);
 
   const SortIcon = ({ column }) => {
     if (sortColumn !== column) return <ArrowUpDown className="w-3.5 h-3.5 text-gray-300" />;
@@ -544,80 +581,126 @@ function PlatformRankings({ urlPlatform }) {
             )}
 
             {/* Rankings List */}
-            {!loading && !error && sortedRankings.map((creator, index) => (
-              <Link
-                key={creator.id}
-                to={`/${creator.platform}/${creator.username}`}
-                className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-gray-800 hover:bg-gray-800/50 transition-colors group"
-              >
-                {/* Rank */}
-                <div className="col-span-2 md:col-span-1">
-                  <span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm ${
-                    creator.originalRank === 1 ? 'bg-yellow-900/30 text-yellow-400' :
-                    creator.originalRank === 2 ? 'bg-gray-800 text-gray-300' :
-                    creator.originalRank === 3 ? 'bg-orange-900/30 text-orange-400' :
-                    'bg-gray-800/50 text-gray-300'
-                  }`}>
-                    {creator.originalRank}
-                  </span>
-                </div>
+            {!loading && !error && displayList.map((creator, index) => {
+              if (creator.isSponsored) {
+                return (
+                  <Link
+                    key={`sponsored-${creator.listingId}`}
+                    to={`/${creator.platform}/${creator.username}`}
+                    className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-amber-900/30 bg-amber-950/10 hover:bg-amber-950/20 transition-colors group"
+                  >
+                    {/* Sponsored badge instead of rank */}
+                    <div className="col-span-2 md:col-span-1">
+                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-900/30 text-amber-400">
+                        <Megaphone className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
 
-                {/* Creator Info */}
-                <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-7' : 'md:col-span-5'}`}>
-                  <img
-                    src={creator.profile_image || '/placeholder-avatar.svg'}
-                    alt={creator.display_name}
-                    loading="lazy"
-                    className="w-12 h-12 rounded-xl object-cover bg-gray-800 flex-shrink-0"
-                    onError={(e) => {
-                      e.target.src = '/placeholder-avatar.svg';
-                    }}
-                  />
-                  <div className="min-w-0">
-                    <p className="font-semibold text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
-                      {creator.display_name}
-                    </p>
-                    <p className="text-sm text-gray-300 truncate">@{creator.username}</p>
-                  </div>
-                </div>
+                    {/* Creator Info */}
+                    <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-7' : 'md:col-span-5'}`}>
+                      <img
+                        src={creator.profile_image || '/placeholder-avatar.svg'}
+                        alt={creator.display_name}
+                        loading="lazy"
+                        className="w-12 h-12 rounded-xl object-cover bg-gray-800 flex-shrink-0"
+                        onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
+                      />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-gray-100 truncate group-hover:text-amber-400 transition-colors">
+                            {creator.display_name}
+                          </p>
+                          <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20 flex-shrink-0">
+                            Sponsored
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-300 truncate">@{creator.username}</p>
+                      </div>
+                    </div>
 
-                {/* Stats - Desktop */}
-                <div className="hidden md:block col-span-2 text-right">
-                  <span className="font-semibold text-gray-100">{formatNumber(creator.subscribers)}</span>
-                </div>
-                {selectedPlatform === 'tiktok' && (
-                  <div className="hidden md:block col-span-2 text-right">
-                    <span className="text-gray-300">{formatNumber(creator.totalViews)}</span>
-                  </div>
-                )}
-                {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
-                  <div className="hidden md:block col-span-2 text-right">
-                    <span className="text-gray-300">{formatNumber(creator.totalViews)}</span>
-                  </div>
-                )}
-                <div className="hidden md:block col-span-2 text-right">
-                  <span className={`font-medium ${creator.growth30d > 0 ? 'text-emerald-400' : creator.growth30d < 0 ? 'text-red-500' : 'text-gray-300'}`}>
-                    {creator.growth30d > 0 ? '+' : ''}{formatNumber(creator.growth30d)}
-                  </span>
-                </div>
+                    {/* Empty stat columns to match layout */}
+                    <div className="hidden md:block col-span-2 text-right" />
+                    {selectedPlatform !== 'kick' && selectedPlatform !== 'bluesky' && (
+                      <div className="hidden md:block col-span-2 text-right" />
+                    )}
+                    <div className="hidden md:block col-span-2 text-right" />
+                  </Link>
+                );
+              }
 
-                {/* Stats - Mobile */}
-                <div className="col-span-12 md:hidden flex flex-wrap gap-4 text-sm pl-11">
-                  <span className="text-gray-300">
-                    <span className="font-medium text-gray-100">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
-                  </span>
-                  {selectedPlatform === 'tiktok' ? (
-                    <span className="text-gray-300">
-                      <span className="font-medium text-gray-100">{formatNumber(creator.totalLikes || creator.totalViews)}</span> likes
+              return (
+                <Link
+                  key={creator.id}
+                  to={`/${creator.platform}/${creator.username}`}
+                  className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-gray-800 hover:bg-gray-800/50 transition-colors group"
+                >
+                  {/* Rank */}
+                  <div className="col-span-2 md:col-span-1">
+                    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm ${
+                      creator.originalRank === 1 ? 'bg-yellow-900/30 text-yellow-400' :
+                      creator.originalRank === 2 ? 'bg-gray-800 text-gray-300' :
+                      creator.originalRank === 3 ? 'bg-orange-900/30 text-orange-400' :
+                      'bg-gray-800/50 text-gray-300'
+                    }`}>
+                      {creator.originalRank}
                     </span>
-                  ) : selectedPlatform !== 'kick' && selectedPlatform !== 'bluesky' && (
-                    <span className="text-gray-300">
-                      <span className="font-medium text-gray-100">{formatNumber(creator.totalViews)}</span> views
-                    </span>
+                  </div>
+
+                  {/* Creator Info */}
+                  <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-7' : 'md:col-span-5'}`}>
+                    <img
+                      src={creator.profile_image || '/placeholder-avatar.svg'}
+                      alt={creator.display_name}
+                      loading="lazy"
+                      className="w-12 h-12 rounded-xl object-cover bg-gray-800 flex-shrink-0"
+                      onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
+                    />
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
+                        {creator.display_name}
+                      </p>
+                      <p className="text-sm text-gray-300 truncate">@{creator.username}</p>
+                    </div>
+                  </div>
+
+                  {/* Stats - Desktop */}
+                  <div className="hidden md:block col-span-2 text-right">
+                    <span className="font-semibold text-gray-100">{formatNumber(creator.subscribers)}</span>
+                  </div>
+                  {selectedPlatform === 'tiktok' && (
+                    <div className="hidden md:block col-span-2 text-right">
+                      <span className="text-gray-300">{formatNumber(creator.totalViews)}</span>
+                    </div>
                   )}
-                </div>
-              </Link>
-            ))}
+                  {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
+                    <div className="hidden md:block col-span-2 text-right">
+                      <span className="text-gray-300">{formatNumber(creator.totalViews)}</span>
+                    </div>
+                  )}
+                  <div className="hidden md:block col-span-2 text-right">
+                    <span className={`font-medium ${creator.growth30d > 0 ? 'text-emerald-400' : creator.growth30d < 0 ? 'text-red-500' : 'text-gray-300'}`}>
+                      {creator.growth30d > 0 ? '+' : ''}{formatNumber(creator.growth30d)}
+                    </span>
+                  </div>
+
+                  {/* Stats - Mobile */}
+                  <div className="col-span-12 md:hidden flex flex-wrap gap-4 text-sm pl-11">
+                    <span className="text-gray-300">
+                      <span className="font-medium text-gray-100">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
+                    </span>
+                    {selectedPlatform === 'tiktok' ? (
+                      <span className="text-gray-300">
+                        <span className="font-medium text-gray-100">{formatNumber(creator.totalLikes || creator.totalViews)}</span> likes
+                      </span>
+                    ) : selectedPlatform !== 'kick' && selectedPlatform !== 'bluesky' && (
+                      <span className="text-gray-300">
+                        <span className="font-medium text-gray-100">{formatNumber(creator.totalViews)}</span> views
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
 
           {/* SEO FAQ Section */}

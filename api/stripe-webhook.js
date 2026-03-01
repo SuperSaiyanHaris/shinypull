@@ -1,12 +1,14 @@
 /**
- * Stripe webhook handler — updates subscription tier in Supabase.
+ * Stripe webhook handler — updates subscription tier in Supabase
+ * and manages featured listing activations.
  *
  * Configured at: https://dashboard.stripe.com/webhooks
  * Endpoint: https://shinypull.com/api/stripe-webhook
  * Events to enable:
+ *   - checkout.session.completed      (activates featured listings)
  *   - customer.subscription.created
  *   - customer.subscription.updated
- *   - customer.subscription.deleted
+ *   - customer.subscription.deleted   (also cancels featured listings)
  *   - invoice.payment_failed
  */
 
@@ -29,6 +31,14 @@ const PRICE_TIER_MAP = {
   [process.env.STRIPE_SUB_PRICE_ID]: 'sub',
   [process.env.STRIPE_MOD_PRICE_ID]: 'mod',
 };
+
+const FEATURED_PRICE_IDS = new Set([
+  process.env.STRIPE_FEATURED_BASIC_PRICE_ID,
+].filter(Boolean));
+
+function isFeaturedSubscription(subscription) {
+  return subscription.items.data.some(item => FEATURED_PRICE_IDS.has(item.price.id));
+}
 
 function getTierFromSubscription(subscription) {
   for (const item of subscription.items.data) {
@@ -62,10 +72,39 @@ export default async function handler(req, res) {
 
   try {
     switch (event.type) {
+      // Featured listing: activate the pending listing row when checkout completes
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        const listingId = session.metadata?.listingId;
+        if (!listingId) break; // not a featured listing checkout
+
+        const activeFrom = new Date();
+        const activeUntil = new Date(activeFrom);
+        activeUntil.setDate(activeUntil.getDate() + 30);
+
+        await supabase
+          .from('featured_listings')
+          .update({
+            status: 'active',
+            active_from: activeFrom.toISOString(),
+            active_until: activeUntil.toISOString(),
+            stripe_payment_id: session.payment_intent || null,
+            stripe_subscription_id: session.subscription || null,
+          })
+          .eq('id', listingId);
+
+        console.log(`Activated featured listing ${listingId}`);
+        break;
+      }
+
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
         const subscription = event.data.object;
         const customerId = subscription.customer;
+
+        // Featured listing subscriptions are handled via checkout.session.completed.
+        // Skip tier updates for featured listing price IDs.
+        if (isFeaturedSubscription(subscription)) break;
 
         // Find user by stripe_customer_id
         const { data: user } = await supabase
@@ -101,6 +140,16 @@ export default async function handler(req, res) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object;
         const customerId = subscription.customer;
+
+        // If this is a featured listing subscription, cancel the listing
+        if (isFeaturedSubscription(subscription)) {
+          await supabase
+            .from('featured_listings')
+            .update({ status: 'canceled' })
+            .eq('stripe_subscription_id', subscription.id);
+          console.log(`Canceled featured listing for subscription ${subscription.id}`);
+          break;
+        }
 
         const { data: user } = await supabase
           .from('users')

@@ -305,6 +305,49 @@ async function _fetchRankings(platform, rankType, limit) {
 }
 
 /**
+ * Get active featured listings for a platform.
+ * Returns listings with joined creator data, shuffled for fair rotation.
+ */
+export async function getFeaturedListings(platform) {
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from('featured_listings')
+    .select('id, platform, placement_tier, is_mod_free, active_until, creators(id, username, display_name, profile_image, platform)')
+    .eq('platform', platform)
+    .eq('status', 'active')
+    .gt('active_until', now);
+  if (error) throw error;
+  // Shuffle for fair rotation (different users see different sponsored creators)
+  const arr = data || [];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/**
+ * Validate a ShinyPull profile URL and return the creator record.
+ * Accepts: https://shinypull.com/youtube/mrbeast OR youtube/mrbeast
+ */
+export async function validateFeaturedCreatorUrl(urlOrPath) {
+  const path = urlOrPath
+    .replace(/^https?:\/\/shinypull\.com\//, '')
+    .replace(/^\//, '')
+    .trim();
+  const parts = path.split('/');
+  if (parts.length < 2) return null;
+  const [platform, username] = parts;
+  const { data } = await supabase
+    .from('creators')
+    .select('id, platform, username, display_name, profile_image')
+    .eq('platform', platform.toLowerCase())
+    .eq('username', username.toLowerCase())
+    .maybeSingle();
+  return data || null;
+}
+
+/**
  * Get ranked creators with latest stats.
  * Cached per (platform, rankType, limit) with stale-while-revalidate.
  */

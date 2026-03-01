@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Mail, Lock, Calendar, Star, CheckCircle, AlertCircle, Eye, EyeOff, ArrowLeft, Zap, Crown, ExternalLink } from 'lucide-react';
+import { User, Mail, Lock, Calendar, Star, CheckCircle, AlertCircle, Eye, EyeOff, ArrowLeft, Zap, Crown, ExternalLink, Megaphone, X, Search, Loader } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription, TIER_DISPLAY, TIER_LIMITS } from '../contexts/SubscriptionContext';
 import { getFollowedCreators } from '../services/followService';
+import { validateFeaturedCreatorUrl } from '../services/creatorService';
 import SEO from '../components/SEO';
 
 function Toast({ message, type, onDismiss }) {
@@ -51,11 +52,125 @@ export default function Account() {
   // Stats
   const [followCount, setFollowCount] = useState(null);
 
+  // Featured listings
+  const [featuredListings, setFeaturedListings] = useState([]);
+  const [featuredUrl, setFeaturedUrl] = useState('');
+  const [validatingUrl, setValidatingUrl] = useState(false);
+  const [pendingCreator, setPendingCreator] = useState(null);
+  const [urlError, setUrlError] = useState('');
+  const [purchasingListing, setPurchasingListing] = useState(false);
+  const [activatingFree, setActivatingFree] = useState(false);
+
+  const loadFeaturedListings = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('featured_listings')
+      .select('id, platform, status, active_from, active_until, is_mod_free, creators(display_name, username, profile_image, platform)')
+      .eq('purchased_by_user_id', user.id)
+      .order('created_at', { ascending: false });
+    setFeaturedListings(data || []);
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
     setDisplayName(user.user_metadata?.display_name || '');
     getFollowedCreators(user.id).then(list => setFollowCount(list.length)).catch(() => {});
-  }, [user]);
+    loadFeaturedListings();
+  }, [user, loadFeaturedListings]);
+
+  // Check if Mod user has used their free listing this calendar month
+  const modFreeUsedThisMonth = featuredListings.some(l => {
+    if (!l.is_mod_free) return false;
+    const d = new Date(l.active_from || '');
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+
+  const handleValidateUrl = async () => {
+    setUrlError('');
+    setPendingCreator(null);
+    if (!featuredUrl.trim()) return;
+    setValidatingUrl(true);
+    try {
+      const creator = await validateFeaturedCreatorUrl(featuredUrl.trim());
+      if (!creator) {
+        setUrlError('Creator not found. Make sure the URL is a valid ShinyPull profile (e.g. https://shinypull.com/youtube/mrbeast).');
+      } else {
+        setPendingCreator(creator);
+      }
+    } catch {
+      setUrlError('Could not validate that URL. Try again.');
+    } finally {
+      setValidatingUrl(false);
+    }
+  };
+
+  const handleActivateModFree = async () => {
+    if (!pendingCreator) return;
+    setActivatingFree(true);
+    try {
+      const activeFrom = new Date();
+      const activeUntil = new Date(activeFrom);
+      activeUntil.setDate(activeUntil.getDate() + 30);
+      const { error } = await supabase.from('featured_listings').insert({
+        creator_id: pendingCreator.id,
+        platform: pendingCreator.platform,
+        placement_tier: 'basic',
+        status: 'active',
+        purchased_by_user_id: user.id,
+        active_from: activeFrom.toISOString(),
+        active_until: activeUntil.toISOString(),
+        is_mod_free: true,
+      });
+      if (error) throw error;
+      showToast('Featured listing activated. Your profile will appear in rankings within a few minutes.');
+      setFeaturedUrl('');
+      setPendingCreator(null);
+      loadFeaturedListings();
+    } catch (err) {
+      showToast(err.message || 'Failed to activate listing.', 'error');
+    } finally {
+      setActivatingFree(false);
+    }
+  };
+
+  const handlePurchaseListing = async () => {
+    if (!pendingCreator) return;
+    setPurchasingListing(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch('/api/stripe-featured-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          creatorId: pendingCreator.id,
+          platform: pendingCreator.platform,
+          returnUrl: window.location.href,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to start checkout');
+      window.location.href = data.url;
+    } catch (err) {
+      showToast(err.message || 'Could not start checkout.', 'error');
+      setPurchasingListing(false);
+    }
+  };
+
+  const handleCancelListing = async (listingId) => {
+    const { error } = await supabase
+      .from('featured_listings')
+      .update({ status: 'canceled' })
+      .eq('id', listingId)
+      .eq('purchased_by_user_id', user.id);
+    if (error) {
+      showToast('Could not cancel listing.', 'error');
+    } else {
+      showToast('Listing canceled.');
+      loadFeaturedListings();
+    }
+  };
 
   if (!user) {
     return null;
@@ -229,6 +344,112 @@ export default function Account() {
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Featured Listings */}
+          <div className="bg-gray-900 rounded-2xl border border-amber-800/40 p-6">
+            <div className="flex items-center gap-2 mb-1">
+              <Megaphone className="w-4 h-4 text-amber-400" />
+              <h2 className="text-base font-semibold text-gray-100">Featured Listings</h2>
+              <span className="ml-auto px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">$49/mo</span>
+            </div>
+            <p className="text-sm text-gray-400 mb-5">
+              Your creator profile appears as a sponsored row in rankings pages, even if you're not in the top list.
+            </p>
+
+            {/* Existing listings */}
+            {featuredListings.length > 0 && (
+              <div className="mb-5 space-y-2">
+                {featuredListings.map(listing => {
+                  const c = listing.creators;
+                  const isActive = listing.status === 'active';
+                  const isPending = listing.status === 'pending';
+                  const until = listing.active_until ? new Date(listing.active_until).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null;
+                  return (
+                    <div key={listing.id} className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-xl border border-gray-700/50">
+                      {c?.profile_image && (
+                        <img src={c.profile_image} alt={c.display_name} className="w-9 h-9 rounded-lg object-cover bg-gray-700 flex-shrink-0" onError={e => { e.target.style.display = 'none'; }} />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-gray-100 truncate">{c?.display_name || 'Unknown creator'}</p>
+                        <p className="text-xs text-gray-400">{listing.platform} {until && isActive ? `· Active until ${until}` : ''}{listing.is_mod_free ? ' · Free with Mod' : ''}</p>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${
+                        isActive ? 'bg-emerald-950/50 text-emerald-400 border border-emerald-800' :
+                        isPending ? 'bg-amber-950/50 text-amber-400 border border-amber-800' :
+                        'bg-gray-800 text-gray-500 border border-gray-700'
+                      }`}>
+                        {listing.status}
+                      </span>
+                      {(isActive && listing.is_mod_free) || isPending ? null : isActive && (
+                        <button
+                          onClick={() => handleCancelListing(listing.id)}
+                          className="p-1 text-gray-300 hover:text-red-400 transition-colors flex-shrink-0"
+                          title="Cancel listing"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Add new listing form */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-gray-300 uppercase tracking-wider">Add a listing</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={featuredUrl}
+                  onChange={e => { setFeaturedUrl(e.target.value); setPendingCreator(null); setUrlError(''); }}
+                  onKeyDown={e => e.key === 'Enter' && handleValidateUrl()}
+                  placeholder="https://shinypull.com/youtube/mrbeast"
+                  className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-sm"
+                />
+                <button
+                  onClick={handleValidateUrl}
+                  disabled={validatingUrl || !featuredUrl.trim()}
+                  className="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-gray-100 font-medium rounded-xl transition-colors text-sm flex items-center gap-2"
+                >
+                  {validatingUrl ? <Loader className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                  Check
+                </button>
+              </div>
+
+              {urlError && <p className="text-xs text-red-400">{urlError}</p>}
+
+              {pendingCreator && (
+                <div className="flex items-center gap-3 p-3 bg-amber-950/20 border border-amber-800/40 rounded-xl">
+                  {pendingCreator.profile_image && (
+                    <img src={pendingCreator.profile_image} alt={pendingCreator.display_name} className="w-9 h-9 rounded-lg object-cover bg-gray-700 flex-shrink-0" onError={e => { e.target.style.display = 'none'; }} />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-gray-100 truncate">{pendingCreator.display_name}</p>
+                    <p className="text-xs text-gray-400">@{pendingCreator.username} · {pendingCreator.platform}</p>
+                  </div>
+                  <div className="flex gap-2 flex-shrink-0">
+                    {tier === 'mod' && !modFreeUsedThisMonth ? (
+                      <button
+                        onClick={handleActivateModFree}
+                        disabled={activatingFree}
+                        className="px-3 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors"
+                      >
+                        {activatingFree ? 'Activating...' : 'Use Free Listing'}
+                      </button>
+                    ) : null}
+                    <button
+                      onClick={handlePurchaseListing}
+                      disabled={purchasingListing}
+                      className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors"
+                    >
+                      {purchasingListing ? 'Redirecting...' : tier === 'mod' && !modFreeUsedThisMonth ? 'Pay $49/mo' : 'Add for $49/mo'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Account overview */}
