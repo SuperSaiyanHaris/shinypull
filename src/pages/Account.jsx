@@ -351,21 +351,22 @@ export default function Account() {
             {/* Main content */}
             <div className="flex-1 min-w-0">
 
-              {/* Mobile tab pills */}
-              <div className="flex md:hidden gap-1.5 mb-6 overflow-x-auto pb-0.5 -mx-1 px-1">
+              {/* Mobile tabs — fixed 4-column segmented control, no scroll */}
+              <div className="flex md:hidden mb-6 bg-gray-900 border border-gray-800 rounded-xl p-1 gap-1">
                 {TABS.map(tab => {
                   const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
                   return (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap flex-shrink-0 transition-all ${
-                        activeTab === tab.id
-                          ? 'bg-gray-700 text-gray-100'
-                          : 'bg-gray-900 border border-gray-800 text-gray-400 hover:border-gray-700 hover:text-gray-300'
+                      className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg text-[10px] font-semibold transition-all ${
+                        isActive
+                          ? 'bg-indigo-600 text-white shadow-sm'
+                          : 'text-gray-400 hover:text-gray-200'
                       }`}
                     >
-                      <Icon className="w-3.5 h-3.5" />
+                      <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                       {tab.label}
                     </button>
                   );
