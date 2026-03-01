@@ -307,7 +307,7 @@ async function _fetchRankings(platform, rankType, limit) {
 /**
  * Get active featured listings for a platform.
  * Returns listings ordered by created_at ascending — first come, first served.
- * Earliest listing gets the best slot (position 11), later ones fill every 5th row after.
+ * Earliest listing gets the best slot (position 15), later ones fill every 5th row after.
  */
 export async function getFeaturedListings(platform) {
   const now = new Date().toISOString();

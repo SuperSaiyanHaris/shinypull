@@ -732,7 +732,7 @@ export default function Account() {
                                 <span className="text-sm font-semibold text-indigo-400">
                                   {activatingFree ? 'Activating...' : purchasingListing ? 'Redirecting...' : tier === 'mod' && !modFreeUsedThisMonth ? 'Free this month' : '$49/mo'}
                                 </span>
-                                <span className="text-[10px] text-gray-500 mt-0.5">Rank 11 and beyond</span>
+                                <span className="text-[10px] text-gray-500 mt-0.5">Rank 15 and beyond</span>
                               </button>
 
                               {/* Premium tile */}
