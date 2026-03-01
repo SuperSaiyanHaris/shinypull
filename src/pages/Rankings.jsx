@@ -214,48 +214,53 @@ function RankingsOverview() {
                         <div className="px-5 py-8 text-center text-gray-300 text-sm">No data available</div>
                       ) : (() => {
                         const listings = sponsoredByPlatform[platform.id] || [];
-                        const premiumListing = listings.find(l => l.placement_tier === 'premium');
+                        const premiumListings = listings.filter(l => l.placement_tier === 'premium');
                         const items = [];
-                        creators.forEach((creator, index) => {
-                          // Inject premium slot between rank 4 and 5
-                          if (index === 4) {
-                            if (premiumListing) {
-                              const c = premiumListing.creators;
-                              items.push(
-                                <Link
-                                  key="premium-ad"
-                                  to={`/${c?.platform}/${c?.username}`}
-                                  className="flex items-center gap-3 px-5 py-3 bg-amber-950/15 hover:bg-amber-950/25 transition-colors group"
-                                >
-                                  <span className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 bg-amber-900/30 text-amber-500">Ad</span>
-                                  <img src={c?.profile_image || '/placeholder-avatar.svg'} alt={c?.display_name} loading="lazy" className="w-8 h-8 rounded-lg object-cover bg-gray-800 flex-shrink-0" onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }} />
-                                  <div className="min-w-0 flex-1">
-                                    <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-amber-300 transition-colors">{c?.display_name}</p>
-                                  </div>
-                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex-shrink-0">⭐ Premium</span>
-                                </Link>
-                              );
-                            } else {
-                              items.push(
-                                <Link
-                                  key="premium-ghost"
-                                  to="/pricing"
-                                  className="flex items-center gap-3 px-5 py-3 bg-amber-950/5 hover:bg-amber-950/15 border-y border-dashed border-amber-800/30 transition-colors group"
-                                >
-                                  <div className="w-6 h-6 rounded-md bg-gray-800/60 border border-dashed border-gray-700 flex-shrink-0 flex items-center justify-center">
-                                    <span className="text-gray-600 text-[10px]">?</span>
-                                  </div>
-                                  <div className="w-8 h-8 rounded-lg bg-gray-800/60 border border-dashed border-gray-700 flex-shrink-0 flex items-center justify-center">
-                                    <span className="text-gray-600 text-sm">?</span>
-                                  </div>
-                                  <div className="min-w-0 flex-1">
-                                    <p className="text-sm font-semibold text-gray-600 group-hover:text-amber-500 transition-colors">This could be you</p>
-                                  </div>
-                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20 flex-shrink-0">Premium spot</span>
-                                </Link>
-                              );
-                            }
+
+                        const pushPremiumSlot = (slotKey, advertiser) => {
+                          if (advertiser) {
+                            const c = advertiser.creators;
+                            items.push(
+                              <Link
+                                key={slotKey}
+                                to={`/${c?.platform}/${c?.username}`}
+                                className="flex items-center gap-3 px-5 py-3 bg-amber-950/15 hover:bg-amber-950/25 transition-colors group"
+                              >
+                                <span className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 bg-amber-900/30 text-amber-500">Ad</span>
+                                <img src={c?.profile_image || '/placeholder-avatar.svg'} alt={c?.display_name} loading="lazy" className="w-8 h-8 rounded-lg object-cover bg-gray-800 flex-shrink-0" onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }} />
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-amber-300 transition-colors">{c?.display_name}</p>
+                                </div>
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex-shrink-0">⭐ Premium</span>
+                              </Link>
+                            );
+                          } else {
+                            items.push(
+                              <Link
+                                key={slotKey}
+                                to="/pricing"
+                                className="flex items-center gap-3 px-5 py-3 bg-amber-950/5 hover:bg-amber-950/15 border-y border-dashed border-amber-800/30 transition-colors group"
+                              >
+                                <div className="w-6 h-6 rounded-md bg-gray-800/60 border border-dashed border-gray-700 flex-shrink-0 flex items-center justify-center">
+                                  <span className="text-gray-600 text-[10px]">?</span>
+                                </div>
+                                <div className="w-8 h-8 rounded-lg bg-gray-800/60 border border-dashed border-gray-700 flex-shrink-0 flex items-center justify-center">
+                                  <span className="text-gray-600 text-sm">?</span>
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-semibold text-gray-600 group-hover:text-amber-500 transition-colors">This could be you</p>
+                                </div>
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20 flex-shrink-0">Premium spot</span>
+                              </Link>
+                            );
                           }
+                        };
+
+                        creators.forEach((creator, index) => {
+                          // Premium slot 1: between rank 4 and 5
+                          if (index === 4) pushPremiumSlot('premium-ghost-1', premiumListings[0]);
+                          // Premium slot 2: between rank 9 and 10
+                          if (index === 9) pushPremiumSlot('premium-ghost-2', premiumListings[1]);
                           items.push(
                             <Link
                               key={creator.id}
