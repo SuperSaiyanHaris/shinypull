@@ -140,10 +140,11 @@ export default function Account() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-      const res = await fetch('/api/stripe-featured-checkout', {
+      const res = await fetch('/api/stripe-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
+          priceKey: 'featured',
           creatorId: pendingCreator.id,
           platform: pendingCreator.platform,
           returnUrl: window.location.href,

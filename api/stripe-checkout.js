@@ -1,9 +1,15 @@
 /**
- * Create a Stripe Checkout session for a subscription upgrade.
+ * Create a Stripe Checkout session.
  *
  * POST /api/stripe-checkout
- * Body: { priceKey: 'sub' | 'mod', returnUrl: string }
  * Headers: Authorization: Bearer <supabase-jwt>
+ *
+ * Plan upgrade:
+ *   Body: { priceKey: 'sub' | 'mod', returnUrl: string }
+ *
+ * Featured listing ($49/mo):
+ *   Body: { priceKey: 'featured', creatorId: string, platform: string, returnUrl: string }
+ *   Pre-creates a pending featured_listings row; webhook activates it on payment success.
  */
 
 import Stripe from 'stripe';
@@ -12,6 +18,7 @@ import { createClient } from '@supabase/supabase-js';
 const PRICE_IDS = {
   sub: process.env.STRIPE_SUB_PRICE_ID,
   mod: process.env.STRIPE_MOD_PRICE_ID,
+  featured: process.env.STRIPE_FEATURED_BASIC_PRICE_ID,
 };
 
 export default async function handler(req, res) {
@@ -20,7 +27,6 @@ export default async function handler(req, res) {
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
   const supabase = createClient(
     process.env.VITE_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -30,26 +36,21 @@ export default async function handler(req, res) {
     // Authenticate user from Bearer token
     const authHeader = req.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
 
-    // Verify token and get user
     const supabaseAuth = createClient(
       process.env.VITE_SUPABASE_URL,
       process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
     );
     const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-    if (authError || !user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    if (authError || !user) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { priceKey, returnUrl } = req.body;
+    const { priceKey, returnUrl, creatorId, platform } = req.body;
     if (!priceKey || !PRICE_IDS[priceKey]) {
       return res.status(400).json({ error: 'Invalid price key' });
     }
 
-    // Get or create stripe_customer_id
+    // Get or create Stripe customer
     const { data: userData } = await supabase
       .from('users')
       .select('stripe_customer_id, email, display_name')
@@ -57,7 +58,6 @@ export default async function handler(req, res) {
       .maybeSingle();
 
     let customerId = userData?.stripe_customer_id;
-
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: userData?.email || user.email,
@@ -65,23 +65,65 @@ export default async function handler(req, res) {
         metadata: { supabase_user_id: user.id },
       });
       customerId = customer.id;
-
-      // Save customer ID
       await supabase
         .from('users')
         .update({ stripe_customer_id: customerId })
         .eq('id', user.id);
     }
 
-    // Create checkout session
+    const origin = req.headers.origin || 'https://shinypull.com';
+    let sessionMetadata = { supabase_user_id: user.id };
+    let successUrl = (returnUrl || `${origin}/account`) + '?upgrade=success';
+    let cancelUrl = `${origin}/pricing`;
+
+    // Featured listing: pre-create pending row, pass listingId in metadata
+    if (priceKey === 'featured') {
+      if (!creatorId || !platform) {
+        return res.status(400).json({ error: 'Missing creatorId or platform for featured listing' });
+      }
+
+      // Validate creator exists
+      const { data: creator } = await supabase
+        .from('creators')
+        .select('id')
+        .eq('id', creatorId)
+        .eq('platform', platform)
+        .maybeSingle();
+      if (!creator) return res.status(400).json({ error: 'Creator not found' });
+
+      const activeFrom = new Date();
+      const activeUntil = new Date(activeFrom);
+      activeUntil.setDate(activeUntil.getDate() + 30);
+
+      const { data: listing, error: listingError } = await supabase
+        .from('featured_listings')
+        .insert({
+          creator_id: creatorId,
+          platform,
+          placement_tier: 'basic',
+          status: 'pending',
+          purchased_by_user_id: user.id,
+          active_from: activeFrom.toISOString(),
+          active_until: activeUntil.toISOString(),
+          is_mod_free: false,
+        })
+        .select('id')
+        .single();
+      if (listingError) throw listingError;
+
+      sessionMetadata.listingId = listing.id;
+      successUrl = (returnUrl || `${origin}/account`) + '?featured=success';
+      cancelUrl = `${origin}/account`;
+    }
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
       line_items: [{ price: PRICE_IDS[priceKey], quantity: 1 }],
-      success_url: (returnUrl || `${req.headers.origin || 'https://shinypull.com'}/account`) + '?upgrade=success',
-      cancel_url: `${req.headers.origin || 'https://shinypull.com'}/pricing`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       allow_promotion_codes: true,
-      metadata: { supabase_user_id: user.id },
+      metadata: sessionMetadata,
     });
 
     return res.status(200).json({ url: session.url });
