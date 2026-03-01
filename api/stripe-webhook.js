@@ -179,6 +179,14 @@ export default async function handler(req, res) {
           })
           .eq('id', user.id);
 
+        // Cancel any active mod-free featured listings — perk no longer valid
+        await supabase
+          .from('featured_listings')
+          .update({ status: 'canceled' })
+          .eq('purchased_by_user_id', user.id)
+          .eq('is_mod_free', true)
+          .eq('status', 'active');
+
         console.log(`Reverted user ${user.id} to Lurker (subscription canceled)`);
         break;
       }
