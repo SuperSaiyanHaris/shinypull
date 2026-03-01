@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { Youtube, Twitch, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star, Play, ThumbsUp, MessageCircle, Download, Lock } from 'lucide-react';
+import { Youtube, Twitch, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star, Play, ThumbsUp, MessageCircle, Download, Lock, Share2, Check } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
@@ -49,7 +49,7 @@ export default function CreatorProfile() {
   const { platform, username } = useParams();
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
-  const { maxFollows, historyDays, hasExport, openUpgradePanel } = useSubscription();
+  const { maxFollows, historyDays, hasExport, openUpgradePanel, tier } = useSubscription();
   const [creator, setCreator] = useState(null);
   const [statsHistory, setStatsHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +63,7 @@ export default function CreatorProfile() {
   const [isLive, setIsLive] = useState(false);
   const [liveStreamInfo, setLiveStreamInfo] = useState(null);
   const [latestVideo, setLatestVideo] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     loadCreator();
@@ -294,6 +295,20 @@ export default function CreatorProfile() {
     } finally {
       setFollowLoading(false);
     }
+  };
+
+  const handleShare = () => {
+    if (tier !== 'mod') {
+      window.dispatchEvent(new CustomEvent('openUpgradePanel', {
+        detail: { feature: 'share' },
+      }));
+      return;
+    }
+    const url = `${window.location.origin}/s/${platform}/${creator?.username || username}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   const Icon = platformIcons[platform];
@@ -569,8 +584,21 @@ export default function CreatorProfile() {
           <div className="max-w-6xl mx-auto">
             {/* Profile Header */}
             <div className={`bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4 sm:p-6 md:p-8 mb-6 relative z-10 ${creator.bannerImage ? '-mt-16' : ''}`}>
-              {/* Follow Button - Top Right */}
-              <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+              {/* Action Buttons - Top Right */}
+              <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-2">
+                {/* Share button */}
+                <button
+                  onClick={handleShare}
+                  className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm shadow-lg border ${
+                    copied
+                      ? 'bg-emerald-900/40 border-emerald-700 text-emerald-400'
+                      : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500 hover:text-gray-100'
+                  }`}
+                >
+                  {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                  <span className="hidden sm:inline">{copied ? 'Copied!' : 'Share'}</span>
+                </button>
+                {/* Follow button */}
                 <button
                   onClick={handleFollowToggle}
                   disabled={followLoading}

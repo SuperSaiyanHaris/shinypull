@@ -54,6 +54,7 @@ const Support = lazyWithRetry(() => import('./pages/Support'));
 const Account = lazyWithRetry(() => import('./pages/Account'));
 const Pricing = lazyWithRetry(() => import('./pages/Pricing'));
 const Refunds = lazyWithRetry(() => import('./pages/Refunds'));
+const ShareProfile = lazyWithRetry(() => import('./pages/ShareProfile'));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -85,46 +86,57 @@ function RouteChangeTracker() {
   return null;
 }
 
+// Extracted so we can call useLocation() to suppress chrome on share pages
+function LayoutWrapper() {
+  const location = useLocation();
+  const isShareRoute = location.pathname.startsWith('/s/');
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+      <RouteChangeTracker />
+      <ScrollToTop />
+      <BackToTop />
+      {!isShareRoute && <Header />}
+      <main className="flex-1">
+        <ErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/rankings" element={<Rankings />} />
+          <Route path="/rankings/:platform" element={<Rankings />} />
+          <Route path="/compare" element={<Compare />} />
+          <Route path="/youtube/money-calculator" element={<Calculator />} />
+          <Route path="/live/:platform/:username" element={<LiveCount />} />
+          <Route path="/s/:platform/:username" element={<ShareProfile />} />
+          <Route path="/:platform/:username" element={<CreatorProfile />} />
+          <Route path="/auth/reset" element={<ResetPassword />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/refunds" element={<Refunds />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/admin" element={<BlogAdmin />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+        </Routes>
+        </Suspense>
+        </ErrorBoundary>
+      </main>
+      {!isShareRoute && <Footer />}
+    </div>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <SubscriptionProvider>
-      <div className="min-h-screen bg-gray-900 text-white flex flex-col">
-        <RouteChangeTracker />
-        <ScrollToTop />
-        <BackToTop />
-        <Header />
-        <main className="flex-1">
-          <ErrorBoundary>
-          <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/rankings" element={<Rankings />} />
-            <Route path="/rankings/:platform" element={<Rankings />} />
-            <Route path="/compare" element={<Compare />} />
-            <Route path="/youtube/money-calculator" element={<Calculator />} />
-            <Route path="/live/:platform/:username" element={<LiveCount />} />
-            <Route path="/:platform/:username" element={<CreatorProfile />} />
-            <Route path="/auth/reset" element={<ResetPassword />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/support" element={<Support />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/refunds" element={<Refunds />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/admin" element={<BlogAdmin />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-          </Routes>
-          </Suspense>
-          </ErrorBoundary>
-        </main>
-        <Footer />
-      </div>
+        <LayoutWrapper />
       </SubscriptionProvider>
     </AuthProvider>
   );

@@ -10,6 +10,7 @@ const FEATURE_MESSAGES = {
   history: "Unlock more stat history with a paid plan.",
   export:  "CSV export is available on Sub and Mod plans.",
   saves:   "You've hit the saved comparisons limit for your plan.",
+  share:   "Shareable profile links are a Mod feature. Generate a clean, no-nav link to any creator's stats.",
   default: "Unlock more features by upgrading your plan.",
 };
 
@@ -62,7 +63,7 @@ const TIERS = [
       'CSV export (bulk)',
       'No ads',
       '1 featured listing/month',
-      'White-label profile links',
+      'Shareable profile links',
     ],
     cta: 'Upgrade to Mod',
     priceKey: 'mod',
