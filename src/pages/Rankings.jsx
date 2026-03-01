@@ -289,7 +289,7 @@ function RankingsOverview() {
                           );
                         });
                         return items;
-                      })()
+                      })()}
                     </div>
 
                     {/* View Full Rankings Button */}
