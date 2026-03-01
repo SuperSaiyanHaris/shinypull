@@ -142,6 +142,7 @@ export default async function handler(req, res) {
         .select('id', { count: 'exact', head: true })
         .eq('purchased_by_user_id', user.id)
         .eq('is_mod_free', true)
+        .eq('status', 'active')
         .gte('created_at', startOfMonth.toISOString());
       if (count > 0) {
         return res.status(400).json({ error: 'Free listing already used this month' });

@@ -78,7 +78,7 @@ export default function Account() {
       .from('featured_listings')
       .select('id, platform, status, active_from, active_until, is_mod_free, creators(display_name, username, profile_image, platform)')
       .eq('purchased_by_user_id', user.id)
-      .neq('status', 'pending')
+      .eq('status', 'active')
       .order('created_at', { ascending: false });
     setFeaturedListings(data || []);
   }, [user]);

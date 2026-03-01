@@ -589,10 +589,10 @@ function PlatformRankings({ urlPlatform }) {
                     to={`/${creator.platform}/${creator.username}`}
                     className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-amber-900/30 bg-amber-950/10 hover:bg-amber-950/20 transition-colors group"
                   >
-                    {/* Sponsored badge instead of rank */}
-                    <div className="col-span-2 md:col-span-1">
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-900/30 text-amber-400">
-                        <Megaphone className="w-3.5 h-3.5" />
+                    {/* "Ad" badge in rank column — always visible on mobile and desktop */}
+                    <div className="col-span-2 md:col-span-1 flex items-center">
+                      <span className="inline-flex items-center px-2 py-1 rounded-lg bg-amber-900/40 border border-amber-800/50 text-amber-400 text-xs font-bold tracking-wide">
+                        Ad
                       </span>
                     </div>
 
@@ -610,7 +610,7 @@ function PlatformRankings({ urlPlatform }) {
                           <p className="font-semibold text-gray-100 truncate group-hover:text-amber-400 transition-colors">
                             {creator.display_name}
                           </p>
-                          <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20 flex-shrink-0">
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20 flex-shrink-0">
                             Sponsored
                           </span>
                         </div>
