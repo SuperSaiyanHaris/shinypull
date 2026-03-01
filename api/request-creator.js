@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { platform, username } = req.body;
+    const { platform, username, instant } = req.body;
     // userId intentionally not accepted from client — prevents spoofing
 
     // Validate required fields
@@ -29,9 +29,9 @@ export default async function handler(req, res) {
     }
 
     // Validate platform
-    const validPlatforms = ['tiktok', 'youtube', 'twitch', 'kick'];
+    const validPlatforms = instant ? ['tiktok'] : ['tiktok', 'youtube', 'twitch', 'kick'];
     if (!validPlatforms.includes(platform)) {
-      return res.status(400).json({ error: 'Invalid platform' });
+      return res.status(400).json({ error: instant ? 'Instant lookup is only supported for TikTok' : 'Invalid platform' });
     }
 
     // Normalize username: strip @, remove spaces/special chars, lowercase
@@ -65,11 +65,84 @@ export default async function handler(req, res) {
       .single();
 
     if (existingCreator) {
+      if (instant) {
+        // Return full creator object so the caller can immediately select them
+        const { data: fullCreator } = await supabase
+          .from('creators')
+          .select('id, username, display_name, profile_image, platform')
+          .eq('id', existingCreator.id)
+          .single();
+        return res.status(200).json({ success: true, creator: fullCreator });
+      }
       return res.status(200).json({
         exists: true,
         message: 'This creator is already in our database!',
         username: existingCreator.username
       });
+    }
+
+    // Instant TikTok lookup — scrape the profile now and insert immediately
+    if (instant && platform === 'tiktok') {
+      const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      let ttResponse;
+      try {
+        ttResponse = await fetch(`https://www.tiktok.com/@${normalized}`, {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': BROWSER_UA,
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+          },
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      if (!ttResponse.ok) {
+        return res.status(404).json({ error: `TikTok profile not found. Check the username and try again.` });
+      }
+
+      const html = await ttResponse.text();
+      const scriptMatch = html.match(/<script\s+id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([\s\S]*?)<\/script>/);
+      if (!scriptMatch) {
+        return res.status(404).json({ error: 'Could not load TikTok profile. Try again in a moment.' });
+      }
+
+      let ttData;
+      try { ttData = JSON.parse(scriptMatch[1]); } catch {
+        return res.status(500).json({ error: 'Could not parse TikTok profile data.' });
+      }
+
+      const userInfo = ttData?.['__DEFAULT_SCOPE__']?.['webapp.user-detail']?.['userInfo'];
+      if (!userInfo?.user || !userInfo?.stats) {
+        return res.status(404).json({ error: 'TikTok user not found. Double-check the username.' });
+      }
+
+      const u = userInfo.user;
+      const displayName = u.nickname || normalized;
+
+      const { data: newCreator, error: upsertError } = await supabase
+        .from('creators')
+        .upsert({
+          platform: 'tiktok',
+          platform_id: u.id || normalized,
+          username: u.uniqueId || normalized,
+          display_name: displayName,
+          profile_image: u.avatarLarger || u.avatarMedium || null,
+          description: u.signature || '',
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'platform,platform_id' })
+        .select('id, username, display_name, profile_image, platform')
+        .single();
+
+      if (upsertError) {
+        console.error('Failed to upsert TikTok creator:', upsertError);
+        return res.status(500).json({ error: 'Failed to save creator. Try again.' });
+      }
+
+      return res.status(200).json({ success: true, creator: newCreator });
     }
 
     // Check if there's already a pending request for this creator

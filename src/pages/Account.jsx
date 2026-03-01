@@ -41,6 +41,7 @@ const TABS = [
 
 const LISTING_PLATFORMS = ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky'];
 const PLATFORM_LABELS = { youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky' };
+const PLATFORM_PILL_ACTIVE = { youtube: 'bg-red-600', tiktok: 'bg-pink-600', twitch: 'bg-purple-600', kick: 'bg-green-600', bluesky: 'bg-sky-500' };
 
 export default function Account() {
   const { user, signOut } = useAuth();
@@ -75,6 +76,8 @@ export default function Account() {
   const [alreadyListed, setAlreadyListed] = useState(false);
   const [purchasingListing, setPurchasingListing] = useState(false);
   const [activatingFree, setActivatingFree] = useState(false);
+  const [tikTokAdding, setTikTokAdding] = useState(false);
+  const [tikTokAddError, setTikTokAddError] = useState('');
 
   const loadFeaturedListings = useCallback(async () => {
     if (!user) return;
@@ -141,6 +144,26 @@ export default function Account() {
       .gt('active_until', now)
       .limit(1);
     setAlreadyListed(!!(data && data.length > 0));
+  };
+
+  const handleTikTokInstantAdd = async () => {
+    if (!listingQuery.trim()) return;
+    setTikTokAdding(true);
+    setTikTokAddError('');
+    try {
+      const res = await fetch('/api/request-creator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: 'tiktok', username: listingQuery.trim(), instant: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not find that TikTok account.');
+      if (data.creator) await handleSelectCreator(data.creator);
+    } catch (err) {
+      setTikTokAddError(err.message || 'Could not find that TikTok account.');
+    } finally {
+      setTikTokAdding(false);
+    }
   };
 
   const handleActivateModFree = async () => {
@@ -560,10 +583,11 @@ export default function Account() {
                               setListingQuery('');
                               setListingResults([]);
                               setAlreadyListed(false);
+                              setTikTokAddError('');
                             }}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                               listingPlatform === p
-                                ? 'bg-amber-600 text-white'
+                                ? `${PLATFORM_PILL_ACTIVE[p]} text-white`
                                 : 'bg-gray-800 text-gray-400 hover:text-gray-200 border border-gray-700'
                             }`}
                           >
@@ -592,7 +616,7 @@ export default function Account() {
                           />
                           {listingQuery && (
                             <button
-                              onClick={() => { setListingQuery(''); setSelectedCreator(null); setListingResults([]); setAlreadyListed(false); }}
+                              onClick={() => { setListingQuery(''); setSelectedCreator(null); setListingResults([]); setAlreadyListed(false); setTikTokAddError(''); }}
                               className="text-gray-500 hover:text-gray-300"
                             >
                               <X className="w-3.5 h-3.5" />
@@ -621,6 +645,24 @@ export default function Account() {
                           </div>
                         )}
                       </div>
+
+                      {/* TikTok: not in DB — offer instant lookup */}
+                      {listingPlatform === 'tiktok' && listingQuery.trim().length >= 2 && !listingSearching && listingResults.length === 0 && !selectedCreator && (
+                        <div className="flex items-center gap-3 px-1">
+                          <p className="text-xs text-gray-500 flex-1 min-w-0">
+                            Not in our database. Add <span className="text-gray-300 font-medium">@{listingQuery.trim()}</span> directly.
+                          </p>
+                          <button
+                            onClick={handleTikTokInstantAdd}
+                            disabled={tikTokAdding}
+                            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors"
+                          >
+                            {tikTokAdding && <Loader className="w-3 h-3 animate-spin" />}
+                            {tikTokAdding ? 'Looking up...' : 'Add'}
+                          </button>
+                        </div>
+                      )}
+                      {tikTokAddError && <p className="text-xs text-red-400 px-1">{tikTokAddError}</p>}
 
                       {/* Selected creator card */}
                       {selectedCreator && (
