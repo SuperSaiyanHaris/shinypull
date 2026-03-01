@@ -19,6 +19,7 @@
 
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, getClientIdentifier } from './_ratelimit.js';
 
 const PRICE_IDS = {
   sub: process.env.STRIPE_SUB_PRICE_ID,
@@ -26,9 +27,30 @@ const PRICE_IDS = {
   featured: process.env.STRIPE_FEATURED_BASIC_PRICE_ID,
 };
 
+const VALID_PLATFORMS = new Set(['youtube', 'tiktok', 'twitch', 'kick', 'bluesky']);
+const ALLOWED_ORIGINS = new Set(['https://shinypull.com', 'http://localhost:3000']);
+
+function isSafeReturnUrl(url, origin) {
+  if (!url) return true;
+  try {
+    const parsed = new URL(url);
+    // Must be same host as our site or the request origin
+    return parsed.origin === 'https://shinypull.com' || parsed.origin === origin;
+  } catch {
+    return false; // relative URLs are fine; malformed URLs are rejected
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limit: 10 checkout attempts per IP per minute
+  const clientId = getClientIdentifier(req);
+  const rateCheck = checkRateLimit(`checkout:${clientId}`, 10, 60000);
+  if (!rateCheck.allowed) {
+    return res.status(429).json({ error: 'Too many requests. Try again in a minute.' });
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -53,6 +75,17 @@ export default async function handler(req, res) {
     const { priceKey, returnUrl, creatorId, platform } = req.body;
     if (!priceKey || (!PRICE_IDS[priceKey] && priceKey !== 'featured-free')) {
       return res.status(400).json({ error: 'Invalid price key' });
+    }
+
+    // Validate returnUrl to prevent open redirects
+    const origin = req.headers.origin || 'https://shinypull.com';
+    if (returnUrl && !isSafeReturnUrl(returnUrl, origin)) {
+      return res.status(400).json({ error: 'Invalid return URL' });
+    }
+
+    // Validate platform is one of our supported values (when provided)
+    if (platform && !VALID_PLATFORMS.has(platform)) {
+      return res.status(400).json({ error: 'Invalid platform' });
     }
 
     // Mod free featured listing — no Stripe payment, server-side only
@@ -136,7 +169,6 @@ export default async function handler(req, res) {
         .eq('id', user.id);
     }
 
-    const origin = req.headers.origin || 'https://shinypull.com';
     let sessionMetadata = { supabase_user_id: user.id };
     let successUrl = (returnUrl || `${origin}/account`) + '?upgrade=success';
     let cancelUrl = `${origin}/pricing`;
