@@ -124,33 +124,40 @@ function RankingsOverview() {
     const loadAll = async () => {
       setLoading(true);
       try {
-        const [rankResults, sponsoredResults] = await Promise.all([
-          Promise.all(platforms.map(async (p) => {
+        // Rankings are the critical content — show them first
+        const rankResults = await Promise.all(
+          platforms.map(async (p) => {
             try {
               const data = await getRankedCreators(p.id, 'subscribers', 10);
               return { platform: p.id, data };
             } catch {
               return { platform: p.id, data: [] };
             }
-          })),
-          Promise.all(platforms.map(async (p) => {
-            try {
-              const listings = await getFeaturedListings(p.id);
-              return { platform: p.id, listings };
-            } catch {
-              return { platform: p.id, listings: [] };
-            }
-          })),
-        ]);
+          })
+        );
         const map = {};
         rankResults.forEach(r => { map[r.platform] = r.data; });
         setPlatformData(map);
-        const sMap = {};
-        sponsoredResults.forEach(r => { sMap[r.platform] = r.listings; });
-        setSponsoredByPlatform(sMap);
       } finally {
         setLoading(false);
       }
+
+      // Featured listings load in the background — non-blocking.
+      // They're cached after first load so this is near-instant on repeat visits.
+      Promise.all(
+        platforms.map(async (p) => {
+          try {
+            const listings = await getFeaturedListings(p.id);
+            return { platform: p.id, listings };
+          } catch {
+            return { platform: p.id, listings: [] };
+          }
+        })
+      ).then(results => {
+        const sMap = {};
+        results.forEach(r => { sMap[r.platform] = r.listings; });
+        setSponsoredByPlatform(sMap);
+      });
     };
     loadAll();
   }, []);

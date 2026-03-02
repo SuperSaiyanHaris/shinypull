@@ -304,12 +304,12 @@ async function _fetchRankings(platform, rankType, limit) {
   }));
 }
 
-/**
- * Get active featured listings for a platform.
- * Returns listings ordered by created_at ascending — first come, first served.
- * Earliest listing gets the best slot (position 15), later ones fill every 5th row after.
- */
-export async function getFeaturedListings(platform) {
+// Module-level listings cache — same SWR pattern as rankings.
+// Featured listings change very infrequently (only on create/expire), so 5-min TTL is safe.
+const _listingsCache = new Map(); // key (platform) → { data, ts }
+const LISTINGS_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function _fetchFeaturedListings(platform) {
   const now = new Date().toISOString();
   const { data, error } = await supabase
     .from('featured_listings')
@@ -320,6 +320,30 @@ export async function getFeaturedListings(platform) {
     .order('created_at', { ascending: true });
   if (error) throw error;
   return data || [];
+}
+
+/**
+ * Get active featured listings for a platform.
+ * Returns listings ordered by created_at ascending — first come, first served.
+ * Earliest listing gets the best slot (position 15), later ones fill every 5th row after.
+ * Cached with stale-while-revalidate — instant on subsequent visits.
+ */
+export async function getFeaturedListings(platform) {
+  const hit = _listingsCache.get(platform);
+  const now = Date.now();
+
+  if (hit) {
+    if (now - hit.ts > LISTINGS_TTL) {
+      _fetchFeaturedListings(platform)
+        .then(data => _listingsCache.set(platform, { data, ts: Date.now() }))
+        .catch(() => {});
+    }
+    return hit.data;
+  }
+
+  const data = await _fetchFeaturedListings(platform);
+  _listingsCache.set(platform, { data, ts: now });
+  return data;
 }
 
 /**
