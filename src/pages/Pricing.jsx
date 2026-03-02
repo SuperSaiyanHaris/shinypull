@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, X, Zap, Crown, ArrowRight, Star } from 'lucide-react';
+import { Check, X, Zap, Crown, ArrowRight, Star, Info } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
@@ -35,9 +35,9 @@ const TIERS = [
     features: [
       'Follow up to 100 creators',
       'Compare up to 5 creators',
-      '1 year of stat history',
-      '20 saved comparisons',
-      'CSV export for any creator',
+      { text: '1 year of stat history', tip: 'See charts and data going back 365 days for any creator you view on ShinyPull.' },
+      { text: '20 saved comparisons', tip: 'Save any side-by-side creator comparison and pull it back up from your dashboard anytime.' },
+      { text: 'CSV export for any creator', tip: "Download a creator's full stat history as a spreadsheet. Includes dates, follower counts, views, and more." },
       'No ads',
     ],
     monthly: { price: '$6',  note: '/month', key: 'sub' },
@@ -52,12 +52,12 @@ const TIERS = [
     features: [
       'Unlimited follows',
       'Compare up to 10 creators',
-      'Full history (everything we have)',
+      { text: 'Full history (everything we have)', tip: 'Every data point ever collected for that creator, going back to when we first started tracking them.' },
       'Unlimited saved comparisons',
-      'Bulk CSV export',
+      { text: 'Bulk CSV export', tip: 'Export stats for multiple creators at once straight from the compare page.' },
       'No ads',
-      '1 free featured listing/month',
-      'Shareable profile links',
+      { text: '1 free featured listing/month', tip: 'Feature one creator in our rankings each month at no extra cost. Same $49/mo placement, included in your plan.' },
+      { text: 'Shareable profile links', tip: 'A clean, ad-free stats page for any creator. Copy the link or embed it as an iframe in Notion, client decks, or anywhere.' },
     ],
     monthly: { price: '$20',  note: '/month', key: 'mod' },
     annual:  { price: '$200', note: '/year',  equiv: '$17/mo billed annually', savings: 'Save $40', key: 'mod_annual' },
@@ -86,6 +86,18 @@ const FAQS = [
   {
     q: "What are saved comparisons?",
     a: "When you compare creators side by side, you can save that comparison to revisit later. Each saved comparison is one slot. Lurker gets 3, Sub gets 20, Mod gets unlimited.",
+  },
+  {
+    q: "How does CSV export work?",
+    a: "On any creator's profile, hit the Export button to download their full stat history as a .csv file. You get date, follower or subscriber counts, views, and any other tracked metrics. Sub exports one creator at a time. Mod can export in bulk from the compare page.",
+  },
+  {
+    q: "What are shareable profile links?",
+    a: "A stripped-down version of any creator's stats page. No header, no ads, no nav. Mod users get a clean link and an iframe embed code. Drop it in a client deck, a Notion page, or anywhere that accepts iframes.",
+  },
+  {
+    q: "What's the free featured listing on Mod?",
+    a: "Each month, Mod subscribers can feature one creator in our rankings at no extra cost. It's the same basic listing slot ($49/mo value), included in your plan. Manage it from your Account page under the Listings tab.",
   },
   {
     q: "Do annual plans auto-renew?",
@@ -271,12 +283,24 @@ export default function Pricing() {
 
                   {/* Features */}
                   <ul className="space-y-2.5 flex-1 mb-8">
-                    {t.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
-                        <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${colors.check}`} />
-                        {f}
-                      </li>
-                    ))}
+                    {t.features.map((f) => {
+                      const text = typeof f === 'string' ? f : f.text;
+                      const tip = typeof f === 'object' ? f.tip : null;
+                      return (
+                        <li key={text} className="relative flex items-center gap-2.5 text-sm text-gray-300 group/tip">
+                          <Check className={`w-4 h-4 flex-shrink-0 ${colors.check}`} />
+                          <span className="flex-1">{text}</span>
+                          {tip && (
+                            <span className="relative flex-shrink-0">
+                              <Info className="w-3 h-3 text-gray-600 cursor-help" />
+                              <span className="pointer-events-none absolute right-0 bottom-6 w-56 rounded-xl bg-gray-800 border border-gray-700 px-3 py-2.5 text-xs text-gray-300 shadow-xl opacity-0 group-hover/tip:opacity-100 transition-opacity duration-150 z-30 leading-relaxed">
+                                {tip}
+                              </span>
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })}
                     {t.notIncluded?.map((f) => (
                       <li key={f} className="flex items-start gap-2.5 text-sm text-gray-600">
                         <X className="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-700" />
