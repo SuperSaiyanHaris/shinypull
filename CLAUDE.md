@@ -83,6 +83,7 @@ src/
 │   ├── Home.jsx          # Landing page with search
 │   ├── Search.jsx        # Creator search
 │   ├── Rankings.jsx      # Top creators by platform
+│   ├── Reports.jsx       # Custom reports & bulk export (Mod-only)
 │   ├── CreatorProfile.jsx # Individual creator stats
 │   ├── LiveCount.jsx     # Real-time subscriber counter
 │   ├── Compare.jsx       # Compare creators
@@ -150,6 +151,7 @@ api/                              # Vercel serverless functions
 | `/blog` | Blog | Blog listing page |
 | `/blog/:slug` | BlogPost | Individual blog post |
 | `/blog/admin` | BlogAdmin | Blog & products admin panel |
+| `/reports` | Reports | Custom reports & bulk export (Mod-only) |
 | `/about`, `/contact`, `/privacy`, `/terms` | Static | Info pages |
 
 ## Database Schema
@@ -162,6 +164,7 @@ stream_sessions (id, creator_id, stream_id, started_at, ended_at, peak_viewers, 
 viewer_samples (id, session_id, recorded_at, viewer_count, game_name)
 blog_posts (id, slug, title, description, content, category, author, image, read_time, published_at, is_published, created_at, updated_at)
 products (id, slug, name, price, badge, description, features[], image, affiliate_link, is_active, created_at, updated_at)
+saved_reports (id, user_id, name, config[jsonb], created_at, updated_at)
 ```
 
 ## Platform API Notes
@@ -520,6 +523,12 @@ All tables have RLS enabled. Here are the current policies:
   - SELECT own: `TO authenticated USING (auth.uid() = id)`
   - INSERT own: `TO authenticated WITH CHECK (auth.uid() = id)`
   - UPDATE own: `TO authenticated USING/WITH CHECK (auth.uid() = id)`
+  - Anon blocked: `TO anon USING/WITH CHECK (false)`
+
+- `saved_reports`:
+  - SELECT own: `TO authenticated USING (auth.uid() = user_id)`
+  - INSERT own: `TO authenticated WITH CHECK (auth.uid() = user_id)`
+  - DELETE own: `TO authenticated USING (auth.uid() = user_id)`
   - Anon blocked: `TO anon USING/WITH CHECK (false)`
 
 ## Agent Instructions

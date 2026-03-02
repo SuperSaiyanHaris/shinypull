@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings } from 'lucide-react';
+import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings, FileSpreadsheet } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useSubscription } from '../contexts/SubscriptionContext';
 import AuthPanel from './AuthPanel';
 import UpgradePanel from './UpgradePanel';
 
@@ -16,6 +17,7 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut, isAuthenticated } = useAuth();
+  const { tier } = useSubscription();
   const mobileMenuRef = useRef(null);
 
   // Close mobile menu on route change
@@ -169,6 +171,16 @@ export default function Header() {
                           <LayoutDashboard className="w-4 h-4" />
                           Dashboard
                         </Link>
+                        {tier === 'mod' && (
+                          <Link
+                            to="/reports"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-2 px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-gray-100 w-full transition-colors"
+                          >
+                            <FileSpreadsheet className="w-4 h-4 text-amber-400" />
+                            Reports
+                          </Link>
+                        )}
                         <Link
                           to="/account"
                           onClick={() => setUserMenuOpen(false)}
@@ -259,6 +271,16 @@ export default function Header() {
                       <LayoutDashboard className="w-5 h-5" />
                       My Dashboard
                     </Link>
+                    {tier === 'mod' && (
+                      <Link
+                        to="/reports"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors"
+                      >
+                        <FileSpreadsheet className="w-5 h-5 text-amber-400" />
+                        Reports
+                      </Link>
+                    )}
                     <Link
                       to="/account"
                       onClick={() => setMobileMenuOpen(false)}

@@ -54,7 +54,7 @@ const TIERS = [
       'Compare up to 10 creators',
       { text: 'Full history (everything we have)', tip: 'Every data point ever collected for that creator, going back to when we first started tracking them.' },
       'Unlimited saved comparisons',
-      { text: 'Bulk CSV export', tip: 'Export stats for multiple creators at once straight from the compare page.' },
+      { text: 'Custom reports & bulk export', tip: 'Build reports for any creators in our database. Pick date ranges, metrics, preview data, and export as CSV. Save report templates for one-click re-runs.' },
       'No ads',
       { text: '1 free featured listing/month', tip: 'Feature one creator in our rankings each month at no extra cost. Same $49/mo placement, included in your plan.' },
       { text: 'Shareable profile links', tip: 'A clean, ad-free stats page for any creator. Copy the link or embed it as an iframe in Notion, client decks, or anywhere.' },
@@ -76,7 +76,7 @@ const COMPARISON = [
   { feature: 'Compare creators',   lurker: '2',       sub: '5',      mod: '10' },
   { feature: 'Stat history',       lurker: '30 days', sub: '1 year', mod: 'Full' },
   { feature: 'Saved comparisons',  lurker: '3',       sub: '20',     mod: 'Unlimited' },
-  { feature: 'CSV export',         lurker: false,     sub: true,     mod: 'Bulk' },
+  { feature: 'CSV export',         lurker: false,     sub: true,     mod: 'Reports + Bulk' },
   { feature: 'No ads',             lurker: false,     sub: true,     mod: true },
   { feature: 'Shareable links',    lurker: false,     sub: false,    mod: true },
   { feature: 'Featured listing',   lurker: false,     sub: false,    mod: '1 free/month' },
@@ -89,7 +89,7 @@ const FAQS = [
   },
   {
     q: "How does CSV export work?",
-    a: "On any creator's profile, hit the Export button to download their full stat history as a .csv file. You get date, follower or subscriber counts, views, and any other tracked metrics. Sub exports one creator at a time. Mod can export in bulk from their dashboard.",
+    a: "Sub: hit the Export button on any creator's profile to download their stat history as a .csv file. Mod: you also get a dedicated Reports page where you can pull stats for any creators in our database, pick date ranges and metrics, preview the data, and export everything as a summary or detailed day-by-day CSV.",
   },
   {
     q: "What are shareable profile links?",
