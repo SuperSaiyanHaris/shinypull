@@ -89,7 +89,7 @@ const FAQS = [
   },
   {
     q: "How does CSV export work?",
-    a: "On any creator's profile, hit the Export button to download their full stat history as a .csv file. You get date, follower or subscriber counts, views, and any other tracked metrics. Sub exports one creator at a time. Mod can export in bulk from the compare page.",
+    a: "On any creator's profile, hit the Export button to download their full stat history as a .csv file. You get date, follower or subscriber counts, views, and any other tracked metrics. Sub exports one creator at a time. Mod can export in bulk from their dashboard.",
   },
   {
     q: "What are shareable profile links?",
