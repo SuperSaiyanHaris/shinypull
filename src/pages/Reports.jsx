@@ -503,7 +503,7 @@ export default function Reports() {
                   Reports is a Mod-only feature. Build custom multi-creator reports with full history access and bulk export.
                 </p>
                 <button
-                  onClick={() => openUpgradePanel('export')}
+                  onClick={() => openUpgradePanel('reports')}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-sm font-semibold transition-colors"
                 >
                   See Mod plan

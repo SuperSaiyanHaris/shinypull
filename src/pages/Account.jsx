@@ -537,12 +537,15 @@ export default function Account() {
                         {[
                           ['Follow creators', '5 max'],
                           ['Compare creators', '2 at a time'],
+                          ['Saved comparisons', '3 max'],
                           ['Stat history', '30 days'],
+                          ['Reports', 'No'],
+                          ['CSV export', 'No'],
                           ['Ads', 'Shown'],
                         ].map(([feature, value]) => (
                           <div key={feature} className="flex items-center justify-between px-4 py-3 bg-gray-800/50 rounded-xl">
                             <span className="text-sm text-gray-400">{feature}</span>
-                            <span className="text-sm font-medium text-gray-300">{value}</span>
+                            <span className={`text-sm font-medium ${value === 'No' || value === 'Shown' ? 'text-gray-500' : 'text-gray-300'}`}>{value}</span>
                           </div>
                         ))}
                       </div>
@@ -569,13 +572,19 @@ export default function Account() {
                         {[
                           ['Follow creators', TIER_LIMITS[tier].maxFollows === Infinity ? 'Unlimited' : `Up to ${TIER_LIMITS[tier].maxFollows}`],
                           ['Compare creators', `Up to ${TIER_LIMITS[tier].maxCompare}`],
+                          ['Saved comparisons', TIER_LIMITS[tier].maxSavedCompares === Infinity ? 'Unlimited' : `${TIER_LIMITS[tier].maxSavedCompares} max`],
                           ['Stat history', TIER_LIMITS[tier].historyDays === Infinity ? 'Full history' : `${TIER_LIMITS[tier].historyDays} days`],
+                          ['Reports', tier === 'mod' ? 'Yes' : 'No'],
+                          ['CSV export', tier === 'mod' ? 'Bulk' : 'Yes'],
                           ['Ads', 'None'],
-                          ...(tier === 'mod' ? [['Featured listings', '1 free/month']] : []),
+                          ...(tier === 'mod' ? [
+                            ['Shareable links', 'Yes'],
+                            ['Featured listings', '1 free/month'],
+                          ] : []),
                         ].map(([feature, value]) => (
                           <div key={feature} className="flex items-center justify-between px-4 py-3 bg-gray-800/50 rounded-xl">
                             <span className="text-sm text-gray-400">{feature}</span>
-                            <span className="text-sm font-medium text-gray-200">{value}</span>
+                            <span className={`text-sm font-medium ${value === 'No' ? 'text-gray-500' : 'text-gray-200'}`}>{value}</span>
                           </div>
                         ))}
                       </div>

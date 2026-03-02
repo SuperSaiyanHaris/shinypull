@@ -11,6 +11,7 @@ const FEATURE_MESSAGES = {
   export:  "CSV export is available on Sub and Mod plans.",
   saves:   "You've hit the saved comparisons limit for your plan.",
   share:   "Shareable profile links are a Mod feature. Generate a clean, no-nav link to any creator's stats.",
+  reports: "Reports is a Mod-only feature. Get full stat breakdowns and bulk CSV exports across all your tracked creators.",
   default: "Unlock more features by upgrading your plan.",
 };
 
