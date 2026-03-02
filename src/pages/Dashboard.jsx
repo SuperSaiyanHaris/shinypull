@@ -241,7 +241,7 @@ export default function Dashboard() {
                 'See follower counts and daily changes',
                 'Save compare setups for quick access',
                 'Track recently viewed profiles',
-                'Export followed creators to CSV',
+                'Compare creators side by side',
                 'Free forever, no credit card needed',
               ].map(f => (
                 <div key={f} className="flex items-start gap-2.5 text-sm text-gray-400">
