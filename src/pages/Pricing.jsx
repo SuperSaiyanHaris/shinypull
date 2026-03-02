@@ -110,7 +110,7 @@ export default function Pricing() {
   const { tier } = useSubscription();
   const [upgrading, setUpgrading] = useState(null);
   const [error, setError] = useState('');
-  const [annual, setAnnual] = useState(false);
+  const [annual, setAnnual] = useState(true);
   const navigate = useNavigate();
 
   function handleFeaturedClick() {

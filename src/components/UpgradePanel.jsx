@@ -84,7 +84,7 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [upgrading, setUpgrading] = useState(null);
   const [error, setError] = useState('');
-  const [annual, setAnnual] = useState(false);
+  const [annual, setAnnual] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
