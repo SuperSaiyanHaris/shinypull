@@ -200,8 +200,76 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
   return research;
 }
 
+// --- Enrichment Agent ---
+// Runs after topic selection, before writing. Surfaces real stats, tables,
+// case studies, and source URLs so the writer can weave them into the first draft.
+async function enrichmentAgent(research) {
+  console.log('📊 Enrichment Agent: gathering stats, tables, and sources...');
+
+  const response = await callWithRetry(() => anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 2048,
+    messages: [
+      {
+        role: 'user',
+        content: `You are a research enrichment specialist for ShinyPull, a creator analytics platform (YouTube, TikTok, Twitch, Kick, Bluesky stats — similar to SocialBlade).
+
+A blog post is about to be written on this topic:
+Title: ${research.suggestedTitle}
+Angle: ${research.angle}
+Key facts from source article: ${research.keyFacts.join('; ')}
+
+Your job: identify concrete supporting material that will make this post credible and visually engaging. Only include things you are confident are accurate based on your training data.
+
+1. STATS: 3-5 specific statistics with real numbers (percentages, dollar amounts, user counts). Include the publication name and URL for each. Prefer well-known industry sources (Influencer Marketing Hub, Sprout Social, Later, Digiday, eMarketer, Pew Research, etc.).
+
+2. TABLE: Is there a natural comparison table for this topic? (Tier comparisons, platform breakdowns, before/after, cost breakdowns, etc.) If yes, provide real data for 3-6 rows. If no clear table fits, set applicable to false.
+
+3. CASE STUDY: Is there a specific real brand or creator story with concrete numbers that illustrates the core point? (e.g. "Daniel Wellington: $200/creator, $220M revenue by 2015"). If yes, include it with a source URL. If not, set applicable to false.
+
+4. LINKS: 3-5 authoritative URLs to cite inline or link from relevant sentences.
+
+5. POST TYPE: Classify as one of: "data-driven" (stats and tables are the backbone), "analysis" (stats help but narrative drives it), "news" (light data, mostly event coverage), "drama" (mostly story/narrative, minimal data needed).
+
+Respond with ONLY valid JSON (no markdown fences, no explanation):
+{
+  "stats": [
+    { "fact": "statistic text with number", "source": "Publication Name", "url": "https://..." }
+  ],
+  "table": {
+    "applicable": true,
+    "caption": "what the table shows",
+    "headers": ["Col 1", "Col 2", "Col 3"],
+    "rows": [["val", "val", "val"], ["val", "val", "val"]]
+  },
+  "caseStudy": {
+    "applicable": true,
+    "brand": "Brand or creator name",
+    "story": "2-3 sentences with specific numbers and outcome",
+    "sourceUrl": "https://..."
+  },
+  "links": [
+    { "label": "anchor text", "url": "https://..." }
+  ],
+  "postType": "data-driven"
+}`,
+      },
+    ],
+  }));
+
+  try {
+    const enrichment = safeParseJSON(response.content[0].text.trim());
+    console.log(`✅ Enrichment: ${enrichment.postType} post, ${enrichment.stats.length} stats, table: ${enrichment.table.applicable}, case study: ${enrichment.caseStudy.applicable}`);
+    return enrichment;
+  } catch {
+    // If parsing fails, return a safe empty enrichment so the pipeline continues
+    console.warn('⚠️  Enrichment Agent returned invalid JSON — continuing without enrichment');
+    return { stats: [], table: { applicable: false }, caseStudy: { applicable: false }, links: [], postType: 'analysis' };
+  }
+}
+
 // --- Writer Agent ---
-async function writerAgent(research, isProductPost, products) {
+async function writerAgent(research, enrichment, isProductPost, products) {
   console.log('✍️  Writer Agent: drafting post...');
 
   const styleGuide = `MANDATORY writing style rules (violating these is a failure):
@@ -213,31 +281,48 @@ async function writerAgent(research, isProductPost, products) {
 - State opinions directly. No hedging with qualifiers.
 - Vary sentence length — mix short punchy lines with longer explanations.`;
 
+  const wordTarget = enrichment.postType === 'data-driven' ? '900-1100' : '700-900';
+
   const blogFormat = `Blog format rules:
 - Start with an intro paragraph (NO H1 title in content — title is displayed separately in the header)
 - Use ## for section headings (H2 only)
-- 700-900 words total
+- ${wordTarget} words total
 - End with a 2-3 sentence takeaway paragraph
 - No bullet lists in the intro paragraph`;
 
-  let productInstruction = '';
-  if (isProductPost && products.length > 0) {
-    const productList = products
-      .map((p) => `- "${p.name}" (slug: "${p.slug}"): ${p.description || p.name} — $${p.price || 'varies'}`)
-      .join('\n');
+  // Build the enrichment context block for the writer
+  const statsBlock = enrichment.stats.length > 0
+    ? `\nSTATISTICS TO USE (cite these inline with markdown links, bold the key number):\n${enrichment.stats.map((s) => `- **${s.fact}** ([${s.source}](${s.url}))`).join('\n')}`
+    : '';
 
-    productInstruction = `
-WEDNESDAY REQUIREMENT: This is a Wednesday post. Naturally embed the single most relevant product from our affiliate catalog somewhere in the post using the syntax {{product:slug}} on its own line. Only include it where it genuinely fits the topic. If truly none are relevant, skip it.
+  const tableBlock = enrichment.table.applicable
+    ? `\nMARKDOWN TABLE: Include this comparison table in a relevant section. Caption: "${enrichment.table.caption}"\nHeaders: ${enrichment.table.headers.join(' | ')}\nData rows:\n${enrichment.table.rows.map((r) => r.join(' | ')).join('\n')}`
+    : '';
 
-Available products:
-${productList}`;
-  }
+  const caseStudyBlock = enrichment.caseStudy.applicable
+    ? `\nCASE STUDY: Weave this into a dedicated section or as supporting evidence:\n${enrichment.caseStudy.brand}: ${enrichment.caseStudy.story}${enrichment.caseStudy.sourceUrl ? ` (source: ${enrichment.caseStudy.sourceUrl})` : ''}`
+    : '';
+
+  const linksBlock = enrichment.links.length > 0
+    ? `\nADDITIONAL LINKS to use where naturally relevant:\n${enrichment.links.map((l) => `- [${l.label}](${l.url})`).join('\n')}`
+    : '';
+
+  const visualRules = `
+Visual and data elements (mandatory for ${enrichment.postType} posts):
+- Inline links: wrap cited stats and studies in markdown [text](url) — do not leave sources uncited
+- Bold key numbers: wrap the most important statistics in **bold**
+${enrichment.table.applicable ? '- Markdown table: include the provided table in a natural section — format it with pipe syntax' : ''}
+${enrichment.caseStudy.applicable ? '- Case study: include the provided brand/creator example with its specific numbers' : ''}
+- ShinyPull plug: mention ShinyPull once near the end where it naturally fits (tracking stats, growth data, etc.)
+- Only add these elements where they genuinely strengthen the post, not as decoration`;
+
+  const enrichmentContext = `${statsBlock}${tableBlock}${caseStudyBlock}${linksBlock}`;
 
   const context = `Research context:
 - Topic: ${research.suggestedTitle}
 - Angle for our audience: ${research.angle}
-- Key facts: ${research.keyFacts.join('; ')}
-- Source: ${research.source}`;
+- Key facts from source: ${research.keyFacts.join('; ')}
+- Source publication: ${research.source}`;
 
   // Step 1: get metadata as JSON (no long string fields — avoids escaping issues)
   const metaPrompt = `You are a blog editor for ShinyPull (shinypull.com), a creator analytics platform.
@@ -267,7 +352,10 @@ Return ONLY valid JSON (no markdown fences, no explanation):
 ${styleGuide}
 
 ${blogFormat}
-${productInstruction}
+
+${visualRules}
+${enrichmentContext}
+${isProductPost && products.length > 0 ? `\nWEDNESDAY REQUIREMENT: Naturally embed the single most relevant product from our catalog using {{product:slug}} on its own line. Only where it genuinely fits.\n\nAvailable products:\n${products.map((p) => `- "${p.name}" (slug: "${p.slug}"): ${p.description || p.name} — $${p.price || 'varies'}`).join('\n')}` : ''}
 
 ${context}
 Post title: ${meta.title}
@@ -494,7 +582,11 @@ async function main() {
   await sleep(1000);
   const research = await researchAgent(articles, recentTitles);
 
-  // 2. Load products for Wednesday posts
+  // 2. Enrich: gather stats, tables, case studies, and links for the writer
+  await sleep(1500);
+  const enrichment = await enrichmentAgent(research);
+
+  // 3. Load products for Wednesday posts
   let products = [];
   if (isProductPost) {
     const { data } = await supabase.from('products').select('*').eq('is_active', true);
@@ -502,16 +594,16 @@ async function main() {
     console.log(`🛍️  Loaded ${products.length} active products for Wednesday embed`);
   }
 
-  // 3. Write
+  // 4. Write (enrichment context included in first draft — no second pass needed)
   await sleep(2000);
-  let draft = await writerAgent(research, isProductPost, products);
+  let draft = await writerAgent(research, enrichment, isProductPost, products);
 
-  // 4. Review
+  // 5. Review
   await sleep(2000);
   const review = await reviewAgent(draft);
   let rewritten = false;
 
-  // 5. Rewrite if needed (one pass only)
+  // 6. Rewrite if needed (one pass only)
   if (!review.approved) {
     await sleep(2000);
     draft = await rewriteAgent(draft, review);
@@ -521,10 +613,10 @@ async function main() {
     review.score = Math.min(review.score + 2, 10);
   }
 
-  // 6. Save draft to Supabase
+  // 7. Save draft to Supabase
   const savedPost = await saveDraft(draft);
 
-  // 7. Send email notification
+  // 8. Send email notification
   await sendNotification(savedPost, draft, review, rewritten);
 
   console.log('\n✅ Done! Draft saved and notification sent.');
