@@ -616,7 +616,7 @@ export default function CreatorProfile() {
               {/* Action Buttons - Top Right */}
               <div ref={shareRef} className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-2">
                 {/* Share button + panel */}
-                <div className="relative">
+                <div>
                   <button
                     onClick={handleShareClick}
                     className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm shadow-lg border ${
@@ -628,10 +628,11 @@ export default function CreatorProfile() {
                     <Share2 className="w-4 h-4" />
                     <span className="hidden sm:inline">Share</span>
                   </button>
+                </div>
 
                   {/* Share panel dropdown */}
                   {showSharePanel && (
-                    <div className="absolute top-full right-0 mt-2 w-80 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-4 z-30">
+                    <div className="absolute top-full right-0 mt-2 w-[min(320px,calc(100vw-2rem))] bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-4 z-30">
 
                       {/* Profile URL — everyone */}
                       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Profile URL</p>
@@ -717,7 +718,6 @@ export default function CreatorProfile() {
                       {isMod && <p className="text-xs text-gray-500">Embed works in Notion, websites, and anywhere iframes are supported.</p>}
                     </div>
                   )}
-                </div>
 
                 {/* Follow button */}
                 <button
