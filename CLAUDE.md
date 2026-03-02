@@ -332,7 +332,7 @@ STRIPE_MOD_PRICE_ID=price_...
 
 **Database columns added to `users`:** `subscription_tier`, `subscription_status`, `stripe_customer_id`, `stripe_subscription_id`
 
-**New table: `featured_listings`** — B2B sponsored slots for rankings pages (not yet implemented in UI)
+**New table: `featured_listings`** — B2B sponsored slots for rankings pages (implemented and live in Rankings UI)
 
 ---
 
