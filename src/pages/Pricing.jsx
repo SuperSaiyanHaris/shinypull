@@ -386,7 +386,7 @@ export default function Pricing() {
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
                 <Star className="w-3.5 h-3.5" />
-                For brands and agencies
+                Get noticed
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-3">
                 Featured Listings
