@@ -92,7 +92,7 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
     } else {
       setIsAnimating(false);
       setError('');
-      setAnnual(false);
+      setAnnual(true);
     }
   }, [isOpen]);
 
