@@ -656,7 +656,7 @@ export default function Reports() {
                   value={searchQuery}
                   onChange={e => handleSearch(e.target.value)}
                   placeholder="Search creators to add to report..."
-                  className="flex-1 bg-transparent text-sm text-gray-200 placeholder-gray-500 ml-3 outline-none"
+                  className="flex-1 bg-transparent text-[16px] sm:text-sm text-gray-200 placeholder-gray-500 ml-3 outline-none"
                 />
                 {searching && <Loader2 className="w-4 h-4 text-gray-500 animate-spin" />}
               </div>
@@ -801,7 +801,7 @@ export default function Reports() {
                         onChange={e => setSaveName(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && saveReport()}
                         placeholder="Report name..."
-                        className="w-44 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 placeholder-gray-500 outline-none focus:border-indigo-500"
+                        className="w-44 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-[16px] sm:text-sm text-gray-200 placeholder-gray-500 outline-none focus:border-indigo-500"
                         autoFocus
                       />
                       <button
