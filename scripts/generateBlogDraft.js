@@ -22,14 +22,22 @@ const REVIEW_SCORE_THRESHOLD = 7;
 
 // --- RSS Feeds ---
 const RSS_FEEDS = [
+  // Creator economy & platform news
   { url: 'https://www.tubefilter.com/feed/', name: 'TubeFilter' },
-  { url: 'https://www.hollywoodreporter.com/feed/', name: 'Hollywood Reporter' },
-  { url: 'https://variety.com/feed/', name: 'Variety' },
   { url: 'https://www.theverge.com/rss/creators/index.xml', name: 'The Verge (Creators)' },
   { url: 'https://www.theverge.com/rss/streaming/index.xml', name: 'The Verge (Streaming)' },
-  { url: 'https://deadline.com/feed/', name: 'Deadline' },
-  { url: 'https://streamersquare.com/feed/', name: 'StreamerSquare' },
   { url: 'https://digiday.com/feed/', name: 'Digiday' },
+  { url: 'https://streamersquare.com/feed/', name: 'StreamerSquare' },
+  // Gaming, streaming drama & culture
+  { url: 'https://www.dexerto.com/feed/', name: 'Dexerto' },
+  { url: 'https://dotesports.com/feed', name: 'Dot Esports' },
+  { url: 'https://www.kotaku.com/rss', name: 'Kotaku' },
+  // Industry / broader creator business
+  { url: 'https://influencermarketinghub.com/feed/', name: 'Influencer Marketing Hub' },
+  { url: 'https://www.socialmediaexaminer.com/feed/', name: 'Social Media Examiner' },
+  // Platform-official
+  { url: 'https://blog.youtube/rss/', name: 'YouTube Official Blog' },
+  { url: 'https://deadline.com/feed/', name: 'Deadline' },
 ];
 
 // --- Helpers ---
@@ -123,13 +131,31 @@ async function fetchArticles() {
   return articles;
 }
 
+// --- Fetch recently published post titles to avoid repeats ---
+async function fetchRecentPostTitles() {
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const { data } = await supabase
+    .from('blog_posts')
+    .select('title, published_at')
+    .gte('published_at', thirtyDaysAgo.split('T')[0])
+    .order('published_at', { ascending: false });
+  return (data || []).map((p) => p.title);
+}
+
 // --- Research Agent ---
-async function researchAgent(articles) {
+async function researchAgent(articles, recentTitles) {
   console.log('🔍 Research Agent: selecting best topic...');
+  if (recentTitles.length > 0) {
+    console.log(`   Excluding ${recentTitles.length} recently covered topics`);
+  }
 
   const articleList = articles
     .map((a, i) => `${i + 1}. [${a.source}] ${a.title}\n   ${a.description}`)
     .join('\n\n');
+
+  const recentBlock = recentTitles.length > 0
+    ? `\nALREADY COVERED in the last 30 days — do NOT select these topics or anything closely overlapping:\n${recentTitles.map((t) => `- ${t}`).join('\n')}\n`
+    : '';
 
   const response = await callWithRetry(() => anthropic.messages.create({
     model: 'claude-sonnet-4-6',
@@ -137,18 +163,20 @@ async function researchAgent(articles) {
     messages: [
       {
         role: 'user',
-        content: `You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, and Kick stats (similar to SocialBlade).
+        content: `You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky stats (similar to SocialBlade).
 
 Our audience: streamers, YouTubers, TikTokers, aspiring creators, and people into creator economy data and analytics.
-
-From the articles below, select the SINGLE most interesting and relevant topic for our audience. Prefer topics about:
+${recentBlock}
+From the articles below, select the SINGLE most interesting and relevant topic for our audience that has NOT already been covered. Prioritize recency and pick the most recent article when quality is similar. Cover a wide range of topic types — rotate between:
 - Platform policy or algorithm changes affecting creators
 - Monetization and creator economy shifts
+- Creator drama, controversies, or community moments that have broader lessons
 - Streaming and creator industry trends
 - Platform feature launches (YouTube, TikTok, Twitch, Kick)
 - Creator growth, analytics, or business strategy
+- Viral moments that reveal something interesting about the platform or creator business
 
-Avoid: celebrity gossip, movies/TV unrelated to streaming, politics, general business news.
+Avoid: celebrity gossip unrelated to the creator economy, movies/TV unrelated to streaming, politics, general business news with no creator angle.
 
 Articles:
 ${articleList}
@@ -455,12 +483,16 @@ async function main() {
   console.log(`\n🚀 Blog Draft Generator — ${isProductPost ? 'Wednesday (product post)' : 'Standard post'}`);
   console.log('='.repeat(60));
 
-  // 1. Research: fetch and select best article
-  const articles = await fetchArticles();
+  // 1. Research: fetch articles + existing post titles for deduplication
+  const [articles, recentTitles] = await Promise.all([
+    fetchArticles(),
+    fetchRecentPostTitles(),
+  ]);
   if (articles.length === 0) throw new Error('No articles fetched from any RSS feed');
+  console.log(`📋 ${recentTitles.length} recent posts loaded for deduplication`);
 
   await sleep(1000);
-  const research = await researchAgent(articles);
+  const research = await researchAgent(articles, recentTitles);
 
   // 2. Load products for Wednesday posts
   let products = [];
