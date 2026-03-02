@@ -108,6 +108,10 @@ const FAQS = [
     a: "You'll see an upgrade prompt when you try to follow a 6th creator. Your existing follows stay put. Upgrade to Sub for 100 follows or Mod for unlimited.",
   },
   {
+    q: "Are featured listings marked as ads?",
+    a: "Yes. Featured listings appear with a 'Sponsored' label in rankings so visitors know they're paid placements. This is standard practice and required by FTC guidelines.",
+  },
+  {
     q: "Can I cancel anytime?",
     a: "Yes. Cancel from your Account page and you keep access until the end of your billing period. No hidden fees.",
   },
@@ -392,7 +396,7 @@ export default function Pricing() {
                 Featured Listings
               </h2>
               <p className="text-gray-400 max-w-xl mx-auto text-base">
-                Get a creator in front of people actively searching for talent. Sponsored placements in rankings, clearly labeled, first come first served.
+                Get a creator in front of people actively searching for talent. Sponsored placements in rankings, first come first served.
               </p>
             </div>
 
@@ -415,7 +419,6 @@ export default function Pricing() {
                     'Appears starting at rank 15, every 5 rows',
                     'Works across Top 50, 100, and 500',
                     'All platforms supported',
-                    'Clearly labeled as sponsored',
                     'Cancel anytime',
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
@@ -454,7 +457,6 @@ export default function Pricing() {
                     'Appears between ranks 4-5 and 9-10',
                     'Only 2 slots available per platform',
                     'Highest visibility placement on the page',
-                    'Clearly labeled as sponsored',
                     'Cancel anytime',
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">

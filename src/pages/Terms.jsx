@@ -235,6 +235,15 @@ export default function Terms() {
                 </p>
               </Section>
 
+              <Section title="Sponsored Content Disclosure">
+                <p className="mb-4">
+                  ShinyPull offers paid featured listing placements in our creator rankings pages. These placements are clearly labeled as "Sponsored" so visitors can distinguish them from organic rankings.
+                </p>
+                <p>
+                  Sponsored listings do not influence organic ranking positions. Rankings are based solely on subscriber and follower counts collected from public platform data.
+                </p>
+              </Section>
+
               <Section title="Amazon Associates Disclosure">
                 <p className="mb-4">
                   ShinyPull is a participant in the Amazon Services LLC Associates Program, an affiliate
