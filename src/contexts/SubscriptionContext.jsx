@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 
@@ -79,6 +79,23 @@ export function SubscriptionProvider({ children }) {
 
   const limits = TIER_LIMITS[tier] || TIER_LIMITS.lurker;
 
+  const refresh = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('subscription_tier, subscription_status')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (!error && data) {
+        setTier(data.subscription_tier || 'lurker');
+        setStatus(data.subscription_status || 'active');
+      }
+    } catch {
+      // ignore
+    }
+  }, [user]);
+
   function openUpgradePanel(feature, context) {
     window.dispatchEvent(new CustomEvent('openUpgradePanel', {
       detail: { feature, context },
@@ -91,6 +108,7 @@ export function SubscriptionProvider({ children }) {
     loading,
     ...limits,
     openUpgradePanel,
+    refresh,
   };
 
   return (

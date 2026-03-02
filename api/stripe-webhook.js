@@ -84,6 +84,18 @@ export default async function handler(req, res) {
         const userId = session.metadata?.supabase_user_id;
         if (!creatorId || !platform || !userId) break; // not a featured listing checkout
 
+        // Idempotency guard: Stripe retries events on 5xx — prevent duplicate rows
+        if (session.subscription) {
+          const { count: existing } = await supabase
+            .from('featured_listings')
+            .select('id', { count: 'exact', head: true })
+            .eq('stripe_subscription_id', session.subscription);
+          if (existing > 0) {
+            console.log(`Skipping duplicate checkout.session.completed for subscription ${session.subscription}`);
+            break;
+          }
+        }
+
         const placementTier = session.metadata?.featuredPlacementTier || 'basic';
         const activeFrom = new Date();
         const activeUntil = new Date(activeFrom);
@@ -196,7 +208,26 @@ export default async function handler(req, res) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object;
         const customerId = invoice.customer;
+        const failedSubscriptionId = invoice.subscription;
 
+        // If the failed invoice belongs to a featured listing subscription, cancel the listing
+        if (failedSubscriptionId) {
+          const { count: featuredCount } = await supabase
+            .from('featured_listings')
+            .select('id', { count: 'exact', head: true })
+            .eq('stripe_subscription_id', failedSubscriptionId)
+            .eq('status', 'active');
+          if (featuredCount > 0) {
+            await supabase
+              .from('featured_listings')
+              .update({ status: 'canceled' })
+              .eq('stripe_subscription_id', failedSubscriptionId);
+            console.log(`Canceled featured listing for failed payment on subscription ${failedSubscriptionId}`);
+            break;
+          }
+        }
+
+        // Tier subscription payment failed — remove access immediately (no grace period)
         const { data: user } = await supabase
           .from('users')
           .select('id')
@@ -207,10 +238,18 @@ export default async function handler(req, res) {
 
         await supabase
           .from('users')
-          .update({ subscription_status: 'past_due' })
+          .update({ subscription_tier: 'lurker', subscription_status: 'past_due' })
           .eq('id', user.id);
 
-        console.log(`Marked user ${user.id} as past_due`);
+        // Cancel any mod-free featured listings — perk no longer valid
+        await supabase
+          .from('featured_listings')
+          .update({ status: 'canceled' })
+          .eq('purchased_by_user_id', user.id)
+          .eq('is_mod_free', true)
+          .eq('status', 'active');
+
+        console.log(`Downgraded user ${user.id} to Lurker (payment failed)`);
         break;
       }
 

@@ -9,6 +9,16 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
+function isSafeReturnUrl(url, origin) {
+  if (!url) return true;
+  try {
+    const parsed = new URL(url);
+    return parsed.origin === 'https://shinypull.com' || parsed.origin === origin;
+  } catch {
+    return false;
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -51,6 +61,10 @@ export default async function handler(req, res) {
 
     const { returnUrl } = req.body;
     const origin = req.headers.origin || 'https://shinypull.com';
+
+    if (returnUrl && !isSafeReturnUrl(returnUrl, origin)) {
+      return res.status(400).json({ error: 'Invalid return URL' });
+    }
 
     const session = await stripe.billingPortal.sessions.create({
       customer: userData.stripe_customer_id,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   User, Mail, Lock, Calendar, Star, CheckCircle, AlertCircle,
@@ -45,7 +45,7 @@ const PLATFORM_PILL_ACTIVE = { youtube: 'bg-red-600', tiktok: 'bg-pink-600', twi
 
 export default function Account() {
   const { user, signOut } = useAuth();
-  const { tier, status: subStatus } = useSubscription();
+  const { tier, status: subStatus, refresh: refreshTier } = useSubscription();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(() => {
     const tab = searchParams.get('tab');
@@ -102,6 +102,59 @@ export default function Account() {
     getFollowedCreators(user.id).then(list => setFollowCount(list.length)).catch(() => {});
     loadFeaturedListings();
   }, [user, loadFeaturedListings]);
+
+  // Post-payment: poll for tier/listing changes after Stripe redirects back
+  const initialTierRef = useRef(null);
+  const pollTimerRef = useRef(null);
+
+  useEffect(() => {
+    const isUpgrade = searchParams.get('upgrade') === 'success';
+    const isFeatured = searchParams.get('featured') === 'success';
+    if (!isUpgrade && !isFeatured) return;
+
+    window.history.replaceState({}, '', '/account');
+
+    if (isFeatured) {
+      // Featured listing: reload listings after short delay for webhook to land
+      setTimeout(() => {
+        loadFeaturedListings();
+        setActiveTab('listings');
+        setToast({ message: 'Featured listing activated. Your creator will appear in rankings shortly.', type: 'success' });
+      }, 2000);
+      return;
+    }
+
+    // Upgrade: poll until tier changes (webhook is async)
+    initialTierRef.current = tier;
+    let attempts = 0;
+    const MAX_ATTEMPTS = 8;
+
+    function poll() {
+      refreshTier().then(() => {
+        attempts++;
+        if (attempts < MAX_ATTEMPTS) {
+          pollTimerRef.current = setTimeout(poll, 2000);
+        } else {
+          setToast({ message: "Upgrade complete! Refresh if your plan doesn't update.", type: 'success' });
+          initialTierRef.current = null;
+        }
+      });
+    }
+
+    pollTimerRef.current = setTimeout(poll, 1500);
+    return () => clearTimeout(pollTimerRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Detect tier change during polling and show success toast
+  useEffect(() => {
+    if (initialTierRef.current === null) return;
+    if (tier !== initialTierRef.current) {
+      clearTimeout(pollTimerRef.current);
+      setToast({ message: `You're now on the ${TIER_DISPLAY[tier]?.label} plan. Welcome!`, type: 'success' });
+      initialTierRef.current = null;
+    }
+  }, [tier]);
 
   const modFreeUsedThisMonth = featuredListings.some(l => {
     if (!l.is_mod_free) return false;
