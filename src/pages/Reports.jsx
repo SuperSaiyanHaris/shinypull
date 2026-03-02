@@ -300,7 +300,7 @@ export default function Reports() {
         metricLabels[m] = opt.label;
       }
     }
-    header.push('Data Points', 'Profile URL');
+    header.push('Profile URL');
 
     const rows = [
       ['ShinyPull Report'],
@@ -334,7 +334,6 @@ export default function Reports() {
           row.push('');
         }
       }
-      row.push(s.dataPoints);
       row.push(`https://shinypull.com/${s.creator.platform}/${s.creator.username}`);
       rows.push(row);
     }
@@ -342,7 +341,26 @@ export default function Reports() {
     downloadCsv(rows, `shinypull-report-${now}.csv`);
   }
 
-  /* ─── detailed CSV (all data points per creator) ─── */
+  /* ─── detailed CSV (all data points per creator, platform-aware columns) ─── */
+  const PLATFORM_DETAIL_COLS = {
+    youtube:  ['Date', 'Subscribers', 'Total Views', 'Videos'],
+    tiktok:   ['Date', 'Followers', 'Likes', 'Videos'],
+    twitch:   ['Date', 'Followers', 'Hours Watched', 'Peak Viewers', 'Avg Viewers'],
+    kick:     ['Date', 'Followers', 'Hours Watched', 'Peak Viewers', 'Avg Viewers'],
+    bluesky:  ['Date', 'Followers', 'Posts'],
+  };
+
+  function getDetailRow(platform, row) {
+    switch (platform) {
+      case 'youtube':  return [row.recorded_at, row.subscribers || '', row.total_views || '', row.total_posts || ''];
+      case 'tiktok':   return [row.recorded_at, row.subscribers || '', row.total_views || '', row.total_posts || ''];
+      case 'twitch':   return [row.recorded_at, row.subscribers || '', row.hours_watched_day || '', row.peak_viewers_day || '', row.avg_viewers_day || ''];
+      case 'kick':     return [row.recorded_at, row.subscribers || '', row.hours_watched_day || '', row.peak_viewers_day || '', row.avg_viewers_day || ''];
+      case 'bluesky':  return [row.recorded_at, row.subscribers || '', row.total_posts || ''];
+      default:         return [row.recorded_at, row.subscribers || '', row.total_views || '', row.total_posts || '', row.hours_watched_day || '', row.peak_viewers_day || '', row.avg_viewers_day || ''];
+    }
+  }
+
   function exportDetailedCsv() {
     if (!reportData) return;
     const rangeLabel = DATE_RANGES.find(r => r.id === dateRange)?.label || dateRange;
@@ -356,20 +374,13 @@ export default function Reports() {
     ];
 
     for (const s of getSortedSummary()) {
-      rows.push([`--- ${s.creator.display_name || s.creator.username} (${PLATFORM_LABELS[s.creator.platform]}) ---`]);
-      rows.push(['Date', 'Subscribers/Followers', 'Views/Likes', 'Posts/Videos', 'Hours Watched', 'Peak Viewers', 'Avg Viewers']);
+      const platform = s.creator.platform;
+      rows.push([`--- ${s.creator.display_name || s.creator.username} (${PLATFORM_LABELS[platform]}) ---`]);
+      rows.push(PLATFORM_DETAIL_COLS[platform] || ['Date', 'Subscribers', 'Views', 'Posts', 'Hours Watched', 'Peak Viewers', 'Avg Viewers']);
 
       const sorted = [...s.rawRows].sort((a, b) => new Date(a.recorded_at) - new Date(b.recorded_at));
       for (const row of sorted) {
-        rows.push([
-          row.recorded_at,
-          row.subscribers || row.followers || '',
-          row.total_views || '',
-          row.total_posts || '',
-          row.hours_watched_day || '',
-          row.peak_viewers_day || '',
-          row.avg_viewers_day || '',
-        ]);
+        rows.push(getDetailRow(platform, row));
       }
       rows.push([]);
     }
@@ -904,7 +915,6 @@ export default function Reports() {
                           Avg Viewers {sortCol === 'avg_viewers_day' ? (sortAsc ? '↑' : '↓') : ''}
                         </th>
                       )}
-                      <th className="text-right py-3 px-3 text-gray-400 font-semibold">Points</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -971,9 +981,6 @@ export default function Reports() {
                             {s.avg_viewers_day ? formatNumber(s.avg_viewers_day) : '—'}
                           </td>
                         )}
-                        <td className="py-3 px-3 text-right text-gray-500 text-xs tabular-nums">
-                          {s.dataPoints}
-                        </td>
                       </tr>
                     ))}
                   </tbody>
