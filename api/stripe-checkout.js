@@ -24,6 +24,8 @@ import { checkRateLimit, getClientIdentifier } from './_ratelimit.js';
 const PRICE_IDS = {
   sub: process.env.STRIPE_SUB_PRICE_ID,
   mod: process.env.STRIPE_MOD_PRICE_ID,
+  sub_annual: process.env.STRIPE_SUB_ANNUAL_PRICE_ID,
+  mod_annual: process.env.STRIPE_MOD_ANNUAL_PRICE_ID,
   featured: process.env.STRIPE_FEATURED_BASIC_PRICE_ID,
   'featured-premium': process.env.STRIPE_FEATURED_PREMIUM_PRICE_ID,
 };

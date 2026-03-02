@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Zap, Crown, ArrowRight, Star } from 'lucide-react';
+import { Check, X, Zap, Crown, ArrowRight, Star } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,13 +22,15 @@ const TIERS = [
       'Basic search across all platforms',
       'Rankings pages',
     ],
-    notIncluded: ['No ads removed', 'No CSV export'],
+    notIncluded: [
+      'Ads displayed',
+      'No CSV export',
+      'No shareable links',
+    ],
   },
   {
     id: 'sub',
     name: 'Sub',
-    price: '$6',
-    priceNote: '/month',
     description: 'For the analytics nerd who actually tracks growth.',
     color: 'indigo',
     badge: 'Most popular',
@@ -40,13 +42,13 @@ const TIERS = [
       'CSV export for any creator',
       'No ads',
     ],
-    priceKey: 'sub',
+    monthly: { price: '$6',  note: '/month', key: 'sub' },
+    annual:  { price: '$60', note: '/year',  equiv: '$5/mo billed annually', savings: 'Save $12', key: 'sub_annual' },
+    cta: 'Upgrade to Sub',
   },
   {
     id: 'mod',
     name: 'Mod',
-    price: '$20',
-    priceNote: '/month',
     description: 'For creator managers, MCNs, and brand teams.',
     color: 'amber',
     features: [
@@ -56,10 +58,12 @@ const TIERS = [
       'Unlimited saved comparisons',
       'Bulk CSV export',
       'No ads',
-      '1 featured listing slot per month',
+      '1 free featured listing/month',
       'Shareable profile links',
     ],
-    priceKey: 'mod',
+    monthly: { price: '$20',  note: '/month', key: 'mod' },
+    annual:  { price: '$200', note: '/year',  equiv: '$17/mo billed annually', savings: 'Save $40', key: 'mod_annual' },
+    cta: 'Upgrade to Mod',
   },
 ];
 
@@ -69,26 +73,41 @@ const colorMap = {
   amber:  { ring: 'ring-amber-600',  btn: 'bg-amber-600 hover:bg-amber-500 text-white',  badge: 'bg-amber-600 text-white',  icon: 'text-amber-400',  check: 'text-amber-400',  glow: 'shadow-2xl shadow-amber-500/10',  blob: 'bg-amber-500/10 group-hover:bg-amber-500/20' },
 };
 
+const COMPARISON = [
+  { feature: 'Follows',            lurker: '5',       sub: '100',    mod: 'Unlimited' },
+  { feature: 'Compare creators',   lurker: '2',       sub: '5',      mod: '10' },
+  { feature: 'Stat history',       lurker: '30 days', sub: '1 year', mod: 'Full' },
+  { feature: 'Saved comparisons',  lurker: '3',       sub: '20',     mod: 'Unlimited' },
+  { feature: 'CSV export',         lurker: false,     sub: true,     mod: 'Bulk' },
+  { feature: 'No ads',             lurker: false,     sub: true,     mod: true },
+  { feature: 'Shareable links',    lurker: false,     sub: false,    mod: true },
+  { feature: 'Featured listing',   lurker: false,     sub: false,    mod: '1 free/month' },
+];
+
 const FAQS = [
+  {
+    q: "What are saved comparisons?",
+    a: "When you compare creators side by side, you can save that comparison to revisit later. Each saved comparison is one slot. Lurker gets 3, Sub gets 20, Mod gets unlimited.",
+  },
+  {
+    q: "Do annual plans auto-renew?",
+    a: "Yes. Annual plans renew each year. Cancel anytime from your Account page and you keep access until the end of your paid period.",
+  },
+  {
+    q: "Do you offer refunds?",
+    a: "Yes. If you're not satisfied within the first 14 days, email us and we'll refund you, no questions asked.",
+  },
   {
     q: "What happens when I hit the Lurker follow limit?",
     a: "You'll see an upgrade prompt when you try to follow a 6th creator. Your existing follows stay put. Upgrade to Sub for 100 follows or Mod for unlimited.",
   },
   {
     q: "Can I cancel anytime?",
-    a: "Yes. Cancel from your Account page and you keep access until the end of your billing period. No hidden fees, no questions.",
-  },
-  {
-    q: "What is a featured listing?",
-    a: "A sponsored spot in the rankings. Basic listings appear starting at position 15, then every 5 rows after that (15, 20, 25...). Premium listings appear between ranks 4-5 and 9-10 for maximum visibility. Slots are first come, first served. Cancel and the next advertiser moves up automatically.",
-  },
-  {
-    q: "How many premium spots are there?",
-    a: "Two per platform. Once they're filled, the next available slot opens when an existing advertiser cancels. You can see live slot availability on your Account page before purchasing.",
+    a: "Yes. Cancel from your Account page and you keep access until the end of your billing period. No hidden fees.",
   },
   {
     q: "What counts as 'full history' on Mod?",
-    a: "Every stat we've ever collected for that creator. We've been collecting daily snapshots since launch, so it grows over time.",
+    a: "Every stat we've ever collected for that creator. We collect daily snapshots so the range grows over time.",
   },
 ];
 
@@ -97,6 +116,7 @@ export default function Pricing() {
   const { tier } = useSubscription();
   const [upgrading, setUpgrading] = useState(null);
   const [error, setError] = useState('');
+  const [annual, setAnnual] = useState(false);
   const navigate = useNavigate();
 
   function handleFeaturedClick() {
@@ -144,6 +164,12 @@ export default function Pricing() {
     }
   }
 
+  function renderCell(val) {
+    if (val === true) return <Check className="w-4 h-4 text-emerald-400 mx-auto" />;
+    if (val === false) return <span className="block text-center text-gray-700">—</span>;
+    return <span className="text-gray-300 text-sm">{val}</span>;
+  }
+
   return (
     <>
       <SEO
@@ -153,7 +179,7 @@ export default function Pricing() {
 
       <div className="min-h-screen bg-[#0a0a0f]">
         {/* Hero */}
-        <div className="text-center pt-20 pb-12 px-4">
+        <div className="text-center pt-20 pb-10 px-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-sm font-semibold mb-6">
             <Zap className="w-3.5 h-3.5" />
             Simple pricing
@@ -178,12 +204,37 @@ export default function Pricing() {
           )}
         </div>
 
+        {/* Billing toggle */}
+        <div className="flex items-center justify-center gap-4 mb-10">
+          <span className={`text-sm font-medium transition-colors ${!annual ? 'text-gray-100' : 'text-gray-500'}`}>
+            Monthly
+          </span>
+          <button
+            onClick={() => setAnnual(a => !a)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${annual ? 'bg-indigo-600' : 'bg-gray-700'}`}
+          >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${annual ? 'translate-x-6' : 'translate-x-1'}`} />
+          </button>
+          <span className={`text-sm font-medium transition-colors ${annual ? 'text-gray-100' : 'text-gray-500'}`}>
+            Annual
+          </span>
+          {annual && (
+            <span className="px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full">
+              2 months free
+            </span>
+          )}
+        </div>
+
         {/* Tier cards */}
-        <div className="max-w-5xl mx-auto px-4 pb-20">
+        <div className="max-w-5xl mx-auto px-4 pb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {TIERS.map((t) => {
               const colors = colorMap[t.color];
               const isCurrent = t.id === tier;
+              const pricing = annual ? t.annual : t.monthly;
+              const priceKey = pricing?.key;
+              const displayPrice = t.id === 'lurker' ? t.price : pricing.price;
+              const displayNote = t.id === 'lurker' ? t.priceNote : pricing.note;
 
               return (
                 <div
@@ -212,9 +263,14 @@ export default function Pricing() {
                       {t.id === 'sub' && <Zap className={`w-5 h-5 ${colors.icon}`} />}
                       <h2 className="text-xl font-extrabold text-gray-100">{t.name}</h2>
                     </div>
-                    <div className="flex items-baseline gap-1 mb-3">
-                      <span className="text-4xl font-black text-gray-100">{t.price}</span>
-                      <span className="text-gray-400 text-sm">{t.priceNote}</span>
+                    <div className="flex items-baseline gap-1 mb-1">
+                      <span className="text-4xl font-black text-gray-100">{displayPrice}</span>
+                      <span className="text-gray-400 text-sm">{displayNote}</span>
+                    </div>
+                    <div className="h-5 mb-2">
+                      {t.id !== 'lurker' && annual && pricing?.equiv && (
+                        <p className="text-xs text-emerald-400">{pricing.equiv} · {pricing.savings}</p>
+                      )}
                     </div>
                     <p className="text-sm text-gray-400">{t.description}</p>
                   </div>
@@ -224,6 +280,12 @@ export default function Pricing() {
                     {t.features.map((f) => (
                       <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
                         <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${colors.check}`} />
+                        {f}
+                      </li>
+                    ))}
+                    {t.notIncluded?.map((f) => (
+                      <li key={f} className="flex items-start gap-2.5 text-sm text-gray-600">
+                        <X className="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-700" />
                         {f}
                       </li>
                     ))}
@@ -247,12 +309,12 @@ export default function Pricing() {
                     </Link>
                   ) : (
                     <button
-                      onClick={() => handleUpgradeClick(t.priceKey)}
-                      disabled={upgrading === t.priceKey}
+                      onClick={() => handleUpgradeClick(priceKey)}
+                      disabled={upgrading === priceKey}
                       className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${colors.btn}`}
                     >
-                      {upgrading === t.priceKey ? 'Redirecting...' : `Upgrade to ${t.name}`}
-                      {upgrading !== t.priceKey && <ArrowRight className="w-4 h-4" />}
+                      {upgrading === priceKey ? 'Redirecting...' : t.cta}
+                      {upgrading !== priceKey && <ArrowRight className="w-4 h-4" />}
                     </button>
                   )}
                 </div>
@@ -267,113 +329,136 @@ export default function Pricing() {
             </div>
           )}
 
-          {/* Comparison note */}
-          <p className="text-center text-sm text-gray-500 mt-8">
-            All plans include access to YouTube, TikTok, Twitch, Kick, and Bluesky stats. Billed monthly, cancel anytime.
+          {/* Guarantee */}
+          <p className="text-center text-xs text-gray-500 mt-6">
+            14-day refund, no questions asked. All plans include YouTube, TikTok, Twitch, Kick, and Bluesky. Cancel anytime.
           </p>
+
+          {/* Comparison table */}
+          <div className="mt-16">
+            <h2 className="text-xl font-extrabold text-gray-100 text-center mb-8">Compare plans</h2>
+            <div className="overflow-x-auto rounded-2xl border border-gray-800">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-800 bg-gray-900/60">
+                    <th className="text-left py-3 px-5 text-gray-400 font-semibold w-1/2">Feature</th>
+                    <th className="text-center py-3 px-4 text-gray-300 font-bold">Lurker</th>
+                    <th className="text-center py-3 px-4 text-indigo-400 font-bold">Sub</th>
+                    <th className="text-center py-3 px-4 text-amber-400 font-bold">Mod</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARISON.map((row, i) => (
+                    <tr key={row.feature} className={`border-b border-gray-800/50 ${i % 2 === 0 ? 'bg-gray-900/20' : ''}`}>
+                      <td className="py-3 px-5 text-gray-400">{row.feature}</td>
+                      <td className="py-3 px-4 text-center">{renderCell(row.lurker)}</td>
+                      <td className="py-3 px-4 text-center">{renderCell(row.sub)}</td>
+                      <td className="py-3 px-4 text-center">{renderCell(row.mod)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         {/* Featured Listings B2B */}
-        <div className="max-w-5xl mx-auto px-4 pb-24">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
-              <Star className="w-3.5 h-3.5" />
-              Advertise on ShinyPull
+        <div className="border-t border-gray-800 mt-20">
+          <div className="max-w-5xl mx-auto px-4 py-24">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
+                <Star className="w-3.5 h-3.5" />
+                For brands and agencies
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-3">
+                Featured Listings
+              </h2>
+              <p className="text-gray-400 max-w-xl mx-auto text-base">
+                Get a creator in front of people actively searching for talent. Sponsored placements in rankings, clearly labeled, first come first served.
+              </p>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-3">
-              Featured Listings
-            </h2>
-            <p className="text-gray-400 max-w-xl mx-auto text-base">
-              Get a creator in front of people actively searching for talent. Sponsored placements in rankings, clearly labeled, first come first served.
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              {/* Basic listing */}
+              <div className="group relative bg-gray-900 border border-gray-800 rounded-2xl p-7 flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:border-indigo-500/60 hover:shadow-2xl hover:shadow-indigo-500/10">
+                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/15 transition-colors duration-500" />
+                <div className="mb-5">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-full mb-4">
+                    Featured Listing
+                  </span>
+                  <div className="flex items-baseline gap-1 mb-2">
+                    <span className="text-4xl font-black text-gray-100">$49</span>
+                    <span className="text-gray-400 text-sm">/month</span>
+                  </div>
+                  <p className="text-sm text-gray-400">Your creator in sponsored rows throughout rankings. Position 15 and beyond, unlimited platforms.</p>
+                </div>
+                <ul className="space-y-2.5 flex-1 mb-8">
+                  {[
+                    'Appears starting at rank 15, every 5 rows',
+                    'Works across Top 50, 100, and 500',
+                    'All platforms supported',
+                    'Clearly labeled as sponsored',
+                    'Cancel anytime',
+                  ].map((f) => (
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
+                      <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-indigo-400" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={handleFeaturedClick}
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 bg-indigo-600 hover:bg-indigo-500 text-white"
+                >
+                  Get a listing
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Premium listing */}
+              <div className="group relative bg-amber-950/20 border border-amber-700/40 rounded-2xl p-7 flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/10">
+                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-colors duration-500" />
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold bg-amber-600 text-white whitespace-nowrap">
+                  Top 10 placement
+                </div>
+                <div className="mb-5">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold rounded-full mb-4">
+                    Premium Featured Listing
+                  </span>
+                  <div className="flex items-baseline gap-1 mb-2">
+                    <span className="text-4xl font-black text-gray-100">$149</span>
+                    <span className="text-gray-400 text-sm">/month</span>
+                  </div>
+                  <p className="text-sm text-gray-400">Your creator between the top 10. Only 2 slots exist per platform, so availability is limited.</p>
+                </div>
+                <ul className="space-y-2.5 flex-1 mb-8">
+                  {[
+                    'Appears between ranks 4-5 and 9-10',
+                    'Only 2 slots available per platform',
+                    'Highest visibility placement on the page',
+                    'Clearly labeled as sponsored',
+                    'Cancel anytime',
+                  ].map((f) => (
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
+                      <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-400" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={handleFeaturedClick}
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 bg-amber-600 hover:bg-amber-500 text-white"
+                >
+                  Get a premium listing
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <p className="text-center text-sm text-gray-500 mt-8">
+              Featured listings are managed from your Account page. Check live slot availability before purchasing.
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {/* Basic listing */}
-            <div className="group relative bg-gray-900 border border-gray-800 rounded-2xl p-7 flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:border-indigo-500/60 hover:shadow-2xl hover:shadow-indigo-500/10">
-              <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/15 transition-colors duration-500" />
-
-              <div className="mb-5">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-full mb-4">
-                  Featured Listing
-                </span>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-4xl font-black text-gray-100">$49</span>
-                  <span className="text-gray-400 text-sm">/month</span>
-                </div>
-                <p className="text-sm text-gray-400">Your creator in sponsored rows throughout rankings. Position 15 and beyond, unlimited platforms.</p>
-              </div>
-
-              <ul className="space-y-2.5 flex-1 mb-8">
-                {[
-                  'Appears starting at rank 15, every 5 rows',
-                  'Works across Top 50, 100, and 500',
-                  'All platforms supported',
-                  'Clearly labeled as sponsored',
-                  'Cancel anytime',
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
-                    <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-indigo-400" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                onClick={handleFeaturedClick}
-                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 bg-indigo-600 hover:bg-indigo-500 text-white"
-              >
-                Get a listing
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Premium listing */}
-            <div className="group relative bg-amber-950/20 border border-amber-700/40 rounded-2xl p-7 flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/10">
-              <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-colors duration-500" />
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold bg-amber-600 text-white whitespace-nowrap">
-                Top 10 placement
-              </div>
-
-              <div className="mb-5">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold rounded-full mb-4">
-                  Premium Featured Listing
-                </span>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-4xl font-black text-gray-100">$149</span>
-                  <span className="text-gray-400 text-sm">/month</span>
-                </div>
-                <p className="text-sm text-gray-400">Your creator between the top 10. Only 2 slots exist per platform, so availability is limited.</p>
-              </div>
-
-              <ul className="space-y-2.5 flex-1 mb-8">
-                {[
-                  'Appears between ranks 4-5 and 9-10',
-                  'Only 2 slots available per platform',
-                  'Highest visibility placement on the page',
-                  'Clearly labeled as sponsored',
-                  'Cancel anytime',
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
-                    <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-400" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                onClick={handleFeaturedClick}
-                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 bg-amber-600 hover:bg-amber-500 text-white"
-              >
-                Get a premium listing
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <p className="text-center text-sm text-gray-500 mt-8">
-            Featured listings are managed from your Account page. Check live slot availability before purchasing.
-          </p>
         </div>
 
         {/* FAQ */}

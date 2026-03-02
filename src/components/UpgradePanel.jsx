@@ -28,14 +28,17 @@ const TIERS = [
       '3 saved comparisons',
       'Basic search',
     ],
+    notIncluded: [
+      'Ads displayed',
+      'No CSV export',
+      'No shareable links',
+    ],
     cta: "You're on this plan",
     ctaDisabled: true,
   },
   {
     id: 'sub',
     name: 'Sub',
-    price: '$6',
-    priceNote: '/month',
     color: 'indigo',
     badge: 'Most popular',
     features: [
@@ -46,14 +49,13 @@ const TIERS = [
       'CSV export',
       'No ads',
     ],
+    monthly: { price: '$6',  note: '/month', key: 'sub' },
+    annual:  { price: '$60', note: '/year',  equiv: '$5/mo', savings: 'Save $12', key: 'sub_annual' },
     cta: 'Upgrade to Sub',
-    priceKey: 'sub',
   },
   {
     id: 'mod',
     name: 'Mod',
-    price: '$20',
-    priceNote: '/month',
     color: 'amber',
     features: [
       'Unlimited follows',
@@ -62,11 +64,12 @@ const TIERS = [
       'Unlimited saved comparisons',
       'CSV export (bulk)',
       'No ads',
-      '1 featured listing/month',
+      '1 free featured listing/month',
       'Shareable profile links',
     ],
+    monthly: { price: '$20',  note: '/month', key: 'mod' },
+    annual:  { price: '$200', note: '/year',  equiv: '$17/mo', savings: 'Save $40', key: 'mod_annual' },
     cta: 'Upgrade to Mod',
-    priceKey: 'mod',
   },
 ];
 
@@ -82,6 +85,7 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [upgrading, setUpgrading] = useState(null);
   const [error, setError] = useState('');
+  const [annual, setAnnual] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -89,6 +93,7 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
     } else {
       setIsAnimating(false);
       setError('');
+      setAnnual(false);
     }
   }, [isOpen]);
 
@@ -187,10 +192,23 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
             <p className="text-sm text-indigo-300">{message}</p>
           </div>
 
-          {/* Current tier badge */}
-          <p className="text-sm text-gray-400 mb-4">
-            You're on the <span className={`font-semibold ${TIER_DISPLAY[tier]?.color}`}>{TIER_DISPLAY[tier]?.label}</span> plan.
-          </p>
+          {/* Current tier + billing toggle row */}
+          <div className="flex items-center justify-between mb-5">
+            <p className="text-sm text-gray-400">
+              You're on the <span className={`font-semibold ${TIER_DISPLAY[tier]?.color}`}>{TIER_DISPLAY[tier]?.label}</span> plan.
+            </p>
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-medium transition-colors ${!annual ? 'text-gray-200' : 'text-gray-500'}`}>Monthly</span>
+              <button
+                onClick={() => setAnnual(a => !a)}
+                className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors duration-200 focus:outline-none ${annual ? 'bg-indigo-600' : 'bg-gray-700'}`}
+              >
+                <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow transition-transform duration-200 ${annual ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+              <span className={`text-xs font-medium transition-colors ${annual ? 'text-gray-200' : 'text-gray-500'}`}>Annual</span>
+              {annual && <span className="text-xs text-emerald-400 font-semibold">2 mo. free</span>}
+            </div>
+          </div>
 
           {/* Tier cards */}
           <div className="space-y-4">
@@ -198,6 +216,10 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
               const colors = colorMap[t.color];
               const isCurrent = t.id === tier;
               const isRecommended = (tier === 'lurker' && t.id === 'sub') || (tier === 'sub' && t.id === 'mod');
+              const pricing = annual ? t.annual : t.monthly;
+              const priceKey = pricing?.key;
+              const displayPrice = t.id === 'lurker' ? t.price : pricing.price;
+              const displayNote = t.id === 'lurker' ? t.priceNote : pricing.note;
 
               return (
                 <div
@@ -226,12 +248,15 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
                           {t.name}
                         </h3>
                       </div>
+                      {t.id !== 'lurker' && annual && pricing?.equiv && (
+                        <p className="text-xs text-emerald-400 mt-0.5">{pricing.equiv} · {pricing.savings}</p>
+                      )}
                     </div>
                     <div className="text-right">
                       <span className={`text-2xl font-black ${isCurrent ? 'text-gray-500' : 'text-gray-100'}`}>
-                        {t.price}
+                        {displayPrice}
                       </span>
-                      <span className="text-sm text-gray-400 ml-1">{t.priceNote}</span>
+                      <span className="text-sm text-gray-400 ml-1">{displayNote}</span>
                     </div>
                   </div>
 
@@ -240,6 +265,12 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
                     {t.features.map((f) => (
                       <li key={f} className="flex items-center gap-2 text-sm text-gray-300">
                         <Check className={`w-3.5 h-3.5 flex-shrink-0 ${isCurrent ? 'text-gray-600' : t.id === 'mod' ? 'text-amber-400' : 'text-indigo-400'}`} />
+                        {f}
+                      </li>
+                    ))}
+                    {t.notIncluded?.map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="w-3.5 flex-shrink-0 text-center text-gray-700 text-xs leading-none">✕</span>
                         {f}
                       </li>
                     ))}
@@ -256,11 +287,11 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
                     </button>
                   ) : (
                     <button
-                      onClick={() => handleUpgrade(t.priceKey)}
-                      disabled={upgrading === t.priceKey}
+                      onClick={() => handleUpgrade(priceKey)}
+                      disabled={upgrading === priceKey}
                       className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${colors.btn}`}
                     >
-                      {upgrading === t.priceKey ? 'Redirecting...' : t.cta}
+                      {upgrading === priceKey ? 'Redirecting...' : t.cta}
                     </button>
                   )}
                 </div>
@@ -276,7 +307,7 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
 
           {/* Assurance */}
           <p className="mt-6 text-center text-xs text-gray-500">
-            No ads on paid plans. Cancel anytime. Billed monthly via Stripe.
+            14-day refund, no questions asked. Cancel anytime. Billed via Stripe.
           </p>
         </div>
       </div>
