@@ -30,6 +30,8 @@ export const config = { api: { bodyParser: false } };
 const PRICE_TIER_MAP = {
   [process.env.STRIPE_SUB_PRICE_ID]: 'sub',
   [process.env.STRIPE_MOD_PRICE_ID]: 'mod',
+  [process.env.STRIPE_SUB_ANNUAL_PRICE_ID]: 'sub',
+  [process.env.STRIPE_MOD_ANNUAL_PRICE_ID]: 'mod',
 };
 
 const FEATURED_PRICE_IDS = new Set([
