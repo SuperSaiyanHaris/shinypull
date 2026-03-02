@@ -127,35 +127,29 @@ export default function Header() {
               </Link>
             ))}
 
-            {/* Dashboard (authenticated only) */}
-            {isAuthenticated && (
-              <Link
-                to="/dashboard"
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActive('/dashboard')
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
-                }`}
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                <span>Dashboard</span>
-              </Link>
-            )}
+            <Link
+              to="/dashboard"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActive('/dashboard')
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              <span>Dashboard</span>
+            </Link>
 
-            {/* Reports (Mod only) */}
-            {tier === 'mod' && (
-              <Link
-                to="/reports"
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActive('/reports')
-                    ? 'bg-amber-600 text-white'
-                    : 'text-amber-400 hover:bg-amber-950/40 hover:text-amber-300 border border-transparent'
-                }`}
-              >
-                <FileSpreadsheet className="w-4 h-4" />
-                <span>Reports</span>
-              </Link>
-            )}
+            <Link
+              to="/reports"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActive('/reports')
+                  ? 'bg-amber-600 text-white'
+                  : 'text-amber-400 hover:bg-amber-950/40 hover:text-amber-300 border border-transparent'
+              }`}
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Reports</span>
+            </Link>
 
             {/* Auth Section */}
             <div className="ml-4 pl-4 border-l border-gray-700">
@@ -252,37 +246,31 @@ export default function Header() {
                 </Link>
               ))}
 
-              {/* Dashboard (authenticated only) */}
-              {isAuthenticated && (
-                <Link
-                  to="/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                    isActive('/dashboard')
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
-                  }`}
-                >
-                  <LayoutDashboard className="w-5 h-5" />
-                  <span>Dashboard</span>
-                </Link>
-              )}
+              <Link
+                to="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  isActive('/dashboard')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
+                }`}
+              >
+                <LayoutDashboard className="w-5 h-5" />
+                <span>Dashboard</span>
+              </Link>
 
-              {/* Reports (Mod only) */}
-              {tier === 'mod' && (
-                <Link
-                  to="/reports"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                    isActive('/reports')
-                      ? 'bg-amber-600 text-white'
-                      : 'text-amber-400 hover:bg-amber-950/40 hover:text-amber-300 border border-transparent'
-                  }`}
-                >
-                  <FileSpreadsheet className="w-5 h-5" />
-                  <span>Reports</span>
-                </Link>
-              )}
+              <Link
+                to="/reports"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  isActive('/reports')
+                    ? 'bg-amber-600 text-white'
+                    : 'text-amber-400 hover:bg-amber-950/40 hover:text-amber-300 border border-transparent'
+                }`}
+              >
+                <FileSpreadsheet className="w-5 h-5" />
+                <span>Reports</span>
+              </Link>
 
               {/* Mobile Auth Section */}
               <div className="mt-4 pt-4 border-t border-gray-800">
