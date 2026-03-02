@@ -157,7 +157,105 @@ export default function Dashboard() {
     );
   }
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <>
+        <SEO title="Dashboard - ShinyPull" description="Track your followed creators and see their latest stats in one place." />
+        <div className="min-h-screen bg-[#0a0a0f]">
+          <div className="max-w-4xl mx-auto px-4 pt-20 pb-32">
+
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-sm font-semibold mb-6">
+                <Star className="w-3.5 h-3.5" />
+                Free with an account
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-100 mb-4">
+                Your Dashboard
+              </h1>
+              <p className="text-lg text-gray-400 max-w-xl mx-auto">
+                Follow creators, track their stats, and see everything in one place. Free to sign up.
+              </p>
+            </div>
+
+            {/* Blurred preview */}
+            <div className="relative">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0a0f]/60 backdrop-blur-sm rounded-2xl">
+                <Lock className="w-10 h-10 text-indigo-400 mb-4" />
+                <p className="text-lg font-semibold text-gray-100 mb-2">Sign in to continue</p>
+                <p className="text-sm text-gray-400 mb-6 max-w-sm text-center">
+                  Create a free account to follow creators and track their stats.
+                </p>
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent('openAuthPanel', { detail: { message: 'Sign in to access your dashboard' } }))}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold transition-colors"
+                >
+                  Sign Up / Sign In
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Fake preview */}
+              <div className="pointer-events-none select-none opacity-40">
+                <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-4 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <div className="h-4 w-32 bg-gray-700 rounded" />
+                      <div className="h-4 w-12 bg-indigo-900 rounded-full" />
+                    </div>
+                    <div className="flex gap-3">
+                      {[1, 2, 3].map(i => (
+                        <div key={i} className="h-3 w-20 bg-gray-800 rounded" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+                  <div className="flex border-b border-gray-800 px-4">
+                    {['Following', 'Saved Compares', 'Recently Viewed'].map((t, i) => (
+                      <div key={t} className={`px-4 py-3 text-sm font-medium ${i === 0 ? 'text-indigo-400 border-b-2 border-indigo-500' : 'text-gray-600'}`}>{t}</div>
+                    ))}
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/40">
+                        <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0" />
+                        <div className="flex-1">
+                          <div className="h-3.5 w-28 bg-gray-700 rounded mb-1.5" />
+                          <div className="h-3 w-16 bg-gray-800 rounded" />
+                        </div>
+                        <div className="h-4 w-16 bg-gray-700 rounded" />
+                        <div className="h-4 w-14 bg-emerald-900/60 rounded" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature list */}
+            <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+              {[
+                'Follow creators across all platforms',
+                'See follower counts and daily changes',
+                'Save compare setups for quick access',
+                'Track recently viewed profiles',
+                'Export followed creators to CSV',
+                'Free forever, no credit card needed',
+              ].map(f => (
+                <div key={f} className="flex items-start gap-2.5 text-sm text-gray-400">
+                  <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-indigo-400" />
+                  {f}
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      </>
+    );
+  }
 
   const handleBulkExport = () => {
     if (!followedCreators.length) return;
