@@ -26,7 +26,6 @@ const TIERS = [
       'Compare 2 creators',
       '30 days of history',
       '3 saved comparisons',
-      'Basic search',
     ],
     notIncluded: [
       'Ads displayed',
@@ -307,7 +306,7 @@ export default function UpgradePanel({ isOpen, onClose, feature }) {
 
           {/* Assurance */}
           <p className="mt-6 text-center text-xs text-gray-500">
-            14-day refund, no questions asked. Cancel anytime. Billed via Stripe.
+            No ads on paid plans. Cancel anytime. Billed via Stripe.
           </p>
         </div>
       </div>

@@ -19,8 +19,6 @@ const TIERS = [
       'Compare 2 creators at once',
       '30 days of stat history',
       '3 saved comparisons',
-      'Basic search across all platforms',
-      'Rankings pages',
     ],
     notIncluded: [
       'Ads displayed',
@@ -49,7 +47,7 @@ const TIERS = [
   {
     id: 'mod',
     name: 'Mod',
-    description: 'For creator managers, MCNs, and brand teams.',
+    description: 'When analytics is your job, not just your hobby.',
     color: 'amber',
     features: [
       'Unlimited follows',
@@ -92,10 +90,6 @@ const FAQS = [
   {
     q: "Do annual plans auto-renew?",
     a: "Yes. Annual plans renew each year. Cancel anytime from your Account page and you keep access until the end of your paid period.",
-  },
-  {
-    q: "Do you offer refunds?",
-    a: "Yes. If you're not satisfied within the first 14 days, email us and we'll refund you, no questions asked.",
   },
   {
     q: "What happens when I hit the Lurker follow limit?",
@@ -329,9 +323,9 @@ export default function Pricing() {
             </div>
           )}
 
-          {/* Guarantee */}
+          {/* Note */}
           <p className="text-center text-xs text-gray-500 mt-6">
-            14-day refund, no questions asked. All plans include YouTube, TikTok, Twitch, Kick, and Bluesky. Cancel anytime.
+            All plans include YouTube, TikTok, Twitch, Kick, and Bluesky. Cancel anytime.
           </p>
 
           {/* Comparison table */}
