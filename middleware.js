@@ -104,6 +104,19 @@ function getMeta(pathname, searchParams) {
     };
   }
 
+  // Static pages
+  const staticPages = {
+    '/blog':     { title: 'Blog - ShinyPull',     description: 'Creator economy insights, platform trends, and analytics tips from ShinyPull.' },
+    '/pricing':  { title: 'Pricing - ShinyPull',  description: 'Free, Sub ($6/mo), and Mod ($20/mo) plans for tracking creator stats across YouTube, TikTok, Twitch, Kick, and Bluesky.' },
+    '/dashboard':{ title: 'Dashboard - ShinyPull',description: 'Track your followed creators and see their latest stats in one place.' },
+    '/reports':  { title: 'Reports - ShinyPull',  description: 'Build custom reports and export creator stats across platforms.' },
+    '/about':    { title: 'About - ShinyPull',    description: 'ShinyPull tracks creator stats across YouTube, TikTok, Twitch, Kick, and Bluesky.' },
+    '/contact':  { title: 'Contact - ShinyPull',  description: 'Get in touch with the ShinyPull team.' },
+    '/privacy':  { title: 'Privacy Policy - ShinyPull', description: "ShinyPull's privacy policy." },
+    '/terms':    { title: 'Terms of Service - ShinyPull', description: "ShinyPull's terms of service." },
+  };
+  if (staticPages[pathname]) return staticPages[pathname];
+
   return null; // Use index.html defaults for / and other pages
 }
 
