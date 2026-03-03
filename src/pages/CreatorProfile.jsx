@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
-import { Youtube, Twitch, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star, Play, ThumbsUp, MessageCircle, Download, Lock, Share2, Check } from 'lucide-react';
+import { useParams, useLocation, Link, useNavigate } from 'react-router-dom';
+import { Youtube, Twitch, Users, Eye, Video, TrendingUp, ExternalLink, AlertCircle, Calendar, Target, Clock, Radio, Star, Play, ThumbsUp, MessageCircle, Download, Lock, Share2, Check, Scale } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
@@ -48,6 +48,7 @@ const platformUrls = {
 export default function CreatorProfile() {
   const { platform, username } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { maxFollows, historyDays, hasExport, openUpgradePanel, tier } = useSubscription();
   const [creator, setCreator] = useState(null);
@@ -615,6 +616,16 @@ export default function CreatorProfile() {
             <div className={`bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4 sm:p-6 md:p-8 mb-6 relative z-10 ${creator.bannerImage ? '-mt-16' : ''}`}>
               {/* Action Buttons - Top Right */}
               <div ref={shareRef} className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-2">
+                {/* Compare button */}
+                <button
+                  onClick={() => navigate(`/compare?creators=${platform}:${username}`)}
+                  className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm shadow-lg border bg-gray-900 border-gray-700 text-gray-300 hover:border-violet-600/60 hover:text-violet-300 hover:bg-violet-950/20"
+                  title="Compare this creator"
+                >
+                  <Scale className="w-4 h-4" />
+                  <span className="hidden sm:inline">Compare</span>
+                </button>
+
                 {/* Share button + panel */}
                 <div>
                   <button

@@ -24,7 +24,7 @@ import logger from '../lib/logger';
 
 const POPULAR_MATCHUPS = [
   { url: 'youtube:pewdiepie,youtube:mrbeast',   aName: 'PewDiePie',      bName: 'MrBeast',   aPlatform: 'youtube', bPlatform: 'youtube' },
-  { url: 'twitch:xqcow,twitch:kaicenat',        aName: 'xQc',            bName: 'Kai Cenat', aPlatform: 'twitch',  bPlatform: 'twitch'  },
+  { url: 'kick:xqc,twitch:kaicenat',            aName: 'xQc',            bName: 'Kai Cenat', aPlatform: 'kick',    bPlatform: 'twitch'  },
   { url: 'twitch:ninja,twitch:shroud',          aName: 'Ninja',          bName: 'Shroud',    aPlatform: 'twitch',  bPlatform: 'twitch'  },
   { url: 'twitch:pokimane,twitch:hasanabi',     aName: 'Pokimane',       bName: 'HasanAbi',  aPlatform: 'twitch',  bPlatform: 'twitch'  },
   { url: 'youtube:mrbeast,twitch:ninja',        aName: 'MrBeast',        bName: 'Ninja',     aPlatform: 'youtube', bPlatform: 'twitch'  },
@@ -725,17 +725,22 @@ export default function Compare() {
 
                 {/* View Full Profiles - Desktop */}
                 <div className="px-6 py-4 border-t border-gray-800 bg-gray-800/50">
-                  <div className="flex flex-wrap gap-4 justify-center">
-                    {filledCreators.map((creator) => (
-                      <Link
-                        key={creator.platformId}
-                        to={`/${creator.platform}/${creator.username}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-gray-300 hover:text-indigo-400 hover:border-indigo-700 transition-colors"
-                      >
-                        View {creator.displayName}'s profile
-                        <ArrowRight className="w-4 h-4" />
-                      </Link>
-                    ))}
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest text-center mb-3">View full profiles</p>
+                  <div className={`grid gap-2 ${filledCreators.length <= 2 ? 'grid-cols-2' : filledCreators.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
+                    {filledCreators.map((creator) => {
+                      const PlatIcon = platformConfig[creator.platform]?.icon;
+                      return (
+                        <Link
+                          key={creator.platformId}
+                          to={`/${creator.platform}/${creator.username}`}
+                          className="flex items-center gap-2 px-3 py-2.5 bg-gray-900 border border-gray-700 rounded-xl hover:border-violet-600/60 hover:bg-violet-950/10 transition-all group"
+                        >
+                          <img src={creator.profileImage} alt="" loading="lazy" className="w-7 h-7 rounded-lg flex-shrink-0" />
+                          <span className="flex-1 min-w-0 text-sm font-medium text-gray-200 truncate group-hover:text-white transition-colors">{creator.displayName}</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-gray-500 group-hover:text-violet-400 flex-shrink-0 transition-colors" />
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -751,17 +756,17 @@ export default function Compare() {
 
                 {/* View Full Profiles - Mobile */}
                 <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4">
-                  <p className="text-sm font-medium text-gray-300 mb-3">View Profiles</p>
-                  <div className="space-y-2">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">View full profiles</p>
+                  <div className="grid grid-cols-2 gap-2">
                     {filledCreators.map((creator) => (
                       <Link
                         key={creator.platformId}
                         to={`/${creator.platform}/${creator.username}`}
-                        className="flex items-center gap-3 p-3 bg-gray-800/50 hover:bg-gray-800 rounded-xl transition-colors"
+                        className="flex items-center gap-2 p-2.5 bg-gray-800/50 hover:bg-violet-950/20 hover:border-violet-600/40 border border-transparent rounded-xl transition-all group"
                       >
-                        <img src={creator.profileImage} alt="" loading="lazy" className="w-8 h-8 rounded-lg" />
-                        <span className="flex-1 font-medium text-gray-100 truncate">{creator.displayName}</span>
-                        <ArrowRight className="w-4 h-4 text-gray-300" />
+                        <img src={creator.profileImage} alt="" loading="lazy" className="w-7 h-7 rounded-lg flex-shrink-0" />
+                        <span className="flex-1 min-w-0 text-sm font-medium text-gray-200 truncate group-hover:text-white transition-colors">{creator.displayName}</span>
+                        <ArrowRight className="w-3 h-3 text-gray-500 group-hover:text-violet-400 flex-shrink-0 transition-colors" />
                       </Link>
                     ))}
                   </div>
@@ -781,39 +786,45 @@ function CreatorCard({ creator, onRemove }) {
   const Icon = config.icon;
 
   return (
-    <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-5 relative">
+    <div className="relative group/card">
       <button
-        onClick={onRemove}
-        className="absolute top-3 right-3 p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-950/30 transition-all"
+        onClick={(e) => { e.stopPropagation(); onRemove(); }}
+        className="absolute top-3 right-3 z-10 p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-950/30 transition-all"
         title="Remove"
       >
         <X className="w-4 h-4" />
       </button>
-      <div className="flex items-center gap-4 mb-4">
-        <img
-          src={creator.profileImage}
-          alt={creator.displayName}
-          className="w-16 h-16 rounded-xl object-cover"
-        />
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-gray-100 truncate">{creator.displayName}</p>
-          <p className="text-sm text-gray-300 truncate">@{creator.username}</p>
-          <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md text-xs ${config.bg} ${config.color}`}>
-            <Icon className="w-3 h-3" />
-            {creator.platform}
-          </span>
+      <Link
+        to={`/${creator.platform}/${creator.username}`}
+        className="block bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-5 hover:border-violet-500/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-200"
+      >
+        <div className="flex items-center gap-4 mb-4">
+          <img
+            src={creator.profileImage}
+            alt={creator.displayName}
+            className="w-16 h-16 rounded-xl object-cover"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-gray-100 truncate">{creator.displayName}</p>
+            <p className="text-sm text-gray-300 truncate">@{creator.username}</p>
+            <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md text-xs ${config.bg} ${config.color}`}>
+              <Icon className="w-3 h-3" />
+              {creator.platform}
+            </span>
+          </div>
         </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-gray-800/50 rounded-xl p-3">
-          <p className="text-xs text-gray-300 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' ? 'Followers' : 'Subs'}</p>
-          <p className="font-bold text-gray-100">{formatNumber(creator.subscribers || creator.followers)}</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-gray-800/50 rounded-xl p-3">
+            <p className="text-xs text-gray-300 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' ? 'Followers' : 'Subs'}</p>
+            <p className="font-bold text-gray-100">{formatNumber(creator.subscribers || creator.followers)}</p>
+          </div>
+          <div className="bg-gray-800/50 rounded-xl p-3">
+            <p className="text-xs text-gray-300 mb-1">{creator.platform === 'tiktok' ? 'Likes' : creator.platform === 'bluesky' ? 'Posts' : 'Views'}</p>
+            <p className="font-bold text-gray-100">{formatNumber(creator.platform === 'bluesky' ? creator.totalPosts : creator.totalViews)}</p>
+          </div>
         </div>
-        <div className="bg-gray-800/50 rounded-xl p-3">
-          <p className="text-xs text-gray-300 mb-1">{creator.platform === 'tiktok' ? 'Likes' : creator.platform === 'bluesky' ? 'Posts' : 'Views'}</p>
-          <p className="font-bold text-gray-100">{formatNumber(creator.platform === 'bluesky' ? creator.totalPosts : creator.totalViews)}</p>
-        </div>
-      </div>
+        <p className="text-xs text-violet-400/60 text-center mt-3 group-hover/card:text-violet-400/90 transition-colors">View profile →</p>
+      </Link>
     </div>
   );
 }
