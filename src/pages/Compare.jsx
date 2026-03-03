@@ -24,7 +24,7 @@ import logger from '../lib/logger';
 
 const POPULAR_MATCHUPS = [
   { url: 'youtube:pewdiepie,youtube:mrbeast',   aName: 'PewDiePie',      bName: 'MrBeast',   aPlatform: 'youtube', bPlatform: 'youtube' },
-  { url: 'kick:xqc,twitch:kaicenat',            aName: 'xQc',            bName: 'Kai Cenat', aPlatform: 'kick',    bPlatform: 'twitch'  },
+  { url: 'twitch:xqc,twitch:kaicenat',          aName: 'xQc',            bName: 'Kai Cenat', aPlatform: 'twitch',  bPlatform: 'twitch'  },
   { url: 'twitch:ninja,twitch:shroud',          aName: 'Ninja',          bName: 'Shroud',    aPlatform: 'twitch',  bPlatform: 'twitch'  },
   { url: 'twitch:pokimane,twitch:hasanabi',     aName: 'Pokimane',       bName: 'HasanAbi',  aPlatform: 'twitch',  bPlatform: 'twitch'  },
   { url: 'youtube:mrbeast,twitch:ninja',        aName: 'MrBeast',        bName: 'Ninja',     aPlatform: 'youtube', bPlatform: 'twitch'  },
