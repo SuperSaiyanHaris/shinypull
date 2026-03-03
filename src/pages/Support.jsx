@@ -1,11 +1,11 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Server, Code, Zap, Coffee, Megaphone, MessageSquare, ArrowRight } from 'lucide-react';
+import { Server, Code, Zap, Coffee, Megaphone, MessageSquare, ArrowRight, Check, Link2 } from 'lucide-react';
 import SEO from '../components/SEO';
 
 const BUYMEACOFFEE_URL = 'https://buymeacoffee.com/shinypull';
-const TWITTER_SHARE_URL = 'https://twitter.com/intent/tweet?text=Check%20out%20ShinyPull%20%E2%80%94%20free%20creator%20analytics%20for%20YouTube%2C%20Twitch%2C%20TikTok%2C%20Kick%2C%20and%20Bluesky.&url=https%3A%2F%2Fshinypull.com';
 
-const BMCButton = ({ size = 'lg' }) => (
+const BMCButton = ({ label = 'Buy Me a Coffee', size = 'lg' }) => (
   <a
     href={BUYMEACOFFEE_URL}
     target="_blank"
@@ -15,7 +15,7 @@ const BMCButton = ({ size = 'lg' }) => (
     }`}
   >
     <Coffee className={size === 'lg' ? 'w-6 h-6' : 'w-5 h-5'} />
-    Buy Me a Coffee
+    {label}
   </a>
 );
 
@@ -44,11 +44,19 @@ const supportReasons = [
 ];
 
 export default function Support() {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText('https://shinypull.com');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <>
       <SEO
         title="Support ShinyPull"
-        description="Help keep ShinyPull free and support the development of new features. Buy the developer a coffee!"
+        description="Help support ShinyPull and fund new features. Buy the developer a coffee!"
       />
 
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">
@@ -57,17 +65,12 @@ export default function Support() {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-rose-950/40 to-transparent" />
           <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] h-72 bg-rose-500/5 rounded-full blur-3xl" />
           <div className="max-w-4xl mx-auto px-4 py-14 sm:py-20 text-center relative">
-            {/* Impact stat chip */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-full text-rose-400 text-sm font-semibold mb-6">
-              500+ creators tracked &middot; 5 platforms &middot; always free
-            </div>
-
             <div className="w-14 h-14 bg-gradient-to-br from-rose-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-rose-500/30">
               <Coffee className="w-7 h-7 text-white" />
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-100 mb-4">
-              Keep ShinyPull Free
+              Support ShinyPull
             </h1>
             <p className="text-lg sm:text-xl text-gray-400 max-w-xl mx-auto mb-8">
               ShinyPull runs on real API data. Not estimates, not guesses. Someone has to pay for that.
@@ -96,25 +99,25 @@ export default function Support() {
             </div>
           </div>
 
-          {/* Other ways — with real linked CTAs */}
+          {/* Other ways */}
           <div className="grid sm:grid-cols-2 gap-4">
-            <a
-              href={TWITTER_SHARE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-start gap-4 bg-gray-900 border border-gray-800 hover:border-sky-600/50 rounded-2xl p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-sky-500/5"
+            {/* Share — copies site link, no social platform dependency */}
+            <button
+              onClick={handleCopyLink}
+              className="group flex items-start gap-4 bg-gray-900 border border-gray-800 hover:border-sky-600/50 rounded-2xl p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-sky-500/5 text-left w-full"
             >
               <div className="w-11 h-11 bg-gradient-to-br from-sky-500 to-cyan-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-sky-500/30 group-hover:scale-105 transition-transform duration-300">
                 <Megaphone className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-gray-100 mb-1">Share ShinyPull</h3>
-                <p className="text-sm text-gray-400">Post about it on X. Tell a creator friend. Every new user helps justify the server bill.</p>
+                <h3 className="font-bold text-gray-100 mb-1">Spread the Word</h3>
+                <p className="text-sm text-gray-400">Tell a creator, a manager, or anyone who obsesses over stats. Word of mouth is how this thing grows.</p>
                 <span className="inline-flex items-center gap-1 mt-3 text-sm font-semibold text-sky-400 group-hover:gap-2 transition-all duration-200">
-                  Share on X <ArrowRight className="w-3.5 h-3.5" />
+                  {copied ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
+                  {copied ? 'Link copied!' : 'Copy link'}
                 </span>
               </div>
-            </a>
+            </button>
 
             <Link
               to="/contact"
@@ -133,18 +136,15 @@ export default function Support() {
             </Link>
           </div>
 
-          {/* Closing CTA — mirrors the hero, circles back to the action */}
+          {/* Closing CTA */}
           <div className="relative overflow-hidden bg-gray-900 border border-yellow-500/20 rounded-2xl p-8 sm:p-10 text-center">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-yellow-500/5 to-transparent rounded-2xl" />
             <div className="relative">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Still thinking about it?</p>
-              <p className="text-lg sm:text-xl font-semibold text-gray-200 mb-2">
-                Creator analytics should be free for everyone.
-              </p>
               <p className="text-gray-400 mb-8 max-w-md mx-auto">
                 One coffee funds a week of API calls. The data never stops. Your support makes sure neither do we.
               </p>
-              <BMCButton size="lg" />
+              <BMCButton label="ok fine, here's a coffee" size="lg" />
             </div>
           </div>
 
