@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigationType } from 'react-router-dom';
-import { Calculator as CalcIcon, DollarSign, Youtube, Search, Loader2, Info, ArrowRight, ExternalLink, Pencil, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigationType, useNavigate, useSearchParams } from 'react-router-dom';
+import { Calculator as CalcIcon, DollarSign, Youtube, Search, Loader2, Info, ArrowRight, ExternalLink, Pencil, X, Check, Link2, Database, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { searchChannels } from '../services/youtubeService';
 import { supabase } from '../lib/supabase';
@@ -38,25 +38,42 @@ const viewsToSlider = (v) =>
 const sliderToViews = (pos) =>
   Math.round(Math.pow(10, LOG_MIN + (pos / SLIDER_STEPS) * (LOG_MAX - LOG_MIN)));
 
-// Earnings tier based on monthly USD midpoint
-const getEarningsTier = (monthlyUSD) => {
-  if (monthlyUSD >= 100000) return { label: 'Top 1%',          color: 'text-yellow-400',  bg: 'bg-yellow-950/30',  border: 'border-yellow-700/40' };
-  if (monthlyUSD >= 10000)  return { label: 'Established',     color: 'text-purple-400',  bg: 'bg-purple-950/30',  border: 'border-purple-700/40' };
-  if (monthlyUSD >= 2000)   return { label: 'Full-Time Viable', color: 'text-emerald-400', bg: 'bg-emerald-950/30', border: 'border-emerald-700/40' };
-  if (monthlyUSD >= 500)    return { label: 'Growing',          color: 'text-blue-400',    bg: 'bg-blue-950/30',    border: 'border-blue-700/40' };
-  return                           { label: 'Small Channel',    color: 'text-gray-400',    bg: 'bg-gray-800/50',    border: 'border-gray-700' };
-};
+const TIER_THRESHOLDS = [
+  { label: 'Small Channel',    range: '< $500/mo',          min: 0,      max: 500,    color: 'text-gray-400',    bg: 'bg-gray-800/50',    border: 'border-gray-700' },
+  { label: 'Growing',          range: '$500 \u2013 $2K/mo',      min: 500,    max: 2000,   color: 'text-blue-400',    bg: 'bg-blue-950/30',    border: 'border-blue-700/40' },
+  { label: 'Full-Time Viable', range: '$2K \u2013 $10K/mo',      min: 2000,   max: 10000,  color: 'text-emerald-400', bg: 'bg-emerald-950/30', border: 'border-emerald-700/40' },
+  { label: 'Established',      range: '$10K \u2013 $100K/mo',    min: 10000,  max: 100000, color: 'text-purple-400',  bg: 'bg-purple-950/30',  border: 'border-purple-700/40' },
+  { label: 'Top 1%',           range: '$100K+/mo',          min: 100000, max: Infinity, color: 'text-yellow-400', bg: 'bg-yellow-950/30',  border: 'border-yellow-700/40' },
+];
+
+const getEarningsTier = (monthlyUSD) =>
+  TIER_THRESHOLDS.find(t => monthlyUSD >= t.min && monthlyUSD < t.max) || TIER_THRESHOLDS[0];
 
 export default function Calculator() {
   const navigationType = useNavigationType();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [mode, setMode] = useState('creator');
-  const [dailyViews, setDailyViews] = useState(10000);
-  const [rpmLow, setRpmLow] = useState(DEFAULT_RPM_LOW);
-  const [rpmHigh, setRpmHigh] = useState(DEFAULT_RPM_HIGH);
-  const [currency, setCurrency] = useState(currencies[0]);
+  // Initialize state from URL params if present
+  const [mode, setMode] = useState(
+    searchParams.get('mode') === 'personal' ? 'personal' : 'creator'
+  );
+  const [dailyViews, setDailyViews] = useState(
+    Math.max(1000, Math.min(10000000, parseInt(searchParams.get('views')) || 10000))
+  );
+  const [rpmLow, setRpmLow] = useState(
+    parseFloat(searchParams.get('rpm_low')) || DEFAULT_RPM_LOW
+  );
+  const [rpmHigh, setRpmHigh] = useState(
+    parseFloat(searchParams.get('rpm_high')) || DEFAULT_RPM_HIGH
+  );
+  const [currency, setCurrency] = useState(
+    currencies.find(c => c.code === searchParams.get('currency')) || currencies[0]
+  );
   const [overrideEnabled, setOverrideEnabled] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [showTierTooltip, setShowTierTooltip] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Creator search
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,6 +81,9 @@ export default function Calculator() {
   const [searching, setSearching] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState(null);
   const [showResults, setShowResults] = useState(false);
+
+  // Skip first URL sync (state was already seeded from URL)
+  const isFirstRender = useRef(true);
 
   // Restore state when user hits Back
   useEffect(() => {
@@ -81,7 +101,22 @@ export default function Calculator() {
     }
   }, []);
 
-  // Persist state to sessionStorage
+  // Sync state to URL (debounced, skip first render)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      params.set('mode', mode);
+      params.set('views', dailyViews);
+      params.set('rpm_low', rpmLow);
+      params.set('rpm_high', rpmHigh);
+      if (currency.code !== 'USD') params.set('currency', currency.code);
+      navigate(`?${params.toString()}`, { replace: true });
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [mode, dailyViews, rpmLow, rpmHigh, currency]);
+
+  // Persist creator state to sessionStorage
   useEffect(() => {
     if (selectedCreator) {
       sessionStorage.setItem('calc_state', JSON.stringify({ selectedCreator, dailyViews, rpmLow, rpmHigh }));
@@ -112,11 +147,11 @@ export default function Calculator() {
     return `${currency.symbol}${amount.toFixed(2)}`;
   };
 
-  // Bar chart: midpoint per period
+  // Stacked bar chart: base = low, range = high-low (shows the uncertainty band)
   const chartData = [
-    { period: 'Daily',   mid: Math.round((dailyLow   + dailyHigh)   / 2), low: Math.round(dailyLow),   high: Math.round(dailyHigh),   color: '#10b981' },
-    { period: 'Monthly', mid: Math.round((monthlyLow + monthlyHigh) / 2), low: Math.round(monthlyLow), high: Math.round(monthlyHigh), color: '#60a5fa' },
-    { period: 'Yearly',  mid: Math.round((yearlyLow  + yearlyHigh)  / 2), low: Math.round(yearlyLow),  high: Math.round(yearlyHigh),  color: '#c084fc' },
+    { period: 'Daily',   base: Math.round(dailyLow),   range: Math.round(dailyHigh - dailyLow),   low: dailyLow,   high: dailyHigh,   color: '#10b981' },
+    { period: 'Monthly', base: Math.round(monthlyLow), range: Math.round(monthlyHigh - monthlyLow), low: monthlyLow, high: monthlyHigh, color: '#60a5fa' },
+    { period: 'Yearly',  base: Math.round(yearlyLow),  range: Math.round(yearlyHigh - yearlyLow),  low: yearlyLow,  high: yearlyHigh,  color: '#c084fc' },
   ];
 
   const handleSearch = async (e) => {
@@ -156,19 +191,14 @@ export default function Calculator() {
     if (creator.platformId) {
       try {
         const { data: dbCreator } = await supabase
-          .from('creators')
-          .select('id')
-          .eq('platform', 'youtube')
-          .eq('platform_id', creator.platformId)
-          .single();
+          .from('creators').select('id')
+          .eq('platform', 'youtube').eq('platform_id', creator.platformId).single();
 
         if (dbCreator) {
           const { data: recentStats } = await supabase
-            .from('creator_stats')
-            .select('total_views, recorded_at')
+            .from('creator_stats').select('total_views, recorded_at')
             .eq('creator_id', dbCreator.id)
-            .order('recorded_at', { ascending: false })
-            .limit(14);
+            .order('recorded_at', { ascending: false }).limit(14);
 
           if (recentStats && recentStats.length >= 2) {
             const latest = recentStats[0];
@@ -205,6 +235,12 @@ export default function Calculator() {
   const switchMode = (newMode) => {
     setMode(newMode);
     if (newMode === 'personal') clearCreator();
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
   };
 
   const isLocked = mode === 'creator' && !!selectedCreator && !overrideEnabled;
@@ -267,7 +303,6 @@ export default function Calculator() {
           </div>
         </div>
 
-        {/* Extra bottom padding on mobile for sticky bar */}
         <div className="max-w-4xl mx-auto px-4 py-8 pb-28 lg:pb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -279,11 +314,7 @@ export default function Calculator() {
                   <p className="text-sm text-gray-300 flex-1">
                     Search for a creator to auto-populate their real daily views and category RPM.
                   </p>
-                  <button
-                    onClick={() => setBannerDismissed(true)}
-                    className="p-1 text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0"
-                    title="Dismiss"
-                  >
+                  <button onClick={() => setBannerDismissed(true)} className="p-1 text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -314,11 +345,7 @@ export default function Calculator() {
                       >
                         Profile <ExternalLink className="w-3 h-3" />
                       </Link>
-                      <button
-                        onClick={clearCreator}
-                        className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-950/30 transition-colors flex-shrink-0"
-                        title="Clear creator"
-                      >
+                      <button onClick={clearCreator} className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-950/30 transition-colors flex-shrink-0" title="Clear creator">
                         <X className="w-4 h-4" />
                       </button>
                     </div>
@@ -348,11 +375,7 @@ export default function Calculator() {
                       {showResults && searchResults.length > 0 && (
                         <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-xl z-10 max-h-64 overflow-y-auto">
                           {searchResults.map((result) => (
-                            <button
-                              key={result.platformId}
-                              onClick={() => selectCreator(result)}
-                              className="w-full flex items-center gap-3 p-3 hover:bg-gray-800/50 transition-colors text-left"
-                            >
+                            <button key={result.platformId} onClick={() => selectCreator(result)} className="w-full flex items-center gap-3 p-3 hover:bg-gray-800/50 transition-colors text-left">
                               <img src={result.profileImage} alt={result.displayName} className="w-10 h-10 rounded-lg object-cover" />
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-gray-100 truncate">{result.displayName}</p>
@@ -364,6 +387,38 @@ export default function Calculator() {
                       )}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Creator stats — INPUT CONTEXT, lives in left column */}
+              {selectedCreator && (
+                <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
+                  <h4 className="font-semibold text-gray-100 mb-3 flex items-center gap-2">
+                    <Youtube className="w-4 h-4 text-red-500" />
+                    {selectedCreator.displayName}'s Stats
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-gray-800/50 rounded-xl">
+                      <p className="text-xs text-gray-400">Subscribers</p>
+                      <p className="font-bold text-gray-100">{formatNumber(selectedCreator.subscribers)}</p>
+                    </div>
+                    <div className="p-3 bg-gray-800/50 rounded-xl">
+                      <p className="text-xs text-gray-400">Total Views</p>
+                      <p className="font-bold text-gray-100">{formatNumber(selectedCreator.totalViews)}</p>
+                    </div>
+                    <div className="p-3 bg-gray-800/50 rounded-xl">
+                      <p className="text-xs text-gray-400">Videos</p>
+                      <p className="font-bold text-gray-100">{formatNumber(selectedCreator.totalPosts)}</p>
+                    </div>
+                    <div className="p-3 bg-gray-800/50 rounded-xl">
+                      <p className="text-xs text-gray-400">Avg Views / Video</p>
+                      <p className="font-bold text-gray-100">
+                        {selectedCreator.totalPosts > 0
+                          ? formatNumber(Math.round(selectedCreator.totalViews / selectedCreator.totalPosts))
+                          : '—'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -398,7 +453,6 @@ export default function Calculator() {
                     isLocked ? 'bg-gray-800 cursor-not-allowed text-gray-400' : 'bg-gray-800/50'
                   }`}
                 />
-                {/* Logarithmic slider */}
                 <input
                   type="range"
                   min="0"
@@ -421,7 +475,7 @@ export default function Calculator() {
                 </div>
               </div>
 
-              {/* RPM Range + Currency (combined) */}
+              {/* RPM + Currency (combined) */}
               <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-sm font-medium text-gray-300">
@@ -429,7 +483,6 @@ export default function Calculator() {
                     {isLocked && <span className="ml-2 text-xs text-emerald-400">(by category)</span>}
                     {overrideEnabled && <span className="ml-2 text-xs text-amber-400">(custom)</span>}
                   </label>
-                  {/* Currency inline — no longer its own card */}
                   <div className="flex flex-col items-end gap-0.5">
                     <select
                       value={currency.code}
@@ -441,7 +494,7 @@ export default function Calculator() {
                       ))}
                     </select>
                     {currency.code !== 'USD' && (
-                      <span className="text-[10px] text-gray-600">rates approx. 2025</span>
+                      <span className="text-[10px] text-gray-600">rates approx. 2026</span>
                     )}
                   </div>
                 </div>
@@ -450,9 +503,7 @@ export default function Calculator() {
                   <div>
                     <label className="text-xs text-gray-500 mb-1 block">Low (USD $)</label>
                     <input
-                      type="number"
-                      step="0.01"
-                      value={rpmLow}
+                      type="number" step="0.01" value={rpmLow}
                       onChange={(e) => setRpmLow(Math.max(0, parseFloat(e.target.value) || 0))}
                       disabled={isLocked}
                       className={`w-full px-3 py-2.5 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors ${
@@ -463,9 +514,7 @@ export default function Calculator() {
                   <div>
                     <label className="text-xs text-gray-500 mb-1 block">High (USD $)</label>
                     <input
-                      type="number"
-                      step="0.01"
-                      value={rpmHigh}
+                      type="number" step="0.01" value={rpmHigh}
                       onChange={(e) => setRpmHigh(Math.max(rpmLow, parseFloat(e.target.value) || 0))}
                       disabled={isLocked}
                       className={`w-full px-3 py-2.5 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors ${
@@ -493,44 +542,66 @@ export default function Calculator() {
                     <DollarSign className="w-5 h-5 text-emerald-500" />
                     Estimated Earnings
                   </h3>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${tier.bg} ${tier.border} ${tier.color}`}>
-                    {tier.label}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {/* Tier badge with tooltip */}
+                    <div className="relative">
+                      <span
+                        className={`text-xs font-semibold px-2.5 py-1 rounded-full border cursor-help ${tier.bg} ${tier.border} ${tier.color}`}
+                        onMouseEnter={() => setShowTierTooltip(true)}
+                        onMouseLeave={() => setShowTierTooltip(false)}
+                      >
+                        {tier.label}
+                      </span>
+                      {showTierTooltip && (
+                        <div className="absolute right-0 top-full mt-2 z-20 w-60 bg-gray-900 border border-gray-700 rounded-xl p-3 shadow-2xl">
+                          <p className="text-xs font-semibold text-gray-300 mb-2 uppercase tracking-wide">Monthly USD tiers</p>
+                          {TIER_THRESHOLDS.map((t) => (
+                            <div key={t.label} className={`flex items-center justify-between py-1 text-xs ${t.label === tier.label ? `font-semibold ${t.color}` : 'text-gray-500'}`}>
+                              <span>{t.label}</span>
+                              <span>{t.range}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {/* Copy link */}
+                    <button
+                      onClick={handleCopyLink}
+                      className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800 border border-transparent hover:border-gray-700 transition-all"
+                      title="Copy shareable link"
+                    >
+                      {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Link2 className="w-3.5 h-3.5" />}
+                      {copiedLink ? 'Copied!' : 'Share'}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
                   <div className="p-4 bg-emerald-950/30 rounded-xl border border-emerald-800/50">
                     <p className="text-xs text-gray-400 mb-1">Daily</p>
-                    <p className="text-2xl font-bold text-emerald-400">{formatCurrency(dailyLow)} – {formatCurrency(dailyHigh)}</p>
+                    <p className="text-2xl font-bold text-emerald-400">{formatCurrency(dailyLow)} &ndash; {formatCurrency(dailyHigh)}</p>
                   </div>
                   <div className="p-4 bg-blue-950/30 rounded-xl border border-blue-800/50">
                     <p className="text-xs text-gray-400 mb-1">Monthly</p>
-                    <p className="text-2xl font-bold text-blue-400">{formatCurrency(monthlyLow)} – {formatCurrency(monthlyHigh)}</p>
+                    <p className="text-2xl font-bold text-blue-400">{formatCurrency(monthlyLow)} &ndash; {formatCurrency(monthlyHigh)}</p>
                   </div>
                   <div className="p-4 bg-purple-950/30 rounded-xl border border-purple-800/50">
                     <p className="text-xs text-gray-400 mb-1">Yearly</p>
-                    <p className="text-2xl font-bold text-purple-400">{formatCurrency(yearlyLow)} – {formatCurrency(yearlyHigh)}</p>
+                    <p className="text-2xl font-bold text-purple-400">{formatCurrency(yearlyLow)} &ndash; {formatCurrency(yearlyHigh)}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Bar chart */}
+              {/* Bar chart — stacked low + range band */}
               <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
-                <h4 className="text-sm font-semibold text-gray-300 mb-1">Earnings Breakdown</h4>
-                <p className="text-xs text-gray-500 mb-4">Midpoint estimate per period</p>
-                <ResponsiveContainer width="100%" height={160}>
+                <h4 className="text-sm font-semibold text-gray-300 mb-0.5">Earnings Breakdown</h4>
+                <p className="text-xs text-gray-500 mb-4">Solid = low estimate &nbsp;&middot;&nbsp; Faded = upside range</p>
+                <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 0 }} barCategoryGap="35%">
-                    <XAxis
-                      dataKey="period"
-                      tick={{ fill: '#9ca3af', fontSize: 12 }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
+                    <XAxis dataKey="period" tick={{ fill: '#9ca3af', fontSize: 12 }} axisLine={false} tickLine={false} />
                     <YAxis
                       tick={{ fill: '#6b7280', fontSize: 11 }}
-                      axisLine={false}
-                      tickLine={false}
-                      width={58}
+                      axisLine={false} tickLine={false} width={60}
                       tickFormatter={(v) => {
                         if (v >= 1000000) return `${currency.symbol}${(v / 1000000).toFixed(1)}M`;
                         if (v >= 1000)    return `${currency.symbol}${(v / 1000).toFixed(0)}K`;
@@ -546,85 +617,69 @@ export default function Calculator() {
                         return (
                           <div style={{ background: '#111827', border: '1px solid #374151', borderRadius: '12px', padding: '10px 14px' }}>
                             <p style={{ color: '#f3f4f6', fontWeight: 600, marginBottom: 4, fontSize: 13 }}>{label}</p>
-                            <p style={{ color: '#9ca3af', fontSize: 12 }}>
-                              {formatCurrency(entry.low)} – {formatCurrency(entry.high)}
-                            </p>
+                            <p style={{ color: '#9ca3af', fontSize: 12 }}>{formatCurrency(entry.low)} &ndash; {formatCurrency(entry.high)}</p>
                           </div>
                         );
                       }}
                     />
-                    <Bar dataKey="mid" radius={[6, 6, 0, 0]} maxBarSize={64}>
+                    {/* Base bar (low estimate) — full opacity */}
+                    <Bar dataKey="base" stackId="earn" radius={[0, 0, 6, 6]} maxBarSize={72}>
                       {chartData.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} fillOpacity={0.85} />
+                        <Cell key={`base-${i}`} fill={entry.color} fillOpacity={0.9} />
+                      ))}
+                    </Bar>
+                    {/* Range bar (low→high delta) — faded upside */}
+                    <Bar dataKey="range" stackId="earn" radius={[6, 6, 0, 0]} maxBarSize={72}>
+                      {chartData.map((entry, i) => (
+                        <Cell key={`range-${i}`} fill={entry.color} fillOpacity={0.25} />
                       ))}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+            </div>
 
-              {/* How it works */}
-              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
-                <h4 className="font-semibold text-gray-100 mb-3">How This Works</h4>
-                <ul className="text-sm text-gray-400 space-y-2">
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 mt-0.5">•</span>
-                    <span>Earnings = (Daily Views ÷ 1,000) × RPM</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 mt-0.5">•</span>
-                    <span>RPM varies by content type, audience location, and ad rates.</span>
-                  </li>
-                  {mode === 'creator' && (
-                    <li className="flex items-start gap-2">
-                      <span className="text-emerald-500 mt-0.5">•</span>
-                      <span>Daily views come from the last 14 days of view delta in our database, not a naive total.</span>
-                    </li>
-                  )}
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 mt-0.5">•</span>
-                    <span>These are estimates. Actual earnings depend on watch time, ad engagement, and geography.</span>
-                  </li>
-                  {mode === 'personal' && (
-                    <li className="flex items-start gap-2">
-                      <span className="text-emerald-500 mt-0.5">•</span>
-                      <span>Use the Edit button on the slider to tweak views if you know your channel's real numbers.</span>
-                    </li>
-                  )}
-                </ul>
-              </div>
-
-              {/* Selected creator stats */}
-              {selectedCreator && (
-                <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
-                  <h4 className="font-semibold text-gray-100 mb-3 flex items-center gap-2">
-                    <Youtube className="w-5 h-5 text-red-500" />
-                    {selectedCreator.displayName}'s Stats
-                  </h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 bg-gray-800/50 rounded-xl">
-                      <p className="text-xs text-gray-400">Subscribers</p>
-                      <p className="font-bold text-gray-100">{formatNumber(selectedCreator.subscribers)}</p>
-                    </div>
-                    <div className="p-3 bg-gray-800/50 rounded-xl">
-                      <p className="text-xs text-gray-400">Total Views</p>
-                      <p className="font-bold text-gray-100">{formatNumber(selectedCreator.totalViews)}</p>
-                    </div>
-                    <div className="p-3 bg-gray-800/50 rounded-xl">
-                      <p className="text-xs text-gray-400">Videos</p>
-                      <p className="font-bold text-gray-100">{formatNumber(selectedCreator.totalPosts)}</p>
-                    </div>
-                    <div className="p-3 bg-gray-800/50 rounded-xl">
-                      <p className="text-xs text-gray-400">Avg Views / Video</p>
-                      <p className="font-bold text-gray-100">
-                        {selectedCreator.totalPosts > 0
-                          ? formatNumber(Math.round(selectedCreator.totalViews / selectedCreator.totalPosts))
-                          : '—'}
-                      </p>
-                    </div>
+            {/* ── HOW IT WORKS — full width below both columns ── */}
+            <div className="order-4 lg:col-span-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="flex items-start gap-3 bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                  <div className="w-9 h-9 bg-emerald-950/60 border border-emerald-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <CalcIcon className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-200 mb-1">The Formula</p>
+                    <p className="text-xs text-gray-400 leading-relaxed">(Daily Views &divide; 1,000) &times; RPM. RPM is your revenue per thousand views, before YouTube's 45% cut.</p>
                   </div>
                 </div>
-              )}
+
+                <div className="flex items-start gap-3 bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                  <div className="w-9 h-9 bg-blue-950/60 border border-blue-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-200 mb-1">RPM by Niche</p>
+                    <p className="text-xs text-gray-400 leading-relaxed">Gaming &amp; entertainment: $1&ndash;3. Education: $2&ndash;5. Finance &amp; tech: $4&ndash;8. Audience location matters too.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                  <div className="w-9 h-9 bg-purple-950/60 border border-purple-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Database className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-200 mb-1">
+                      {mode === 'creator' ? 'Real Channel Data' : 'Your Estimates'}
+                    </p>
+                    <p className="text-xs text-gray-400 leading-relaxed">
+                      {mode === 'creator'
+                        ? 'Daily views come from 14 days of view deltas in our database, not a naive total-divided-by-videos guess.'
+                        : 'Set your expected daily views and RPM range. Actual earnings vary by watch time, ad engagement, and geography.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -633,7 +688,7 @@ export default function Calculator() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-950/95 backdrop-blur-sm border-t border-gray-800 px-4 py-3 flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">Monthly estimate</p>
-          <p className="text-base font-bold text-blue-400 truncate">{formatCurrency(monthlyLow)} – {formatCurrency(monthlyHigh)}</p>
+          <p className="text-base font-bold text-blue-400 truncate">{formatCurrency(monthlyLow)} &ndash; {formatCurrency(monthlyHigh)}</p>
         </div>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${tier.bg} ${tier.border} ${tier.color}`}>
           {tier.label}
