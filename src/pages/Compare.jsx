@@ -22,6 +22,15 @@ import { useSubscription } from '../contexts/SubscriptionContext';
 import { Lock } from 'lucide-react';
 import logger from '../lib/logger';
 
+const POPULAR_MATCHUPS = [
+  { url: 'youtube:pewdiepie,youtube:mrbeast',   aName: 'PewDiePie',      bName: 'MrBeast',   aPlatform: 'youtube', bPlatform: 'youtube' },
+  { url: 'twitch:xqcow,twitch:kaicenat',        aName: 'xQc',            bName: 'Kai Cenat', aPlatform: 'twitch',  bPlatform: 'twitch'  },
+  { url: 'twitch:ninja,twitch:shroud',          aName: 'Ninja',          bName: 'Shroud',    aPlatform: 'twitch',  bPlatform: 'twitch'  },
+  { url: 'twitch:pokimane,twitch:hasanabi',     aName: 'Pokimane',       bName: 'HasanAbi',  aPlatform: 'twitch',  bPlatform: 'twitch'  },
+  { url: 'youtube:mrbeast,twitch:ninja',        aName: 'MrBeast',        bName: 'Ninja',     aPlatform: 'youtube', bPlatform: 'twitch'  },
+  { url: 'tiktok:charlidamelio,tiktok:addisonre', aName: "Charli D'Amelio", bName: 'Addison Rae', aPlatform: 'tiktok', bPlatform: 'tiktok' },
+];
+
 const platformConfig = {
   youtube: { icon: Youtube, color: 'text-red-400', bg: 'bg-red-950/30', border: 'border-red-800' },
   tiktok: { icon: TikTokIcon, color: 'text-pink-400', bg: 'bg-pink-950/30', border: 'border-pink-800' },
@@ -361,10 +370,14 @@ export default function Compare() {
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Header */}
         <div className="relative overflow-hidden border-b border-gray-800/60">
-          <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-violet-950/30 to-transparent" />
+          <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 w-[480px] h-72 bg-violet-500/5 rounded-full blur-3xl" />
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative">
             <div className="max-w-6xl mx-auto text-center">
-              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2">
-                <Scale className="w-6 h-6 sm:w-8 sm:h-8 text-violet-400" />
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <div className="w-11 h-11 bg-gradient-to-br from-violet-600 to-purple-700 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/30 flex-shrink-0">
+                  <Scale className="w-5 h-5 text-white" />
+                </div>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-100">Compare Creators</h1>
               </div>
               <p className="text-base sm:text-lg text-gray-400">
@@ -458,11 +471,33 @@ export default function Compare() {
             </div>
           )}
 
-          {/* Hint - shown above slots when comparison not yet active */}
+          {/* Empty state — popular matchups */}
           {!loadingFromUrl && filledCreators.length < 2 && (
-            <div className="flex items-center gap-3 mb-5 px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl">
-              <Users className="w-5 h-5 text-indigo-500 shrink-0" />
-              <p className="text-sm text-gray-300">Search for at least 2 creators below to start comparing.</p>
+            <div className="mb-8">
+              <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest text-center mb-4">Popular matchups</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                {POPULAR_MATCHUPS.map(({ url, aName, bName, aPlatform, bPlatform }) => {
+                  const AIcon = platformConfig[aPlatform]?.icon;
+                  const BIcon = platformConfig[bPlatform]?.icon;
+                  return (
+                    <Link
+                      key={url}
+                      to={`/compare?creators=${url}`}
+                      className="group flex items-center gap-2 p-3 bg-gray-900 border border-gray-800 hover:border-violet-500/40 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-violet-500/5"
+                    >
+                      <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                        {AIcon && <span className={`flex-shrink-0 ${platformConfig[aPlatform]?.color}`}><AIcon className="w-3.5 h-3.5" /></span>}
+                        <span className="text-sm font-semibold text-gray-300 truncate group-hover:text-gray-100 transition-colors">{aName}</span>
+                      </div>
+                      <span className="text-[9px] font-black text-violet-400 bg-violet-950/50 border border-violet-800/60 px-2 py-0.5 rounded-full flex-shrink-0 tracking-widest">VS</span>
+                      <div className="flex items-center gap-1.5 flex-1 min-w-0 justify-end">
+                        <span className="text-sm font-semibold text-gray-300 truncate text-right group-hover:text-gray-100 transition-colors">{bName}</span>
+                        {BIcon && <span className={`flex-shrink-0 ${platformConfig[bPlatform]?.color}`}><BIcon className="w-3.5 h-3.5" /></span>}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           )}
 
@@ -488,9 +523,10 @@ export default function Compare() {
             {creators.length < maxCompare && (
               <button
                 onClick={addSlot}
-                className="min-h-[280px] border-2 border-dashed border-gray-700 rounded-2xl flex items-center justify-center text-gray-300 hover:text-gray-300 hover:border-gray-600 transition-colors"
+                className="min-h-[280px] border-2 border-dashed border-gray-700 rounded-2xl flex flex-col items-center justify-center gap-2 text-gray-500 hover:text-gray-300 hover:border-gray-500 transition-all duration-200"
               >
-                <Plus className="w-8 h-8" />
+                <Plus className="w-7 h-7" />
+                <span className="text-sm font-medium">Add creator</span>
               </button>
             )}
             {/* Locked slot — shown when at tier limit and upgrades are available */}
@@ -525,12 +561,36 @@ export default function Compare() {
           </div>
           )}
 
+          {/* VS divider — shown when 2+ creators are loaded */}
+          {!loadingFromUrl && filledCreators.length >= 2 && (
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-violet-800/40 to-violet-800/40" />
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <img src={filledCreators[0].profileImage} alt="" className="w-6 h-6 rounded-md object-cover" />
+                  <span className="text-sm font-bold text-gray-200 max-w-[100px] truncate">{filledCreators[0].displayName}</span>
+                </div>
+                <div className="px-3 py-1 bg-violet-950/60 border border-violet-700/60 rounded-full shadow-sm shadow-violet-500/10">
+                  <span className="text-violet-300 font-black text-[11px] tracking-widest">VS</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-bold text-gray-200 max-w-[100px] truncate">{filledCreators[1].displayName}</span>
+                  <img src={filledCreators[1].profileImage} alt="" className="w-6 h-6 rounded-md object-cover" />
+                </div>
+                {filledCreators.length > 2 && (
+                  <span className="text-xs text-gray-500">+{filledCreators.length - 2} more</span>
+                )}
+              </div>
+              <div className="flex-1 h-px bg-gradient-to-l from-transparent via-violet-800/40 to-violet-800/40" />
+            </div>
+          )}
+
           {/* Comparison Section */}
           {!loadingFromUrl && filledCreators.length >= 2 && (
             <>
               {/* Radar Chart */}
               <div className="mb-6">
-                <ComparisonRadarChart creators={filledCreators} growthData={growthData} />
+                <ComparisonRadarChart creators={filledCreators} growthData={growthData} loadingGrowth={loadingGrowth} />
               </div>
 
               {/* Desktop Table View */}
@@ -538,6 +598,12 @@ export default function Compare() {
                 <div className="px-6 py-4 border-b border-gray-800 flex items-center gap-2">
                   <h3 className="text-lg font-semibold text-gray-100">Comparison</h3>
                   <InfoTooltip text="Some fields show dashes for newer creators. Growth and earnings need a few days of tracked data before they populate." />
+                  {loadingGrowth && (
+                    <span className="ml-auto flex items-center gap-1.5 text-xs text-gray-500">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Loading growth data...
+                    </span>
+                  )}
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -715,10 +781,11 @@ function CreatorCard({ creator, onRemove }) {
   const Icon = config.icon;
 
   return (
-    <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-5 relative group">
+    <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-5 relative">
       <button
         onClick={onRemove}
-        className="absolute top-3 right-3 p-1.5 bg-gray-800 hover:bg-red-900/30 rounded-lg text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+        className="absolute top-3 right-3 p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-950/30 transition-all"
+        title="Remove"
       >
         <X className="w-4 h-4" />
       </button>
@@ -925,17 +992,14 @@ function InfoTooltip({ text }) {
   const [style, setStyle] = useState({});
   const btnRef = useRef(null);
 
-  const handleToggle = (e) => {
-    e.stopPropagation();
-    if (!open && btnRef.current) {
-      const rect = btnRef.current.getBoundingClientRect();
-      const tipWidth = 224; // 14rem — fixed positioning uses viewport coords, no scroll offset
-      const left = (rect.left + tipWidth > window.innerWidth - 8)
-        ? Math.max(8, window.innerWidth - tipWidth - 8)
-        : rect.left;
-      setStyle({ top: rect.bottom + 6, left });
-    }
-    setOpen(o => !o);
+  const calcStyle = () => {
+    if (!btnRef.current) return;
+    const rect = btnRef.current.getBoundingClientRect();
+    const tipWidth = 224;
+    const left = (rect.left + tipWidth > window.innerWidth - 8)
+      ? Math.max(8, window.innerWidth - tipWidth - 8)
+      : rect.left;
+    setStyle({ top: rect.bottom + 6, left });
   };
 
   return (
@@ -945,15 +1009,16 @@ function InfoTooltip({ text }) {
         ref={btnRef}
         type="button"
         className="focus:outline-none -m-1 p-1 flex-shrink-0"
-        onClick={handleToggle}
+        onMouseEnter={() => { calcStyle(); setOpen(true); }}
+        onMouseLeave={() => setOpen(false)}
+        onClick={(e) => { e.stopPropagation(); calcStyle(); setOpen(o => !o); }}
       >
         <Info className="w-3.5 h-3.5 text-gray-500 hover:text-gray-300 transition-colors" />
       </button>
       {open && createPortal(
         <div
-          className="fixed w-56 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-300 z-[999] whitespace-normal shadow-xl"
+          className="fixed w-56 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-300 z-[999] whitespace-normal shadow-xl pointer-events-none"
           style={style}
-          onClick={(e) => e.stopPropagation()}
         >
           {text}
         </div>,
@@ -1130,7 +1195,7 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
   );
 }
 
-function ComparisonRadarChart({ creators, growthData }) {
+function ComparisonRadarChart({ creators, growthData, loadingGrowth }) {
   const CREATOR_COLORS = ['#818cf8', '#34d399', '#f59e0b'];
 
   // When two creators share a display name (e.g. same person on YouTube + Bluesky),
@@ -1149,6 +1214,16 @@ function ComparisonRadarChart({ creators, growthData }) {
     { label: '7-Day Growth', getValue: (c) => Math.max(0, growthData[c.platformId]?.growth7Day || 0) },
     { label: '30-Day Growth',getValue: (c) => Math.max(0, growthData[c.platformId]?.growth30Day || 0) },
   ];
+
+  // Skip chart if any creator has all-zero values (new creator or no data) — lopsided radar is misleading
+  const anyCreatorHasNoData = !loadingGrowth && creators.some(c => metrics.every(m => m.getValue(c) === 0));
+  if (anyCreatorHasNoData) {
+    return (
+      <div className="bg-gray-900 rounded-2xl border border-gray-800 p-6 flex items-center justify-center">
+        <p className="text-gray-500 text-sm">Not enough data yet to show a comparison chart. Check back once the creators have a few days of tracked history.</p>
+      </div>
+    );
+  }
 
   const radarData = metrics.map(({ label, getValue }) => {
     const values = creators.map(getValue);
