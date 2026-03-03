@@ -73,8 +73,7 @@ export default function Support() {
               Support ShinyPull
             </h1>
             <p className="text-lg sm:text-xl text-gray-400 max-w-xl mx-auto mb-8">
-              ShinyPull runs on real API data. Not estimates, not guesses. Someone has to pay for that.
-              If the site's saved you time, this is how you give back.
+              We pull live data from five platforms so you don't have to argue from memory. Turns out APIs aren't free. If ShinyPull has ever settled a Discord argument, you know what to do.
             </p>
 
             <BMCButton size="lg" />
