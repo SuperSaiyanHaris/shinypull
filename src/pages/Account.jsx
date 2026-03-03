@@ -89,7 +89,7 @@ export default function Account() {
     if (!user) return;
     const { data } = await supabase
       .from('featured_listings')
-      .select('id, platform, status, active_from, active_until, is_mod_free, creators(display_name, username, profile_image, platform)')
+      .select('id, platform, status, active_from, active_until, is_mod_free, created_at, creators(display_name, username, profile_image, platform)')
       .eq('purchased_by_user_id', user.id)
       .eq('status', 'active')
       .order('created_at', { ascending: false });
@@ -158,7 +158,7 @@ export default function Account() {
 
   const modFreeUsedThisMonth = featuredListings.some(l => {
     if (!l.is_mod_free) return false;
-    const d = new Date(l.active_from || '');
+    const d = new Date(l.created_at || '');
     const now = new Date();
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   });
