@@ -364,7 +364,7 @@ export default function Compare() {
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="max-w-6xl mx-auto text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2">
-                <Scale className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-400" />
+                <Scale className="w-6 h-6 sm:w-8 sm:h-8 text-violet-400" />
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-100">Compare Creators</h1>
               </div>
               <p className="text-base sm:text-lg text-gray-400">
@@ -497,7 +497,7 @@ export default function Compare() {
             {creators.length >= maxCompare && tier !== 'mod' && (
               <button
                 onClick={() => openUpgradePanel('compare')}
-                className="relative min-h-[280px] border-2 border-dashed border-indigo-800/60 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-indigo-600/80 transition-colors overflow-hidden"
+                className="relative min-h-[280px] border-2 border-dashed border-violet-800/60 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-violet-600/80 transition-colors overflow-hidden"
               >
                 {/* Blurred fake content */}
                 <div className="absolute inset-0 pointer-events-none select-none opacity-20 p-5 flex flex-col gap-3">
@@ -508,15 +508,15 @@ export default function Compare() {
                   <div className="h-3 w-1/3 rounded-full bg-gray-700" />
                 </div>
                 <div className="relative z-10 flex flex-col items-center gap-2 px-4 text-center">
-                  <div className="w-10 h-10 rounded-full bg-indigo-950/60 border border-indigo-800 flex items-center justify-center mb-1">
-                    <Lock className="w-4 h-4 text-indigo-400" />
+                  <div className="w-10 h-10 rounded-full bg-violet-950/60 border border-violet-800 flex items-center justify-center mb-1">
+                    <Lock className="w-4 h-4 text-violet-400" />
                   </div>
                   <p className="text-sm font-semibold text-gray-200">
                     {tier === 'lurker'
                       ? 'Compare up to 5 creators with Sub'
                       : 'Compare up to 10 creators with Mod'}
                   </p>
-                  <span className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-colors">
+                  <span className="px-3 py-1 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-lg transition-colors">
                     Upgrade
                   </span>
                 </div>

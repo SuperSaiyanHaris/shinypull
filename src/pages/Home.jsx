@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, X, GitCompare } from 'lucide-react';
+import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, X, Scale } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
@@ -200,20 +200,20 @@ export default function Home() {
               {/* Card 1 — Search */}
               <Link
                 to="/search"
-                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-indigo-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-indigo-500/10"
+                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-sky-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-sky-500/10"
               >
                 {/* glow blob */}
-                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
+                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-sky-500/10 rounded-full blur-3xl group-hover:bg-sky-500/20 transition-colors duration-500" />
                 {/* card number */}
                 <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">01</span>
 
                 <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform duration-300">
+                  <div className="w-14 h-14 bg-gradient-to-br from-sky-500 to-cyan-600 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-sky-500/30 group-hover:scale-105 transition-transform duration-300">
                     <Search className="w-7 h-7 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-100 mb-2">Find Any Creator</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-6">Search across YouTube, TikTok, Twitch, Kick, and Bluesky. Real profiles with live stats.</p>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-400 group-hover:gap-3 transition-all duration-200">
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-sky-400 group-hover:gap-3 transition-all duration-200">
                     Search now <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
@@ -242,18 +242,18 @@ export default function Home() {
               {/* Card 3 — Compare */}
               <Link
                 to="/compare"
-                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-cyan-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-cyan-500/10"
+                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-violet-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-violet-500/10"
               >
-                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-colors duration-500" />
+                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-violet-500/10 rounded-full blur-3xl group-hover:bg-violet-500/20 transition-colors duration-500" />
                 <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">03</span>
 
                 <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-cyan-400 to-sky-500 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-transform duration-300">
-                    <GitCompare className="w-7 h-7 text-white" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-violet-600 to-purple-700 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-violet-500/30 group-hover:scale-105 transition-transform duration-300">
+                    <Scale className="w-7 h-7 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-100 mb-2">Compare Creators</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-6">Put any creators head to head. Subscribers, views, and growth. All in one chart.</p>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-400 group-hover:gap-3 transition-all duration-200">
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-400 group-hover:gap-3 transition-all duration-200">
                     Compare now <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
@@ -277,8 +277,8 @@ export default function Home() {
               <span className="pointer-events-none absolute bottom-5 right-7 text-6xl sm:text-8xl font-black text-gray-800 select-none leading-none group-hover:text-gray-700 transition-colors">$$$</span>
 
               {/* Icon box */}
-              <div className="relative flex-shrink-0 w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-300">
-                <DollarSign className="w-8 h-8 text-white" />
+              <div className="relative flex-shrink-0 w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-300">
+                <Calculator className="w-8 h-8 text-white" />
               </div>
 
               {/* Text + CTA */}
