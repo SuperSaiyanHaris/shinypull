@@ -112,7 +112,7 @@ export default function Reports() {
   useEffect(() => {
     if (!authLoading && !user) {
       window.dispatchEvent(new CustomEvent('openAuthPanel', {
-        detail: { message: 'Sign in to access reports' },
+        detail: { message: 'Reports require a Mod subscription. Create an account and upgrade to get started.' },
       }));
     }
   }, [user, authLoading]);

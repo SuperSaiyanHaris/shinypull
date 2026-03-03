@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings, FileSpreadsheet, ChevronDown, LayoutGrid } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useSubscription } from '../contexts/SubscriptionContext';
 import AuthPanel from './AuthPanel';
 import UpgradePanel from './UpgradePanel';
 
@@ -42,7 +41,6 @@ const moreLinks = [
     gradient: 'from-amber-500 to-orange-500',
     hoverBorder: 'hover:border-amber-500/40',
     hoverBg: 'hover:bg-amber-950/20',
-    badge: 'Mod',
   },
   {
     path: '/blog',
@@ -76,7 +74,6 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut, isAuthenticated } = useAuth();
-  const { tier } = useSubscription();
   const mobileMenuRef = useRef(null);
 
   // Close menus on route change
@@ -197,7 +194,7 @@ export default function Header() {
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   moreMenuOpen || isMoreActive
                     ? 'bg-gray-800 text-gray-100 border border-gray-700'
-                    : 'text-gray-300 hover:bg-gray-800/70 hover:text-gray-100 border border-transparent'
+                    : 'text-gray-300 hover:bg-gray-800/60 hover:text-gray-100 border border-gray-700/50 hover:border-gray-600'
                 }`}
               >
                 <LayoutGrid className="w-4 h-4" />
