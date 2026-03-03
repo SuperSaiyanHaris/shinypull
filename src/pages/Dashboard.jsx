@@ -108,7 +108,11 @@ export default function Dashboard() {
 
       const stats = {};
       for (const { id, data } of statsResults) {
-        if (data.length > 0) stats[id] = { current: data[0], previous: data[1] || null, weekAgo: data[data.length - 1] || null };
+        if (data.length > 0) stats[id] = {
+          current: data[data.length - 1],          // most recent (today)
+          previous: data[data.length - 2] || null, // yesterday
+          weekAgo: data[0] || null,                // oldest in window
+        };
       }
       setCreatorStats(stats);
 
