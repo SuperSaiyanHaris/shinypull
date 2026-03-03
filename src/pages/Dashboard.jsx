@@ -629,46 +629,46 @@ export default function Dashboard() {
               {/* ── FOLLOWING TAB ── */}
               {activeTab === 'following' && (
                 <div>
-                  {/* Compare mode banner — shown above everything when active */}
+                  {/* Compare mode banner — full card, mobile-first */}
                   {compareMode && (
-                    <div className="mb-4 bg-indigo-950/50 border border-indigo-700/60 rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap">
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <Scale className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                        <span className="text-sm text-indigo-300 font-medium">
-                          Select 2-3 creators to compare
-                        </span>
-                        <span className="text-xs text-indigo-500">({selectedForCompare.length}/3)</span>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <Link
-                          to={`/compare?creators=${selectedForCompare.map(id => {
-                            const c = followedCreators.find(fc => fc.id === id);
-                            return c ? `${c.platform}:${c.username}` : '';
-                          }).filter(Boolean).join(',')}`}
-                          onClick={() => { setCompareMode(false); setSelectedForCompare([]); }}
-                          className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
-                            selectedForCompare.length >= 2
-                              ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-                              : 'bg-gray-700 text-gray-500 cursor-not-allowed pointer-events-none'
-                          }`}
-                        >
-                          <Scale className="w-3.5 h-3.5" />
-                          Compare Selected
-                        </Link>
+                    <div className="mb-4 bg-indigo-950/50 border border-indigo-700/60 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <Scale className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                          <span className="text-sm font-semibold text-indigo-300">Compare mode</span>
+                          <span className="text-xs text-indigo-500 font-medium">({selectedForCompare.length}/3)</span>
+                        </div>
                         <button
                           onClick={() => { setCompareMode(false); setSelectedForCompare([]); }}
-                          className="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-800 text-gray-400 hover:text-gray-200 text-sm rounded-xl transition-colors"
+                          className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-700/50 transition-colors"
                         >
-                          <X className="w-3.5 h-3.5" />
-                          Cancel
+                          <X className="w-4 h-4" />
                         </button>
                       </div>
+                      <p className="text-xs text-indigo-400/70 mb-3">Tap creators from the list to select them</p>
+                      <Link
+                        to={`/compare?creators=${selectedForCompare.map(id => {
+                          const c = followedCreators.find(fc => fc.id === id);
+                          return c ? `${c.platform}:${c.username}` : '';
+                        }).filter(Boolean).join(',')}`}
+                        onClick={() => { setCompareMode(false); setSelectedForCompare([]); }}
+                        className={`flex items-center justify-center gap-2 w-full py-2.5 text-sm font-semibold rounded-xl transition-colors ${
+                          selectedForCompare.length >= 2
+                            ? 'bg-indigo-600 text-white hover:bg-indigo-500'
+                            : 'bg-gray-800 text-gray-600 pointer-events-none'
+                        }`}
+                      >
+                        <Scale className="w-4 h-4" />
+                        {selectedForCompare.length >= 2
+                          ? `Compare ${selectedForCompare.length} creators`
+                          : 'Select at least 2 creators'}
+                      </Link>
                     </div>
                   )}
 
-                  {/* Filter chips + sort + export — all in one row */}
-                  {followedCreators.length > 0 && (
-                    <div className={`flex flex-wrap items-center gap-2 mb-4 ${compareMode ? 'opacity-40 pointer-events-none' : ''}`}>
+                  {/* Filter chips — horizontally scrollable, no wrap */}
+                  {!compareMode && followedCreators.length > 0 && (
+                    <div className="flex overflow-x-auto gap-2 mb-2 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                       <FilterChip
                         active={selectedPlatform === 'all'}
                         onClick={() => setSelectedPlatform('all')}
@@ -700,19 +700,33 @@ export default function Dashboard() {
                           live
                         />
                       )}
+                    </div>
+                  )}
 
-                      {/* Sort + Export pushed to right */}
+                  {/* Toolbar row: sort + compare + export */}
+                  {!compareMode && !loadingCreators && followedCreators.length > 0 && (
+                    <div className="flex items-center gap-2 mb-4">
+                      <select
+                        value={sortBy}
+                        onChange={e => setSortBy(e.target.value)}
+                        className="text-xs bg-gray-800 border border-gray-700 text-gray-400 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-gray-600 cursor-pointer"
+                      >
+                        <option value="live">Live first</option>
+                        <option value="growth">Top growth</option>
+                        <option value="followers">Most followed</option>
+                        <option value="name">Name A-Z</option>
+                      </select>
+
                       <div className="ml-auto flex items-center gap-2">
-                        <select
-                          value={sortBy}
-                          onChange={e => setSortBy(e.target.value)}
-                          className="text-xs bg-gray-800 border border-gray-700 text-gray-400 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-gray-600 cursor-pointer"
-                        >
-                          <option value="live">Live first</option>
-                          <option value="growth">Top growth</option>
-                          <option value="followers">Most followed</option>
-                          <option value="name">Name A-Z</option>
-                        </select>
+                        {followedCreators.length >= 2 && (
+                          <button
+                            onClick={() => setCompareMode(true)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-gray-100 text-xs font-medium rounded-lg transition-colors"
+                          >
+                            <Scale className="w-3.5 h-3.5" />
+                            Compare
+                          </button>
+                        )}
 
                         {tier === 'mod' ? (
                           <button
@@ -720,7 +734,8 @@ export default function Dashboard() {
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-950/40 hover:bg-amber-950/60 text-amber-400 border border-amber-800/60 transition-colors"
                           >
                             <Download className="w-3.5 h-3.5" />
-                            Export CSV
+                            <span className="hidden sm:inline">Export CSV</span>
+                            <span className="sm:hidden">Export</span>
                           </button>
                         ) : (
                           <button
@@ -729,23 +744,10 @@ export default function Dashboard() {
                             title="Bulk CSV export requires Mod plan"
                           >
                             <Lock className="w-3.5 h-3.5" />
-                            Export CSV
+                            <span className="hidden sm:inline">Export CSV</span>
                           </button>
                         )}
                       </div>
-                    </div>
-                  )}
-
-                  {/* Compare mode launch button (when not in compare mode, 2+ creators) */}
-                  {!compareMode && !loadingCreators && followedCreators.length >= 2 && (
-                    <div className="flex items-center gap-3 mb-4">
-                      <button
-                        onClick={() => setCompareMode(true)}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-gray-100 text-sm font-medium rounded-xl transition-colors"
-                      >
-                        <Scale className="w-4 h-4" />
-                        Compare
-                      </button>
                     </div>
                   )}
 
@@ -1044,7 +1046,7 @@ function FilterChip({ active, onClick, label, count, icon, live, platform }) {
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border ${
+      className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border ${
         active
           ? activeClass
           : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-gray-200 hover:border-gray-600'
