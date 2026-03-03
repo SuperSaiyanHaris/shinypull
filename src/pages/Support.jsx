@@ -1,23 +1,45 @@
+import { Link } from 'react-router-dom';
+import { Server, Code, Zap, Coffee, Megaphone, MessageSquare, ArrowRight } from 'lucide-react';
 import SEO from '../components/SEO';
-import { Heart, Server, Code, Zap, Coffee, Target, Database, RefreshCw } from 'lucide-react';
 
 const BUYMEACOFFEE_URL = 'https://buymeacoffee.com/shinypull';
+const TWITTER_SHARE_URL = 'https://twitter.com/intent/tweet?text=Check%20out%20ShinyPull%20%E2%80%94%20free%20creator%20analytics%20for%20YouTube%2C%20Twitch%2C%20TikTok%2C%20Kick%2C%20and%20Bluesky.&url=https%3A%2F%2Fshinypull.com';
+
+const BMCButton = ({ size = 'lg' }) => (
+  <a
+    href={BUYMEACOFFEE_URL}
+    target="_blank"
+    rel="noopener noreferrer"
+    className={`inline-flex items-center gap-3 bg-[#FFDD00] text-gray-900 rounded-xl font-bold transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:bg-yellow-300 hover:shadow-xl hover:shadow-yellow-500/30 hover:-translate-y-1 ${
+      size === 'lg' ? 'px-8 py-4 text-lg' : 'px-6 py-3 text-base'
+    }`}
+  >
+    <Coffee className={size === 'lg' ? 'w-6 h-6' : 'w-5 h-5'} />
+    Buy Me a Coffee
+  </a>
+);
 
 const supportReasons = [
   {
     icon: Server,
-    title: 'Hosting & Infrastructure',
-    description: 'Keep the servers running 24/7 with fast, reliable performance for everyone.',
+    title: 'Hosting',
+    description: 'Servers that stay up 24/7. Fast response times. No downtime during traffic spikes.',
+    color: 'from-indigo-500 to-blue-600',
+    shadow: 'shadow-indigo-500/30',
   },
   {
     icon: Code,
     title: 'New Features',
-    description: 'Fund development of new tools, platforms, and analytics features.',
+    description: 'More platforms, better charts, new tools. Every feature starts with funded dev time.',
+    color: 'from-violet-500 to-purple-600',
+    shadow: 'shadow-violet-500/30',
   },
   {
     icon: Zap,
     title: 'API Costs',
-    description: 'Cover the costs of pulling real-time data across all supported platforms.',
+    description: 'Real data costs real money. YouTube, Twitch, Kick, TikTok, and Bluesky all have API costs.',
+    color: 'from-amber-500 to-orange-500',
+    shadow: 'shadow-amber-500/30',
   },
 ];
 
@@ -31,109 +53,101 @@ export default function Support() {
 
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Hero */}
-        <div className="relative overflow-hidden border-b border-gray-800/60 py-16 bg-gradient-to-b from-indigo-950/60 to-transparent">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <div className="w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-indigo-500/30">
-              <Heart className="w-8 h-8 text-indigo-400" />
+        <div className="relative overflow-hidden border-b border-gray-800/60">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-rose-950/40 to-transparent" />
+          <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] h-72 bg-rose-500/5 rounded-full blur-3xl" />
+          <div className="max-w-4xl mx-auto px-4 py-14 sm:py-20 text-center relative">
+            {/* Impact stat chip */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-full text-rose-400 text-sm font-semibold mb-6">
+              500+ creators tracked &middot; 5 platforms &middot; always free
             </div>
-            <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Support ShinyPull</h1>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              ShinyPull is free to use for everyone. Your support helps keep it that way and funds new features.
+
+            <div className="w-14 h-14 bg-gradient-to-br from-rose-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-rose-500/30">
+              <Coffee className="w-7 h-7 text-white" />
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-100 mb-4">
+              Keep ShinyPull Free
+            </h1>
+            <p className="text-lg sm:text-xl text-gray-400 max-w-xl mx-auto mb-8">
+              ShinyPull runs on real API data. Not estimates, not guesses. Someone has to pay for that.
+              If the site's saved you time, this is how you give back.
             </p>
+
+            <BMCButton size="lg" />
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 py-12">
-          {/* Buy Me a Coffee CTA */}
-          <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8 mb-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-100 mb-3">Buy Me a Coffee</h2>
-            <p className="text-gray-300 mb-6 max-w-lg mx-auto">
-              If you find ShinyPull useful, consider buying the developer a coffee. Every contribution helps keep the site running and growing.
-            </p>
-            <a
-              href={BUYMEACOFFEE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-[#FFDD00] text-gray-900 rounded-xl font-bold text-lg hover:bg-yellow-300 transition-colors shadow-lg shadow-yellow-500/20 hover:shadow-xl hover:shadow-yellow-500/30"
-            >
-              <Coffee className="w-6 h-6" />
-              Buy Me a Coffee
-            </a>
-          </div>
+        <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
 
-          {/* What your support goes toward */}
-          <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-100 mb-6 text-center">Where Your Support Goes</h2>
-            <div className="grid md:grid-cols-3 gap-6">
+          {/* Where support goes */}
+          <div>
+            <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest text-center mb-5">Where your support goes</p>
+            <div className="grid md:grid-cols-3 gap-4">
               {supportReasons.map((reason) => (
-                <div key={reason.title} className="text-center p-6 bg-gray-800/50 rounded-xl">
-                  <div className="w-12 h-12 bg-indigo-900/50 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <reason.icon className="w-6 h-6 text-indigo-400" />
+                <div key={reason.title} className="group bg-gray-900 border border-gray-800 hover:border-gray-700 rounded-2xl p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+                  <div className={`w-12 h-12 bg-gradient-to-br ${reason.color} rounded-xl flex items-center justify-center mb-4 shadow-lg ${reason.shadow}`}>
+                    <reason.icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="font-semibold text-gray-100 mb-2">{reason.title}</h3>
-                  <p className="text-sm text-gray-300">{reason.description}</p>
+                  <h3 className="font-bold text-gray-100 mb-1.5">{reason.title}</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed">{reason.description}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Other ways to support */}
-          <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-100 mb-4 text-center">Other Ways to Help</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="flex items-start gap-3 p-4 bg-gray-800/50 rounded-xl">
-                <span className="text-2xl">📣</span>
-                <div>
-                  <h3 className="font-semibold text-gray-100">Spread the Word</h3>
-                  <p className="text-sm text-gray-300">Share ShinyPull with friends, creators, or on social media.</p>
-                </div>
+          {/* Other ways — with real linked CTAs */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <a
+              href={TWITTER_SHARE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-start gap-4 bg-gray-900 border border-gray-800 hover:border-sky-600/50 rounded-2xl p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-sky-500/5"
+            >
+              <div className="w-11 h-11 bg-gradient-to-br from-sky-500 to-cyan-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-sky-500/30 group-hover:scale-105 transition-transform duration-300">
+                <Megaphone className="w-5 h-5 text-white" />
               </div>
-              <div className="flex items-start gap-3 p-4 bg-gray-800/50 rounded-xl">
-                <span className="text-2xl">💡</span>
-                <div>
-                  <h3 className="font-semibold text-gray-100">Send Feedback</h3>
-                  <p className="text-sm text-gray-300">Suggest features or report bugs to help us improve.</p>
-                </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-gray-100 mb-1">Share ShinyPull</h3>
+                <p className="text-sm text-gray-400">Post about it on X. Tell a creator friend. Every new user helps justify the server bill.</p>
+                <span className="inline-flex items-center gap-1 mt-3 text-sm font-semibold text-sky-400 group-hover:gap-2 transition-all duration-200">
+                  Share on X <ArrowRight className="w-3.5 h-3.5" />
+                </span>
               </div>
+            </a>
+
+            <Link
+              to="/contact"
+              className="group flex items-start gap-4 bg-gray-900 border border-gray-800 hover:border-violet-600/50 rounded-2xl p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-violet-500/5"
+            >
+              <div className="w-11 h-11 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/30 group-hover:scale-105 transition-transform duration-300">
+                <MessageSquare className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-gray-100 mb-1">Send Feedback</h3>
+                <p className="text-sm text-gray-400">Bug report, feature idea, creator request. Good feedback shapes what gets built next.</p>
+                <span className="inline-flex items-center gap-1 mt-3 text-sm font-semibold text-violet-400 group-hover:gap-2 transition-all duration-200">
+                  Contact us <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+            </Link>
+          </div>
+
+          {/* Closing CTA — mirrors the hero, circles back to the action */}
+          <div className="relative overflow-hidden bg-gray-900 border border-yellow-500/20 rounded-2xl p-8 sm:p-10 text-center">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-yellow-500/5 to-transparent rounded-2xl" />
+            <div className="relative">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Still thinking about it?</p>
+              <p className="text-lg sm:text-xl font-semibold text-gray-200 mb-2">
+                Creator analytics should be free for everyone.
+              </p>
+              <p className="text-gray-400 mb-8 max-w-md mx-auto">
+                One coffee funds a week of API calls. The data never stops. Your support makes sure neither do we.
+              </p>
+              <BMCButton size="lg" />
             </div>
           </div>
 
-          {/* Mission Statement & Data Transparency */}
-          <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Target className="w-6 h-6 text-indigo-400" />
-              <h2 className="text-2xl font-bold text-gray-100">Our Mission</h2>
-            </div>
-            <p className="text-gray-400 text-center max-w-2xl mx-auto mb-8">
-              Creator analytics should be open, honest, and accessible to everyone. We built ShinyPull because that wasn't always the case.
-            </p>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-gray-800/60 rounded-xl p-6 border border-gray-700/50">
-                <div className="flex items-start gap-3">
-                  <Database className="w-6 h-6 text-indigo-400 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-gray-100 mb-2">Accurate Data</h3>
-                    <p className="text-sm text-gray-400">
-                      Every number on ShinyPull comes from the source. We don't estimate, interpolate, or fill gaps with guesses. If the data isn't reliable, we don't show it.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-800/60 rounded-xl p-6 border border-gray-700/50">
-                <div className="flex items-start gap-3">
-                  <RefreshCw className="w-6 h-6 text-indigo-400 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-gray-100 mb-2">Always Current</h3>
-                    <p className="text-sm text-gray-400">
-                      Stats are refreshed continuously so the growth trends you're seeing reflect what's actually happening, not a stale snapshot from last week.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </>
