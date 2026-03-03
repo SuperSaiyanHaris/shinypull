@@ -9,14 +9,21 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-function isSafeReturnUrl(url, origin) {
+const SAFE_ORIGINS = new Set(['https://shinypull.com', 'http://localhost:3000']);
+
+function isSafeReturnUrl(url) {
   if (!url) return true;
   try {
     const parsed = new URL(url);
-    return parsed.origin === 'https://shinypull.com' || parsed.origin === origin;
+    return SAFE_ORIGINS.has(parsed.origin);
   } catch {
     return false;
   }
+}
+
+function getSiteOrigin(req) {
+  const reqOrigin = req.headers.origin || '';
+  return reqOrigin === 'http://localhost:3000' ? 'http://localhost:3000' : 'https://shinypull.com';
 }
 
 export default async function handler(req, res) {
@@ -60,9 +67,9 @@ export default async function handler(req, res) {
     }
 
     const { returnUrl } = req.body;
-    const origin = req.headers.origin || 'https://shinypull.com';
+    const origin = getSiteOrigin(req);
 
-    if (returnUrl && !isSafeReturnUrl(returnUrl, origin)) {
+    if (returnUrl && !isSafeReturnUrl(returnUrl)) {
       return res.status(400).json({ error: 'Invalid return URL' });
     }
 
@@ -74,6 +81,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ url: session.url });
   } catch (err) {
     console.error('Stripe portal error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to create portal session' });
+    return res.status(500).json({ error: 'Payment system error. Please try again.' });
   }
 }

@@ -96,7 +96,8 @@ export default async function handler(req, res) {
           }
         }
 
-        const placementTier = session.metadata?.featuredPlacementTier || 'basic';
+        const rawTier = session.metadata?.featuredPlacementTier;
+        const placementTier = (rawTier === 'basic' || rawTier === 'premium') ? rawTier : 'basic';
         const activeFrom = new Date();
         const activeUntil = new Date(activeFrom);
         activeUntil.setDate(activeUntil.getDate() + 30);

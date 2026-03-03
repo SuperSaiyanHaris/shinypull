@@ -33,15 +33,21 @@ const PRICE_IDS = {
 const VALID_PLATFORMS = new Set(['youtube', 'tiktok', 'twitch', 'kick', 'bluesky']);
 const ALLOWED_ORIGINS = new Set(['https://shinypull.com', 'http://localhost:3000']);
 
-function isSafeReturnUrl(url, origin) {
+const SAFE_ORIGINS = new Set(['https://shinypull.com', 'http://localhost:3000']);
+
+function isSafeReturnUrl(url) {
   if (!url) return true;
   try {
     const parsed = new URL(url);
-    // Must be same host as our site or the request origin
-    return parsed.origin === 'https://shinypull.com' || parsed.origin === origin;
+    return SAFE_ORIGINS.has(parsed.origin);
   } catch {
-    return false; // relative URLs are fine; malformed URLs are rejected
+    return false;
   }
+}
+
+function getSiteOrigin(req) {
+  const reqOrigin = req.headers.origin || '';
+  return reqOrigin === 'http://localhost:3000' ? 'http://localhost:3000' : 'https://shinypull.com';
 }
 
 export default async function handler(req, res) {
@@ -110,8 +116,8 @@ export default async function handler(req, res) {
     }
 
     // Validate returnUrl to prevent open redirects
-    const origin = req.headers.origin || 'https://shinypull.com';
-    if (returnUrl && !isSafeReturnUrl(returnUrl, origin)) {
+    const origin = getSiteOrigin(req);
+    if (returnUrl && !isSafeReturnUrl(returnUrl)) {
       return res.status(400).json({ error: 'Invalid return URL' });
     }
 
@@ -136,16 +142,15 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Mod plan required for free featured listing' });
       }
 
-      // Verify not already used this calendar month
+      // Verify not already used this calendar month (UTC)
       const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
+      startOfMonth.setUTCDate(1);
+      startOfMonth.setUTCHours(0, 0, 0, 0);
       const { count } = await supabase
         .from('featured_listings')
         .select('id', { count: 'exact', head: true })
         .eq('purchased_by_user_id', user.id)
         .eq('is_mod_free', true)
-        .eq('status', 'active')
         .gte('created_at', startOfMonth.toISOString());
       if (count > 0) {
         return res.status(400).json({ error: 'Free listing already used this month' });
@@ -280,6 +285,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ url: session.url });
   } catch (err) {
     console.error('Stripe checkout error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to create checkout session' });
+    return res.status(500).json({ error: 'Payment system error. Please try again.' });
   }
 }
