@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown,
   Scale, Clock, ChevronRight, ChevronLeft, Check, X, Trash2,
-  ExternalLink, Download, Lock, Settings, Zap, Crown,
+  ExternalLink, Download, Lock, Settings, Zap,
 } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -16,7 +16,7 @@ import { getSavedCompares, deleteSavedCompare } from '../services/compareService
 import { getCreatorStats } from '../services/creatorService';
 import { getLiveStreams as getTwitchLiveStreams } from '../services/twitchService';
 import { getLiveStreams as getKickLiveStreams } from '../services/kickService';
-import { getRecentlyViewed } from '../lib/recentlyViewed';
+import { getRecentlyViewed, clearRecentlyViewed } from '../lib/recentlyViewed';
 import { formatNumber } from '../lib/utils';
 import logger from '../lib/logger';
 
@@ -40,6 +40,14 @@ const PLATFORM_LABELS = {
   youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky',
 };
 
+const METRIC_LABEL = {
+  youtube: 'subs',
+  tiktok: 'followers',
+  twitch: 'followers',
+  kick: 'paid subs',
+  bluesky: 'followers',
+};
+
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
   const { tier } = useSubscription();
@@ -58,6 +66,7 @@ export default function Dashboard() {
   // UI state
   const [activeTab, setActiveTab] = useState('following');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
+  const [sortBy, setSortBy] = useState('live');
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState([]);
   const [recentlyViewedIndex, setRecentlyViewedIndex] = useState(0);
@@ -145,6 +154,12 @@ export default function Dashboard() {
     } catch (err) {
       logger.error('Failed to delete compare:', err);
     }
+  }
+
+  function handleClearHistory() {
+    clearRecentlyViewed();
+    setRecentlyViewed([]);
+    setRecentlyViewedIndex(0);
   }
 
   const getGrowth = (creatorId, field) => {
@@ -405,6 +420,31 @@ export default function Dashboard() {
     ? followedCreators.filter(c => (c.platform === 'twitch' || c.platform === 'kick') && liveStreamers.has(c.username.toLowerCase()))
     : followedCreators.filter(c => c.platform === selectedPlatform);
 
+  const sortedCreators = [...filteredCreators].sort((a, b) => {
+    if (sortBy === 'live') {
+      const aLive = (a.platform === 'twitch' || a.platform === 'kick') && liveStreamers.has(a.username.toLowerCase()) ? 1 : 0;
+      const bLive = (b.platform === 'twitch' || b.platform === 'kick') && liveStreamers.has(b.username.toLowerCase()) ? 1 : 0;
+      if (aLive !== bLive) return bLive - aLive;
+      const aCount = creatorStats[a.id]?.current?.subscribers || creatorStats[a.id]?.current?.followers || 0;
+      const bCount = creatorStats[b.id]?.current?.subscribers || creatorStats[b.id]?.current?.followers || 0;
+      return bCount - aCount;
+    }
+    if (sortBy === 'growth') {
+      const aGrowth = getGrowth(a.id, a.platform === 'youtube' ? 'subscribers' : 'followers') ?? -Infinity;
+      const bGrowth = getGrowth(b.id, b.platform === 'youtube' ? 'subscribers' : 'followers') ?? -Infinity;
+      return bGrowth - aGrowth;
+    }
+    if (sortBy === 'followers') {
+      const aCount = creatorStats[a.id]?.current?.subscribers || creatorStats[a.id]?.current?.followers || 0;
+      const bCount = creatorStats[b.id]?.current?.subscribers || creatorStats[b.id]?.current?.followers || 0;
+      return bCount - aCount;
+    }
+    if (sortBy === 'name') {
+      return (a.display_name || a.username).localeCompare(b.display_name || b.username);
+    }
+    return 0;
+  });
+
   const tabs = [
     { id: 'following', label: 'Following', shortLabel: 'Following', icon: Star, count: followedCreators.length },
     { id: 'compares', label: 'Saved Compares', shortLabel: 'Compares', icon: Scale, count: savedCompares.length },
@@ -430,38 +470,72 @@ export default function Dashboard() {
         <div className="max-w-5xl mx-auto px-4 py-8">
 
           {/* Profile summary strip */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-8 flex items-center gap-4">
-            {/* Avatar */}
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-base font-extrabold text-white flex-shrink-0 bg-gradient-to-br ${
-              tier === 'mod' ? 'from-amber-500 to-orange-600' : tier === 'sub' ? 'from-indigo-500 to-purple-600' : 'from-gray-600 to-gray-700'
-            }`}>
-              {initials}
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                <span className="font-semibold text-gray-100">Welcome back, {displayName}</span>
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${TIER_DISPLAY[tier]?.bg} ${TIER_DISPLAY[tier]?.color} border ${TIER_DISPLAY[tier]?.border}`}>
-                  {TIER_DISPLAY[tier]?.label}
-                </span>
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-8">
+            <div className="flex items-center gap-4">
+              {/* Avatar */}
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-base font-extrabold text-white flex-shrink-0 bg-gradient-to-br ${
+                tier === 'mod' ? 'from-amber-500 to-orange-600' : tier === 'sub' ? 'from-indigo-500 to-purple-600' : 'from-gray-600 to-gray-700'
+              }`}>
+                {initials}
               </div>
-              <p className="text-sm text-gray-500 truncate">{user.email}</p>
-            </div>
 
-            <div className="hidden sm:flex items-center gap-8 flex-shrink-0 pr-2">
-              <div className="text-center">
-                <p className="text-xl font-bold text-gray-100">{followedCreators.length}</p>
-                <p className="text-xs text-gray-500 mt-0.5">Following</p>
-              </div>
-              {liveCount > 0 && (
-                <div className="text-center">
-                  <p className="text-xl font-bold text-red-400">{liveCount}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Live now</p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                  <span className="font-semibold text-gray-100">Welcome back, {displayName}</span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${TIER_DISPLAY[tier]?.bg} ${TIER_DISPLAY[tier]?.color} border ${TIER_DISPLAY[tier]?.border}`}>
+                    {TIER_DISPLAY[tier]?.label}
+                  </span>
                 </div>
-              )}
-              <div className="text-center">
-                <p className="text-xl font-bold text-gray-100">{savedCompares.length}</p>
-                <p className="text-xs text-gray-500 mt-0.5">Saved compares</p>
+                <p className="text-sm text-gray-500 truncate">{user.email}</p>
+              </div>
+
+              {/* Desktop stats */}
+              <div className="hidden sm:flex items-center gap-8 flex-shrink-0 pr-2">
+                <div className="text-center">
+                  <p className="text-xl font-bold text-gray-100">{followedCreators.length}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Following</p>
+                </div>
+                {liveCount > 0 && (
+                  <div className="text-center">
+                    <p className="text-xl font-bold text-red-400">{liveCount}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Live now</p>
+                  </div>
+                )}
+                <div className="text-center">
+                  <p className="text-xl font-bold text-gray-100">{savedCompares.length}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Saved compares</p>
+                </div>
+              </div>
+
+              {/* Mobile settings icon */}
+              <Link
+                to="/account"
+                className="sm:hidden p-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors flex-shrink-0"
+                title="Account Settings"
+              >
+                <Settings className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Mobile stats row */}
+            <div className="flex sm:hidden items-center gap-0 mt-3 pt-3 border-t border-gray-800">
+              <div className="flex-1 text-center">
+                <p className="text-base font-bold text-gray-100">{followedCreators.length}</p>
+                <p className="text-xs text-gray-500">Following</p>
+              </div>
+              <div className="w-px h-8 bg-gray-800" />
+              {liveCount > 0 ? (
+                <>
+                  <div className="flex-1 text-center">
+                    <p className="text-base font-bold text-red-400">{liveCount}</p>
+                    <p className="text-xs text-gray-500">Live now</p>
+                  </div>
+                  <div className="w-px h-8 bg-gray-800" />
+                </>
+              ) : null}
+              <div className="flex-1 text-center">
+                <p className="text-base font-bold text-gray-100">{savedCompares.length}</p>
+                <p className="text-xs text-gray-500">Saved compares</p>
               </div>
             </div>
           </div>
@@ -523,7 +597,7 @@ export default function Dashboard() {
             {/* Main content */}
             <div className="flex-1 min-w-0">
 
-              {/* Mobile tabs — fixed 3-column segmented control, no scroll */}
+              {/* Mobile tabs — fixed 3-column segmented control */}
               <div className="flex md:hidden mb-6 bg-gray-900 border border-gray-800 rounded-xl p-1 gap-1">
                 {tabs.map(tab => {
                   const Icon = tab.icon;
@@ -555,32 +629,46 @@ export default function Dashboard() {
               {/* ── FOLLOWING TAB ── */}
               {activeTab === 'following' && (
                 <div>
-                  {/* Export + Platform filter */}
-                  {followedCreators.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2 mb-4">
-                      {tier === 'mod' ? (
-                        <button
-                          onClick={handleBulkExport}
-                          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-950/40 hover:bg-amber-950/60 text-amber-400 border border-amber-800/60 transition-colors"
+                  {/* Compare mode banner — shown above everything when active */}
+                  {compareMode && (
+                    <div className="mb-4 bg-indigo-950/50 border border-indigo-700/60 rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <Scale className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                        <span className="text-sm text-indigo-300 font-medium">
+                          Select 2-3 creators to compare
+                        </span>
+                        <span className="text-xs text-indigo-500">({selectedForCompare.length}/3)</span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Link
+                          to={`/compare?creators=${selectedForCompare.map(id => {
+                            const c = followedCreators.find(fc => fc.id === id);
+                            return c ? `${c.platform}:${c.username}` : '';
+                          }).filter(Boolean).join(',')}`}
+                          onClick={() => { setCompareMode(false); setSelectedForCompare([]); }}
+                          className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
+                            selectedForCompare.length >= 2
+                              ? 'bg-indigo-600 text-white hover:bg-indigo-500'
+                              : 'bg-gray-700 text-gray-500 cursor-not-allowed pointer-events-none'
+                          }`}
                         >
-                          <Download className="w-3.5 h-3.5" />
-                          Export All CSV
-                        </button>
-                      ) : (
+                          <Scale className="w-3.5 h-3.5" />
+                          Compare Selected
+                        </Link>
                         <button
-                          onClick={() => window.dispatchEvent(new CustomEvent('openUpgradePanel', { detail: { feature: 'export' } }))}
-                          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-800/50 text-gray-600 border border-gray-800 cursor-pointer hover:text-gray-500 transition-colors"
-                          title="Bulk CSV export requires Mod plan"
+                          onClick={() => { setCompareMode(false); setSelectedForCompare([]); }}
+                          className="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-800 text-gray-400 hover:text-gray-200 text-sm rounded-xl transition-colors"
                         >
-                          <Lock className="w-3.5 h-3.5" />
-                          Export All CSV
+                          <X className="w-3.5 h-3.5" />
+                          Cancel
                         </button>
-                      )}
+                      </div>
                     </div>
                   )}
 
+                  {/* Filter chips + sort + export — all in one row */}
                   {followedCreators.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className={`flex flex-wrap items-center gap-2 mb-4 ${compareMode ? 'opacity-40 pointer-events-none' : ''}`}>
                       <FilterChip
                         active={selectedPlatform === 'all'}
                         onClick={() => setSelectedPlatform('all')}
@@ -612,49 +700,52 @@ export default function Dashboard() {
                           live
                         />
                       )}
+
+                      {/* Sort + Export pushed to right */}
+                      <div className="ml-auto flex items-center gap-2">
+                        <select
+                          value={sortBy}
+                          onChange={e => setSortBy(e.target.value)}
+                          className="text-xs bg-gray-800 border border-gray-700 text-gray-400 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-gray-600 cursor-pointer"
+                        >
+                          <option value="live">Live first</option>
+                          <option value="growth">Top growth</option>
+                          <option value="followers">Most followed</option>
+                          <option value="name">Name A-Z</option>
+                        </select>
+
+                        {tier === 'mod' ? (
+                          <button
+                            onClick={handleBulkExport}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-950/40 hover:bg-amber-950/60 text-amber-400 border border-amber-800/60 transition-colors"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            Export CSV
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => window.dispatchEvent(new CustomEvent('openUpgradePanel', { detail: { feature: 'export' } }))}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-800/50 text-gray-600 border border-gray-800 hover:text-gray-500 transition-colors"
+                            title="Bulk CSV export requires Mod plan"
+                          >
+                            <Lock className="w-3.5 h-3.5" />
+                            Export CSV
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
 
-                  {/* Compare mode bar */}
-                  {!loadingCreators && followedCreators.length >= 2 && (
+                  {/* Compare mode launch button (when not in compare mode, 2+ creators) */}
+                  {!compareMode && !loadingCreators && followedCreators.length >= 2 && (
                     <div className="flex items-center gap-3 mb-4">
-                      {!compareMode ? (
-                        <button
-                          onClick={() => setCompareMode(true)}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-gray-100 text-sm font-medium rounded-xl transition-colors"
-                        >
-                          <Scale className="w-4 h-4" />
-                          Compare
-                        </button>
-                      ) : (
-                        <>
-                          <span className="text-sm text-gray-400">
-                            Select 2-3 creators ({selectedForCompare.length}/3)
-                          </span>
-                          <Link
-                            to={`/compare?creators=${selectedForCompare.map(id => {
-                              const c = followedCreators.find(fc => fc.id === id);
-                              return c ? `${c.platform}:${c.username}` : '';
-                            }).filter(Boolean).join(',')}`}
-                            onClick={() => { setCompareMode(false); setSelectedForCompare([]); }}
-                            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
-                              selectedForCompare.length >= 2
-                                ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-                                : 'bg-gray-700 text-gray-500 cursor-not-allowed pointer-events-none'
-                            }`}
-                          >
-                            <Scale className="w-4 h-4" />
-                            Compare Selected
-                          </Link>
-                          <button
-                            onClick={() => { setCompareMode(false); setSelectedForCompare([]); }}
-                            className="inline-flex items-center gap-2 px-3 py-2 bg-gray-800 text-gray-400 hover:text-gray-200 text-sm rounded-xl transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                            Cancel
-                          </button>
-                        </>
-                      )}
+                      <button
+                        onClick={() => setCompareMode(true)}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-gray-100 text-sm font-medium rounded-xl transition-colors"
+                      >
+                        <Scale className="w-4 h-4" />
+                        Compare
+                      </button>
                     </div>
                   )}
 
@@ -664,11 +755,13 @@ export default function Dashboard() {
                       <div className="flex items-center justify-center p-12">
                         <Loader2 className="w-7 h-7 text-indigo-600 animate-spin" />
                       </div>
-                    ) : filteredCreators.length === 0 ? (
+                    ) : sortedCreators.length === 0 ? (
                       <div className="text-center p-12">
                         {selectedPlatform === 'all' ? (
                           <>
-                            <Star className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+                            <div className="w-14 h-14 bg-gray-800/60 rounded-xl flex items-center justify-center mx-auto mb-3">
+                              <Star className="w-7 h-7 text-gray-600" />
+                            </div>
                             <p className="text-gray-100 font-semibold mb-1">No creators followed yet</p>
                             <p className="text-gray-400 text-sm mb-5">Find creators to follow and track their growth.</p>
                             <Link
@@ -686,13 +779,14 @@ export default function Dashboard() {
                       </div>
                     ) : (
                       <div className="divide-y divide-gray-800">
-                        {filteredCreators.map(creator => {
+                        {sortedCreators.map(creator => {
                           const PlatformIcon = platformIcons[creator.platform] || Users;
                           const colors = platformColors[creator.platform] || { light: 'bg-gray-800/50', text: 'text-gray-400' };
                           const stats = creatorStats[creator.id];
                           const isLive = (creator.platform === 'twitch' || creator.platform === 'kick') && liveStreamers.has(creator.username.toLowerCase());
                           const growth = getGrowth(creator.id, creator.platform === 'youtube' ? 'subscribers' : 'followers');
                           const isSelected = selectedForCompare.includes(creator.id);
+                          const metricLabel = METRIC_LABEL[creator.platform] || 'followers';
 
                           const rowContent = (
                             <div className="flex items-center gap-4 px-4 py-3.5">
@@ -726,18 +820,23 @@ export default function Dashboard() {
                                 <p className="text-xs text-gray-500 mt-0.5">@{creator.username}</p>
                               </div>
                               <div className="text-right hidden sm:block">
-                                <p className="text-sm font-semibold text-gray-100">
-                                  {stats?.current ? formatNumber(stats.current.subscribers || stats.current.followers) : '–'}
-                                </p>
+                                <div className="flex items-baseline gap-1 justify-end">
+                                  <p className="text-sm font-semibold text-gray-100">
+                                    {stats?.current ? formatNumber(stats.current.subscribers || stats.current.followers) : '–'}
+                                  </p>
+                                  {stats?.current && (
+                                    <span className="text-[10px] text-gray-600 uppercase tracking-wide">{metricLabel}</span>
+                                  )}
+                                </div>
                                 {growth !== null && growth !== 0 ? (
                                   <span className={`flex items-center justify-end text-xs font-medium ${growth > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                                     {growth > 0 ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
                                     {growth > 0 ? '+' : ''}{formatNumber(growth)}
                                   </span>
+                                ) : growth === 0 ? (
+                                  <span className="text-xs text-gray-600">no change</span>
                                 ) : (
-                                  <span className="text-xs text-gray-600">
-                                    {creator.platform === 'youtube' ? 'subs' : 'followers'}
-                                  </span>
+                                  <span className="text-xs text-gray-700">–</span>
                                 )}
                               </div>
                               {!compareMode && <ChevronRight className="w-4 h-4 text-gray-600 flex-shrink-0" />}
@@ -783,7 +882,9 @@ export default function Dashboard() {
                     </div>
                   ) : savedCompares.length === 0 ? (
                     <div className="bg-gray-900 rounded-2xl border border-gray-800 p-12 text-center">
-                      <Scale className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+                      <div className="w-14 h-14 bg-gray-800/60 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <Scale className="w-7 h-7 text-gray-600" />
+                      </div>
                       <p className="text-gray-100 font-semibold mb-1">No saved comparisons</p>
                       <p className="text-gray-400 text-sm mb-5">Head to the Compare page, set up a comparison, and hit "Save comparison".</p>
                       <Link
@@ -795,45 +896,44 @@ export default function Dashboard() {
                       </Link>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-gray-900 rounded-2xl border border-gray-800 divide-y divide-gray-800 overflow-hidden">
                       {savedCompares.map(compare => {
                         const entries = compare.creators_param.split(',').map(e => {
                           const [platform, username] = e.split(':');
                           return { platform, username };
                         });
                         return (
-                          <div key={compare.id} className="bg-gray-900 rounded-2xl border border-gray-800 p-5 flex flex-col gap-4 hover:border-gray-700 transition-colors">
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="font-semibold text-gray-100 text-sm leading-snug">{compare.name}</p>
+                          <div key={compare.id} className="flex items-center gap-3 px-4 py-3.5 group hover:bg-gray-800/40 transition-colors">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-gray-100 text-sm mb-1.5">{compare.name}</p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {entries.map((e, i) => {
+                                  const Icon = platformIcons[e.platform];
+                                  const colors = platformColors[e.platform] || { light: 'bg-gray-800', text: 'text-gray-400' };
+                                  return (
+                                    <span key={i} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${colors.light} ${colors.text}`}>
+                                      {Icon && <Icon className="w-2.5 h-2.5" />}
+                                      {e.username}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 flex-shrink-0">
                               <button
                                 onClick={() => handleDeleteCompare(compare.id)}
-                                className="p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-950/20 transition-colors flex-shrink-0"
+                                className="p-2 rounded-lg text-gray-700 hover:text-red-400 hover:bg-red-950/20 transition-colors opacity-0 group-hover:opacity-100"
                                 title="Delete"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
+                              <Link
+                                to={`/compare?creators=${compare.creators_param}`}
+                                className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors px-2"
+                              >
+                                Open <ChevronRight className="w-4 h-4" />
+                              </Link>
                             </div>
-
-                            <div className="flex flex-wrap gap-2">
-                              {entries.map((e, i) => {
-                                const Icon = platformIcons[e.platform];
-                                const colors = platformColors[e.platform] || { light: 'bg-gray-800', text: 'text-gray-400' };
-                                return (
-                                  <span key={i} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${colors.light} ${colors.text}`}>
-                                    {Icon && <Icon className="w-3 h-3" />}
-                                    {e.username}
-                                  </span>
-                                );
-                              })}
-                            </div>
-
-                            <Link
-                              to={`/compare?creators=${compare.creators_param}`}
-                              className="mt-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-xl transition-colors"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              Open Comparison
-                            </Link>
                           </div>
                         );
                       })}
@@ -847,31 +947,41 @@ export default function Dashboard() {
                 <div>
                   {recentlyViewed.length === 0 ? (
                     <div className="bg-gray-900 rounded-2xl border border-gray-800 p-12 text-center">
-                      <Clock className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+                      <div className="w-14 h-14 bg-gray-800/60 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <Clock className="w-7 h-7 text-gray-600" />
+                      </div>
                       <p className="text-gray-100 font-semibold mb-1">Nothing here yet</p>
                       <p className="text-gray-400 text-sm">Creators you visit will show up here.</p>
                     </div>
                   ) : (
                     <>
-                      {recentlyViewed.length > 4 && (
-                        <div className="flex items-center gap-2 mb-4 justify-end">
-                          <button
-                            onClick={() => setRecentlyViewedIndex(Math.max(0, recentlyViewedIndex - 8))}
-                            disabled={recentlyViewedIndex === 0}
-                            className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                          >
-                            <ChevronLeft className="w-4 h-4" />
-                          </button>
-                          <span className="text-xs text-gray-500">{Math.floor(recentlyViewedIndex / 8) + 1} / {Math.ceil(recentlyViewed.length / 8)}</span>
-                          <button
-                            onClick={() => setRecentlyViewedIndex(Math.min(recentlyViewed.length - 8, recentlyViewedIndex + 8))}
-                            disabled={recentlyViewedIndex >= recentlyViewed.length - 8}
-                            className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                          >
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex items-center justify-between mb-4">
+                        {recentlyViewed.length > 8 ? (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setRecentlyViewedIndex(Math.max(0, recentlyViewedIndex - 8))}
+                              disabled={recentlyViewedIndex === 0}
+                              className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                            >
+                              <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <span className="text-xs text-gray-500">{Math.floor(recentlyViewedIndex / 8) + 1} / {Math.ceil(recentlyViewed.length / 8)}</span>
+                            <button
+                              onClick={() => setRecentlyViewedIndex(Math.min(recentlyViewed.length - 8, recentlyViewedIndex + 8))}
+                              disabled={recentlyViewedIndex >= recentlyViewed.length - 8}
+                              className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                            >
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : <div />}
+                        <button
+                          onClick={handleClearHistory}
+                          className="text-xs text-gray-600 hover:text-red-400 transition-colors"
+                        >
+                          Clear all
+                        </button>
+                      </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {recentlyViewed.slice(recentlyViewedIndex, recentlyViewedIndex + 8).map((creator, idx) => {
                           const PlatformIcon = platformIcons[creator.platform] || Users;
