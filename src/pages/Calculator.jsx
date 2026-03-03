@@ -303,7 +303,7 @@ export default function Calculator() {
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 py-8 pb-28 lg:pb-8">
+        <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             {/* Dismissible info banner */}
@@ -684,16 +684,6 @@ export default function Calculator() {
         </div>
       </div>
 
-      {/* Sticky mobile results bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-950/95 backdrop-blur-sm border-t border-gray-800 px-4 py-3 flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">Monthly estimate</p>
-          <p className="text-base font-bold text-blue-400 truncate">{formatCurrency(monthlyLow)} &ndash; {formatCurrency(monthlyHigh)}</p>
-        </div>
-        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${tier.bg} ${tier.border} ${tier.color}`}>
-          {tier.label}
-        </span>
-      </div>
     </>
   );
 }
