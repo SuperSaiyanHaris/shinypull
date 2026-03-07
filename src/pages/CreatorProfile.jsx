@@ -913,7 +913,7 @@ export default function CreatorProfile() {
                 icon={Users}
                 label={platform === 'tiktok' || platform === 'twitch' || platform === 'bluesky' ? 'Followers' : platform === 'kick' ? 'Paid Subscribers' : 'Subscribers'}
                 value={formatNumber(creator.subscribers || creator.followers)}
-                sublabel={creator.hiddenSubscribers ? '(hidden)' : platform === 'youtube' ? '(rounded by YouTube)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
+                sublabel={creator.hiddenSubscribers ? '(hidden)' : (platform === 'youtube' && (creator.subscribers || 0) >= 1000) ? '(rounded by YouTube)' : creator.broadcasterType ? `(${creator.broadcasterType})` : null}
               />
 
               {/* TikTok: Show Likes and Videos */}
@@ -1283,7 +1283,7 @@ export default function CreatorProfile() {
                           <td className="px-6 py-4 text-right">
                             <div className="flex flex-col items-end">
                               <span className="font-medium text-gray-100">{formatNumber(stat.subscribers || stat.followers)}</span>
-                              {(platform === 'tiktok' || platform === 'twitch' || platform === 'kick' || platform === 'bluesky') && stat.subsChange !== 0 && (
+                              {(platform === 'tiktok' || platform === 'twitch' || platform === 'kick' || platform === 'bluesky' || (platform === 'youtube' && (creator.subscribers || 0) < 1000)) && stat.subsChange !== 0 && (
                                 <span className={`text-xs ${stat.subsChange > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                                   {stat.subsChange > 0 ? '+' : ''}{formatNumber(stat.subsChange)}
                                 </span>
@@ -1363,8 +1363,8 @@ export default function CreatorProfile() {
                       <tr className="bg-indigo-950/50 font-semibold">
                         <td className="px-6 py-4 text-indigo-200">Daily Average</td>
                         <td className="px-6 py-4 text-right">
-                          {/* For YouTube, show dash since subscriber counts are rounded */}
-                          {platform === 'youtube' ? (
+                          {/* For large YouTube channels, hide sub average since counts are rounded */}
+                          {platform === 'youtube' && (creator.subscribers || 0) >= 1000 ? (
                             <span className="text-gray-300">—</span>
                           ) : (
                             <span className={metrics.dailyAverage.subs >= 0 ? 'text-emerald-400' : 'text-red-500'}>
@@ -1753,7 +1753,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       label: 'Subscriber Growth',
       dataKey: 'subscribers',
       color: '#6366f1',
-      note: '(rounded by YouTube)'
+      ...(((creator?.subscribers || 0) >= 1000) && { note: '(rounded by YouTube)' })
     });
     metrics.push({
       value: 'videos',
