@@ -1233,6 +1233,7 @@ export default function CreatorProfile() {
                 }}
                 platform={platform}
                 maxHistoryDays={historyDays}
+                subscribers={creator?.subscribers || 0}
               />
             )}
 
@@ -1724,7 +1725,7 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
   );
 }
 
-function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platform, maxHistoryDays }) {
+function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platform, maxHistoryDays, subscribers = 0 }) {
   const ranges = [
     { label: '30D', value: 30 },
     { label: '60D', value: 60 },
@@ -1753,7 +1754,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       label: 'Subscriber Growth',
       dataKey: 'subscribers',
       color: '#6366f1',
-      ...(((creator?.subscribers || 0) >= 1000) && { note: '(rounded by YouTube)' })
+      ...(subscribers >= 1000 && { note: '(rounded by YouTube)' })
     });
     metrics.push({
       value: 'videos',
