@@ -140,23 +140,30 @@ async function monitorStreams() {
     return;
   }
 
-  // Get ALL active sessions — a creator may have multiple orphaned ones
+  // Get ALL active sessions — chunk creator IDs to stay within Supabase URL length limits
+  // (1,500+ creator IDs in one .in() call exceeds the ~8KB URL limit and silently returns nothing)
   const creatorIds = creators.map(c => c.id);
-  const { data: activeSessions } = await supabase
-    .from('stream_sessions')
-    .select('id, creator_id, stream_id, started_at, peak_viewers')
-    .is('ended_at', null)
-    .in('creator_id', creatorIds);
+  const CREATOR_ID_CHUNK = 200;
+  let allActiveSessions = [];
+  for (let i = 0; i < creatorIds.length; i += CREATOR_ID_CHUNK) {
+    const idChunk = creatorIds.slice(i, i + CREATOR_ID_CHUNK);
+    const { data } = await supabase
+      .from('stream_sessions')
+      .select('id, creator_id, stream_id, started_at, peak_viewers')
+      .is('ended_at', null)
+      .in('creator_id', idChunk);
+    if (data) allActiveSessions.push(...data);
+  }
 
   const activeSessionsByCreator = new Map();
-  (activeSessions || []).forEach(s => {
+  allActiveSessions.forEach(s => {
     if (!activeSessionsByCreator.has(s.creator_id)) {
       activeSessionsByCreator.set(s.creator_id, []);
     }
     activeSessionsByCreator.get(s.creator_id).push(s);
   });
 
-  console.log(`   Active (unfinalised) sessions in DB: ${activeSessions?.length || 0}`);
+  console.log(`   Active (unfinalised) sessions in DB: ${allActiveSessions.length}`);
 
   // Fetch channel data in batches (includes live status)
   const creatorBatches = chunk(creators, BATCH_SIZE);

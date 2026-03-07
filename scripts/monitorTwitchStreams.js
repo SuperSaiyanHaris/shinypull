@@ -152,20 +152,19 @@ async function monitorStreams() {
 
   console.log(`📊 Monitoring ${creators.length} Twitch creators\n`);
 
-  // Get ALL active sessions for Twitch creators only (paginate to avoid 1000-row default limit)
+  // Get ALL active sessions — chunk creator IDs to stay within Supabase URL length limits
+  // (8,000+ creator IDs in one .in() call exceeds the ~8KB URL limit and silently returns nothing)
   const creatorIds = creators.map(c => c.id);
+  const CREATOR_ID_CHUNK = 200;
   let allActiveSessions = [];
-  const SESSION_PAGE_SIZE = 1000;
-  for (let page = 0; ; page++) {
+  for (let i = 0; i < creatorIds.length; i += CREATOR_ID_CHUNK) {
+    const idChunk = creatorIds.slice(i, i + CREATOR_ID_CHUNK);
     const { data } = await supabase
       .from('stream_sessions')
       .select('id, creator_id, stream_id, started_at, peak_viewers')
       .is('ended_at', null)
-      .in('creator_id', creatorIds)
-      .range(page * SESSION_PAGE_SIZE, (page + 1) * SESSION_PAGE_SIZE - 1);
-    if (!data || data.length === 0) break;
-    allActiveSessions.push(...data);
-    if (data.length < SESSION_PAGE_SIZE) break;
+      .in('creator_id', idChunk);
+    if (data) allActiveSessions.push(...data);
   }
 
   // Group all active sessions by creator_id (there may be multiple orphaned ones)
