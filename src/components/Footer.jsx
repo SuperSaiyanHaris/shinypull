@@ -60,11 +60,6 @@ export default function Footer() {
                   Pricing
                 </Link>
               </li>
-              <li>
-                <Link to="/faq" className="text-gray-300 hover:text-indigo-400 transition-colors">
-                  FAQ
-                </Link>
-              </li>
             </ul>
           </div>
 
