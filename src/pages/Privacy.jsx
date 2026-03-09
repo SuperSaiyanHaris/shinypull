@@ -129,6 +129,29 @@ export default function Privacy() {
                 </p>
               </Section>
 
+              <Section title="Advertising">
+                <p className="mb-4">
+                  ShinyPull uses Google AdSense to display advertisements. Google, as a third-party vendor,
+                  uses cookies to serve ads on our site. Google's use of the DART cookie enables it to serve
+                  ads to our users based on previous visits to our site and other sites.
+                </p>
+                <p className="mb-4">
+                  You may opt out of personalized advertising by visiting{' '}
+                  <a href="https://www.google.com/settings/ads" className="text-indigo-600 hover:text-indigo-300" target="_blank" rel="noopener noreferrer">
+                    Google's Ads Settings
+                  </a>. You can also opt out of third-party vendor cookies at{' '}
+                  <a href="https://www.aboutads.info/choices/" className="text-indigo-600 hover:text-indigo-300" target="_blank" rel="noopener noreferrer">
+                    www.aboutads.info/choices
+                  </a>.
+                </p>
+                <p>
+                  Third-party ad servers or ad networks may use cookies, JavaScript, or web beacons in their
+                  ads or links that appear on ShinyPull. These are sent directly to your browser and they
+                  automatically receive your IP address. These technologies are used to measure the effectiveness
+                  of their advertising campaigns and to personalize the ad content you see.
+                </p>
+              </Section>
+
               <Section title="Data Sources">
                 <p>
                   In order to keep statistical data updated, ShinyPull utilizes API services of third parties

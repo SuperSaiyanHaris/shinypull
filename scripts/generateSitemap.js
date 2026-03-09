@@ -33,6 +33,8 @@ const staticPages = [
   { url: '/about', lastmod: TODAY, changefreq: 'monthly', priority: 0.6 },
   { url: '/contact', lastmod: TODAY, changefreq: 'monthly', priority: 0.5 },
   { url: '/support', lastmod: TODAY, changefreq: 'monthly', priority: 0.5 },
+  { url: '/faq', lastmod: TODAY, changefreq: 'monthly', priority: 0.6 },
+  { url: '/methodology', lastmod: TODAY, changefreq: 'monthly', priority: 0.5 },
   { url: '/privacy', lastmod: TODAY, changefreq: 'monthly', priority: 0.3 },
   { url: '/terms', lastmod: TODAY, changefreq: 'monthly', priority: 0.3 },
 ];
