@@ -56,6 +56,8 @@ const Pricing = lazyWithRetry(() => import('./pages/Pricing'));
 const Refunds = lazyWithRetry(() => import('./pages/Refunds'));
 const ShareProfile = lazyWithRetry(() => import('./pages/ShareProfile'));
 const Reports = lazyWithRetry(() => import('./pages/Reports'));
+const FAQ = lazyWithRetry(() => import('./pages/FAQ'));
+const Methodology = lazyWithRetry(() => import('./pages/Methodology'));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -124,6 +126,8 @@ function LayoutWrapper() {
           <Route path="/refunds" element={<Refunds />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/admin" element={<BlogAdmin />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/methodology" element={<Methodology />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
         </Routes>
         </Suspense>

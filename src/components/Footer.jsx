@@ -60,6 +60,11 @@ export default function Footer() {
                   Pricing
                 </Link>
               </li>
+              <li>
+                <Link to="/faq" className="text-gray-300 hover:text-indigo-400 transition-colors">
+                  FAQ
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -132,6 +137,16 @@ export default function Footer() {
               <li>
                 <Link to="/support" className="text-gray-300 hover:text-indigo-400 transition-colors">
                   Support Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="text-gray-300 hover:text-indigo-400 transition-colors">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link to="/methodology" className="text-gray-300 hover:text-indigo-400 transition-colors">
+                  Data Methodology
                 </Link>
               </li>
             </ul>
