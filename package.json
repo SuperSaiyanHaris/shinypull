@@ -25,6 +25,7 @@
     "discover:kick": "node scripts/discoverKickCreators.js",
     "discover:tiktok": "node scripts/discoverTikTokCreators.js",
     "refresh:tiktok": "node scripts/refreshTikTokProfiles.js",
+    "refresh:rankings": "node scripts/refreshRankingsCache.js",
     "seed:gear-blog": "node scripts/seedGearBlogPosts.js",
     "generate:blog": "node scripts/generateBlogDraft.js",
     "generate:blog:product": "node scripts/generateBlogDraft.js product"

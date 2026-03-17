@@ -111,7 +111,8 @@ src/
 └── index.css             # Tailwind + custom styles
 
 scripts/
-├── collectDailyStats.js      # Daily stats collection (runs 2x daily)
+├── collectDailyStats.js      # Daily stats collection (runs 3x daily)
+├── refreshRankingsCache.js   # Precomputes rankings_cache table (runs after each stats collection)
 ├── refreshTikTokProfiles.js  # Refresh N TikTok profiles (staleness order)
 ├── discoverTikTokCreators.js  # Discover new TikTok creators from curated list
 ├── monitorTwitchStreams.js   # Twitch stream monitoring (every 5 min)
@@ -159,6 +160,7 @@ api/                              # Vercel serverless functions
 ```sql
 creators (id, platform, platform_id, username, display_name, profile_image, description, country, category, created_at, updated_at)
 creator_stats (id, creator_id, recorded_at, subscribers, followers, total_views, total_posts, hours_watched_*, peak_viewers_*, avg_viewers_*, streams_count_*)
+rankings_cache (platform, rank_type, rank_position, creator_id, username, display_name, profile_image, platform_id, subscribers, total_views, total_posts, growth_30d, hours_watched_*, computed_at) — PK (platform, rank_type, rank_position)
 creator_requests (id, platform, username, user_id, status, error_message, created_at, processed_at)
 stream_sessions (id, creator_id, stream_id, started_at, ended_at, peak_viewers, avg_viewers, hours_watched, game_name, title)
 viewer_samples (id, session_id, recorded_at, viewer_count, game_name)
@@ -239,6 +241,7 @@ npm run seed:bluesky           # Seed top Bluesky accounts
 npm run seed:blog              # Seed blog posts
 npm run seed:products          # Seed affiliate products
 npm run collect:daily          # Collect daily stats (YouTube, Twitch, Kick, Bluesky)
+npm run refresh:rankings       # Recompute rankings_cache table (all platforms, all rank types)
 npm run monitor:twitch         # Monitor Twitch streams
 npm run monitor:kick           # Monitor Kick streams
 npm run aggregate:hours-watched # Aggregate hours watched

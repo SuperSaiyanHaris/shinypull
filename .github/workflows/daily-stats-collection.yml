@@ -42,6 +42,12 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/aggregateHoursWatched.js
 
+      - name: Refresh rankings cache
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/refreshRankingsCache.js
+
       - name: Report completion
         if: success()
         run: echo "✅ Daily stats collection completed successfully"

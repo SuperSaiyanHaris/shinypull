@@ -277,14 +277,17 @@ const _rankingsCache = new Map(); // key → { data, ts }
 const RANKINGS_TTL = 10 * 60 * 1000; // 10 minutes
 
 async function _fetchRankings(platform, rankType, limit) {
-  const { data, error } = await supabase.rpc('get_ranked_creators', {
-    p_platform: platform,
-    p_rank_type: rankType,
-    p_limit: limit,
-  });
+  const { data, error } = await supabase
+    .from('rankings_cache')
+    .select('creator_id, platform, username, display_name, profile_image, platform_id, subscribers, total_views, total_posts, growth_30d, hours_watched_day, hours_watched_week, hours_watched_month')
+    .eq('platform', platform)
+    .eq('rank_type', rankType)
+    .order('rank_position', { ascending: true })
+    .limit(limit);
   if (error) throw error;
   return (data || []).map((creator) => ({
     ...creator,
+    id: creator.creator_id,
     latestStats: {
       subscribers: creator.subscribers,
       followers: creator.subscribers,
@@ -294,7 +297,6 @@ async function _fetchRankings(platform, rankType, limit) {
       hours_watched_week: creator.hours_watched_week,
       hours_watched_month: creator.hours_watched_month,
     },
-    subscribers: creator.subscribers,
     totalViews: creator.total_views,
     totalPosts: creator.total_posts,
     growth30d: creator.growth_30d,
