@@ -200,6 +200,55 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
   return research;
 }
 
+// --- URL Validator ---
+// Checks each URL the Enrichment Agent produced. Removes any that 404 or error
+// so the Writer never receives a broken link to embed in the post.
+async function validateEnrichmentUrls(enrichment) {
+  // Collect all unique URLs from stats, caseStudy, and links
+  const allUrls = new Set();
+  enrichment.stats.forEach((s) => s.url && allUrls.add(s.url));
+  if (enrichment.caseStudy.applicable && enrichment.caseStudy.sourceUrl) {
+    allUrls.add(enrichment.caseStudy.sourceUrl);
+  }
+  enrichment.links.forEach((l) => l.url && allUrls.add(l.url));
+
+  if (allUrls.size === 0) return enrichment;
+
+  // Check all URLs in parallel
+  const results = await Promise.all(
+    [...allUrls].map(async (url) => {
+      try {
+        const r = await fetch(url, {
+          method: 'HEAD',
+          redirect: 'follow',
+          signal: AbortSignal.timeout(8000),
+          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ShinyPull/1.0)' },
+        });
+        return { url, ok: r.ok };
+      } catch {
+        return { url, ok: false };
+      }
+    })
+  );
+
+  const badUrls = new Set(results.filter((r) => !r.ok).map((r) => r.url));
+  if (badUrls.size > 0) {
+    console.warn(`⚠️  URL validation: removed ${badUrls.size} broken link(s): ${[...badUrls].join(', ')}`);
+  } else {
+    console.log('✅ URL validation: all enrichment links are live');
+  }
+
+  // Strip broken URLs from each section
+  return {
+    ...enrichment,
+    stats: enrichment.stats.filter((s) => !badUrls.has(s.url)),
+    caseStudy: enrichment.caseStudy.applicable && badUrls.has(enrichment.caseStudy.sourceUrl)
+      ? { ...enrichment.caseStudy, sourceUrl: null }
+      : enrichment.caseStudy,
+    links: enrichment.links.filter((l) => !badUrls.has(l.url)),
+  };
+}
+
 // --- Enrichment Agent ---
 // Runs after topic selection, before writing. Surfaces real stats, tables,
 // case studies, and source URLs so the writer can weave them into the first draft.
@@ -584,7 +633,10 @@ async function main() {
 
   // 2. Enrich: gather stats, tables, case studies, and links for the writer
   await sleep(1500);
-  const enrichment = await enrichmentAgent(research);
+  const rawEnrichment = await enrichmentAgent(research);
+
+  // 2b. Validate URLs — strip any 404s before they reach the Writer
+  const enrichment = await validateEnrichmentUrls(rawEnrichment);
 
   // 3. Load products for Wednesday posts
   let products = [];
