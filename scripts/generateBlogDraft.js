@@ -341,7 +341,7 @@ async function writerAgent(research, enrichment, isProductPost, products) {
 
   // Build the enrichment context block for the writer
   const statsBlock = enrichment.stats.length > 0
-    ? `\nSTATISTICS TO USE (cite these inline with markdown links, bold the key number):\n${enrichment.stats.map((s) => `- **${s.fact}** ([${s.source}](${s.url}))`).join('\n')}`
+    ? `\nSTATISTICS TO USE (weave these naturally into the text — bold the key number, name the source in prose):\n${enrichment.stats.map((s) => `- **${s.fact}** (source: ${s.source} — ${s.url})`).join('\n')}\n\nDO NOT turn these into hyperlinks. State facts like a journalist: "According to the IAB, podcast revenue hit $1.8B in 2022." Bold the number. Name the source in text. That's it.`
     : '';
 
   const tableBlock = enrichment.table.applicable
@@ -353,13 +353,14 @@ async function writerAgent(research, enrichment, isProductPost, products) {
     : '';
 
   const linksBlock = enrichment.links.length > 0
-    ? `\nADDITIONAL LINKS to use where naturally relevant:\n${enrichment.links.map((l) => `- [${l.label}](${l.url})`).join('\n')}`
+    ? `\nLINKS (use at most 1-2 of these in the ENTIRE post — only when the source name itself is the natural anchor text, never wrap a whole sentence):\n${enrichment.links.map((l) => `- [${l.label}](${l.url})`).join('\n')}`
     : '';
 
   const visualRules = `
 Visual and data elements (mandatory for ${enrichment.postType} posts):
-- Inline links: wrap cited stats and studies in markdown [text](url) — do not leave sources uncited
-- Bold key numbers: wrap the most important statistics in **bold**
+- HYPERLINKS: use a maximum of 2-3 links in the ENTIRE post. Real journalists don't hyperlink every stat. Link only when the destination is the natural anchor (e.g. "[iHeartMedia](url)" to cite their site, or "[Edison Research's Infinite Dial](url)" to name a specific study). NEVER wrap a full sentence or a bolded number in a link.
+- Bold key numbers: wrap the single most important statistic per section in **bold** — not every number
+- Cite sources in prose: "According to the IAB..." or "per Pew Research..." — not as hyperlinks
 ${enrichment.table.applicable ? '- Markdown table: include the provided table in a natural section — format it with pipe syntax' : ''}
 ${enrichment.caseStudy.applicable ? '- Case study: include the provided brand/creator example with its specific numbers' : ''}
 - ShinyPull plug: mention ShinyPull once near the end where it naturally fits (tracking stats, growth data, etc.)
@@ -442,6 +443,7 @@ FAIL conditions (deduct 2 points each from a starting score of 10):
 3. Corporate/stiff/academic tone — reads like a press release or college essay
 4. H1 heading (#) used anywhere in the content body
 5. First paragraph is a bullet list instead of prose
+6. More than 3 hyperlinks total in the post — over-linking is the #1 AI tell. Real writers link sparingly. Wrapping a bolded number or a full sentence in a link is an automatic fail.
 
 WARN conditions (deduct 0.5 points each):
 - More than two sentences over 25 words
