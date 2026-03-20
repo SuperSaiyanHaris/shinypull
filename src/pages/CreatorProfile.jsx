@@ -1849,9 +1849,12 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       subscribers: stat.subscribers || stat.followers || 0,
       views: stat.total_views || 0,
       videos: stat.total_posts || 0,
-      hoursWatched: stat.hours_watched_month || 0,
+      hoursWatched: stat.hours_watched_month || null,
       label: new Date(stat.recorded_at + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    }));
+    }))
+    // When showing Watch Hrs, drop rows with no data so the chart doesn't
+    // cliff-dive to 0 after the last aggregation run.
+    .filter((stat) => metric !== 'hoursWatched' || stat.hoursWatched !== null);
 
   if (filteredData.length < 2) {
     return null;

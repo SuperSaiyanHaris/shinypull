@@ -11,7 +11,7 @@ import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChan
 import { searchChannels as searchTwitch, getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { searchChannels as searchKick, getChannelByUsername as getKickChannel } from '../services/kickService';
 import { searchBluesky, getBlueskyProfile } from '../services/blueskyService';
-import { searchCreators, getCreatorByUsername, getCreatorStats } from '../services/creatorService';
+import { searchCreators, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import { saveCompare, findSavedCompare, deleteSavedCompare } from '../services/compareService';
 import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
@@ -233,14 +233,21 @@ export default function Compare() {
             }
           }
 
+          // For Twitch/Kick, fetch hours watched separately — getHoursWatched has
+          // no date limit and always returns the most recent non-zero value.
+          let hoursWatched = 0;
+          if (creator.platform === 'twitch' || creator.platform === 'kick') {
+            const hw = await getHoursWatched(dbCreator.id);
+            hoursWatched = hw?.hours_watched_month || 0;
+          }
+
           growth[creator.platformId] = {
             growth7Day: calc7Day,
             growth30Day: calc30Day,
             diff7Day: sevenDaysBack?.subscribers != null ? latest.subscribers - sevenDaysBack.subscribers : 0,
             diff30Day: thirtyDaysBack?.subscribers != null ? latest.subscribers - thirtyDaysBack.subscribers : 0,
             monthlyViews: monthlyViews,
-            hoursWatched: (creator.platform === 'twitch' || creator.platform === 'kick')
-              ? (stats.slice().reverse().find(s => (s.hours_watched_month || 0) > 0)?.hours_watched_month || 0) : 0,
+            hoursWatched,
           };
         } catch (err) {
           logger.warn(`Failed to fetch growth data for ${creator.username}:`, err);
