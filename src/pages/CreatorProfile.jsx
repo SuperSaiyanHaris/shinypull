@@ -1786,7 +1786,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
     });
     metrics.push({
       value: 'hoursWatched',
-      label: 'Hours Watched',
+      label: 'Watch Hrs (30d)',
       dataKey: 'hoursWatched',
       color: '#a855f7'
     });
@@ -1849,18 +1849,9 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       subscribers: stat.subscribers || stat.followers || 0,
       views: stat.total_views || 0,
       videos: stat.total_posts || 0,
-      hoursWatchedDay: stat.hours_watched_day || 0,
+      hoursWatched: stat.hours_watched_month || 0,
       label: new Date(stat.recorded_at + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     }));
-
-  // Build cumulative hours watched (running total from oldest to newest)
-  if (platform === 'twitch' || platform === 'kick') {
-    let cumulative = 0;
-    for (let i = 0; i < filteredData.length; i++) {
-      cumulative += filteredData[i].hoursWatchedDay;
-      filteredData[i].hoursWatched = cumulative;
-    }
-  }
 
   if (filteredData.length < 2) {
     return null;

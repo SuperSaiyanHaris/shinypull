@@ -240,7 +240,7 @@ export default function Compare() {
             diff30Day: thirtyDaysBack?.subscribers != null ? latest.subscribers - thirtyDaysBack.subscribers : 0,
             monthlyViews: monthlyViews,
             hoursWatched: (creator.platform === 'twitch' || creator.platform === 'kick')
-              ? (latest?.hours_watched_month || 0) : 0,
+              ? (stats.slice().reverse().find(s => (s.hours_watched_month || 0) > 0)?.hours_watched_month || 0) : 0,
           };
         } catch (err) {
           logger.warn(`Failed to fetch growth data for ${creator.username}:`, err);
