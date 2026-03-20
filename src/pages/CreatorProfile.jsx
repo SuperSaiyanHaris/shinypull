@@ -1784,12 +1784,6 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       dataKey: 'subscribers',
       color: '#6366f1'
     });
-    metrics.push({
-      value: 'hoursWatched',
-      label: 'Watch Hrs (30d)',
-      dataKey: 'hoursWatched',
-      color: '#a855f7'
-    });
   } else if (platform === 'kick') {
     // Kick: only paid subscriber growth (no views/followers available)
     metrics.push({
@@ -1851,10 +1845,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       videos: stat.total_posts || 0,
       hoursWatched: stat.hours_watched_month || null,
       label: new Date(stat.recorded_at + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    }))
-    // When showing Watch Hrs, drop rows with no data so the chart doesn't
-    // cliff-dive to 0 after the last aggregation run.
-    .filter((stat) => metric !== 'hoursWatched' || stat.hoursWatched !== null);
+    }));
 
   if (filteredData.length < 2) {
     return null;

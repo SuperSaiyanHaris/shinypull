@@ -662,7 +662,11 @@ export default function Compare() {
                           }
                           return formatNumber(c.totalViews);
                         })}
-                        highlight={null}
+                        highlight={getWinner(filledCreators.map(c => {
+                          if (c.platform === 'bluesky') return null;
+                          if (c.platform === 'twitch' || c.platform === 'kick') return growthData[c.platformId]?.hoursWatched || null;
+                          return c.totalViews || null;
+                        }))}
                       />
                       <ComparisonRow
                         label="Videos / Content"
