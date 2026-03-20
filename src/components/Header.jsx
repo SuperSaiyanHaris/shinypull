@@ -205,7 +205,7 @@ export default function Header() {
               {moreMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setMoreMenuOpen(false)} />
-                  <div className="absolute left-0 top-full mt-2 w-[400px] bg-[#0d0d14] border border-gray-800 rounded-2xl shadow-2xl shadow-black/70 z-50 p-3">
+                  <div className="absolute right-0 top-full mt-2 w-[400px] bg-[#0d0d14] border border-gray-800 rounded-2xl shadow-2xl shadow-black/70 z-50 p-3">
                     <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest px-1 mb-2.5">Features</p>
                     <div className="grid grid-cols-2 gap-1.5">
                       {moreLinks.map(link => {
