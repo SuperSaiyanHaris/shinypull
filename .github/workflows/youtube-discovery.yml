@@ -38,14 +38,6 @@ jobs:
           VITE_YOUTUBE_API_KEY: ${{ secrets.VITE_YOUTUBE_API_KEY }}
         run: node scripts/discoverYouTubeCreators.js
 
-      - name: Discover Twitch creators
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          VITE_TWITCH_CLIENT_ID: ${{ secrets.VITE_TWITCH_CLIENT_ID }}
-          VITE_TWITCH_CLIENT_SECRET: ${{ secrets.VITE_TWITCH_CLIENT_SECRET }}
-        run: node scripts/discoverTwitchCreators.js
-
       - name: Discover Kick creators
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
