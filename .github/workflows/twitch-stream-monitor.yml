@@ -2,8 +2,8 @@ name: Twitch Stream Monitor
 
 on:
   schedule:
-    # Run every hour (24x daily) — public repo has unlimited minutes
-    - cron: '0 * * * *'
+    # Run every 5 minutes (288x daily) — public repo has unlimited minutes
+    - cron: '*/5 * * * *'
   workflow_dispatch: # Allow manual trigger
 
 jobs:

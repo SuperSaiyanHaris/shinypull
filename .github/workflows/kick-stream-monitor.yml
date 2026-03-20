@@ -2,8 +2,8 @@ name: Kick Stream Monitor
 
 on:
   schedule:
-    # Run every hour (24x daily), offset 30 min from Twitch — public repo has unlimited minutes
-    - cron: '30 * * * *'
+    # Run every 5 minutes (288x daily), offset 2 min from Twitch — public repo has unlimited minutes
+    - cron: '2-59/5 * * * *'
   workflow_dispatch: # Allow manual trigger
 
 jobs:
