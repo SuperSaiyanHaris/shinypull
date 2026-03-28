@@ -11,9 +11,9 @@ import { getRankedCreators } from '../services/creatorService';
 import { formatNumber } from '../lib/utils';
 
 const TRENDING_PLATFORMS = [
-  { id: 'youtube', name: 'YouTube', icon: Youtube, iconBg: 'bg-red-600' },
-  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, iconBg: 'bg-gray-900 border border-gray-700' },
-  { id: 'twitch', name: 'Twitch', icon: Twitch, iconBg: 'bg-purple-600' },
+  { id: 'youtube', name: 'YouTube', icon: Youtube, iconBg: 'bg-red-600', growthLabel: 'views' },
+  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, iconBg: 'bg-gray-900 border border-gray-700', growthLabel: 'followers' },
+  { id: 'twitch', name: 'Twitch', icon: Twitch, iconBg: 'bg-purple-600', growthLabel: 'watch hrs' },
 ];
 
 const platforms = [
@@ -364,7 +364,7 @@ export default function Home() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-gray-100 truncate text-sm group-hover:text-white">{creator.display_name}</p>
-                        <p className="text-xs text-emerald-400 font-medium mt-0.5">+{formatNumber(creator.growth30d)}</p>
+                        <p className="text-xs text-emerald-400 font-medium mt-0.5">+{formatNumber(creator.growth30d)} <span className="text-gray-500">{platform.growthLabel}</span></p>
                       </div>
                     </Link>
                   );

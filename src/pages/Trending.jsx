@@ -10,11 +10,11 @@ import { getRankedCreators } from '../services/creatorService';
 import { formatNumber } from '../lib/utils';
 
 const PLATFORMS = [
-  { id: 'youtube', name: 'YouTube', icon: Youtube, textColor: 'text-red-400', activeBg: 'bg-red-950/40', activeBorder: 'border-red-500/60', followerLabel: 'subscribers' },
-  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, textColor: 'text-pink-400', activeBg: 'bg-pink-950/40', activeBorder: 'border-pink-500/60', followerLabel: 'followers' },
-  { id: 'twitch', name: 'Twitch', icon: Twitch, textColor: 'text-purple-400', activeBg: 'bg-purple-950/40', activeBorder: 'border-purple-500/60', followerLabel: 'followers' },
-  { id: 'kick', name: 'Kick', icon: KickIcon, textColor: 'text-green-400', activeBg: 'bg-green-950/40', activeBorder: 'border-green-500/60', followerLabel: 'subscribers' },
-  { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, textColor: 'text-sky-400', activeBg: 'bg-sky-950/40', activeBorder: 'border-sky-500/60', followerLabel: 'followers' },
+  { id: 'youtube', name: 'YouTube', icon: Youtube, textColor: 'text-red-400', activeBg: 'bg-red-950/40', activeBorder: 'border-red-500/60', followerLabel: 'subscribers', growthLabel: 'views gained', growthNote: 'YouTube subscriber counts are rounded — views are used as the growth metric.' },
+  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, textColor: 'text-pink-400', activeBg: 'bg-pink-950/40', activeBorder: 'border-pink-500/60', followerLabel: 'followers', growthLabel: 'followers gained', growthNote: null },
+  { id: 'twitch', name: 'Twitch', icon: Twitch, textColor: 'text-purple-400', activeBg: 'bg-purple-950/40', activeBorder: 'border-purple-500/60', followerLabel: 'followers', growthLabel: 'watch hours gained', growthNote: 'Twitch growth is measured by hours watched per month, the standard streaming metric.' },
+  { id: 'kick', name: 'Kick', icon: KickIcon, textColor: 'text-green-400', activeBg: 'bg-green-950/40', activeBorder: 'border-green-500/60', followerLabel: 'paid subs', growthLabel: 'paid subs gained', growthNote: 'Kick\'s API only exposes paid subscriber counts, not free follower counts.' },
+  { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, textColor: 'text-sky-400', activeBg: 'bg-sky-950/40', activeBorder: 'border-sky-500/60', followerLabel: 'followers', growthLabel: 'followers gained', growthNote: null },
 ];
 
 export default function Trending() {
@@ -84,6 +84,14 @@ export default function Trending() {
             })}
           </div>
 
+          {/* Metric note */}
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-xs text-gray-500">
+              Ranked by <span className="text-gray-400 font-medium">{platform.growthLabel}</span> over the last 30 days
+              {platform.growthNote && <span className="hidden sm:inline"> &mdash; {platform.growthNote}</span>}
+            </p>
+          </div>
+
           {/* Creator list */}
           {loading ? (
             <div className="flex justify-center py-20">
@@ -115,7 +123,7 @@ export default function Trending() {
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="font-bold text-emerald-400 text-sm sm:text-base">+{formatNumber(creator.growth30d)}</p>
-                      {growthPct && <p className="text-xs text-gray-500">+{growthPct}%</p>}
+                      <p className="text-xs text-gray-500">{platform.growthLabel}</p>
                     </div>
                   </Link>
                 );
