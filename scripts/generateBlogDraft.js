@@ -91,7 +91,7 @@ async function callWithRetry(fn, retries = 3) {
       const status = err.status || 0;
       const isRetryable = status === 529 || status === 503 || status === 502;
       if (isRetryable && attempt < retries) {
-        const delaySec = 60 * attempt; // 60s, 120s
+        const delaySec = 20 * attempt; // 20s, 40s
         console.warn(`⚠️  API ${status} overloaded (attempt ${attempt}/${retries}), retrying in ${delaySec}s...`);
         await sleep(delaySec * 1000);
         continue;
