@@ -324,7 +324,9 @@ async function writerAgent(research, enrichment, isProductPost, products) {
   const styleGuide = `MANDATORY writing style rules (violating these is a failure):
 - Write conversationally, like a knowledgeable friend. Not corporate, not academic.
 - NEVER use em dashes (—). Use commas, colons, or rewrite the sentence.
-- NEVER use these phrases: "isn't just X", "not just X it's Y", "Here's what it signals:", "Here's the math:", "seismic shift", "game-changer", "landscape" (as industry jargon), "paradigm", "in an era where", "in a world where", "the question isn't", "And that's exactly the point", "Let that sink in", "it's worth noting", "it bears mentioning", "importantly", "genuinely", "beautifully", "spectacularly", "borderline absurd", "sheer audacity"
+- NEVER start a sentence with "Here's [anything]" — not "Here's what", "Here's where", "Here's the thing", "Here's why", "Here's how", "Here's a breakdown", "Here's what it signals", "Here's the math". Rewrite as a direct statement instead.
+- NEVER use "This isn't X. It's Y." or "isn't just X, it's Y" — rewrite as a direct positive statement.
+- NEVER use these phrases: "seismic shift", "game-changer", "landscape" (as industry jargon), "paradigm", "in an era where", "in a world where", "the question isn't", "And that's exactly the point", "And that's precisely the point", "Let that sink in", "it's worth noting", "it bears mentioning", "importantly", "genuinely", "beautifully", "spectacularly", "borderline absurd", "sheer audacity"
 - Short sentences. Fragments are fine. Contractions are good (it's, don't, that's, they're).
 - Use casual language naturally: "basically", "pretty much", "kind of", "a ton of", "honestly", "nah"
 - State opinions directly. No hedging with qualifiers.
@@ -439,11 +441,13 @@ async function reviewAgent(draft) {
 
 FAIL conditions (deduct 2 points each from a starting score of 10):
 1. Em dashes (—) present anywhere in the content
-2. Any of these AI cliché phrases used: "game-changer", "seismic shift", "landscape" as industry jargon, "paradigm", "Let that sink in", "it's worth noting", "in an era where", "genuinely", "beautifully", "spectacularly", "borderline absurd", "sheer audacity", "And that's exactly the point", "isn't just X it's Y"
-3. Corporate/stiff/academic tone — reads like a press release or college essay
-4. H1 heading (#) used anywhere in the content body
-5. First paragraph is a bullet list instead of prose
-6. More than 3 hyperlinks total in the post — over-linking is the #1 AI tell. Real writers link sparingly. Wrapping a bolded number or a full sentence in a link is an automatic fail.
+2. Any sentence starting with "Here's [anything]" — "Here's what", "Here's where", "Here's why", "Here's how", "Here's the thing", "Here's a breakdown", "Here's what it signals", "Here's the math", etc.
+3. "This isn't X. It's Y." or "isn't just X, it's Y" constructions
+4. Any of these AI cliché phrases: "game-changer", "seismic shift", "landscape" as industry jargon, "paradigm", "Let that sink in", "it's worth noting", "in an era where", "genuinely [adjective]", "beautifully", "spectacularly", "borderline absurd", "sheer audacity", "And that's exactly the point"
+5. Corporate/stiff/academic tone — reads like a press release or college essay
+6. H1 heading (#) used anywhere in the content body
+7. First paragraph is a bullet list instead of prose
+8. More than 3 hyperlinks total in the post — over-linking is the #1 AI tell. Real writers link sparingly. Wrapping a bolded number or a full sentence in a link is an automatic fail.
 
 WARN conditions (deduct 0.5 points each):
 - More than two sentences over 25 words
@@ -491,7 +495,11 @@ async function rewriteAgent(draft, review) {
         content: `Rewrite the following blog post to fix these specific style issues:
 - ${issueList}
 
-Rules:
+MANDATORY style rules to follow throughout the rewrite (do not introduce new violations):
+- NEVER use em dashes (—). Use commas, colons, or rewrite the sentence.
+- NEVER start a sentence with "Here's [anything]" — rewrite as a direct statement instead.
+- NEVER use "This isn't X. It's Y." or "isn't just X, it's Y" — rewrite as a direct positive statement.
+- NEVER use: "game-changer", "seismic shift", "landscape" as jargon, "paradigm", "Let that sink in", "it's worth noting", "in an era where", "And that's exactly the point", "genuinely", "beautifully", "spectacularly"
 - Keep the same structure, topic, facts, and approximate length
 - Fix only the style violations — don't change the substance
 - Preserve any {{product:slug}} embed tags exactly as-is
