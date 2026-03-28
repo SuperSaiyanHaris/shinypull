@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, X, Scale } from 'lucide-react';
+import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, X, Scale, TrendingUp } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
@@ -7,6 +7,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { getAllPosts } from '../services/blogService';
+import { getRankedCreators } from '../services/creatorService';
+import { formatNumber } from '../lib/utils';
+
+const TRENDING_PLATFORMS = [
+  { id: 'youtube', name: 'YouTube', icon: Youtube, iconBg: 'bg-red-600' },
+  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, iconBg: 'bg-gray-900 border border-gray-700' },
+  { id: 'twitch', name: 'Twitch', icon: Twitch, iconBg: 'bg-purple-600' },
+];
 
 const platforms = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-950/30', textColor: 'text-red-600', ringColor: 'ring-red-800', stats: '72M+ channels', available: true },
@@ -27,6 +35,7 @@ const typewriterWords = [
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [latestPosts, setLatestPosts] = useState([]);
+  const [topMovers, setTopMovers] = useState([]);
   const navigate = useNavigate();
 
   // Typewriter effect
@@ -59,6 +68,19 @@ export default function Home() {
 
   useEffect(() => {
     getAllPosts().then(posts => setLatestPosts(posts.slice(0, 3)));
+  }, []);
+
+  useEffect(() => {
+    Promise.all(
+      TRENDING_PLATFORMS.map(platform =>
+        getRankedCreators(platform.id, 'growth', 2).then(creators =>
+          (creators || [])
+            .filter(c => c.growth30d > 0)
+            .slice(0, 2)
+            .map(c => ({ creator: c, platform }))
+        )
+      )
+    ).then(results => setTopMovers(results.flat()));
   }, []);
 
   const handleSearch = (e) => {
@@ -298,6 +320,66 @@ export default function Home() {
           </div>
         </section>
 
+
+        {/* Trending This Month */}
+        {topMovers.length > 0 && (
+          <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-900/30">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex items-end justify-between mb-10">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-semibold uppercase tracking-widest text-emerald-400">30-Day Growth</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100">Trending This Month</h2>
+                  <p className="mt-2 text-gray-400 text-base">Fastest growing creators right now.</p>
+                </div>
+                <Link
+                  to="/trending"
+                  className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400 hover:gap-3 transition-all duration-200"
+                >
+                  See all <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                {topMovers.map(({ creator, platform }) => {
+                  const PlatIcon = platform.icon;
+                  return (
+                    <Link
+                      key={`${platform.id}-${creator.id}`}
+                      to={`/${platform.id}/${creator.username}`}
+                      className="group flex items-center gap-3 p-4 bg-gray-900 border border-gray-800 hover:border-emerald-500/40 rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/5"
+                    >
+                      <div className="relative flex-shrink-0">
+                        <img
+                          src={creator.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.display_name)}&background=1f2937&color=9ca3af&size=48`}
+                          alt={creator.display_name}
+                          className="w-11 h-11 rounded-full object-cover bg-gray-800"
+                          loading="lazy"
+                        />
+                        <div className={`absolute -bottom-1 -right-1 w-5 h-5 ${platform.iconBg} rounded-full flex items-center justify-center`}>
+                          <PlatIcon className="w-3 h-3 text-white" />
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-100 truncate text-sm group-hover:text-white">{creator.display_name}</p>
+                        <p className="text-xs text-emerald-400 font-medium mt-0.5">+{formatNumber(creator.growth30d)}</p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <Link
+                to="/trending"
+                className="mt-6 flex sm:hidden items-center justify-center gap-2 text-emerald-400 font-medium hover:gap-4 transition-all"
+              >
+                See all trending <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* Latest Blog Posts */}
         {latestPosts.length > 0 && (

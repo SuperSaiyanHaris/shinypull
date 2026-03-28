@@ -1,11 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings, FileSpreadsheet, ChevronDown, LayoutGrid } from 'lucide-react';
+import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings, FileSpreadsheet, ChevronDown, LayoutGrid, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthPanel from './AuthPanel';
 import UpgradePanel from './UpgradePanel';
 
 const moreLinks = [
+  {
+    path: '/trending',
+    label: 'Trending',
+    description: 'Fastest growing creators',
+    icon: TrendingUp,
+    gradient: 'from-emerald-500 to-teal-600',
+    hoverBorder: 'hover:border-emerald-500/40',
+    hoverBg: 'hover:bg-emerald-950/20',
+  },
   {
     path: '/compare',
     label: 'Compare',

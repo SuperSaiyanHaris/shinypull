@@ -58,6 +58,7 @@ const ShareProfile = lazyWithRetry(() => import('./pages/ShareProfile'));
 const Reports = lazyWithRetry(() => import('./pages/Reports'));
 const FAQ = lazyWithRetry(() => import('./pages/FAQ'));
 const Methodology = lazyWithRetry(() => import('./pages/Methodology'));
+const Trending = lazyWithRetry(() => import('./pages/Trending'));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -110,6 +111,7 @@ function LayoutWrapper() {
           <Route path="/rankings/:platform" element={<Rankings />} />
           <Route path="/compare" element={<Compare />} />
           <Route path="/youtube/money-calculator" element={<Calculator />} />
+          <Route path="/trending" element={<Trending />} />
           <Route path="/live/:platform/:username" element={<LiveCount />} />
           <Route path="/s/:platform/:username" element={<ShareProfile />} />
           <Route path="/:platform/:username" element={<CreatorProfile />} />
