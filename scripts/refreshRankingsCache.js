@@ -13,8 +13,9 @@ const start = Date.now();
 const { error } = await supabase.rpc('refresh_rankings_cache');
 
 if (error) {
-  console.error('❌ Failed to refresh rankings cache:', error.message);
-  process.exit(1);
+  // Log the error but don't fail the job — data collection already succeeded
+  console.warn('⚠️ Rankings cache refresh failed (will retry next run):', error.message);
+  process.exit(0);
 }
 
 console.log(`✅ Rankings cache refreshed in ${((Date.now() - start) / 1000).toFixed(1)}s`);
