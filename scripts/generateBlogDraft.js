@@ -163,7 +163,7 @@ async function researchAgent(articles, recentTitles) {
     messages: [
       {
         role: 'user',
-        content: `You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky stats (similar to SocialBlade).
+        content: `You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky stats.
 
 Our audience: streamers, YouTubers, TikTokers, aspiring creators, and people into creator economy data and analytics.
 ${recentBlock}
@@ -261,7 +261,7 @@ async function enrichmentAgent(research) {
     messages: [
       {
         role: 'user',
-        content: `You are a research enrichment specialist for ShinyPull, a creator analytics platform (YouTube, TikTok, Twitch, Kick, Bluesky stats — similar to SocialBlade).
+        content: `You are a research enrichment specialist for ShinyPull, a creator analytics platform (YouTube, TikTok, Twitch, Kick, Bluesky stats).
 
 A blog post is about to be written on this topic:
 Title: ${research.suggestedTitle}

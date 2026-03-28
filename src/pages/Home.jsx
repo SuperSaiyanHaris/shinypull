@@ -95,7 +95,7 @@ export default function Home() {
       <SEO
         title="Home"
         description="Track YouTube, TikTok, Twitch, and Kick statistics. View subscriber counts, follower growth, earnings estimates, rankings and analytics for your favorite creators."
-        keywords="youtube statistics, tiktok statistics, twitch statistics, kick statistics, subscriber count, follower count, social blade alternative, creator analytics, earnings calculator"
+        keywords="youtube statistics, tiktok statistics, twitch statistics, kick statistics, subscriber count, follower count, creator analytics, earnings calculator"
       />
 
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">

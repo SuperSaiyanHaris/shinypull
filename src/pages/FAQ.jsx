@@ -20,8 +20,8 @@ const faqs = [
         a: 'The Trending page shows the fastest growing creators on each platform over the last 30 days. Each platform uses the metric that best reflects real growth: view count growth for YouTube (since subscriber counts are rounded by policy), follower growth for TikTok and Bluesky, hours watched growth for Twitch, and paid subscriber growth for Kick.',
       },
       {
-        q: 'How is ShinyPull different from SocialBlade?',
-        a: 'ShinyPull focuses on accuracy and clean design. We pull data directly from official APIs where available. Our charts are interactive, the layout is built for modern screens, and we track streaming-specific metrics like hours watched that other tools ignore.',
+        q: 'What makes ShinyPull different from other stats trackers?',
+        a: 'ShinyPull pulls data directly from official platform APIs where available. Charts are interactive, the layout is built for modern screens, and we track streaming-specific metrics like hours watched that most tools ignore.',
       },
       {
         q: 'Do I need an account to use ShinyPull?',
