@@ -116,7 +116,7 @@ export default function BlogPost() {
         <div className="max-w-4xl mx-auto px-4 -mt-32 relative z-10">
           {/* Article Header */}
           <article className="bg-gray-900 rounded-2xl border border-gray-800 shadow-lg overflow-hidden">
-            <div className="p-8 md:p-12">
+            <div className="p-5 sm:p-8 md:p-12">
               {/* Breadcrumbs */}
               <Breadcrumbs 
                 items={[
@@ -132,7 +132,7 @@ export default function BlogPost() {
               </span>
 
               {/* Title */}
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-100 mb-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-100 mb-4">
                 {post.title}
               </h1>
 

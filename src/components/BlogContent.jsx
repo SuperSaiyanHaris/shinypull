@@ -37,20 +37,20 @@ export const markdownComponents = {
     <h1 className="text-3xl font-bold text-gray-100 mt-8 mb-6">{children}</h1>
   ),
   h2: ({ children }) => (
-    <div className="relative mt-16 mb-8 first:mt-0">
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" />
-      <h2 className="text-3xl font-bold text-gray-100 pl-16">{children}</h2>
+    <div className="relative mt-10 sm:mt-16 mb-5 sm:mb-8 first:mt-0">
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-8 sm:w-12 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" />
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 pl-12 sm:pl-16">{children}</h2>
     </div>
   ),
   h3: ({ children }) => (
-    <h3 className="text-xl font-bold text-gray-100 mt-8 mb-3">{children}</h3>
+    <h3 className="text-lg sm:text-xl font-bold text-gray-100 mt-6 sm:mt-8 mb-3">{children}</h3>
   ),
   p: ({ children, node }) => {
     const isFirst = node?.position?.start?.line === 1;
     if (isFirst) {
       return (
-        <div className="mb-12">
-          <p className="text-xl text-gray-300 leading-relaxed font-medium p-6 bg-gradient-to-br from-indigo-950/30 to-purple-950/30 rounded-xl border border-indigo-800">
+        <div className="mb-6 sm:mb-10">
+          <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-medium p-4 sm:p-6 bg-gradient-to-br from-indigo-950/30 to-purple-950/30 rounded-xl border border-indigo-800">
             {children}
           </p>
         </div>
