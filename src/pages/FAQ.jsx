@@ -16,6 +16,10 @@ const faqs = [
         a: 'Yes, the core features are completely free. Anyone can search creators, view their stats, browse rankings, and compare up to two creators at once without an account. Paid plans (Sub and Mod) unlock higher limits and extra features like CSV export, longer history, and more comparison slots.',
       },
       {
+        q: 'What is the Trending page?',
+        a: 'The Trending page shows the fastest growing creators on each platform over the last 30 days. Each platform uses the metric that best reflects real growth: view count growth for YouTube (since subscriber counts are rounded by policy), follower growth for TikTok and Bluesky, hours watched growth for Twitch, and paid subscriber growth for Kick.',
+      },
+      {
         q: 'How is ShinyPull different from SocialBlade?',
         a: 'ShinyPull focuses on accuracy and clean design. We pull data directly from official APIs where available. Our charts are interactive, the layout is built for modern screens, and we track streaming-specific metrics like hours watched that other tools ignore.',
       },

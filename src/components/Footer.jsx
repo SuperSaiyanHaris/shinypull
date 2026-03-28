@@ -41,6 +41,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/trending" className="text-gray-300 hover:text-indigo-400 transition-colors">
+                  Trending Creators
+                </Link>
+              </li>
+              <li>
                 <Link to="/compare" className="text-gray-300 hover:text-indigo-400 transition-colors">
                   Compare Creators
                 </Link>
