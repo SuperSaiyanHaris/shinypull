@@ -160,8 +160,8 @@ export default function Home() {
 
               {/* Typewriter heading */}
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-100 mb-5 sm:mb-6 tracking-tight leading-tight">
-                Find any{' '}
-                <span className={`${typewriterWords[wordIndex].color} inline-block min-w-[200px] sm:min-w-[300px] text-left`}>
+                <span className="block">Find any</span>
+                <span className={`block min-h-[1.25em] ${typewriterWords[wordIndex].color}`}>
                   {displayText}
                   <span className="animate-pulse text-indigo-400">|</span>
                 </span>
