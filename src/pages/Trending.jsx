@@ -10,7 +10,7 @@ import { getRankedCreators } from '../services/creatorService';
 import { formatNumber } from '../lib/utils';
 
 const PLATFORMS = [
-  { id: 'youtube', name: 'YouTube', icon: Youtube, textColor: 'text-red-400', activeBg: 'bg-red-950/40', activeBorder: 'border-red-500/60', followerLabel: 'subscribers', growthLabel: 'views gained', growthNote: 'YouTube subscriber counts are rounded — views are used as the growth metric.' },
+  { id: 'youtube', name: 'YouTube', icon: Youtube, textColor: 'text-red-400', activeBg: 'bg-red-950/40', activeBorder: 'border-red-500/60', followerLabel: 'subscribers', growthLabel: 'views gained', growthNote: 'YouTube rounds subscriber counts by policy, so views are used as the growth metric.' },
   { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, textColor: 'text-pink-400', activeBg: 'bg-pink-950/40', activeBorder: 'border-pink-500/60', followerLabel: 'followers', growthLabel: 'followers gained', growthNote: null },
   { id: 'twitch', name: 'Twitch', icon: Twitch, textColor: 'text-purple-400', activeBg: 'bg-purple-950/40', activeBorder: 'border-purple-500/60', followerLabel: 'followers', growthLabel: 'watch hours gained', growthNote: 'Twitch growth is measured by hours watched per month, the standard streaming metric.' },
   { id: 'kick', name: 'Kick', icon: KickIcon, textColor: 'text-green-400', activeBg: 'bg-green-950/40', activeBorder: 'border-green-500/60', followerLabel: 'paid subs', growthLabel: 'paid subs gained', growthNote: 'Kick\'s API only exposes paid subscriber counts, not free follower counts.' },
@@ -88,7 +88,7 @@ export default function Trending() {
           <div className="flex items-center justify-between mb-4">
             <p className="text-xs text-gray-500">
               Ranked by <span className="text-gray-400 font-medium">{platform.growthLabel}</span> over the last 30 days
-              {platform.growthNote && <span className="hidden sm:inline"> &mdash; {platform.growthNote}</span>}
+              {platform.growthNote && <span className="hidden sm:inline">. {platform.growthNote}</span>}
             </p>
           </div>
 
