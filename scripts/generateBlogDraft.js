@@ -280,6 +280,8 @@ Your job: identify concrete supporting material that will make this post credibl
 
 5. POST TYPE: Classify as one of: "data-driven" (stats and tables are the backbone), "analysis" (stats help but narrative drives it), "news" (light data, mostly event coverage), "drama" (mostly story/narrative, minimal data needed).
 
+6. CHART: Is there a set of 3-6 numbers that would be more impactful as a bar chart or line chart than as prose or a table? Examples: platform market share comparison, creator revenue by tier, subscriber growth over time, platform MAU over several years. If yes, provide the data. Use "bar" for comparisons, "line" for trends over time. If no clear chart fits OR a table already covers it better, set applicable to false.
+
 Respond with ONLY valid JSON (no markdown fences, no explanation):
 {
   "stats": [
@@ -300,7 +302,16 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
   "links": [
     { "label": "anchor text", "url": "https://..." }
   ],
-  "postType": "data-driven"
+  "postType": "data-driven",
+  "chart": {
+    "applicable": true,
+    "type": "bar",
+    "title": "Chart title (concise, under 50 chars)",
+    "labels": ["Label 1", "Label 2", "Label 3"],
+    "values": [100, 200, 150],
+    "valueLabel": "What the numbers represent (e.g. Monthly active users, millions)",
+    "colorScheme": "indigo"
+  }
 }`,
       },
     ],
@@ -308,13 +319,69 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
 
   try {
     const enrichment = safeParseJSON(response.content[0].text.trim());
-    console.log(`✅ Enrichment: ${enrichment.postType} post, ${enrichment.stats.length} stats, table: ${enrichment.table.applicable}, case study: ${enrichment.caseStudy.applicable}`);
+    console.log(`✅ Enrichment: ${enrichment.postType} post, ${enrichment.stats.length} stats, table: ${enrichment.table.applicable}, chart: ${enrichment.chart?.applicable}, case study: ${enrichment.caseStudy.applicable}`);
     return enrichment;
   } catch {
     // If parsing fails, return a safe empty enrichment so the pipeline continues
     console.warn('⚠️  Enrichment Agent returned invalid JSON — continuing without enrichment');
     return { stats: [], table: { applicable: false }, caseStudy: { applicable: false }, links: [], postType: 'analysis' };
   }
+}
+
+// --- Chart URL Builder (QuickChart.io) ---
+// Converts enrichment chart data to a QuickChart URL that the writer embeds as a markdown image.
+// QuickChart renders Chart.js 2 charts server-side — no API key required.
+function buildChartUrl(chart) {
+  if (!chart?.applicable) return null;
+
+  const palettes = {
+    indigo:  { bg: 'rgba(99,102,241,0.85)',  border: 'rgba(99,102,241,1)' },
+    purple:  { bg: 'rgba(168,85,247,0.85)',  border: 'rgba(168,85,247,1)' },
+    emerald: { bg: 'rgba(52,211,153,0.85)',  border: 'rgba(52,211,153,1)' },
+    amber:   { bg: 'rgba(251,191,36,0.85)',  border: 'rgba(251,191,36,1)' },
+    sky:     { bg: 'rgba(56,189,248,0.85)',  border: 'rgba(56,189,248,1)' },
+  };
+  const palette = palettes[chart.colorScheme] || palettes.indigo;
+  const isLine = chart.type === 'line';
+
+  const config = {
+    type: isLine ? 'line' : 'bar',
+    data: {
+      labels: chart.labels,
+      datasets: [{
+        label: chart.valueLabel || '',
+        data: chart.values,
+        backgroundColor: isLine ? palette.bg.replace('0.85', '0.2') : palette.bg,
+        borderColor: palette.border,
+        borderWidth: isLine ? 2 : 0,
+        fill: isLine ? true : undefined,
+        lineTension: isLine ? 0.4 : undefined,
+        pointBackgroundColor: isLine ? palette.border : undefined,
+        pointRadius: isLine ? 4 : undefined,
+      }],
+    },
+    options: {
+      title: {
+        display: true,
+        text: chart.title,
+        fontColor: '#f3f4f6',
+        fontSize: 14,
+        fontStyle: 'bold',
+        padding: 14,
+      },
+      legend: {
+        display: !!(chart.valueLabel),
+        labels: { fontColor: '#9ca3af', fontSize: 12 },
+      },
+      scales: {
+        xAxes: [{ ticks: { fontColor: '#9ca3af', fontSize: 11 }, gridLines: { color: '#1f2937', zeroLineColor: '#374151' } }],
+        yAxes: [{ ticks: { fontColor: '#9ca3af', fontSize: 11 }, gridLines: { color: '#1f2937', zeroLineColor: '#374151' } }],
+      },
+    },
+  };
+
+  const encoded = encodeURIComponent(JSON.stringify(config));
+  return `https://quickchart.io/chart?c=${encoded}&w=700&h=360&backgroundColor=%23111827&devicePixelRatio=2`;
 }
 
 // --- Writer Agent ---
@@ -358,15 +425,33 @@ async function writerAgent(research, enrichment, isProductPost, products) {
     ? `\nLINKS (use at most 1-2 of these in the ENTIRE post — only when the source name itself is the natural anchor text, never wrap a whole sentence):\n${enrichment.links.map((l) => `- [${l.label}](${l.url})`).join('\n')}`
     : '';
 
+  const chartUrl = buildChartUrl(enrichment.chart);
+
   const visualRules = `
-Visual and data elements (mandatory for ${enrichment.postType} posts):
-- HYPERLINKS: use a maximum of 2-3 links in the ENTIRE post. Real journalists don't hyperlink every stat. Link only when the destination is the natural anchor (e.g. "[iHeartMedia](url)" to cite their site, or "[Edison Research's Infinite Dial](url)" to name a specific study). NEVER wrap a full sentence or a bolded number in a link.
-- Bold key numbers: wrap the single most important statistic per section in **bold** — not every number
-- Cite sources in prose: "According to the IAB..." or "per Pew Research..." — not as hyperlinks
-${enrichment.table.applicable ? '- Markdown table: include the provided table in a natural section — format it with pipe syntax' : ''}
-${enrichment.caseStudy.applicable ? '- Case study: include the provided brand/creator example with its specific numbers' : ''}
-- ShinyPull plug: mention ShinyPull once near the end where it naturally fits (tracking stats, growth data, etc.)
-- Only add these elements where they genuinely strengthen the post, not as decoration`;
+Visual and data elements — use what fits, skip what doesn't:
+- HYPERLINKS: max 2-3 in the ENTIRE post. Link only when the destination name is the natural anchor text. NEVER wrap a full sentence or bolded number in a link.
+- Bold key numbers: **bold** the single most important stat per section — not every number.
+- Cite sources in prose: "According to X..." not as hyperlinks.
+- Pull quote: use > blockquote ONCE for the single most striking stat or quote — the thing that'd make a reader stop and re-read. Not for regular prose.
+- Callout box: use ONE of these custom callout boxes where it adds visual emphasis beyond a blockquote:
+    {{callout:stat}}
+    [Key stat or number worth highlighting on its own]
+    {{/callout}}
+    {{callout:insight}}
+    [A key insight or conclusion worth calling out]
+    {{/callout}}
+    {{callout:tip}}
+    [An actionable recommendation for creators]
+    {{/callout}}
+    {{callout:update}}
+    [A platform policy or feature announcement]
+    {{/callout}}
+  Use ONLY ONE callout box per post. Content inside can include **bold** and basic markdown.
+${chartUrl ? `- Data chart: a chart has been prepared for this post. Embed it exactly as-is on its own line in the section where the data is most relevant:\n  ![${enrichment.chart.title}](${chartUrl})\n  Don't modify the URL.` : ''}
+${enrichment.table.applicable ? '- Markdown table: include the provided table in a natural section — format it with pipe syntax.' : ''}
+${enrichment.caseStudy.applicable ? '- Case study: include the provided brand/creator example with its specific numbers.' : ''}
+${isProductPost && products.length >= 3 ? '- Product grid: embed the 3 most relevant products using:\n  {{product-grid}}\n  {{product-mini:slug}}\n  {{product-mini:slug}}\n  {{product-mini:slug}}\n  {{/product-grid}}\n  Use this instead of a single {{product:slug}} embed.' : ''}
+- ShinyPull plug: mention ShinyPull once near the end where it naturally fits.`;
 
   const enrichmentContext = `${statsBlock}${tableBlock}${caseStudyBlock}${linksBlock}`;
 

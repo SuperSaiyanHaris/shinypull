@@ -7,6 +7,25 @@ import ProductCard from './ProductCard';
 import MiniProductCard, { MiniProductGrid } from './MiniProductCard';
 import { getProduct } from '../services/productsService';
 
+const CALLOUT_STYLES = {
+  stat:     { bg: 'bg-purple-950/40',  border: 'border-purple-500/40',  label: 'By the Numbers', labelColor: 'text-purple-400',  icon: '📊' },
+  insight:  { bg: 'bg-indigo-950/40',  border: 'border-indigo-500/40',  label: 'Key Insight',    labelColor: 'text-indigo-400',  icon: '💡' },
+  tip:      { bg: 'bg-emerald-950/40', border: 'border-emerald-500/40', label: 'Pro Tip',         labelColor: 'text-emerald-400', icon: '✅' },
+  update:   { bg: 'bg-amber-950/40',   border: 'border-amber-500/40',   label: 'Platform Update', labelColor: 'text-amber-400',   icon: '📢' },
+};
+
+function CalloutBox({ type, children }) {
+  const s = CALLOUT_STYLES[type] || CALLOUT_STYLES.insight;
+  return (
+    <div className={`${s.bg} border ${s.border} rounded-xl px-6 py-5 my-8`}>
+      <div className={`text-xs font-bold uppercase tracking-widest ${s.labelColor} mb-3`}>
+        {s.icon} {s.label}
+      </div>
+      <div className="text-gray-200 leading-relaxed">{children}</div>
+    </div>
+  );
+}
+
 function ProductEmbed({ slug, mini = false }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -104,17 +123,38 @@ export const markdownComponents = {
     );
   },
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-indigo-500 pl-4 my-4 italic text-gray-400">{children}</blockquote>
+    <blockquote className="border-l-4 border-indigo-500 pl-6 py-1 my-6 text-gray-300 text-lg italic bg-indigo-950/20 rounded-r-lg">
+      {children}
+    </blockquote>
   ),
+  img: ({ src, alt }) => (
+    <img
+      src={src}
+      alt={alt || ''}
+      loading="lazy"
+      className="w-full rounded-xl my-8 object-cover max-h-96"
+    />
+  ),
+};
+
+// Markdown components for inside callout boxes — no special first-paragraph treatment
+const calloutMarkdownComponents = {
+  ...markdownComponents,
+  p: ({ children }) => <p className="text-gray-200 leading-relaxed mb-2 last:mb-0">{children}</p>,
+  strong: ({ children }) => <strong className="font-bold text-white">{children}</strong>,
 };
 
 export default function BlogContent({ content }) {
   if (!content) return null;
 
-  const parts = content.split(/(\{\{product(?:-mini)?:[^}]+\}\}|\{\{product-grid\}\}|\{\{\/product-grid\}\})/g);
+  const parts = content.split(
+    /(\{\{product(?:-mini)?:[^}]+\}\}|\{\{product-grid\}\}|\{\{\/product-grid\}\}|\{\{callout:[^}]+\}\}|\{\{\/callout\}\})/g
+  );
 
   let inGrid = false;
   let gridItems = [];
+  let inCallout = false;
+  let calloutType = 'insight';
   const elements = [];
 
   parts.forEach((part, index) => {
@@ -131,6 +171,16 @@ export default function BlogContent({ content }) {
       gridItems = [];
       return;
     }
+    const calloutOpenMatch = part.match(/\{\{callout:([^}]+)\}\}/);
+    if (calloutOpenMatch) {
+      inCallout = true;
+      calloutType = calloutOpenMatch[1];
+      return;
+    }
+    if (part === '{{/callout}}') {
+      inCallout = false;
+      return;
+    }
     const miniMatch = part.match(/\{\{product-mini:([^}]+)\}\}/);
     if (miniMatch) {
       const embed = <ProductEmbed key={`mini-${index}`} slug={miniMatch[1]} mini={true} />;
@@ -143,11 +193,24 @@ export default function BlogContent({ content }) {
       return;
     }
     if (part.trim()) {
-      elements.push(
-        <ReactMarkdown key={`content-${index}`} remarkPlugins={[remarkGfm]} components={markdownComponents}>
+      const mdContent = (
+        <ReactMarkdown
+          key={`content-${index}`}
+          remarkPlugins={[remarkGfm]}
+          components={inCallout ? calloutMarkdownComponents : markdownComponents}
+        >
           {part}
         </ReactMarkdown>
       );
+      if (inCallout) {
+        elements.push(
+          <CalloutBox key={`callout-${index}`} type={calloutType}>
+            {mdContent}
+          </CalloutBox>
+        );
+      } else {
+        elements.push(mdContent);
+      }
     }
   });
 
