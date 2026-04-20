@@ -142,13 +142,6 @@ async function processRequest(request) {
     const profileData = await scrapeTikTokProfile(request.username);
     console.log(`[${request.username}] ✓ Scraped: ${profileData.displayName} (${profileData.followers.toLocaleString()} followers)`);
 
-    // Reject if followers too low — wrong account (fan/impersonator) or soft rate-limit returning 0
-    if (profileData.followers < 10000) {
-      await supabase.from('creator_requests').delete().eq('id', request.id);
-      console.log(`[${request.username}] ⏭️  Skipped — ${profileData.followers} followers is too low (wrong account or rate-limited). Request deleted.`);
-      return { success: false, username: request.username, error: 'followers_too_low' };
-    }
-
     // Check if creator already exists (in case it was added elsewhere)
     const { data: existingCreator } = await supabase
       .from('creators')
@@ -244,13 +237,6 @@ async function processRequest(request) {
         console.log(`[${request.username}] 🔄 Retrying with AI-resolved handle: @${aiHandle}`);
         const profileData = await scrapeTikTokProfile(aiHandle);
         console.log(`[${aiHandle}] ✓ Scraped: ${profileData.displayName} (${profileData.followers.toLocaleString()} followers)`);
-
-        // Reject low-follower accounts even after AI resolution (wrong account or AI hallucination)
-        if (profileData.followers < 10000) {
-          await supabase.from('creator_requests').delete().eq('id', request.id);
-          console.log(`[${aiHandle}] ⏭️  Skipped — ${profileData.followers} followers is too low (AI resolved wrong account). Request deleted.`);
-          return { success: false, username: request.username, error: 'followers_too_low' };
-        }
 
         // Check if this creator already exists under the corrected handle
         const { data: existingCreator } = await supabase

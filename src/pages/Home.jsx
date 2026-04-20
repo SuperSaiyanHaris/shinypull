@@ -213,9 +213,7 @@ export default function Home() {
                   22,000+ creators tracked
                 </span>
                 <span className="text-gray-700 hidden sm:block">·</span>
-                <span className="text-sm text-gray-500">5 platforms</span>
-                <span className="text-gray-700 hidden sm:block">·</span>
-                <span className="text-sm text-gray-500">Updated 3x daily</span>
+                <span className="text-sm text-gray-500">Updated daily</span>
                 <span className="text-gray-700 hidden sm:block">·</span>
                 <Link to="/methodology" className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
                   How we collect data
