@@ -2,10 +2,47 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Youtube, Twitch } from 'lucide-react';
 import ProductCard from './ProductCard';
 import MiniProductCard, { MiniProductGrid } from './MiniProductCard';
 import { getProduct } from '../services/productsService';
+import KickIcon from './KickIcon';
+import TikTokIcon from './TikTokIcon';
+import BlueskyIcon from './BlueskyIcon';
+
+const PLATFORM_META = {
+  youtube: { Icon: Youtube,    color: 'text-red-400',    bg: 'bg-red-950/40',    border: 'border-red-800/50'    },
+  twitch:  { Icon: Twitch,     color: 'text-purple-400', bg: 'bg-purple-950/40', border: 'border-purple-800/50' },
+  tiktok:  { Icon: TikTokIcon, color: 'text-pink-400',   bg: 'bg-pink-950/40',   border: 'border-pink-800/50'   },
+  kick:    { Icon: KickIcon,   color: 'text-green-400',  bg: 'bg-green-950/40',  border: 'border-green-800/50'  },
+  bluesky: { Icon: BlueskyIcon,color: 'text-sky-400',    bg: 'bg-sky-950/40',    border: 'border-sky-800/50'    },
+};
+
+function CreatorMentions({ creators }) {
+  if (!creators.length) return null;
+  return (
+    <div className="mt-10 pt-8 border-t border-gray-800">
+      <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-4">Creators in this post</p>
+      <div className="flex flex-wrap gap-2">
+        {creators.map(({ platform, username, displayName }) => {
+          const meta = PLATFORM_META[platform];
+          if (!meta) return null;
+          const { Icon, color, bg, border } = meta;
+          return (
+            <Link
+              key={`${platform}/${username}`}
+              to={`/${platform}/${username}`}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 ${bg} border ${border} rounded-full hover:brightness-125 transition-all text-sm font-medium ${color}`}
+            >
+              <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+              {displayName || username}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 const CALLOUT_STYLES = {
   stat:     { bg: 'bg-purple-950/40',  border: 'border-purple-500/40',  label: 'By the Numbers', labelColor: 'text-purple-400',  icon: '📊' },
@@ -147,7 +184,18 @@ const calloutMarkdownComponents = {
 export default function BlogContent({ content }) {
   if (!content) return null;
 
-  const parts = content.split(
+  // Extract {{creators:...}} tag before splitting (it spans the full block)
+  const creatorsTagMatch = content.match(/\{\{creators:([^}]+)\}\}/);
+  const mentionedCreators = creatorsTagMatch
+    ? creatorsTagMatch[1].split(',').map(entry => {
+        const [platformUser, displayName] = entry.trim().split(':');
+        const [platform, username] = (platformUser || '').split('/');
+        return { platform, username, displayName: displayName || username };
+      }).filter(c => c.platform && c.username)
+    : [];
+  const cleanedContent = content.replace(/\{\{creators:[^}]+\}\}\n?/g, '');
+
+  const parts = cleanedContent.split(
     /(\{\{product(?:-mini)?:[^}]+\}\}|\{\{product-grid\}\}|\{\{\/product-grid\}\}|\{\{callout:[^}]+\}\}|\{\{\/callout\}\})/g
   );
 
@@ -214,5 +262,10 @@ export default function BlogContent({ content }) {
     }
   });
 
-  return <div className="prose prose-lg max-w-none">{elements}</div>;
+  return (
+    <div className="prose prose-lg max-w-none">
+      {elements}
+      <CreatorMentions creators={mentionedCreators} />
+    </div>
+  );
 }

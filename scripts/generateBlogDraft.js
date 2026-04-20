@@ -385,7 +385,7 @@ function buildChartUrl(chart) {
 }
 
 // --- Writer Agent ---
-async function writerAgent(research, enrichment, isProductPost, products) {
+async function writerAgent(research, enrichment, isProductPost, products, creatorList = '') {
   console.log('✍️  Writer Agent: drafting post...');
 
   const styleGuide = `MANDATORY writing style rules (violating these is a failure):
@@ -451,7 +451,8 @@ ${chartUrl ? `- Data chart: a chart has been prepared for this post. Embed it ex
 ${enrichment.table.applicable ? '- Markdown table: include the provided table in a natural section — format it with pipe syntax.' : ''}
 ${enrichment.caseStudy.applicable ? '- Case study: include the provided brand/creator example with its specific numbers.' : ''}
 ${isProductPost && products.length >= 3 ? '- Product grid: embed the 3 most relevant products using:\n  {{product-grid}}\n  {{product-mini:slug}}\n  {{product-mini:slug}}\n  {{product-mini:slug}}\n  {{/product-grid}}\n  Use this instead of a single {{product:slug}} embed.' : ''}
-- ShinyPull plug: mention ShinyPull once near the end where it naturally fits.`;
+- ShinyPull plug: mention ShinyPull once near the end where it naturally fits.
+${creatorList ? `- Creator links: if you name any creator from the list below in the post body, add a {{creators:...}} tag on its own line at the very END of the content (after the final paragraph). Format: {{creators:platform/username:Display Name}} — comma-separate multiple entries. Only tag creators you actually name in the text. Omit entirely if none apply.\n  Available: ${creatorList}` : ''}`;
 
   const enrichmentContext = `${statsBlock}${tableBlock}${caseStudyBlock}${linksBlock}`;
 
@@ -733,7 +734,7 @@ async function main() {
   // 2b. Validate URLs — strip any 404s before they reach the Writer
   const enrichment = await validateEnrichmentUrls(rawEnrichment);
 
-  // 3. Load products for Wednesday posts
+  // 3. Load products for Wednesday posts + top creators for internal linking
   let products = [];
   if (isProductPost) {
     const { data } = await supabase.from('products').select('*').eq('is_active', true);
@@ -741,9 +742,20 @@ async function main() {
     console.log(`🛍️  Loaded ${products.length} active products for Wednesday embed`);
   }
 
+  const { data: topCreators } = await supabase
+    .from('creators')
+    .select('platform, username, display_name')
+    .in('platform', ['youtube', 'twitch', 'tiktok', 'kick', 'bluesky'])
+    .order('updated_at', { ascending: false })
+    .limit(120);
+  const creatorList = (topCreators || [])
+    .map(c => `${c.platform}/${c.username}:${c.display_name}`)
+    .join(', ');
+  console.log(`👤 Loaded ${topCreators?.length || 0} creators for internal linking`);
+
   // 4. Write (enrichment context included in first draft — no second pass needed)
   await sleep(2000);
-  let draft = await writerAgent(research, enrichment, isProductPost, products);
+  let draft = await writerAgent(research, enrichment, isProductPost, products, creatorList);
 
   // 5. Review
   await sleep(2000);
