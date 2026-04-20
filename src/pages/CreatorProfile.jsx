@@ -591,12 +591,62 @@ export default function CreatorProfile() {
     );
   }
 
+  const primaryCount = creator.subscribers || creator.followers || 0;
+  const primaryLabel = platform === 'twitch' || platform === 'bluesky' ? 'followers' : 'subscribers';
+
+  const seoTitle = primaryCount > 0
+    ? `${creator.displayName} ${platform.charAt(0).toUpperCase() + platform.slice(1)} Stats (${formatNumber(primaryCount)} ${primaryLabel}) | ShinyPull`
+    : `${creator.displayName} ${platform.charAt(0).toUpperCase() + platform.slice(1)} Statistics | ShinyPull`;
+
+  const seoDescription = (() => {
+    const name = creator.displayName;
+    const count = formatNumber(primaryCount);
+    if (platform === 'youtube') {
+      const views = creator.totalViews ? ` and ${formatNumber(creator.totalViews)} total views` : '';
+      return `${name} has ${count} YouTube subscribers${views}. Track live stats, 30-day growth, earnings estimates, and full channel analytics on ShinyPull.`;
+    }
+    if (platform === 'tiktok') {
+      const likes = creator.totalViews ? ` and ${formatNumber(creator.totalViews)} total likes` : '';
+      return `${name} has ${count} TikTok followers${likes}. Track follower growth, post history, and analytics on ShinyPull.`;
+    }
+    if (platform === 'twitch') {
+      return `${name} has ${count} Twitch followers. View hours watched, peak viewers, stream history, and growth trends on ShinyPull.`;
+    }
+    if (platform === 'kick') {
+      return `${name} has ${count} Kick subscribers. View live stream stats, growth trends, and channel analytics on ShinyPull.`;
+    }
+    if (platform === 'bluesky') {
+      const posts = creator.totalPosts ? ` and ${formatNumber(creator.totalPosts)} posts` : '';
+      return `${name} has ${count} Bluesky followers${posts}. Track follower growth and post activity on ShinyPull.`;
+    }
+    return `Track ${name}'s ${platform} statistics including followers, growth, and analytics on ShinyPull.`;
+  })();
+
+  const seoKeywords = `${creator.displayName} ${platform} stats, ${creator.displayName} ${primaryLabel}, ${creator.displayName} analytics, ${platform} statistics, ${creator.displayName} growth`;
+
+  const profileSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    'name': `${creator.displayName} ${platform.charAt(0).toUpperCase() + platform.slice(1)} Statistics`,
+    'url': `https://shinypull.com/${platform}/${creator.username}`,
+    'mainEntity': {
+      '@type': 'Person',
+      'name': creator.displayName,
+      'identifier': creator.username,
+      ...(creator.profileImage ? { 'image': creator.profileImage } : {}),
+      ...(creator.description ? { 'description': creator.description } : {}),
+    },
+  };
+
   return (
     <>
       <SEO
-        title={`${creator.displayName} - ${platform} Statistics`}
-        description={`View ${creator.displayName}'s ${platform} statistics including subscribers, views, and growth analytics.`}
+        title={seoTitle}
+        description={seoDescription}
+        keywords={seoKeywords}
+        image={creator.profileImage || undefined}
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(profileSchema) }} />
 
       <div className="min-h-screen bg-gray-800/50">
         {/* Banner */}
