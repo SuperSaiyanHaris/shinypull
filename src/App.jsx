@@ -59,6 +59,7 @@ const Reports = lazyWithRetry(() => import('./pages/Reports'));
 const FAQ = lazyWithRetry(() => import('./pages/FAQ'));
 const Methodology = lazyWithRetry(() => import('./pages/Methodology'));
 const Trending = lazyWithRetry(() => import('./pages/Trending'));
+const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -131,6 +132,7 @@ function LayoutWrapper() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/methodology" element={<Methodology />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
         </ErrorBoundary>
