@@ -38,6 +38,42 @@
 
     <title>ShinyPull - Social Media Statistics</title>
 
+    <!-- Organization structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ShinyPull",
+      "url": "https://shinypull.com",
+      "logo": "https://shinypull.com/apple-touch-icon.png",
+      "description": "Social media analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky creator statistics.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "shinypull@proton.me",
+        "contactType": "customer support"
+      },
+      "sameAs": []
+    }
+    </script>
+
+    <!-- WebSite structured data (enables Google Sitelinks Search Box) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ShinyPull",
+      "url": "https://shinypull.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://shinypull.com/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
     <!-- Google AdSense (async - non-blocking) -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3528314730732963" crossorigin="anonymous"></script>
 
