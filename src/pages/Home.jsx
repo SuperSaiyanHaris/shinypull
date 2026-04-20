@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, ChevronRight, Calculator, DollarSign, X, Scale, TrendingUp } from 'lucide-react';
+import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, Calculator, X, Scale, TrendingUp } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
@@ -205,6 +205,22 @@ export default function Home() {
                   </button>
                 </div>
               </form>
+
+              {/* Trust signals */}
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2 px-4">
+                <span className="flex items-center gap-1.5 text-sm text-gray-500">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+                  22,000+ creators tracked
+                </span>
+                <span className="text-gray-700 hidden sm:block">·</span>
+                <span className="text-sm text-gray-500">5 platforms</span>
+                <span className="text-gray-700 hidden sm:block">·</span>
+                <span className="text-sm text-gray-500">Updated 3x daily</span>
+                <span className="text-gray-700 hidden sm:block">·</span>
+                <Link to="/methodology" className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
+                  How we collect data
+                </Link>
+              </div>
             </div>
           </div>
         </section>
