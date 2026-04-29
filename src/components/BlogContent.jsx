@@ -42,19 +42,20 @@ function CreatorMentions({ creators }) {
 }
 
 const CALLOUT_STYLES = {
-  stat:    { bg: 'bg-purple-950/40',  border: 'border-purple-500/40',  label: 'By the Numbers',  labelColor: 'text-purple-400',  icon: 'ðŸ“Š' },
-  insight: { bg: 'bg-indigo-950/40',  border: 'border-indigo-500/40',  label: 'Key Insight',     labelColor: 'text-indigo-400',  icon: 'ðŸ’¡' },
-  tip:     { bg: 'bg-emerald-950/40', border: 'border-emerald-500/40', label: 'Pro Tip',         labelColor: 'text-emerald-400', icon: 'âœ…' },
-  update:  { bg: 'bg-amber-950/40',   border: 'border-amber-500/40',   label: 'Platform Update', labelColor: 'text-amber-400',   icon: 'ðŸ“¢' },
-  warning: { bg: 'bg-red-950/40',     border: 'border-red-500/40',     label: 'Watch Out',       labelColor: 'text-red-400',     icon: 'âš ï¸' },
+  stat:    { bg: 'bg-purple-950/40',  border: 'border-purple-500/40',  label: 'By the Numbers',  labelColor: 'text-purple-400'  },
+  insight: { bg: 'bg-indigo-950/40',  border: 'border-indigo-500/40',  label: 'Key Insight',     labelColor: 'text-indigo-400'  },
+  tip:     { bg: 'bg-emerald-950/40', border: 'border-emerald-500/40', label: 'Pro Tip',         labelColor: 'text-emerald-400' },
+  update:  { bg: 'bg-amber-950/40',   border: 'border-amber-500/40',   label: 'Platform Update', labelColor: 'text-amber-400'   },
+  warning: { bg: 'bg-red-950/40',     border: 'border-red-500/40',     label: 'Watch Out',       labelColor: 'text-red-400'     },
 };
 
 function CalloutBox({ type, children }) {
   const s = CALLOUT_STYLES[type] || CALLOUT_STYLES.insight;
   return (
     <div className={`${s.bg} border ${s.border} rounded-xl px-6 py-5 my-8`}>
-      <div className={`text-xs font-bold uppercase tracking-widest ${s.labelColor} mb-3`}>
-        {s.icon} {s.label}
+      <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest ${s.labelColor} mb-3`}>
+        <span className={`inline-block w-1.5 h-1.5 rounded-full ${s.labelColor.replace('text-', 'bg-')}`} />
+        {s.label}
       </div>
       <div className="text-gray-200 leading-relaxed">{children}</div>
     </div>
@@ -67,10 +68,9 @@ function TldrBox({ children, theme }) {
       <div className={`pointer-events-none absolute -top-10 -right-10 w-32 h-32 ${theme.glow} rounded-full blur-3xl`} />
       <div className="relative px-6 py-5 sm:px-8 sm:py-6">
         <div className={`inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full ${theme.pill} text-xs font-bold uppercase tracking-widest`}>
-          <span>â˜…</span>
           The Quick Read
         </div>
-        <div className="text-gray-200 [&_ul]:list-none [&_ul]:ml-0 [&_li]:relative [&_li]:pl-6 [&_li]:mb-2 [&_li:before]:content-['â†’'] [&_li:before]:absolute [&_li:before]:left-0 [&_li:before]:text-indigo-400 [&_li:before]:font-bold [&_p]:leading-relaxed">
+        <div className="text-gray-200 [&_ul]:list-none [&_ul]:ml-0 [&_li]:relative [&_li]:pl-6 [&_li]:mb-2 [&_li:before]:content-['→'] [&_li:before]:absolute [&_li:before]:left-0 [&_li:before]:text-indigo-400 [&_li:before]:font-bold [&_p]:leading-relaxed">
           {children}
         </div>
       </div>
