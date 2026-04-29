@@ -15,7 +15,7 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'shinypull@proton.me';
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 const REVIEW_SCORE_THRESHOLD = 7;
@@ -536,8 +536,9 @@ function buildChartUrl(chart, paletteName = 'indigo') {
 }
 
 // --- Writer Agent ---
-async function writerAgent(research, enrichment, creatorList = '') {
-  console.log('✍️  Writer Agent: drafting post...');
+async function writerAgent(research, enrichment, creatorList = '', archetype = null) {
+  const arch = archetype || pickArchetype(enrichment.postType || 'analysis');
+  console.log(`✍️  Writer Agent: drafting post (archetype: ${arch.name})...`);
 
   const styleGuide = `MANDATORY writing style rules (violating these is a failure):
 - Write conversationally, like a knowledgeable friend. Not corporate, not academic.
@@ -579,32 +580,52 @@ async function writerAgent(research, enrichment, creatorList = '') {
   const chartPalette = CATEGORY_CHART_PALETTE[research.category] || 'indigo';
   const chartUrl = buildChartUrl(enrichment.chart, chartPalette);
 
-  const visualRules = `
-Visual and data elements — use what fits, skip what doesn't:
-- HYPERLINKS: max 2-3 in the ENTIRE post. Link only when the destination name is the natural anchor text. NEVER wrap a full sentence or bolded number in a link.
-- Bold key numbers: **bold** the single most important stat per section — not every number.
-- Cite sources in prose: "According to X..." not as hyperlinks.
-- Pull quote: use > blockquote ONCE for the single most striking stat or quote — the thing that'd make a reader stop and re-read. Not for regular prose.
-- Callout box: use ONE of these custom callout boxes where it adds visual emphasis beyond a blockquote:
-    {{callout:stat}}
-    [Key stat or number worth highlighting on its own]
-    {{/callout}}
-    {{callout:insight}}
-    [A key insight or conclusion worth calling out]
-    {{/callout}}
-    {{callout:tip}}
-    [An actionable recommendation for creators]
-    {{/callout}}
-    {{callout:update}}
-    [A platform policy or feature announcement]
-    {{/callout}}
-  Use ONLY ONE callout box per post. Content inside can include **bold** and basic markdown.
-${chartUrl ? `- Data chart: a chart has been prepared for this post. Embed it exactly as-is on its own line in the section where the data is most relevant:\n  ![${enrichment.chart.title}](${chartUrl})\n  Don't modify the URL.` : ''}
-${enrichment.table.applicable ? '- Markdown table: include the provided table in a natural section — format it with pipe syntax.' : ''}
-${enrichment.caseStudy.applicable ? '- Case study: include the provided brand/creator example with its specific numbers.' : ''}
+  // Archetype-driven structure rules — forces variety across posts
+  const archetypeRules = `
+STRUCTURAL ARCHETYPE for this post: "${arch.name}"
+Opening rule (CRITICAL — follow exactly): ${arch.opening}
+Body structure: ${arch.structure}
+Required callout types in this post: ${arch.requiredCallouts.map(t => `{{callout:${t}}}`).join(', ')}
+${arch.tldrFirst ? '⚠ TLDR FIRST: This archetype requires a {{tldr}} block at the very top of the post BEFORE any prose paragraph.' : ''}
+${arch.tldrRequired && !arch.tldrFirst ? '⚠ Include a {{tldr}} block right after the intro paragraph.' : ''}`;
 
+  const embedDocs = `
+EMBED SYNTAX REFERENCE (use these to vary the visual rhythm — don't dump them all in every post, follow the archetype above):
+
+1. TLDR block — a styled "Quick Read" summary (3 short bullets):
+{{tldr}}
+- First key takeaway as a short sentence
+- Second key takeaway
+- Third key takeaway
+{{/tldr}}
+
+2. STATS strip — 3 hero numbers in a row (use this when the archetype calls for it). Each line is "value | label", one per line:
+{{stats}}
+2.7B | YouTube monthly users
+$31.5B | YouTube ad revenue 2023
+38.7% | Share of live watch time
+{{/stats}}
+Use exactly 3 stats. Values should be short (e.g., "$31.5B", "63%", "1.5M"). Labels should be 3-7 words.
+
+3. CALLOUT box — a single highlighted insight. Available types: stat, insight, tip, update, warning. Use the type the archetype requires:
+{{callout:insight}}
+A single tight paragraph with the key insight. Bold the most important phrase.
+{{/callout}}
+
+4. CREATORS tag (MANDATORY at the very end of the post if you name any creators in the body):
+{{creators:platform/username:Display Name,platform/username:Display Name}}`;
+
+  const visualRules = `
+Visual and data elements:
+- HYPERLINKS: max 2-3 in the ENTIRE post. Link only when the destination name is the natural anchor text. NEVER wrap a full sentence or bolded number in a link.
+- Bold key numbers: **bold** the single most important stat per section, not every number.
+- Cite sources in prose: "According to X..." not as hyperlinks.
+- Pull quote: use > blockquote ONCE for the single most striking stat or quote.
+${chartUrl ? `- Data chart: a chart has been prepared. Embed it exactly as-is on its own line where the data is most relevant:\n  ![${enrichment.chart.title}](${chartUrl})\n  Don't modify the URL.` : ''}
+${enrichment.table.applicable ? '- Markdown table: include the provided table in a natural section using pipe syntax.' : ''}
+${enrichment.caseStudy.applicable ? '- Case study: include the provided brand/creator example with specific numbers.' : ''}
 - ShinyPull plug: mention ShinyPull once near the end where it naturally fits.
-${creatorList ? `- Creator links: if you name any creator from the list below in the post body, add a {{creators:...}} tag on its own line at the very END of the content (after the final paragraph). Format: {{creators:platform/username:Display Name}} — comma-separate multiple entries. Only tag creators you actually name in the text. Omit entirely if none apply.\n  Available: ${creatorList}` : ''}`;
+${creatorList ? `- CREATORS TAG (mandatory if any creator from the list is named in the post body): emit a {{creators:...}} tag on its own line at the very END of the content. Format: {{creators:platform/username:Display Name}}, comma-separated. Only tag creators you actually name. Available: ${creatorList}` : ''}`;
 
   const enrichmentContext = `${statsBlock}${tableBlock}${caseStudyBlock}${linksBlock}`;
 
@@ -643,6 +664,10 @@ ${styleGuide}
 
 ${blogFormat}
 
+${archetypeRules}
+
+${embedDocs}
+
 ${visualRules}
 ${enrichmentContext}
 
@@ -650,7 +675,7 @@ ${enrichmentContext}
 ${context}
 Post title: ${meta.title}
 
-Write the full blog post content now. Output ONLY the markdown content — no JSON, no code fences, no preamble, no title heading.`;
+Write the full blog post content now. Output ONLY the markdown content — no JSON, no code fences, no preamble, no title heading. Follow the archetype structure above EXACTLY — that's what makes each post visually different from the last one.`;
 
   const contentResponse = await callWithRetry(() => anthropic.messages.create({
     model: 'claude-sonnet-4-6',
@@ -793,6 +818,10 @@ async function saveDraft(draft) {
 
 // --- Send Email ---
 async function sendNotification(savedPost, draft, review, rewritten) {
+  if (!resend) {
+    console.log('📧 Skipping email notification (RESEND_API_KEY not set)');
+    return;
+  }
   const plainText = draft.content
     .replace(/#{1,6}\s/g, '')
     .replace(/\*\*/g, '')
