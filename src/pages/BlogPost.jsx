@@ -7,6 +7,7 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import ShareButtons from '../components/ShareButtons';
 import BlogContent from '../components/BlogContent';
 import { getPostBySlug, getRelatedPosts } from '../services/blogService';
+import { getCategoryTheme } from '../lib/blogTheme';
 
 export default function BlogPost() {
   const { slug } = useParams();
@@ -94,24 +95,32 @@ export default function BlogPost() {
       <StructuredData schema={breadcrumbSchema} />
 
       <div className="min-h-screen bg-gray-800/50">
-        {/* Hero Image */}
-        <div className="relative h-64 md:h-96 bg-gray-900">
-          <img
-            src={post.image}
-            alt={post.title}
-            className="w-full h-full object-cover opacity-60"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
+        {(() => {
+          const theme = getCategoryTheme(post.category);
+          return (
+            <div className={`relative h-64 md:h-96 bg-gradient-to-br ${theme.heroFrom} ${theme.heroVia} ${theme.heroTo} overflow-hidden`}>
+              {post.image && (
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-luminosity"
+                />
+              )}
+              {/* Decorative blobs for atmosphere when no image, or to enrich one */}
+              <div className={`pointer-events-none absolute -top-24 -left-24 w-80 h-80 ${theme.glow} rounded-full blur-3xl`} />
+              <div className={`pointer-events-none absolute -bottom-32 -right-16 w-96 h-96 ${theme.glow} rounded-full blur-3xl opacity-70`} />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent" />
 
-          {/* Back Button */}
-          <button
-            onClick={() => navigate('/blog')}
-            className="absolute top-4 left-4 flex items-center gap-2 px-4 py-2 bg-indigo-600/20 backdrop-blur-sm rounded-lg text-white hover:bg-indigo-600/20 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Blog
-          </button>
-        </div>
+              <button
+                onClick={() => navigate('/blog')}
+                className="absolute top-4 left-4 flex items-center gap-2 px-4 py-2 bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg text-white hover:bg-gray-900/80 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Blog
+              </button>
+            </div>
+          );
+        })()}
 
         <div className="max-w-4xl mx-auto px-4 -mt-32 relative z-10">
           {/* Article Header */}
@@ -127,7 +136,7 @@ export default function BlogPost() {
               />
 
               {/* Category */}
-              <span className="inline-block px-3 py-1 bg-indigo-900/50 text-indigo-600 rounded-full text-sm font-medium mb-4">
+              <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-4 ${getCategoryTheme(post.category).pill}`}>
                 {post.category}
               </span>
 
@@ -162,8 +171,8 @@ export default function BlogPost() {
                 </div>
               </div>
 
-              {/* Content with Product Cards */}
-              <BlogContent content={post.content} />
+              {/* Content */}
+              <BlogContent content={post.content} category={post.category} />
             </div>
           </article>
 

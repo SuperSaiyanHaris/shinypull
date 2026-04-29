@@ -16,7 +16,6 @@
     "seed:bluesky": "node scripts/seedTopBlueskyCreators.js",
     "aggregate:hours-watched": "node scripts/aggregateHoursWatched.js",
     "seed:blog": "node scripts/seedBlogPosts.js",
-    "seed:products": "node scripts/seedProducts.js",
     "delete:fake-data": "node scripts/deleteFakeData.js",
     "validate:data": "node scripts/validateData.js",
     "generate:sitemap": "node scripts/generateSitemap.js",
@@ -26,9 +25,7 @@
     "discover:tiktok": "node scripts/discoverTikTokCreators.js",
     "refresh:tiktok": "node scripts/refreshTikTokProfiles.js",
     "refresh:rankings": "node scripts/refreshRankingsCache.js",
-    "seed:gear-blog": "node scripts/seedGearBlogPosts.js",
-    "generate:blog": "node scripts/generateBlogDraft.js",
-    "generate:blog:product": "node scripts/generateBlogDraft.js product"
+    "generate:blog": "node scripts/generateBlogDraft.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",

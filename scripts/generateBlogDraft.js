@@ -48,19 +48,6 @@ function safeParseJSON(text) {
   return JSON.parse(cleaned);
 }
 
-function getDayType() {
-  // Allow override via CLI arg or env for testing
-  const override = process.argv[2];
-  if (override === 'product' || override === 'wednesday') return 'product';
-  if (override === 'standard') return 'standard';
-
-  const day = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    timeZone: 'America/New_York',
-  });
-  return day === 'Wednesday' ? 'product' : 'standard';
-}
-
 function slugify(title) {
   return title
     .toLowerCase()
@@ -79,6 +66,153 @@ function estimateReadTime(content) {
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// --- Category → chart palette (matches src/lib/blogTheme.js) ---
+// Keep in sync with the renderer so charts match the post accent.
+const CATEGORY_CHART_PALETTE = {
+  'Industry News':     'amber',
+  'Platform Updates':  'sky',
+  'Twitch Trends':     'purple',
+  'YouTube News':      'red',
+  'Creator Economy':   'emerald',
+  'Creator Spotlight': 'pink',
+  'Tips & Strategy':   'indigo',
+  'Growth Tips':       'indigo',
+  'Industry Insights': 'cyan',
+  'Streaming Gear':    'orange',
+  'Tutorials':         'green',
+  'Analytics':         'blue',
+  'Rankings':          'yellow',
+};
+
+// --- Hero image pool by category (Pexels + Unsplash, no API key needed) ---
+// Each post gets a deterministic pick from its category's pool based on slug hash
+// so the same draft always lands on the same image (and posts within a category vary).
+const HERO_IMAGES = {
+  'Industry News': [
+    'https://images.pexels.com/photos/8438916/pexels-photo-8438916.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/3944405/pexels-photo-3944405.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/3585047/pexels-photo-3585047.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/3568520/pexels-photo-3568520.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Platform Updates': [
+    'https://images.pexels.com/photos/16773548/pexels-photo-16773548.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/4974915/pexels-photo-4974915.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/1591056/pexels-photo-1591056.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Twitch Trends': [
+    'https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/2007647/pexels-photo-2007647.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/3165334/pexels-photo-3165334.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/7915437/pexels-photo-7915437.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'YouTube News': [
+    'https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/2510428/pexels-photo-2510428.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/4974914/pexels-photo-4974914.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Creator Economy': [
+    'https://images.pexels.com/photos/9830817/pexels-photo-9830817.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/4968630/pexels-photo-4968630.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/210600/pexels-photo-210600.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/4348404/pexels-photo-4348404.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Creator Spotlight': [
+    'https://images.pexels.com/photos/187041/pexels-photo-187041.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/3756879/pexels-photo-3756879.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Tips & Strategy': [
+    'https://images.pexels.com/photos/3184325/pexels-photo-3184325.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/3194519/pexels-photo-3194519.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/3178818/pexels-photo-3178818.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Growth Tips': [
+    'https://images.pexels.com/photos/3184325/pexels-photo-3184325.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/186461/pexels-photo-186461.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Industry Insights': [
+    'https://images.pexels.com/photos/669610/pexels-photo-669610.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Streaming Gear': [
+    'https://images.pexels.com/photos/3779662/pexels-photo-3779662.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/164938/pexels-photo-164938.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/144429/pexels-photo-144429.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Tutorials': [
+    'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/4348401/pexels-photo-4348401.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Analytics': [
+    'https://images.pexels.com/photos/669610/pexels-photo-669610.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    'https://images.pexels.com/photos/186461/pexels-photo-186461.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+  'Rankings': [
+    'https://images.pexels.com/photos/207983/pexels-photo-207983.jpeg?auto=compress&cs=tinysrgb&w=1600',
+  ],
+};
+
+function hashString(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function pickHeroImage(category, slug) {
+  const pool = HERO_IMAGES[category] || HERO_IMAGES['Industry News'];
+  return pool[hashString(slug || '') % pool.length];
+}
+
+// --- Structural archetypes ---
+// Each draft randomly picks one. Forces variety in opening + body shape so
+// every post doesn't follow the same skeleton.
+const ARCHETYPES = [
+  {
+    name: 'data-deep-dive',
+    fitsPostType: ['data-driven', 'analysis'],
+    opening: 'Open with a single punchy 2-3 sentence hook paragraph that frames the most surprising stat. The hook MUST land before the {{stats}} block.',
+    structure: 'After the hook, drop a {{stats}} strip with 3 key numbers. Then 4-5 H2 sections that unpack the data. Use a {{callout:stat}} mid-post for the headline number.',
+    requiredCallouts: ['stat', 'insight'],
+  },
+  {
+    name: 'narrative-explainer',
+    fitsPostType: ['analysis', 'news', 'drama'],
+    opening: 'Open with a vivid scene-setting paragraph. Tell a tiny story (real moment, person, or beat) in 3-5 sentences. No stats in the opening.',
+    structure: 'Use 4 H2 sections that walk the reader through cause → context → consequence → takeaway. Drop a {{tldr}} block right after the intro with 3 bullet points. Use one {{callout:insight}} mid-post.',
+    requiredCallouts: ['insight'],
+    tldrRequired: true,
+  },
+  {
+    name: 'news-breakdown',
+    fitsPostType: ['news', 'analysis'],
+    opening: 'Open with a {{tldr}} block FIRST (before any prose) summarizing what changed in 3 short bullets. Then a single 2-3 sentence intro paragraph explaining why it matters.',
+    structure: '3-4 H2 sections covering: what is it, why it matters, who it affects, what to do. Use one {{callout:update}} for the official platform announcement detail.',
+    requiredCallouts: ['update'],
+    tldrFirst: true,
+  },
+  {
+    name: 'hot-take',
+    fitsPostType: ['drama', 'analysis'],
+    opening: 'Open with a one-sentence opinion as a single short paragraph. Be direct. No hedging.',
+    structure: '3-4 H2 sections that defend the take with concrete examples. Include one strong > blockquote with the central claim. Use one {{callout:tip}} or {{callout:warning}} near the end.',
+    requiredCallouts: ['tip'],
+  },
+  {
+    name: 'creator-spotlight',
+    fitsPostType: ['drama', 'analysis', 'news'],
+    opening: 'Open by naming the creator and the moment in 2-3 sentences. Make it feel like the start of a profile, not a press release.',
+    structure: '4 H2 sections: the moment, the backstory, the numbers, what it means for other creators. Use a {{stats}} strip with 3 key numbers from this creator. Use one {{callout:insight}}.',
+    requiredCallouts: ['insight'],
+  },
+];
+
+function pickArchetype(postType) {
+  const candidates = ARCHETYPES.filter(a => a.fitsPostType.includes(postType));
+  const pool = candidates.length > 0 ? candidates : ARCHETYPES;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // Retry wrapper for Anthropic API calls — handles 529 overloaded + 503/502 transient errors.
@@ -280,7 +414,9 @@ Your job: identify concrete supporting material that will make this post credibl
 
 5. POST TYPE: Classify as one of: "data-driven" (stats and tables are the backbone), "analysis" (stats help but narrative drives it), "news" (light data, mostly event coverage), "drama" (mostly story/narrative, minimal data needed).
 
-6. CHART: Is there a set of 3-6 numbers that would be more impactful as a bar chart or line chart than as prose or a table? Examples: platform market share comparison, creator revenue by tier, subscriber growth over time, platform MAU over several years. If yes, provide the data. Use "bar" for comparisons, "line" for trends over time. If no clear chart fits OR a table already covers it better, set applicable to false.
+6. CHART: Is there a set of 3-6 numbers that would be more impactful as a bar chart or line chart than as prose or a table? Examples: platform market share comparison, creator revenue by tier, subscriber growth over time, platform MAU over several years. If yes, provide the data. Use "bar" for comparisons, "line" for trends over time. If no clear chart fits OR a table already covers it better, set applicable to false. Do NOT include a colorScheme — the system picks one based on the post category.
+
+7. STATS STRIP: A separate visual element that shows 3 standalone hero numbers across the top of the article (different from the chart, different from prose stats). Pick 3 numbers that, taken together, paint the scope of the topic in one glance. Each item: a short value (e.g. "38.7%", "2.7B", "$31.5B", "7.3M") and a 4-7 word label. If no 3 numbers really stand on their own this way, set applicable to false.
 
 Respond with ONLY valid JSON (no markdown fences, no explanation):
 {
@@ -309,8 +445,15 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
     "title": "Chart title (concise, under 50 chars)",
     "labels": ["Label 1", "Label 2", "Label 3"],
     "values": [100, 200, 150],
-    "valueLabel": "What the numbers represent (e.g. Monthly active users, millions)",
-    "colorScheme": "indigo"
+    "valueLabel": "What the numbers represent (e.g. Monthly active users, millions)"
+  },
+  "statsStrip": {
+    "applicable": true,
+    "items": [
+      { "value": "38.7%", "label": "YouTube share of live watch time" },
+      { "value": "2.7B", "label": "Monthly logged-in users" },
+      { "value": "$31.5B", "label": "Ad revenue in 2023" }
+    ]
   }
 }`,
       },
@@ -331,7 +474,8 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
 // --- Chart URL Builder (QuickChart.io) ---
 // Converts enrichment chart data to a QuickChart URL that the writer embeds as a markdown image.
 // QuickChart renders Chart.js 2 charts server-side — no API key required.
-function buildChartUrl(chart) {
+// `paletteName` overrides the chart color so it matches the post category accent.
+function buildChartUrl(chart, paletteName = 'indigo') {
   if (!chart?.applicable) return null;
 
   const palettes = {
@@ -340,8 +484,15 @@ function buildChartUrl(chart) {
     emerald: { bg: 'rgba(52,211,153,0.85)',  border: 'rgba(52,211,153,1)' },
     amber:   { bg: 'rgba(251,191,36,0.85)',  border: 'rgba(251,191,36,1)' },
     sky:     { bg: 'rgba(56,189,248,0.85)',  border: 'rgba(56,189,248,1)' },
+    pink:    { bg: 'rgba(244,114,182,0.85)', border: 'rgba(244,114,182,1)' },
+    red:     { bg: 'rgba(248,113,113,0.85)', border: 'rgba(248,113,113,1)' },
+    cyan:    { bg: 'rgba(34,211,238,0.85)',  border: 'rgba(34,211,238,1)' },
+    orange:  { bg: 'rgba(251,146,60,0.85)',  border: 'rgba(251,146,60,1)' },
+    green:   { bg: 'rgba(74,222,128,0.85)',  border: 'rgba(74,222,128,1)' },
+    blue:    { bg: 'rgba(96,165,250,0.85)',  border: 'rgba(96,165,250,1)' },
+    yellow:  { bg: 'rgba(250,204,21,0.85)',  border: 'rgba(250,204,21,1)' },
   };
-  const palette = palettes[chart.colorScheme] || palettes.indigo;
+  const palette = palettes[paletteName] || palettes.indigo;
   const isLine = chart.type === 'line';
 
   const config = {
@@ -385,7 +536,7 @@ function buildChartUrl(chart) {
 }
 
 // --- Writer Agent ---
-async function writerAgent(research, enrichment, isProductPost, products, creatorList = '') {
+async function writerAgent(research, enrichment, creatorList = '') {
   console.log('✍️  Writer Agent: drafting post...');
 
   const styleGuide = `MANDATORY writing style rules (violating these is a failure):
@@ -425,7 +576,8 @@ async function writerAgent(research, enrichment, isProductPost, products, creato
     ? `\nLINKS (use at most 1-2 of these in the ENTIRE post — only when the source name itself is the natural anchor text, never wrap a whole sentence):\n${enrichment.links.map((l) => `- [${l.label}](${l.url})`).join('\n')}`
     : '';
 
-  const chartUrl = buildChartUrl(enrichment.chart);
+  const chartPalette = CATEGORY_CHART_PALETTE[research.category] || 'indigo';
+  const chartUrl = buildChartUrl(enrichment.chart, chartPalette);
 
   const visualRules = `
 Visual and data elements — use what fits, skip what doesn't:
@@ -450,7 +602,7 @@ Visual and data elements — use what fits, skip what doesn't:
 ${chartUrl ? `- Data chart: a chart has been prepared for this post. Embed it exactly as-is on its own line in the section where the data is most relevant:\n  ![${enrichment.chart.title}](${chartUrl})\n  Don't modify the URL.` : ''}
 ${enrichment.table.applicable ? '- Markdown table: include the provided table in a natural section — format it with pipe syntax.' : ''}
 ${enrichment.caseStudy.applicable ? '- Case study: include the provided brand/creator example with its specific numbers.' : ''}
-${isProductPost && products.length >= 3 ? '- Product grid: embed the 3 most relevant products using:\n  {{product-grid}}\n  {{product-mini:slug}}\n  {{product-mini:slug}}\n  {{product-mini:slug}}\n  {{/product-grid}}\n  Use this instead of a single {{product:slug}} embed.' : ''}
+
 - ShinyPull plug: mention ShinyPull once near the end where it naturally fits.
 ${creatorList ? `- Creator links: if you name any creator from the list below in the post body, add a {{creators:...}} tag on its own line at the very END of the content (after the final paragraph). Format: {{creators:platform/username:Display Name}} — comma-separate multiple entries. Only tag creators you actually name in the text. Omit entirely if none apply.\n  Available: ${creatorList}` : ''}`;
 
@@ -493,7 +645,7 @@ ${blogFormat}
 
 ${visualRules}
 ${enrichmentContext}
-${isProductPost && products.length > 0 ? `\nWEDNESDAY REQUIREMENT: Naturally embed the single most relevant product from our catalog using {{product:slug}} on its own line. Only where it genuinely fits.\n\nAvailable products:\n${products.map((p) => `- "${p.name}" (slug: "${p.slug}"): ${p.description || p.name} — $${p.price || 'varies'}`).join('\n')}` : ''}
+
 
 ${context}
 Post title: ${meta.title}
@@ -588,7 +740,6 @@ MANDATORY style rules to follow throughout the rewrite (do not introduce new vio
 - NEVER use: "game-changer", "seismic shift", "landscape" as jargon, "paradigm", "Let that sink in", "it's worth noting", "in an era where", "And that's exactly the point", "genuinely", "beautifully", "spectacularly"
 - Keep the same structure, topic, facts, and approximate length
 - Fix only the style violations — don't change the substance
-- Preserve any {{product:slug}} embed tags exactly as-is
 - Return ONLY the rewritten markdown content (no JSON, no explanation, no code fences)
 
 Original content:
@@ -627,7 +778,7 @@ async function saveDraft(draft) {
     content: draft.content,
     category: draft.category || 'Industry News',
     author: 'ShinyPull',
-    image: null,
+    image: pickHeroImage(draft.category, slug),
     read_time: draft.readTime,
     published_at: today,
     is_published: false,
@@ -643,7 +794,6 @@ async function saveDraft(draft) {
 // --- Send Email ---
 async function sendNotification(savedPost, draft, review, rewritten) {
   const plainText = draft.content
-    .replace(/{{product[^}]*}}/g, '[Product Embed]')
     .replace(/#{1,6}\s/g, '')
     .replace(/\*\*/g, '')
     .replace(/\n+/g, ' ')
@@ -710,10 +860,7 @@ async function sendNotification(savedPost, draft, review, rewritten) {
 
 // --- Main ---
 async function main() {
-  const dayType = getDayType();
-  const isProductPost = dayType === 'product';
-
-  console.log(`\n🚀 Blog Draft Generator — ${isProductPost ? 'Wednesday (product post)' : 'Standard post'}`);
+  console.log(`\n🚀 Blog Draft Generator`);
   console.log('='.repeat(60));
 
   // 1. Research: fetch articles + existing post titles for deduplication
@@ -734,14 +881,7 @@ async function main() {
   // 2b. Validate URLs — strip any 404s before they reach the Writer
   const enrichment = await validateEnrichmentUrls(rawEnrichment);
 
-  // 3. Load products for Wednesday posts + top creators for internal linking
-  let products = [];
-  if (isProductPost) {
-    const { data } = await supabase.from('products').select('*').eq('is_active', true);
-    products = data || [];
-    console.log(`🛍️  Loaded ${products.length} active products for Wednesday embed`);
-  }
-
+  // 3. Load top creators for internal linking + creator-mention chips
   const { data: topCreators } = await supabase
     .from('creators')
     .select('platform, username, display_name')
@@ -755,7 +895,7 @@ async function main() {
 
   // 4. Write (enrichment context included in first draft — no second pass needed)
   await sleep(2000);
-  let draft = await writerAgent(research, enrichment, isProductPost, products, creatorList);
+  let draft = await writerAgent(research, enrichment, creatorList);
 
   // 5. Review
   await sleep(2000);

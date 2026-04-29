@@ -7,26 +7,21 @@ import {
   Eye,
   EyeOff,
   Save,
-  Loader2,
   ArrowLeft,
-  FileText,
   Calendar,
   Clock,
-  ExternalLink,
   AlertCircle,
   CheckCircle,
-  Image,
-  Package,
-  ShoppingBag,
-  Copy,
+  Loader2,
+  ExternalLink,
   ShieldAlert,
-  X,
+  FileText,
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import BlogContent from '../components/BlogContent';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { TIMEOUTS, BLOG_CATEGORIES } from '../lib/constants';
+import { BLOG_CATEGORIES, TIMEOUTS } from '../lib/constants';
 import {
   getAllPostsAdmin,
   createPost,
@@ -35,16 +30,6 @@ import {
   togglePublish,
   generateSlug,
 } from '../services/blogAdminService';
-import {
-  getAllProducts,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  toggleProductActive,
-  generateProductSlug,
-} from '../services/productsService';
-
-// Use BLOG_CATEGORIES from constants
 
 const emptyPost = {
   title: '',
@@ -58,26 +43,12 @@ const emptyPost = {
   is_published: false,
 };
 
-const emptyProduct = {
-  name: '',
-  slug: '',
-  price: '',
-  badge: '',
-  description: '',
-  features: [],
-  image: '',
-  affiliate_link: '',
-  is_active: true,
-};
-
 export default function BlogAdmin() {
   const { user, loading: authLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminChecked, setAdminChecked] = useState(false);
 
-  const [activeTab, setActiveTab] = useState('posts');
   const [posts, setPosts] = useState([]);
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -88,25 +59,19 @@ export default function BlogAdmin() {
   const [currentPost, setCurrentPost] = useState(null);
   const [postFormData, setPostFormData] = useState(emptyPost);
 
-  // Product Editor state
-  const [isEditingProduct, setIsEditingProduct] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState(null);
-  const [productFormData, setProductFormData] = useState(emptyProduct);
-  const [featuresInput, setFeaturesInput] = useState('');
-
   // Preview
   const [showPreview, setShowPreview] = useState(false);
 
   // Delete confirmation
-  const [deleteConfirm, setDeleteConfirm] = useState({ type: null, id: null });
+  const [deleteConfirm, setDeleteConfirm] = useState({ id: null });
 
   // Form validation errors
   const [postErrors, setPostErrors] = useState({});
-  const [productErrors, setProductErrors] = useState({});
 
   // Check admin status
   useEffect(() => {
     if (authLoading) return;
+
     if (!user) {
       window.dispatchEvent(new CustomEvent('openAuthPanel', {
         detail: { message: 'Sign in to access the admin panel' }
@@ -116,7 +81,6 @@ export default function BlogAdmin() {
 
     async function checkAdmin() {
       try {
-        // Get access token from current session
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.access_token) {
           setIsAdmin(false);
@@ -124,7 +88,6 @@ export default function BlogAdmin() {
           return;
         }
 
-        // Send JWT token for validation
         const res = await fetch('/api/admin', {
           method: 'POST',
           headers: {
@@ -134,7 +97,6 @@ export default function BlogAdmin() {
         });
 
         if (res.status === 401) {
-          // Token invalid/expired - sign out
           await supabase.auth.signOut();
           setIsAdmin(false);
         } else {
@@ -154,24 +116,19 @@ export default function BlogAdmin() {
     if (isAdmin) fetchData();
   }, [isAdmin]);
 
-  // Scroll to top when entering edit mode
   useEffect(() => {
-    if (isEditingPost || isEditingProduct) {
+    if (isEditingPost) {
       window.scrollTo(0, 0);
     }
-  }, [isEditingPost, isEditingProduct]);
+  }, [isEditingPost]);
 
   async function fetchData() {
     try {
       setLoading(true);
-      const [postsData, productsData] = await Promise.all([
-        getAllPostsAdmin(),
-        getAllProducts(),
-      ]);
+      const postsData = await getAllPostsAdmin();
       setPosts(postsData || []);
-      setProducts(productsData || []);
     } catch (err) {
-      setError('Failed to load data. Make sure you have admin access.');
+      setError('Failed to load posts. Make sure you have admin access.');
     } finally {
       setLoading(false);
     }
@@ -187,12 +144,6 @@ export default function BlogAdmin() {
     setTimeout(() => setError(null), TIMEOUTS.ERROR_MESSAGE);
   }
 
-  function copyToClipboard(text) {
-    navigator.clipboard.writeText(text);
-    showSuccess('Copied to clipboard!');
-  }
-
-  // ===== POST HANDLERS =====
   function handleNewPost() {
     setCurrentPost(null);
     setPostFormData(emptyPost);
@@ -283,117 +234,10 @@ export default function BlogAdmin() {
     try {
       await deletePost(id);
       await fetchData();
-      setDeleteConfirm({ type: null, id: null });
+      setDeleteConfirm({ id: null });
       showSuccess('Post deleted');
     } catch (err) {
       showError('Failed to delete post');
-    }
-  }
-
-  // ===== PRODUCT HANDLERS =====
-  function handleNewProduct() {
-    setCurrentProduct(null);
-    setProductFormData(emptyProduct);
-    setFeaturesInput('');
-    setIsEditingProduct(true);
-  }
-
-  function handleEditProduct(product) {
-    setCurrentProduct(product);
-    setProductFormData({
-      name: product.name || '',
-      slug: product.slug || '',
-      price: product.price || '',
-      badge: product.badge || '',
-      description: product.description || '',
-      features: product.features || [],
-      image: product.image || '',
-      affiliate_link: product.affiliate_link || '',
-      is_active: product.is_active ?? true,
-    });
-    setFeaturesInput((product.features || []).join('\n'));
-    setIsEditingProduct(true);
-  }
-
-  function handleCancelProductEdit() {
-    setIsEditingProduct(false);
-    setCurrentProduct(null);
-    setProductFormData(emptyProduct);
-    setFeaturesInput('');
-    setProductErrors({});
-  }
-
-  function validateProduct(data) {
-    const errors = {};
-    if (!data.name?.trim()) errors.name = 'Product name is required';
-    if (!data.slug?.trim()) errors.slug = 'Slug is required';
-    else if (!/^[a-z0-9-]+$/.test(data.slug)) errors.slug = 'Slug must be lowercase with hyphens only';
-    if (!data.affiliate_link?.trim()) errors.affiliate_link = 'Affiliate link is required';
-    else if (!data.affiliate_link.startsWith('http')) errors.affiliate_link = 'Must be a valid URL';
-    if (data.image && !data.image.startsWith('http')) errors.image = 'Image must be a valid URL';
-    return errors;
-  }
-
-  function handleProductInputChange(e) {
-    const { name, value, type, checked } = e.target;
-    setProductFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-    if (name === 'name' && !currentProduct) {
-      setProductFormData(prev => ({ ...prev, slug: generateProductSlug(value) }));
-    }
-  }
-
-  function handleFeaturesChange(e) {
-    setFeaturesInput(e.target.value);
-    const features = e.target.value.split('\n').filter(f => f.trim());
-    setProductFormData(prev => ({ ...prev, features }));
-  }
-
-  async function handleSaveProduct() {
-    const errors = validateProduct(productFormData);
-    setProductErrors(errors);
-    if (Object.keys(errors).length > 0) {
-      showError('Please fix the validation errors');
-      return;
-    }
-    try {
-      setSaving(true);
-      if (currentProduct) {
-        await updateProduct(currentProduct.id, productFormData);
-        showSuccess('Product updated!');
-      } else {
-        await createProduct(productFormData);
-        showSuccess('Product created!');
-      }
-      await fetchData();
-      handleCancelProductEdit();
-    } catch (err) {
-      showError(err.message || 'Failed to save product');
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleToggleProductActive(product) {
-    try {
-      await toggleProductActive(product.id, !product.is_active);
-      await fetchData();
-      showSuccess(product.is_active ? 'Product deactivated' : 'Product activated!');
-    } catch (err) {
-      showError('Failed to update product status');
-    }
-  }
-
-  async function handleDeleteProduct(id) {
-    try {
-      await deleteProduct(id);
-      await fetchData();
-      setDeleteConfirm({ type: null, id: null });
-      showSuccess('Product deleted');
-    } catch (err) {
-      showError('Failed to delete product');
     }
   }
 
@@ -456,11 +300,9 @@ export default function BlogAdmin() {
     );
   }
 
-  const isEditing = isEditingPost || isEditingProduct;
-
   return (
     <>
-      <SEO title="Blog Admin" description="Manage blog posts and products" />
+      <SEO title="Blog Admin" description="Manage blog posts" />
 
       <div className="min-h-screen bg-gray-800">
         {/* Header */}
@@ -473,49 +315,19 @@ export default function BlogAdmin() {
                 </Link>
                 <div>
                   <h1 className="text-xl font-bold text-gray-100">Blog Admin</h1>
-                  <p className="text-sm text-gray-300">
-                    {posts.length} posts · {products.length} products
-                  </p>
+                  <p className="text-sm text-gray-300">{posts.length} posts</p>
                 </div>
               </div>
-              {!isEditing && (
+              {!isEditingPost && (
                 <button
-                  onClick={activeTab === 'posts' ? handleNewPost : handleNewProduct}
+                  onClick={handleNewPost}
                   className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
-                  New {activeTab === 'posts' ? 'Post' : 'Product'}
+                  New Post
                 </button>
               )}
             </div>
-
-            {/* Tabs */}
-            {!isEditing && (
-              <div className="flex gap-1 mt-4">
-                <button
-                  onClick={() => setActiveTab('posts')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                    activeTab === 'posts'
-                      ? 'bg-indigo-900/50 text-indigo-300'
-                      : 'text-gray-300 hover:bg-gray-800'
-                  }`}
-                >
-                  <FileText className="w-4 h-4" />
-                  Posts
-                </button>
-                <button
-                  onClick={() => setActiveTab('products')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                    activeTab === 'products'
-                      ? 'bg-indigo-900/50 text-indigo-300'
-                      : 'text-gray-300 hover:bg-gray-800'
-                  }`}
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  Products
-                </button>
-              </div>
-            )}
           </div>
         </div>
 
@@ -523,13 +335,13 @@ export default function BlogAdmin() {
         {(error || success) && (
           <div className="max-w-7xl mx-auto px-4 pt-4">
             {error && (
-              <div className="flex items-center gap-2 p-4 bg-red-950/30 border border-red-800 rounded-lg text-red-700">
+              <div className="flex items-center gap-2 p-4 bg-red-950/30 border border-red-800 rounded-lg text-red-400">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 {error}
               </div>
             )}
             {success && (
-              <div className="flex items-center gap-2 p-4 bg-green-950/30 border border-green-200 rounded-lg text-green-700">
+              <div className="flex items-center gap-2 p-4 bg-green-950/30 border border-green-800 rounded-lg text-green-400">
                 <CheckCircle className="w-5 h-5 flex-shrink-0" />
                 {success}
               </div>
@@ -607,7 +419,9 @@ export default function BlogAdmin() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Content (Markdown) *</label>
-                  <p className="text-xs text-gray-300 mb-2">Use {"{{product:slug}}"} to embed product cards</p>
+                  <p className="text-xs text-gray-300 mb-2">
+                    Embeds available: {'{{tldr}}...{{/tldr}}'}, {'{{stats}}value | label{{/stats}}'}, {'{{callout:stat|insight|tip|update|warning}}...{{/callout}}'}, {'{{creators:platform/username:Name, ...}}'}
+                  </p>
                   <textarea name="content" value={postFormData.content} onChange={handlePostInputChange} rows={16} placeholder="# Your Article Title..." className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-100 bg-gray-900 ${postErrors.content ? 'border-red-500' : 'border-gray-600'}`} />
                   {postErrors.content && <p className="mt-1 text-sm text-red-400">{postErrors.content}</p>}
                 </div>
@@ -622,91 +436,8 @@ export default function BlogAdmin() {
             </div>
           )}
 
-          {/* PRODUCT EDITOR */}
-          {isEditingProduct && (
-            <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-sm">
-              <div className="p-6 border-b border-gray-700">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-100">
-                    {currentProduct ? 'Edit Product' : 'Create New Product'}
-                  </h2>
-                  <div className="flex items-center gap-2">
-                    <button onClick={handleCancelProductEdit} className="px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors">
-                      Cancel
-                    </button>
-                    <button onClick={handleSaveProduct} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors disabled:opacity-50">
-                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                      Save
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="p-6 space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Product Name *</label>
-                    <input type="text" name="name" value={productFormData.name} onChange={handleProductInputChange} placeholder="Fifine K669B USB Microphone" className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-100 bg-gray-900 ${productErrors.name ? 'border-red-500' : 'border-gray-600'}`} />
-                    {productErrors.name && <p className="mt-1 text-sm text-red-400">{productErrors.name}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Slug *</label>
-                    <div className="flex gap-2">
-                      <input type="text" name="slug" value={productFormData.slug} onChange={handleProductInputChange} placeholder="fifine-k669b" className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-100 bg-gray-900 ${productErrors.slug ? 'border-red-500' : 'border-gray-600'}`} />
-                      <button onClick={() => copyToClipboard(`{{product:${productFormData.slug}}}`)} className="px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors" title="Copy embed code">
-                        <Copy className="w-4 h-4 text-gray-300" />
-                      </button>
-                    </div>
-                    {productErrors.slug && <p className="mt-1 text-sm text-red-400">{productErrors.slug}</p>}
-                    <p className="text-xs text-gray-300 mt-1">Use in posts: {"{{product:" + (productFormData.slug || 'slug') + "}}"}</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Amazon Affiliate Link *</label>
-                  <input type="text" name="affiliate_link" value={productFormData.affiliate_link} onChange={handleProductInputChange} placeholder="https://amzn.to/..." className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-100 bg-gray-900 ${productErrors.affiliate_link ? 'border-red-500' : 'border-gray-600'}`} />
-                  {productErrors.affiliate_link && <p className="mt-1 text-sm text-red-400">{productErrors.affiliate_link}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Amazon Image URL</label>
-                  <input type="text" name="image" value={productFormData.image} onChange={handleProductInputChange} placeholder="https://m.media-amazon.com/images/I/..." className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-100 bg-gray-900 ${productErrors.image ? 'border-red-500' : 'border-gray-600'}`} />
-                  {productErrors.image && <p className="mt-1 text-sm text-red-400">{productErrors.image}</p>}
-                  <p className="text-xs text-gray-300 mt-1">Right-click product image on Amazon → "Open image in new tab" → Copy URL</p>
-                  {productFormData.image && (
-                    <div className="mt-2 w-32 h-32 bg-gray-900 border border-gray-700 rounded-lg flex items-center justify-center p-2">
-                      <img src={productFormData.image} alt="Preview" className="max-h-full max-w-full object-contain" onError={(e) => e.target.style.display = 'none'} />
-                    </div>
-                  )}
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Price</label>
-                    <input type="text" name="price" value={productFormData.price} onChange={handleProductInputChange} placeholder="~$30" className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-100 bg-gray-900" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Badge</label>
-                    <input type="text" name="badge" value={productFormData.badge} onChange={handleProductInputChange} placeholder="Budget Pick, Most Popular, etc." className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-100 bg-gray-900" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
-                  <input type="text" name="description" value={productFormData.description} onChange={handleProductInputChange} placeholder="Brief product description" className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-100 bg-gray-900" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Features (one per line)</label>
-                  <textarea value={featuresInput} onChange={handleFeaturesChange} rows={4} placeholder="USB plug-and-play&#10;Cardioid pickup pattern&#10;Volume knob on mic" className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-100 bg-gray-900" />
-                </div>
-                <div className="flex items-center gap-3 p-4 bg-gray-800/50 rounded-lg">
-                  <input type="checkbox" id="is_active" name="is_active" checked={productFormData.is_active} onChange={handleProductInputChange} className="w-5 h-5 rounded border-gray-600 text-indigo-600 focus:ring-indigo-500" />
-                  <label htmlFor="is_active" className="flex-1">
-                    <span className="font-medium text-gray-100">Active</span>
-                    <p className="text-sm text-gray-300">When active, this product can be embedded in blog posts</p>
-                  </label>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* POSTS LIST */}
-          {!isEditing && activeTab === 'posts' && (
+          {!isEditingPost && (
             <div className="space-y-4">
               {posts.length === 0 ? (
                 <div className="bg-gray-900 rounded-xl border border-gray-700 p-12 text-center">
@@ -731,7 +462,7 @@ export default function BlogAdmin() {
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2 mb-1">
                               {post.is_published ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-900/30 text-green-700 text-xs font-medium rounded-full"><Eye className="w-3 h-3" />Published</span>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-900/30 text-green-400 text-xs font-medium rounded-full"><Eye className="w-3 h-3" />Published</span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-800 text-gray-300 text-xs font-medium rounded-full"><EyeOff className="w-3 h-3" />Draft</span>
                               )}
@@ -752,7 +483,7 @@ export default function BlogAdmin() {
                             <button onClick={() => handleEditPost(post)} className="p-2 hover:bg-gray-800 rounded-lg transition-colors" title="Edit">
                               <Edit3 className="w-4 h-4 text-gray-300" />
                             </button>
-                            <button onClick={() => setDeleteConfirm({ type: 'post', id: post.id })} className="p-2 hover:bg-red-950/30 rounded-lg transition-colors" title="Delete">
+                            <button onClick={() => setDeleteConfirm({ id: post.id })} className="p-2 hover:bg-red-950/30 rounded-lg transition-colors" title="Delete">
                               <Trash2 className="w-4 h-4 text-red-500" />
                             </button>
                           </div>
@@ -763,86 +494,12 @@ export default function BlogAdmin() {
                         </div>
                       </div>
                     </div>
-                    {deleteConfirm.type === 'post' && deleteConfirm.id === post.id && (
+                    {deleteConfirm.id === post.id && (
                       <div className="mt-4 p-4 bg-red-950/30 border border-red-800 rounded-lg">
-                        <p className="text-sm text-red-700 mb-3">Are you sure you want to delete "{post.title}"?</p>
+                        <p className="text-sm text-red-400 mb-3">Are you sure you want to delete "{post.title}"?</p>
                         <div className="flex gap-2">
                           <button onClick={() => handleDeletePost(post.id)} className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors">Delete</button>
-                          <button onClick={() => setDeleteConfirm({ type: null, id: null })} className="px-3 py-1.5 bg-gray-900 text-gray-300 text-sm rounded-lg border border-gray-600 hover:bg-gray-800/50 transition-colors">Cancel</button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-
-          {/* PRODUCTS LIST */}
-          {!isEditing && activeTab === 'products' && (
-            <div className="space-y-4">
-              {products.length === 0 ? (
-                <div className="bg-gray-900 rounded-xl border border-gray-700 p-12 text-center">
-                  <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-100 mb-2">No products yet</h3>
-                  <p className="text-gray-300 mb-4">Add affiliate products to embed in your blog posts</p>
-                  <button onClick={handleNewProduct} className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors">
-                    <Plus className="w-4 h-4" /> Add Product
-                  </button>
-                </div>
-              ) : (
-                products.map(product => (
-                  <div key={product.id} className="bg-gray-900 rounded-xl border border-gray-700 p-4 hover:shadow-md transition-shadow overflow-hidden">
-                    <div className="flex gap-4">
-                      {product.image && (
-                        <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-900 border border-gray-800 flex-shrink-0 flex items-center justify-center p-1">
-                          <img src={product.image} alt="" className="max-h-full max-w-full object-contain" />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0 overflow-hidden">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2 mb-1">
-                              {product.is_active ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-900/30 text-green-700 text-xs font-medium rounded-full"><Eye className="w-3 h-3" />Active</span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-800 text-gray-300 text-xs font-medium rounded-full"><EyeOff className="w-3 h-3" />Inactive</span>
-                              )}
-                              {product.badge && <span className="px-2 py-0.5 bg-indigo-900/50 text-indigo-300 text-xs font-medium rounded-full">{product.badge}</span>}
-                              {product.price && <span className="text-sm font-semibold text-gray-100">{product.price}</span>}
-                            </div>
-                            <h3 className="font-semibold text-gray-100 truncate">{product.name}</h3>
-                            <p className="text-sm text-gray-300 truncate">{product.description}</p>
-                          </div>
-                          <div className="flex items-center gap-1 flex-shrink-0">
-                            <button onClick={() => copyToClipboard(`{{product:${product.slug}}}`)} className="p-2 hover:bg-gray-800 rounded-lg transition-colors" title="Copy embed code">
-                              <Copy className="w-4 h-4 text-gray-300" />
-                            </button>
-                            <a href={product.affiliate_link} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-gray-800 rounded-lg transition-colors" title="View on Amazon">
-                              <ExternalLink className="w-4 h-4 text-gray-300" />
-                            </a>
-                            <button onClick={() => handleToggleProductActive(product)} className="p-2 hover:bg-gray-800 rounded-lg transition-colors" title={product.is_active ? 'Deactivate' : 'Activate'}>
-                              {product.is_active ? <EyeOff className="w-4 h-4 text-gray-300" /> : <Eye className="w-4 h-4 text-gray-300" />}
-                            </button>
-                            <button onClick={() => handleEditProduct(product)} className="p-2 hover:bg-gray-800 rounded-lg transition-colors" title="Edit">
-                              <Edit3 className="w-4 h-4 text-gray-300" />
-                            </button>
-                            <button onClick={() => setDeleteConfirm({ type: 'product', id: product.id })} className="p-2 hover:bg-red-950/30 rounded-lg transition-colors" title="Delete">
-                              <Trash2 className="w-4 h-4 text-red-500" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                          <code className="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded font-mono">{"{{product:" + product.slug + "}}"}</code>
-                        </div>
-                      </div>
-                    </div>
-                    {deleteConfirm.type === 'product' && deleteConfirm.id === product.id && (
-                      <div className="mt-4 p-4 bg-red-950/30 border border-red-800 rounded-lg">
-                        <p className="text-sm text-red-700 mb-3">Are you sure you want to delete "{product.name}"?</p>
-                        <div className="flex gap-2">
-                          <button onClick={() => handleDeleteProduct(product.id)} className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors">Delete</button>
-                          <button onClick={() => setDeleteConfirm({ type: null, id: null })} className="px-3 py-1.5 bg-gray-900 text-gray-300 text-sm rounded-lg border border-gray-600 hover:bg-gray-800/50 transition-colors">Cancel</button>
+                          <button onClick={() => setDeleteConfirm({ id: null })} className="px-3 py-1.5 bg-gray-900 text-gray-300 text-sm rounded-lg border border-gray-600 hover:bg-gray-800/50 transition-colors">Cancel</button>
                         </div>
                       </div>
                     )}
@@ -856,57 +513,21 @@ export default function BlogAdmin() {
 
       {/* PREVIEW OVERLAY */}
       {showPreview && (
-        <div className="fixed inset-0 z-50 bg-gray-800/50 overflow-y-auto">
-          {/* Preview toolbar */}
+        <div className="fixed inset-0 z-50 bg-gray-800/80 overflow-y-auto">
           <div className="sticky top-0 z-10 bg-gray-900 border-b border-gray-700 px-4 py-3 flex items-center justify-between shadow-sm">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-gray-300">Preview</span>
-              <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">Draft</span>
-            </div>
+            <h3 className="font-semibold text-gray-100">Preview: {postFormData.title || 'Untitled'}</h3>
             <button
               onClick={() => setShowPreview(false)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors text-sm font-medium"
+              className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
             >
-              <X className="w-4 h-4" />
-              Close Preview
+              Close
             </button>
           </div>
-
-          {/* Simulated hero */}
-          {postFormData.image && (
-            <div className="relative h-64 md:h-96 bg-gray-900">
-              <img src={postFormData.image} alt="" className="w-full h-full object-cover opacity-60" />
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
+          <div className="max-w-3xl mx-auto px-4 py-8">
+            <div className="bg-gray-900 rounded-xl border border-gray-700 p-6 sm:p-10">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-100 mb-6">{postFormData.title || 'Untitled'}</h1>
+              <BlogContent content={postFormData.content || ''} category={postFormData.category} />
             </div>
-          )}
-
-          {/* Article body */}
-          <div className={`max-w-4xl mx-auto px-4 ${postFormData.image ? '-mt-32 relative z-10' : 'mt-8'}`}>
-            <article className="bg-gray-900 rounded-2xl border border-gray-800 shadow-lg overflow-hidden">
-              <div className="p-8 md:p-12">
-                {postFormData.category && (
-                  <span className="inline-block px-3 py-1 bg-indigo-900/50 text-indigo-600 rounded-full text-sm font-medium mb-4">
-                    {postFormData.category}
-                  </span>
-                )}
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-100 mb-4">
-                  {postFormData.title || 'Untitled Post'}
-                </h1>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300 mb-8 pb-8 border-b border-gray-800">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {postFormData.read_time || '5 min read'}
-                  </span>
-                  <span>By {postFormData.author || 'ShinyPull Team'}</span>
-                </div>
-                <BlogContent content={postFormData.content} />
-              </div>
-            </article>
-            <div className="h-12" />
           </div>
         </div>
       )}

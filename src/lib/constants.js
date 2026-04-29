@@ -109,7 +109,6 @@ export const BLOG_CATEGORIES = [
   'Tips & Strategy',
   'Growth Tips',
   'Industry Insights',
-  'Streaming Gear',
   'Tutorials',
   'YouTube News',
   'Twitch Trends',
