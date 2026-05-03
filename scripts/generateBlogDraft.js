@@ -66,6 +66,18 @@ function slugify(title) {
     .substring(0, 60);
 }
 
+// Hard strip em dashes from content — never trust the AI to catch these.
+// Runs after every write/rewrite step before anything gets saved.
+// " — " (spaced) → ", "  |  "—" (bare) → "-"
+// Also covers HTML entities and Unicode variants.
+function stripEmDashes(text) {
+  return text
+    .replace(/\s*—\s*/g, (match) => match.trim() === '—' ? '-' : ', ')
+    .replace(/&mdash;/gi, ', ')
+    .replace(/&#8212;/g, ', ')
+    .replace(/&#x2014;/gi, ', ');
+}
+
 function estimateReadTime(content) {
   const words = content.split(/\s+/).length;
   const minutes = Math.ceil(words / 200);
@@ -169,9 +181,47 @@ function hashString(str) {
   return Math.abs(h);
 }
 
-function pickHeroImage(category, slug) {
+function pickHeroImageFallback(category, slug) {
   const pool = HERO_IMAGES[category] || HERO_IMAGES['Industry News'];
   return pool[hashString(slug || '') % pool.length];
+}
+
+// Fetch a topic-relevant image from Pexels using the post title as the search query.
+// Falls back to the static category pool if no API key is set or the search fails.
+async function pickHeroImage(title, category, slug) {
+  const apiKey = process.env.PEXELS_API_KEY;
+  if (!apiKey) {
+    console.log('ℹ️  No PEXELS_API_KEY — using static image pool');
+    return pickHeroImageFallback(category, slug);
+  }
+
+  // Build a clean search query from the title: strip punctuation, take first 5 words
+  const query = title
+    .replace(/[^a-zA-Z0-9\s]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 5)
+    .join(' ');
+
+  try {
+    const res = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=10&orientation=landscape`,
+      { headers: { Authorization: apiKey }, signal: AbortSignal.timeout(8000) }
+    );
+    if (!res.ok) throw new Error(`Pexels API ${res.status}`);
+    const data = await res.json();
+    const photos = data.photos || [];
+    if (photos.length === 0) throw new Error('No results');
+
+    // Pick deterministically so the same slug always gets the same image
+    const photo = photos[hashString(slug || '') % photos.length];
+    const url = photo.src.large2x || photo.src.large || photo.src.original;
+    console.log(`🖼️  Hero image: "${photo.alt || query}" (Pexels ID ${photo.id})`);
+    return url;
+  } catch (err) {
+    console.warn(`⚠️  Pexels search failed (${err.message}) — falling back to static pool`);
+    return pickHeroImageFallback(category, slug);
+  }
 }
 
 // --- Structural archetypes ---
@@ -703,7 +753,7 @@ Write the full blog post content now. Output ONLY the markdown content — no JS
     max_tokens: 4096,
     messages: [{ role: 'user', content: contentPrompt }],
   }));
-  const content = contentResponse.content[0].text.trim();
+  const content = stripEmDashes(contentResponse.content[0].text.trim());
 
   const draft = { ...meta, content };
   draft.readTime = estimateReadTime(draft.content);
@@ -799,7 +849,7 @@ ${draft.content}`,
     ],
   }));
 
-  draft.content = response.content[0].text.trim();
+  draft.content = stripEmDashes(response.content[0].text.trim());
   draft.readTime = estimateReadTime(draft.content);
   console.log('✅ Rewrite complete');
   return draft;
@@ -808,6 +858,12 @@ ${draft.content}`,
 // --- Save to Supabase ---
 async function saveDraft(draft) {
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+
+  // Final hard strip — belt and suspenders. Even if both agents missed em dashes,
+  // they will never make it into the database.
+  draft.content = stripEmDashes(draft.content);
+  draft.description = stripEmDashes(draft.description);
+  draft.title = stripEmDashes(draft.title);
 
   let slug = draft.slug || slugify(draft.title);
 
@@ -829,7 +885,7 @@ async function saveDraft(draft) {
     content: draft.content,
     category: draft.category || 'Industry News',
     author: 'ShinyPull',
-    image: pickHeroImage(draft.category, slug),
+    image: await pickHeroImage(draft.title, draft.category, slug),
     read_time: draft.readTime,
     published_at: today,
     is_published: false,
