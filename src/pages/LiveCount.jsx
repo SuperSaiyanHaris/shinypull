@@ -2,9 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Youtube, Twitch, ExternalLink, Share2, AlertCircle } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
+import SpotifyIcon from '../components/SpotifyIcon';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { getChannelByUsername as getKickChannel } from '../services/kickService';
+import { getArtistById as getSpotifyArtist } from '../services/spotifyService';
+import { getCreatorByUsername } from '../services/creatorService';
 import Odometer from '../components/Odometer';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
@@ -35,6 +38,14 @@ const platformConfig = {
     label: 'paid subscribers',
     avgGrowthPerSecond: 0.3,
   },
+  spotify: {
+    icon: SpotifyIcon,
+    color: 'text-green-400',
+    bgGradient: 'from-green-500 to-green-600',
+    glowColor: 'shadow-green-500/20',
+    label: 'followers',
+    avgGrowthPerSecond: 1.5,
+  },
 };
 
 // Platform URLs for linking to actual channel
@@ -42,6 +53,7 @@ const platformUrls = {
   youtube: (username) => `https://youtube.com/@${username}`,
   twitch: (username) => `https://twitch.tv/${username}`,
   kick: (username) => `https://kick.com/${username}`,
+  spotify: (username) => `https://open.spotify.com/search/${encodeURIComponent(username)}`,
 };
 
 // Helper function to generate realistic random offset based on channel size
@@ -88,6 +100,11 @@ export default function LiveCount() {
           data = await getTwitchChannel(username);
         } else if (platform === 'kick') {
           data = await getKickChannel(username);
+        } else if (platform === 'spotify') {
+          const dbCreator = await getCreatorByUsername('spotify', username);
+          if (dbCreator?.platform_id) {
+            data = await getSpotifyArtist(dbCreator.platform_id);
+          }
         }
 
         if (data) {

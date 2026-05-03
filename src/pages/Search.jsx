@@ -10,6 +10,8 @@ import { searchChannels as searchYouTube } from '../services/youtubeService';
 import { searchChannels as searchTwitch } from '../services/twitchService';
 import { searchChannels as searchKick } from '../services/kickService';
 import { searchBluesky } from '../services/blueskyService';
+import { searchArtists as searchSpotify } from '../services/spotifyService';
+import SpotifyIcon from '../components/SpotifyIcon';
 import { upsertCreator, saveCreatorStats, searchCreators } from '../services/creatorService';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -24,6 +26,7 @@ const platformIcons = {
   twitch: Twitch,
   kick: KickIcon,
   bluesky: BlueskyIcon,
+  spotify: SpotifyIcon,
 };
 
 const platformColors = {
@@ -32,6 +35,7 @@ const platformColors = {
   twitch: { bg: 'bg-purple-600', light: 'bg-purple-950/30', text: 'text-purple-400' },
   kick: { bg: 'bg-green-600', light: 'bg-green-950/30', text: 'text-green-400' },
   bluesky: { bg: 'bg-sky-500', light: 'bg-sky-950/30', text: 'text-sky-400' },
+  spotify: { bg: 'bg-green-500', light: 'bg-green-950/30', text: 'text-green-400' },
   instagram: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400' },
 };
 
@@ -41,6 +45,7 @@ const platforms = [
   { id: 'twitch', name: 'Twitch', icon: Twitch, available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, available: true },
   { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, available: true },
+  { id: 'spotify', name: 'Spotify', icon: SpotifyIcon, available: true },
 ];
 
 // Relevance + popularity score for sorting search results.
@@ -132,7 +137,7 @@ async function searchTwitchFromDB(query) {
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
-  const validPlatforms = ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'instagram'];
+  const validPlatforms = ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'spotify', 'instagram'];
   const initialPlatform = validPlatforms.includes(searchParams.get('platform')) ? searchParams.get('platform') : 'youtube';
   const [selectedPlatform, setSelectedPlatform] = useState(initialPlatform);
   const [results, setResults] = useState([]);
@@ -227,6 +232,11 @@ export default function Search() {
         }
       } else if (platform === 'bluesky') {
         channels = await searchBluesky(searchQuery, 25);
+        if (channels.length > 0) {
+          void persistSearchResults(channels);
+        }
+      } else if (platform === 'spotify') {
+        channels = await searchSpotify(searchQuery, 25);
         if (channels.length > 0) {
           void persistSearchResults(channels);
         }

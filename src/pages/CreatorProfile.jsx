@@ -10,6 +10,8 @@ import { getChannelByUsername as getYouTubeChannel, getChannelById as getYouTube
 import { getChannelByUsername as getTwitchChannel, getLiveStreams as getTwitchLiveStreams } from '../services/twitchService';
 import { getChannelByUsername as getKickChannel, getLiveStreams as getKickLiveStreams } from '../services/kickService';
 import { getBlueskyProfile } from '../services/blueskyService';
+import { getArtistById as getSpotifyArtist } from '../services/spotifyService';
+import SpotifyIcon from '../components/SpotifyIcon';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import { followCreator, unfollowCreator, isFollowing as checkIsFollowing, getFollowedCreators } from '../services/followService';
 import { useAuth } from '../contexts/AuthContext';
@@ -27,6 +29,7 @@ const platformIcons = {
   kick: KickIcon,
   tiktok: TikTokIcon,
   bluesky: BlueskyIcon,
+  spotify: SpotifyIcon,
 };
 
 const platformColors = {
@@ -35,6 +38,7 @@ const platformColors = {
   kick: { bg: 'bg-green-600', light: 'bg-green-950/30', text: 'text-green-400', border: 'border-green-800' },
   tiktok: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400', border: 'border-pink-800' },
   bluesky: { bg: 'bg-sky-500', light: 'bg-sky-950/30', text: 'text-sky-400', border: 'border-sky-800' },
+  spotify: { bg: 'bg-green-500', light: 'bg-green-950/30', text: 'text-green-400', border: 'border-green-800' },
 };
 
 const platformUrls = {
@@ -43,6 +47,7 @@ const platformUrls = {
   kick: (username) => `https://kick.com/${username}`,
   tiktok: (username) => `https://tiktok.com/@${username}`,
   bluesky: (username) => `https://bsky.app/profile/${username}`,
+  spotify: (username, platformId) => platformId ? `https://open.spotify.com/artist/${platformId}` : `https://open.spotify.com/search/${encodeURIComponent(username)}`,
 };
 
 const platformDisplayNames = {
@@ -51,6 +56,7 @@ const platformDisplayNames = {
   kick: 'Kick',
   tiktok: 'TikTok',
   bluesky: 'Bluesky',
+  spotify: 'Spotify',
 };
 
 export default function CreatorProfile() {
@@ -124,6 +130,21 @@ export default function CreatorProfile() {
         channelData = await getKickChannel(username);
       } else if (platform === 'bluesky') {
         channelData = await getBlueskyProfile(username);
+      } else if (platform === 'spotify') {
+        // Spotify: username is a slug, need platform_id to call the API
+        const navPlatformId = location.state?.platformId;
+        if (navPlatformId) {
+          channelData = await getSpotifyArtist(navPlatformId);
+        }
+        if (!channelData) {
+          const dbCreator = await getCreatorByUsername('spotify', username);
+          if (dbCreator?.platform_id) {
+            channelData = await getSpotifyArtist(dbCreator.platform_id);
+          }
+        }
+        if (!channelData) {
+          throw new Error('Artist not found. Try searching Spotify for this artist.');
+        }
       } else if (platform === 'tiktok') {
         // TikTok: Load creator and latest stats from database in parallel
         const dbCreator = await getCreatorByUsername('tiktok', username);
@@ -378,7 +399,7 @@ export default function CreatorProfile() {
       return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
     };
 
-    const PLATFORM_LABELS = { youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky' };
+    const PLATFORM_LABELS = { youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky', spotify: 'Spotify' };
 
     const meta = [
       ['ShinyPull Stats Export'],
@@ -447,6 +468,14 @@ export default function CreatorProfile() {
         fmtDelta(s.subsChange),
         s.total_posts ?? '',
         fmtDelta(s.postsChange),
+      ]);
+    } else if (platform === 'spotify') {
+      headers = ['Date', 'Followers', 'Follower Change', 'Popularity Score'];
+      rows = withChanges.map(s => [
+        fmtDate(s.recorded_at),
+        s.subscribers ?? s.followers ?? '',
+        fmtDelta(s.subsChange),
+        s.total_views ?? '',
       ]);
     } else {
       headers = ['Date', 'Followers', 'Follower Change'];
@@ -572,7 +601,7 @@ export default function CreatorProfile() {
                 <div className="flex items-center gap-3 mb-2 flex-wrap">
                   <h1 className="text-3xl font-bold text-gray-100">@{username}</h1>
                   <a
-                    href={platformUrls[platform]?.(username)}
+                    href={platformUrls[platform]?.(username, creator?.platformId)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${colors.bg} text-white hover:opacity-90 transition-opacity`}
@@ -583,7 +612,7 @@ export default function CreatorProfile() {
                 </div>
                 <p className="text-gray-300 mb-4">Creator not found</p>
                 <a
-                  href={platformUrls[platform]?.(username)}
+                  href={platformUrls[platform]?.(username, creator?.platformId)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-300 font-medium"
@@ -600,7 +629,7 @@ export default function CreatorProfile() {
   }
 
   const primaryCount = creator.subscribers || creator.followers || 0;
-  const primaryLabel = platform === 'twitch' || platform === 'bluesky' ? 'followers' : 'subscribers';
+  const primaryLabel = platform === 'twitch' || platform === 'bluesky' || platform === 'spotify' ? 'followers' : 'subscribers';
 
   const platformName = platformDisplayNames[platform] || platform.charAt(0).toUpperCase() + platform.slice(1);
   const seoTitle = primaryCount > 0
@@ -627,6 +656,10 @@ export default function CreatorProfile() {
     if (platform === 'bluesky') {
       const posts = creator.totalPosts ? ` and ${formatNumber(creator.totalPosts)} posts` : '';
       return `${name} has ${count} Bluesky followers${posts}. Track follower growth and post activity on ShinyPull.`;
+    }
+    if (platform === 'spotify') {
+      const pop = creator.popularity ? ` with a popularity score of ${creator.popularity}/100` : '';
+      return `${name} has ${count} Spotify followers${pop}. Track follower growth, popularity trends, and genre stats on ShinyPull.`;
     }
     return `Track ${name}'s ${platform} statistics including followers, growth, and analytics on ShinyPull.`;
   })();
@@ -814,7 +847,7 @@ export default function CreatorProfile() {
                   <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-100">{creator.displayName}</h1>
                     <a
-                      href={platformUrls[platform]?.(creator.username || username)}
+                      href={platformUrls[platform]?.(creator.username || username, creator?.platformId)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm ${colors.bg} text-white hover:opacity-90 transition-opacity`}
@@ -858,7 +891,7 @@ export default function CreatorProfile() {
                   {/* Social Links */}
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <a
-                      href={platformUrls[platform]?.(creator.username)}
+                      href={platformUrls[platform]?.(creator.username, creator?.platformId)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 sm:gap-2 text-indigo-600 hover:text-indigo-300 font-medium text-xs sm:text-sm"
@@ -965,6 +998,7 @@ export default function CreatorProfile() {
               : platform === 'kick' ? (creator.category ? 'grid-cols-2' : 'grid-cols-1 max-w-md')
               : platform === 'twitch' ? 'grid-cols-3'
               : platform === 'bluesky' ? 'grid-cols-2'
+              : platform === 'spotify' ? (creator.description ? 'grid-cols-3' : 'grid-cols-2')
               : 'grid-cols-2 lg:grid-cols-4'
             }`}>
               {/* Subscribers/Followers Card */}
@@ -998,6 +1032,25 @@ export default function CreatorProfile() {
                   label="Posts"
                   value={formatNumber(creator.totalPosts || 0)}
                 />
+              )}
+
+              {/* Spotify: Show Popularity + Genres */}
+              {platform === 'spotify' && (
+                <>
+                  <StatCard
+                    icon={TrendingUp}
+                    label="Popularity"
+                    value={creator.popularity != null ? `${creator.popularity}/100` : '-'}
+                    sublabel="Spotify score"
+                  />
+                  {creator.description && (
+                    <StatCard
+                      icon={Play}
+                      label="Genres"
+                      value={creator.description}
+                    />
+                  )}
+                </>
               )}
 
               {/* Hours Watched / Total Views */}

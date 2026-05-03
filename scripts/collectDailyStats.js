@@ -9,6 +9,8 @@ const TWITCH_CLIENT_ID = process.env.VITE_TWITCH_CLIENT_ID;
 const TWITCH_CLIENT_SECRET = process.env.VITE_TWITCH_CLIENT_SECRET;
 const KICK_CLIENT_ID = process.env.KICK_CLIENT_ID;
 const KICK_CLIENT_SECRET = process.env.KICK_CLIENT_SECRET;
+const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 
 // Batch sizes
 const YOUTUBE_BATCH_SIZE = 50;  // YouTube allows up to 50 channel IDs per request
@@ -16,12 +18,48 @@ const TWITCH_BATCH_SIZE = 100;  // Twitch allows up to 100 logins per request
 const TWITCH_PARALLEL_FOLLOWERS = 10;  // Parallel follower requests
 const KICK_BATCH_SIZE = 50;    // Kick allows up to 50 slugs per request
 const BLUESKY_BATCH_SIZE = 25;  // AT Protocol getProfiles allows up to 25 actors per request
+const SPOTIFY_BATCH_SIZE = 50;  // Spotify /artists endpoint allows up to 50 IDs per request
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
 });
 
 let twitchAccessToken = null;
+let spotifyAccessToken = null;
+let spotifyTokenExpiry = 0;
+
+async function getSpotifyAccessToken() {
+  if (spotifyAccessToken && Date.now() < spotifyTokenExpiry) return spotifyAccessToken;
+  const credentials = Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64');
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { Authorization: `Basic ${credentials}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=client_credentials',
+  });
+  if (!res.ok) throw new Error(`Spotify token error: ${res.status}`);
+  const data = await res.json();
+  spotifyAccessToken = data.access_token;
+  spotifyTokenExpiry = Date.now() + (data.expires_in - 300) * 1000;
+  return spotifyAccessToken;
+}
+
+async function fetchSpotifyBatch(artistIds) {
+  const token = await getSpotifyAccessToken();
+  const res = await fetch(`https://api.spotify.com/v1/artists?ids=${artistIds.join(',')}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Spotify batch error: ${res.status}`);
+  const data = await res.json();
+  const statsMap = new Map();
+  for (const artist of (data.artists || [])) {
+    if (!artist) continue;
+    statsMap.set(artist.id, {
+      followers: artist.followers?.total ?? 0,
+      popularity: artist.popularity ?? 0,
+    });
+  }
+  return statsMap;
+}
 
 async function getTwitchAccessToken() {
   if (twitchAccessToken) return twitchAccessToken;
@@ -284,6 +322,8 @@ async function collectDailyStats() {
   console.log(`   Twitch Client Secret: ${TWITCH_CLIENT_SECRET ? '✅ Set' : '❌ Missing'}`);
   console.log(`   Kick Client ID: ${KICK_CLIENT_ID ? '✅ Set' : '❌ Missing'}`);
   console.log(`   Kick Client Secret: ${KICK_CLIENT_SECRET ? '✅ Set' : '❌ Missing'}`);
+  console.log(`   Spotify Client ID: ${SPOTIFY_CLIENT_ID ? '✅ Set' : '❌ Missing'}`);
+  console.log(`   Spotify Client Secret: ${SPOTIFY_CLIENT_SECRET ? '✅ Set' : '❌ Missing'}`);
   console.log('');
 
   // Get all creators from database (Supabase default limit is 1000, so paginate)
@@ -308,13 +348,15 @@ async function collectDailyStats() {
   const twitchCreators = creators.filter((c) => c.platform === 'twitch');
   const kickCreators = creators.filter((c) => c.platform === 'kick');
   const blueskyCreators = creators.filter((c) => c.platform === 'bluesky');
+  const spotifyCreators = creators.filter((c) => c.platform === 'spotify');
   // TikTok is handled by refreshTikTokProfiles.js via separate GitHub Actions workflow
 
   console.log(`Found ${creators.length} creators to update`);
   console.log(`   YouTube: ${youtubeCreators.length}`);
   console.log(`   Twitch: ${twitchCreators.length}`);
   console.log(`   Kick: ${kickCreators.length}`);
-  console.log(`   Bluesky: ${blueskyCreators.length}\n`);
+  console.log(`   Bluesky: ${blueskyCreators.length}`);
+  console.log(`   Spotify: ${spotifyCreators.length}\n`);
 
   let successCount = 0;
   let errorCount = 0;
@@ -527,6 +569,51 @@ async function collectDailyStats() {
     }
   }
 
+  // ========== SPOTIFY (batch by 50) ==========
+  if (spotifyCreators.length > 0 && SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_SECRET) {
+    console.log('\n🎵 Processing Spotify artists...');
+    const spotifyBatches = chunk(spotifyCreators, SPOTIFY_BATCH_SIZE);
+    console.log(`   ${spotifyBatches.length} batch(es) of up to ${SPOTIFY_BATCH_SIZE} artists\n`);
+
+    for (let i = 0; i < spotifyBatches.length; i++) {
+      const batch = spotifyBatches[i];
+      const artistIds = batch.map((c) => c.platform_id);
+
+      try {
+        const statsMap = await fetchSpotifyBatch(artistIds);
+
+        for (const creator of batch) {
+          const stats = statsMap.get(creator.platform_id);
+          if (stats && stats.followers > 0) {
+            statsToUpsert.push({
+              creator_id: creator.id,
+              recorded_at: today,
+              subscribers: stats.followers,
+              followers: stats.followers,
+              total_views: stats.popularity,
+              total_posts: null,
+            });
+            console.log(`   ✅ ${creator.display_name}: ${stats.followers.toLocaleString()} followers (popularity: ${stats.popularity})`);
+            successCount++;
+          } else if (stats && stats.followers === 0) {
+            console.log(`   ⚠️  ${creator.display_name}: Skipping — API returned 0 followers`);
+            errorCount++;
+          } else {
+            console.log(`   ❌ ${creator.display_name}: Artist not found`);
+            errorCount++;
+          }
+        }
+      } catch (error) {
+        console.error(`   ❌ Batch ${i + 1} failed: ${error.message}`);
+        errorCount += batch.length;
+      }
+
+      if (i < spotifyBatches.length - 1) {
+        await new Promise((r) => setTimeout(r, 200));
+      }
+    }
+  }
+
   // ========== BULK UPSERT TO DATABASE ==========
   if (statsToUpsert.length > 0) {
     console.log(`\n💾 Saving ${statsToUpsert.length} stats entries to database...`);
@@ -559,6 +646,7 @@ async function collectDailyStats() {
     twitchFollowers: twitchCreators.length,
     kick: Math.ceil(kickCreators.length / KICK_BATCH_SIZE),
     bluesky: Math.ceil(blueskyCreators.length / BLUESKY_BATCH_SIZE),
+    spotify: Math.ceil(spotifyCreators.length / SPOTIFY_BATCH_SIZE),
   };
   console.log(`\n📡 API calls made:`);
   console.log(`   YouTube: ${apiCalls.youtube} (batched ${YOUTUBE_BATCH_SIZE}/request)`);
@@ -566,6 +654,7 @@ async function collectDailyStats() {
   console.log(`   Twitch Followers: ${apiCalls.twitchFollowers} (parallel ${TWITCH_PARALLEL_FOLLOWERS}x)`);
   console.log(`   Kick: ${apiCalls.kick} (batched ${KICK_BATCH_SIZE}/request)`);
   console.log(`   Bluesky: ${apiCalls.bluesky} (batched ${BLUESKY_BATCH_SIZE}/request, no auth)`);
+  console.log(`   Spotify: ${apiCalls.spotify} (batched ${SPOTIFY_BATCH_SIZE}/request)`);
 }
 
 collectDailyStats().catch(console.error);
