@@ -45,6 +45,14 @@ const platformUrls = {
   bluesky: (username) => `https://bsky.app/profile/${username}`,
 };
 
+const platformDisplayNames = {
+  youtube: 'YouTube',
+  twitch: 'Twitch',
+  kick: 'Kick',
+  tiktok: 'TikTok',
+  bluesky: 'Bluesky',
+};
+
 export default function CreatorProfile() {
   const { platform, username } = useParams();
   const location = useLocation();
@@ -570,7 +578,7 @@ export default function CreatorProfile() {
                     className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${colors.bg} text-white hover:opacity-90 transition-opacity`}
                   >
                     {Icon && <Icon className="w-3.5 h-3.5" />}
-                    {platform}
+                    {platformDisplayNames[platform] || platform}
                   </a>
                 </div>
                 <p className="text-gray-300 mb-4">Creator not found</p>
@@ -594,9 +602,10 @@ export default function CreatorProfile() {
   const primaryCount = creator.subscribers || creator.followers || 0;
   const primaryLabel = platform === 'twitch' || platform === 'bluesky' ? 'followers' : 'subscribers';
 
+  const platformName = platformDisplayNames[platform] || platform.charAt(0).toUpperCase() + platform.slice(1);
   const seoTitle = primaryCount > 0
-    ? `${creator.displayName} ${platform.charAt(0).toUpperCase() + platform.slice(1)} Stats (${formatNumber(primaryCount)} ${primaryLabel}) | ShinyPull`
-    : `${creator.displayName} ${platform.charAt(0).toUpperCase() + platform.slice(1)} Statistics | ShinyPull`;
+    ? `${creator.displayName} ${platformName} Stats (${formatNumber(primaryCount)} ${primaryLabel})`
+    : `${creator.displayName} ${platformName} Statistics`;
 
   const seoDescription = (() => {
     const name = creator.displayName;
@@ -627,7 +636,7 @@ export default function CreatorProfile() {
   const profileSchema = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
-    'name': `${creator.displayName} ${platform.charAt(0).toUpperCase() + platform.slice(1)} Statistics`,
+    'name': `${creator.displayName} ${platformName} Statistics`,
     'url': `https://shinypull.com/${platform}/${creator.username}`,
     'mainEntity': {
       '@type': 'Person',
@@ -812,7 +821,7 @@ export default function CreatorProfile() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       {Icon && <Icon className="w-3 h-3 sm:w-4 sm:h-4" />}
-                      {platform}
+                      {platformDisplayNames[platform] || platform}
                     </a>
                     {isLive && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm bg-red-500 text-white animate-pulse">

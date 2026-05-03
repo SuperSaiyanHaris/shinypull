@@ -55,7 +55,7 @@ export default function Support() {
   return (
     <>
       <SEO
-        title="Support ShinyPull"
+        title="Support"
         description="Help support ShinyPull and fund new features. Buy the developer a coffee!"
       />
 

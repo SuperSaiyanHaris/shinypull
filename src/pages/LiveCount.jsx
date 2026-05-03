@@ -262,7 +262,7 @@ export default function LiveCount() {
   return (
     <>
       <SEO
-        title={`${creator.displayName} Live ${config.label} Count`}
+        title={`${creator.displayName} Live ${config.label.charAt(0).toUpperCase() + config.label.slice(1)} Count`}
         description={`Watch ${creator.displayName}'s ${platform} ${config.label} count update in real-time. Estimated live counter.`}
       />
 

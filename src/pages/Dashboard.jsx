@@ -179,7 +179,7 @@ export default function Dashboard() {
   if (!user) {
     return (
       <>
-        <SEO title="Dashboard - ShinyPull" description="Track your followed creators and see their latest stats in one place." />
+        <SEO title="Dashboard" description="Track your followed creators and see their latest stats in one place." />
         <div className="min-h-screen bg-[#0a0a0f]">
           <div className="max-w-4xl mx-auto px-4 pt-20 pb-32">
 

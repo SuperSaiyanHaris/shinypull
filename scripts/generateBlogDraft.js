@@ -9,6 +9,14 @@ import Parser from 'rss-parser';
 // --- Config ---
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// Current date injected into all agent prompts so the model knows what year it is
+// and doesn't reason as if it's still in its training window.
+const TODAY = new Date().toLocaleDateString('en-US', {
+  timeZone: 'America/New_York',
+  year: 'numeric', month: 'long', day: 'numeric',
+}); // e.g. "May 2, 2026"
+const THIS_YEAR = new Date().getFullYear();
+
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -249,7 +257,7 @@ async function fetchArticles() {
         if (pubDate > sevenDaysAgo) {
           articles.push({
             title: item.title || '',
-            description: (item.contentSnippet || item.summary || '').substring(0, 300),
+            description: (item.contentSnippet || item.summary || '').substring(0, 800),
             url: item.link || '',
             source: feed.name,
             pubDate: item.pubDate || '',
@@ -298,6 +306,8 @@ async function researchAgent(articles, recentTitles) {
       {
         role: 'user',
         content: `You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky stats.
+
+Today's date: ${TODAY}. All articles below are from this week. Write as if you know it is ${THIS_YEAR}.
 
 Our audience: streamers, YouTubers, TikTokers, aspiring creators, and people into creator economy data and analytics.
 ${recentBlock}
@@ -397,14 +407,21 @@ async function enrichmentAgent(research) {
         role: 'user',
         content: `You are a research enrichment specialist for ShinyPull, a creator analytics platform (YouTube, TikTok, Twitch, Kick, Bluesky stats).
 
+Today's date: ${TODAY}. The post being written is current — it reflects events happening now in ${THIS_YEAR}.
+
 A blog post is about to be written on this topic:
 Title: ${research.suggestedTitle}
 Angle: ${research.angle}
 Key facts from source article: ${research.keyFacts.join('; ')}
 
-Your job: identify concrete supporting material that will make this post credible and visually engaging. Only include things you are confident are accurate based on your training data.
+Your job: identify concrete supporting material that will make this post credible and visually engaging.
 
-1. STATS: 3-5 specific statistics with real numbers (percentages, dollar amounts, user counts). Include the publication name and URL for each. Prefer well-known industry sources (Influencer Marketing Hub, Sprout Social, Later, Digiday, eMarketer, Pew Research, etc.).
+CRITICAL DATA FRESHNESS RULES:
+- For time-sensitive metrics (quarterly earnings, annual revenue, monthly active users, market share), only include figures if you can state the specific year/quarter they cover. If your training data only has figures through mid-2025, say so explicitly in the "fact" field rather than presenting stale numbers as current. It is better to cite a clearly-dated historical stat ("YouTube Q1 2025 revenue was $X") than to silently present old data as if it is from ${THIS_YEAR}.
+- Do NOT invent or estimate current figures you cannot verify. Leave a stat out rather than fabricate it.
+- For evergreen stats (e.g. platform user counts, general industry benchmarks) that change slowly, include the figure with its known date so the writer can decide whether to cite it.
+
+1. STATS: 3-5 specific statistics with real numbers (percentages, dollar amounts, user counts). Include the publication name and URL for each. Prefer well-known industry sources (Influencer Marketing Hub, Sprout Social, Later, Digiday, eMarketer, Pew Research, etc.). Always include the year the stat is from in the "fact" field.
 
 2. TABLE: Is there a natural comparison table for this topic? (Tier comparisons, platform breakdowns, before/after, cost breakdowns, etc.) If yes, provide real data for 3-6 rows. If no clear table fits, set applicable to false.
 
@@ -638,6 +655,8 @@ ${creatorList ? `- CREATORS TAG (mandatory if any creator from the list is named
   // Step 1: get metadata as JSON (no long string fields — avoids escaping issues)
   const metaPrompt = `You are a blog editor for ShinyPull (shinypull.com), a creator analytics platform.
 
+Today's date: ${TODAY}. This post is being written and published in ${THIS_YEAR}.
+
 ${context}
 
 Return ONLY valid JSON (no markdown fences, no explanation):
@@ -659,6 +678,8 @@ Return ONLY valid JSON (no markdown fences, no explanation):
 
   // Step 2: get content as plain markdown (no JSON wrapper — no escaping needed)
   const contentPrompt = `You are writing a blog post for ShinyPull (shinypull.com), a creator analytics platform.
+
+Today's date: ${TODAY}. This post is publishing in ${THIS_YEAR}. Never refer to ${THIS_YEAR} as "this year" without stating the year explicitly at least once. If citing a stat from ${THIS_YEAR - 1} or earlier, clearly note the year so readers know it is historical context, not current data.
 
 ${styleGuide}
 
@@ -702,6 +723,8 @@ async function reviewAgent(draft) {
         role: 'user',
         content: `You are a strict editor reviewing a blog post for ShinyPull. Check for violations of the style guide.
 
+Today's date: ${TODAY}. The post should reflect ${THIS_YEAR} as the present year.
+
 FAIL conditions (deduct 2 points each from a starting score of 10):
 1. Em dashes (—) present anywhere in the content
 2. Any sentence starting with "Here's [anything]" — "Here's what", "Here's where", "Here's why", "Here's how", "Here's the thing", "Here's a breakdown", "Here's what it signals", "Here's the math", etc.
@@ -711,6 +734,7 @@ FAIL conditions (deduct 2 points each from a starting score of 10):
 6. H1 heading (#) used anywhere in the content body
 7. First paragraph is a bullet list instead of prose
 8. More than 3 hyperlinks total in the post — over-linking is the #1 AI tell. Real writers link sparingly. Wrapping a bolded number or a full sentence in a link is an automatic fail.
+9. Stale year problem: time-sensitive stats (earnings, revenue, MAU, market share) cited for a year earlier than ${THIS_YEAR - 1} without being explicitly framed as historical context. E.g. presenting "Q1 2024 revenue" as if it is current data is a fail. Historical stats are fine if clearly labeled as such.
 
 WARN conditions (deduct 0.5 points each):
 - More than two sentences over 25 words
@@ -757,6 +781,8 @@ async function rewriteAgent(draft, review) {
         role: 'user',
         content: `Rewrite the following blog post to fix these specific style issues:
 - ${issueList}
+
+Today's date: ${TODAY}. The post is publishing in ${THIS_YEAR}. Do not present stats from ${THIS_YEAR - 2} or earlier as current without clearly labeling them as historical.
 
 MANDATORY style rules to follow throughout the rewrite (do not introduce new violations):
 - NEVER use em dashes (—). Use commas, colons, or rewrite the sentence.

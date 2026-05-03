@@ -477,7 +477,7 @@ export default function Reports() {
   if (!isMod) {
     return (
       <>
-        <SEO title="Reports - ShinyPull" description="Build custom reports and export creator stats across platforms." />
+        <SEO title="Reports" description="Build custom reports and export creator stats across platforms." />
         <div className="min-h-screen bg-[#0a0a0f]">
           <div className="max-w-4xl mx-auto px-4 pt-20 pb-32">
             {/* Preview of what Reports looks like */}

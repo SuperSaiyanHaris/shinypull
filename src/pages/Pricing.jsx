@@ -183,7 +183,7 @@ export default function Pricing() {
   return (
     <>
       <SEO
-        title="Pricing - ShinyPull"
+        title="Pricing"
         description="Free, Sub ($6/mo), and Mod ($20/mo) plans for tracking creator stats across YouTube, TikTok, Twitch, Kick, and Bluesky."
       />
 
