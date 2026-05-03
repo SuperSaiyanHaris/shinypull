@@ -6,11 +6,6 @@ on:
     - cron: '0 14 * * 3'   # Wednesday 9 AM ET (14:00 UTC)
     - cron: '0 14 * * 5'   # Friday    9 AM ET (14:00 UTC)
   workflow_dispatch:
-    inputs:
-      day_type:
-        description: 'Override post type: "standard" or "product" (Wednesday)'
-        required: false
-        default: ''
 
 jobs:
   generate-draft:
@@ -38,7 +33,7 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
           NOTIFICATION_EMAIL: ${{ secrets.NOTIFICATION_EMAIL }}
-        run: node scripts/generateBlogDraft.js ${{ github.event.inputs.day_type }}
+        run: node scripts/generateBlogDraft.js
 
       - name: Report success
         if: success()
