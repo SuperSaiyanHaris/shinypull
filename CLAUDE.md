@@ -4,9 +4,9 @@
 
 ## Project Overview
 
-ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube, TikTok, Twitch, Kick, and Bluesky.
+ShinyPull is a social media analytics platform (similar to SocialBlade) that tracks creator statistics across YouTube, TikTok, Twitch, Kick, Bluesky, and Spotify.
 
-**Status:** YouTube, TikTok, Twitch, Kick, and Bluesky integrations fully working. Live subscriber/follower counts, historical charts, and automated data collection operational.
+**Status:** YouTube, TikTok, Twitch, Kick, Bluesky, and Spotify integrations fully working. Live subscriber/follower counts, historical charts, and automated data collection operational.
 
 ## Critical Rules
 
@@ -122,6 +122,7 @@ scripts/
 ├── seedTopCreators.js        # Seed top 50 creators
 ├── seedTopCreatorsExpanded.js # Seed 200+ creators
 ├── seedTopKickCreators.js    # Seed top Kick creators
+├── seedTopSpotifyArtists.js  # Seed top 1000 Spotify artists (15 genre seeds)
 ├── seedBlogPosts.js          # Seed initial blog posts
 ├── seedProducts.js           # Seed affiliate products
 ├── generateSitemap.js        # Generate sitemap.xml dynamically
@@ -211,6 +212,23 @@ saved_reports (id, user_id, name, config[jsonb], created_at, updated_at)
   - 429 errors revert requests to `pending` (not `failed`) for retry on next run
   - Scalable queueing system prevents timeout issues
 
+**Spotify:**
+- Uses the Spotify Web API with Client Credentials OAuth2 flow (no user auth needed)
+- `platform_id` stores the Spotify artist ID (e.g. `06HL4z0CvFAxyc27GXpf02`)
+- `username` stores the slugified artist name (e.g. `taylor-swift`) — NOT a Spotify handle
+- `subscribers` + `followers` = `followers.total` (Spotify API)
+- `total_views` = `popularity` (0-100 Spotify score, updates faster than followers)
+- `total_posts` = null (Spotify has no content count per profile)
+- `description` = comma-separated genres (top 3)
+- Profile page shows: Followers, Popularity Score (/100), Genres
+- Color scheme: `text-green-400`, `bg-green-950/30`, `border-green-800`
+- Proxy: `api/spotify.js` — search, artist (single), batch (up to 50 IDs)
+- Service: `src/services/spotifyService.js`
+- `slugifyArtist()` helper: lowercase, remove non-alphanumeric, collapse spaces/dashes to `-`
+- Seed: `scripts/seedTopSpotifyArtists.js` — collects 1000+ artists across 15 genre seeds
+- Profile URLs: `https://open.spotify.com/artist/{platformId}`
+- **Required env vars:** `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`
+
 **Bluesky:**
 - Uses the AT Protocol public API — zero authentication required, no API key, no approval process
 - Base URL: `https://public.api.bsky.app/xrpc/`
@@ -238,6 +256,7 @@ npm run build                  # Production build
 npm run seed:top-creators      # Seed top creators
 npm run seed:kick              # Seed top Kick creators
 npm run seed:bluesky           # Seed top Bluesky accounts
+npm run seed:spotify           # Seed top 1000 Spotify artists
 npm run seed:blog              # Seed blog posts
 npm run seed:products          # Seed affiliate products
 npm run collect:daily          # Collect daily stats (YouTube, Twitch, Kick, Bluesky)
@@ -260,6 +279,8 @@ VITE_TWITCH_CLIENT_ID=<key>
 TWITCH_CLIENT_SECRET=<key>
 KICK_CLIENT_ID=<key>
 KICK_CLIENT_SECRET=<key>
+SPOTIFY_CLIENT_ID=<key>
+SPOTIFY_CLIENT_SECRET=<key>
 ```
 
 Scripts use `dotenv` to load `.env` automatically.
