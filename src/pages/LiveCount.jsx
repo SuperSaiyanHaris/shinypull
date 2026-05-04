@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Youtube, Twitch, ExternalLink, Share2, AlertCircle } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
-import SpotifyIcon from '../components/SpotifyIcon';
+import { Music } from 'lucide-react';
 import { getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { getChannelByUsername as getKickChannel } from '../services/kickService';
-import { getArtistById as getSpotifyArtist } from '../services/spotifyService';
+import { getArtistByMbid, getArtistByName } from '../services/musicService';
 import { getCreatorByUsername } from '../services/creatorService';
 import Odometer from '../components/Odometer';
 import SEO from '../components/SEO';
@@ -38,13 +38,13 @@ const platformConfig = {
     label: 'paid subscribers',
     avgGrowthPerSecond: 0.3,
   },
-  spotify: {
-    icon: SpotifyIcon,
-    color: 'text-green-400',
-    bgGradient: 'from-green-500 to-green-600',
-    glowColor: 'shadow-green-500/20',
-    label: 'followers',
-    avgGrowthPerSecond: 1.5,
+  music: {
+    icon: Music,
+    color: 'text-amber-400',
+    bgGradient: 'from-amber-500 to-orange-500',
+    glowColor: 'shadow-amber-500/20',
+    label: 'monthly listeners',
+    avgGrowthPerSecond: 1.0,
   },
 };
 
@@ -53,7 +53,7 @@ const platformUrls = {
   youtube: (username) => `https://youtube.com/@${username}`,
   twitch: (username) => `https://twitch.tv/${username}`,
   kick: (username) => `https://kick.com/${username}`,
-  spotify: (username) => `https://open.spotify.com/search/${encodeURIComponent(username)}`,
+  music: (username) => `https://www.last.fm/music/${encodeURIComponent(username.replace(/-/g, '+'))}`,
 };
 
 // Helper function to generate realistic random offset based on channel size
@@ -100,10 +100,13 @@ export default function LiveCount() {
           data = await getTwitchChannel(username);
         } else if (platform === 'kick') {
           data = await getKickChannel(username);
-        } else if (platform === 'spotify') {
-          const dbCreator = await getCreatorByUsername('spotify', username);
+        } else if (platform === 'music') {
+          const MBID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          const dbCreator = await getCreatorByUsername('music', username);
           if (dbCreator?.platform_id) {
-            data = await getSpotifyArtist(dbCreator.platform_id);
+            data = MBID_RE.test(dbCreator.platform_id)
+              ? await getArtistByMbid(dbCreator.platform_id)
+              : await getArtistByName(dbCreator.display_name || username);
           }
         }
 

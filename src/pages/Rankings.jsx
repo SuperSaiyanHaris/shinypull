@@ -4,7 +4,7 @@ import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, Arr
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
-import SpotifyIcon from '../components/SpotifyIcon';
+import { Music } from 'lucide-react';
 import { TableSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
 import { getRankedCreators, getFeaturedListings } from '../services/creatorService';
@@ -20,7 +20,7 @@ const platforms = [
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', hoverColor: 'hover:bg-purple-500', lightBg: 'bg-purple-950/30', textColor: 'text-purple-400', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'bg-green-600', hoverColor: 'hover:bg-green-500', lightBg: 'bg-green-950/30', textColor: 'text-green-400', available: true },
   { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, color: 'bg-sky-500', hoverColor: 'hover:bg-sky-400', lightBg: 'bg-sky-950/30', textColor: 'text-sky-400', available: true },
-  { id: 'spotify', name: 'Spotify', icon: SpotifyIcon, color: 'bg-green-500', hoverColor: 'hover:bg-green-400', lightBg: 'bg-green-950/30', textColor: 'text-green-400', available: true },
+  { id: 'music', name: 'Music', icon: Music, color: 'bg-amber-600', hoverColor: 'hover:bg-amber-500', lightBg: 'bg-amber-950/30', textColor: 'text-amber-400', available: true },
 ];
 
 const topCounts = [50, 100, 500];
@@ -33,7 +33,8 @@ function getSeoData(platform, rankType, topCount) {
 
   const metricLabel = rankType === 'views' ? 'Most Viewed' :
     rankType === 'growth' ? 'Fastest Growing' :
-    pid === 'tiktok' || pid === 'twitch' || pid === 'bluesky' || pid === 'spotify' ? 'Most Followed' :
+    pid === 'tiktok' || pid === 'twitch' || pid === 'bluesky' ? 'Most Followed' :
+    pid === 'music' ? 'Most Listeners' :
     pid === 'kick' ? 'Most Subscribed' : 'Most Subscribed';
 
   const title = `${countLabel} ${p} ${rankType === 'growth' ? 'Fastest Growing' : rankType === 'views' ? 'Most Viewed' : pid === 'youtube' ? 'YouTubers' : p + ' Creators'} (2026) - Live Rankings`;
@@ -44,7 +45,7 @@ function getSeoData(platform, rankType, topCount) {
     twitch: `${countLabel} most followed Twitch streamers ranked by followers, watch hours, and growth. Updated daily. Find the most watched Twitch streamers in 2026.`,
     kick: `${countLabel} Kick streamers ranked by paid subscribers and growth. Updated daily. See the top Kick streamers in 2026.`,
     bluesky: `${countLabel} most followed Bluesky accounts ranked by followers and growth. Updated daily. See who has the most Bluesky followers in 2026.`,
-    spotify: `${countLabel} most followed Spotify artists ranked by followers and popularity. Updated daily. See who has the most Spotify followers in 2026.`,
+    music: `${countLabel} most listened music artists ranked by monthly listeners and total plays. Updated daily. See who has the most listeners in 2026.`,
   };
 
   const keywords = {
@@ -53,7 +54,7 @@ function getSeoData(platform, rankType, topCount) {
     twitch: `top twitch streamers, top ${topCount} twitch streamers, most followed twitch, most watched twitch streamers, most hours watched twitch, biggest twitch channels 2026, twitch rankings`,
     kick: `top kick streamers, top ${topCount} kick streamers, most subscribed kick, biggest kick channels 2026, kick rankings`,
     bluesky: `top bluesky accounts, top ${topCount} bluesky creators, most followed bluesky, biggest bluesky accounts 2026, bluesky rankings, bluesky statistics`,
-    spotify: `top spotify artists, top ${topCount} spotify artists, most followed spotify, who has the most spotify followers, biggest spotify artists 2026, spotify rankings`,
+    music: `top music artists, top ${topCount} artists, most listened artists, monthly listeners ranking, biggest music artists 2026, music artist rankings`,
   };
 
   return {
@@ -71,7 +72,7 @@ function getH1Text(platform, topCount) {
     twitch: `Top ${topCount} Twitch Streamers`,
     kick: `Top ${topCount} Kick Streamers`,
     bluesky: `Top ${topCount} Bluesky Accounts`,
-    spotify: `Top ${topCount} Spotify Artists`,
+    music: `Top ${topCount} Music Artists`,
   };
   return labels[pid] || `Top ${topCount} ${platform?.name} Creators`;
 }
@@ -84,7 +85,7 @@ function getSubheading(platform) {
     twitch: 'Ranked by followers, watch hours, and growth. Updated daily.',
     kick: 'Ranked by paid subscribers and growth. Updated daily.',
     bluesky: 'Ranked by followers and growth. Updated daily.',
-    spotify: 'Ranked by followers and popularity score. Updated daily.',
+    music: 'Ranked by monthly listeners and total plays. Updated daily.',
   };
   return subs[pid] || 'Ranked by stats and growth. Updated daily.';
 }
@@ -171,9 +172,9 @@ function RankingsOverview() {
   return (
     <>
       <SEO
-        title="Creator Rankings - Top YouTubers, TikTokers, Twitch, Kick, Bluesky & Spotify Artists (2026)"
-        description="Live rankings of the top creators across YouTube, TikTok, Twitch, Kick, Bluesky, and Spotify. Updated daily with subscriber counts, follower stats, and growth metrics."
-        keywords="top youtubers, top tiktokers, top twitch streamers, top kick streamers, top bluesky accounts, top spotify artists, creator rankings, most subscribers, most followers, live rankings 2026"
+        title="Creator Rankings - Top YouTubers, TikTokers, Twitch, Kick, Bluesky & Music Artists (2026)"
+        description="Live rankings of the top creators across YouTube, TikTok, Twitch, Kick, Bluesky, and Music. Updated daily with subscriber counts, follower stats, and growth metrics."
+        keywords="top youtubers, top tiktokers, top twitch streamers, top kick streamers, top bluesky accounts, top music artists, creator rankings, most subscribers, most followers, live rankings 2026"
       />
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Header */}
@@ -201,7 +202,7 @@ function RankingsOverview() {
               {platforms.map((platform) => {
                 const Icon = platform.icon;
                 const creators = platformData[platform.id] || [];
-                const follLabel = platform.id === 'tiktok' || platform.id === 'twitch' || platform.id === 'bluesky' || platform.id === 'spotify' ? 'followers' : platform.id === 'kick' ? 'paid subs' : 'subscribers';
+                const follLabel = platform.id === 'tiktok' || platform.id === 'twitch' || platform.id === 'bluesky' ? 'followers' : platform.id === 'music' ? 'listeners' : platform.id === 'kick' ? 'paid subs' : 'subscribers';
 
                 return (
                   <div key={platform.id} className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
@@ -344,9 +345,9 @@ function PlatformRankings({ urlPlatform }) {
   const [sponsoredListings, setSponsoredListings] = useState([]);
 
   const rankTypes = [
-    { id: 'subscribers', name: selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' || selectedPlatform === 'spotify' ? 'Top Followers' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
-    // Hide views for Kick, TikTok, Bluesky, and Spotify since APIs don't provide view data
-    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && selectedPlatform !== 'spotify' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
+    { id: 'subscribers', name: selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' ? 'Top Followers' : selectedPlatform === 'music' ? 'Top Listeners' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
+    // Hide views for Kick, TikTok, Bluesky, and Music since APIs don't provide view data
+    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && selectedPlatform !== 'music' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
     { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
   ];
 
@@ -483,13 +484,13 @@ function PlatformRankings({ urlPlatform }) {
     if (!platformId) return;
     setSelectedPlatform(platformId);
     // Reset rank type if switching to a platform that doesn't support it
-    const noViews = platformId === 'kick' || platformId === 'tiktok' || platformId === 'bluesky' || platformId === 'spotify';
+    const noViews = platformId === 'kick' || platformId === 'tiktok' || platformId === 'bluesky' || platformId === 'music';
     if (selectedRankType === 'views' && noViews) setSelectedRankType('subscribers');
     navigate(`/rankings/${platformId}`);
     analytics.switchPlatform('rankings', platformId);
   };
 
-  const followerLabel = selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' || selectedPlatform === 'spotify' ? 'Followers' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
+  const followerLabel = selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' ? 'Followers' : selectedPlatform === 'music' ? 'Listeners' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
   const currentPlatform = platforms.find(p => p.id === selectedPlatform);
   const seoData = getSeoData(currentPlatform, selectedRankType, topCount);
   const listSchema = createRankingListSchema(rankings, currentPlatform, topCount);
@@ -921,15 +922,15 @@ function PlatformRankings({ urlPlatform }) {
                     </div>
                   </>
                 )}
-                {selectedPlatform === 'spotify' && (
+                {selectedPlatform === 'music' && (
                   <>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Who has the most Spotify followers?</h3>
-                      <p>{rankings[0]?.display_name} holds the top spot with {formatNumber(rankings[0]?.subscribers)} followers. Rankings update daily using the Spotify Web API.</p>
+                      <h3 className="font-semibold text-gray-100 mb-1">Who has the most monthly listeners?</h3>
+                      <p>{rankings[0]?.display_name} holds the top spot with {formatNumber(rankings[0]?.subscribers)} monthly listeners. Rankings update daily using the Last.fm API.</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">What is the Spotify popularity score?</h3>
-                      <p>Spotify gives every artist a popularity score from 0 to 100, based on recent stream counts. It changes faster than follower counts and shows who's actually getting plays right now.</p>
+                      <h3 className="font-semibold text-gray-100 mb-1">What do the listener counts mean?</h3>
+                      <p>Monthly listeners count the number of unique people who played an artist's music in the last 30 days. Total plays count every stream ever recorded. Both metrics come from Last.fm's global tracking data.</p>
                     </div>
                   </>
                 )}

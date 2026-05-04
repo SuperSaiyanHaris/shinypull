@@ -3,7 +3,7 @@ import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, Calculator, X, S
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
-import SpotifyIcon from '../components/SpotifyIcon';
+import { Music } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
@@ -23,7 +23,7 @@ const platforms = [
   { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-950/30', textColor: 'text-purple-600', ringColor: 'ring-purple-800', stats: '7M+ channels', available: true },
   { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-950/30', textColor: 'text-green-600', ringColor: 'ring-green-800', stats: '10M+ channels', available: true },
   { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, color: 'from-sky-500 to-sky-600', bgColor: 'bg-sky-950/30', textColor: 'text-sky-400', ringColor: 'ring-sky-800', stats: '40M+ accounts', available: true },
-  { id: 'spotify', name: 'Spotify', icon: SpotifyIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-950/30', textColor: 'text-green-400', ringColor: 'ring-green-800', stats: '600M+ artists', available: true },
+  { id: 'music', name: 'Music', icon: Music, color: 'from-amber-500 to-orange-500', bgColor: 'bg-amber-950/30', textColor: 'text-amber-400', ringColor: 'ring-amber-800', stats: '10M+ artists', available: true },
 ];
 
 const typewriterWords = [
@@ -32,7 +32,7 @@ const typewriterWords = [
   { text: 'Twitch Streamer', color: 'text-purple-600' },
   { text: 'Kick Channel', color: 'text-green-500' },
   { text: 'Bluesky Creator', color: 'text-sky-400' },
-  { text: 'Spotify Artist', color: 'text-green-400' },
+  { text: 'Music Artist', color: 'text-amber-400' },
 ];
 
 export default function Home() {

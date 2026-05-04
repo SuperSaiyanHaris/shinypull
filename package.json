@@ -14,7 +14,7 @@
     "monitor:kick": "node scripts/monitorKickStreams.js",
     "seed:kick": "node scripts/seedTopKickCreators.js",
     "seed:bluesky": "node scripts/seedTopBlueskyCreators.js",
-    "seed:spotify": "node scripts/seedTopSpotifyArtists.js",
+    "seed:music": "node scripts/seedTopMusicArtists.js",
     "aggregate:hours-watched": "node scripts/aggregateHoursWatched.js",
     "seed:blog": "node scripts/seedBlogPosts.js",
     "delete:fake-data": "node scripts/deleteFakeData.js",

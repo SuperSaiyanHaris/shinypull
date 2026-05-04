@@ -6,13 +6,13 @@ import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
-import SpotifyIcon from '../components/SpotifyIcon';
+import { Music } from 'lucide-react';
 import { CompareCardSkeleton } from '../components/Skeleton';
 import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
 import { searchChannels as searchTwitch, getChannelByUsername as getTwitchChannel } from '../services/twitchService';
 import { searchChannels as searchKick, getChannelByUsername as getKickChannel } from '../services/kickService';
 import { searchBluesky, getBlueskyProfile } from '../services/blueskyService';
-import { searchArtists as searchSpotify, getArtistById as getSpotifyArtist } from '../services/spotifyService';
+import { searchArtists as searchMusic, getArtistByMbid, getArtistByName } from '../services/musicService';
 import { searchCreators, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import { saveCompare, findSavedCompare, deleteSavedCompare } from '../services/compareService';
 import { supabase } from '../lib/supabase';
@@ -39,7 +39,7 @@ const platformConfig = {
   twitch: { icon: Twitch, color: 'text-purple-400', bg: 'bg-purple-950/30', border: 'border-purple-800' },
   kick: { icon: KickIcon, color: 'text-green-400', bg: 'bg-green-950/30', border: 'border-green-800' },
   bluesky: { icon: BlueskyIcon, color: 'text-sky-400', bg: 'bg-sky-950/30', border: 'border-sky-800' },
-  spotify: { icon: SpotifyIcon, color: 'text-green-400', bg: 'bg-green-950/30', border: 'border-green-800' },
+  music: { icon: Music, color: 'text-amber-400', bg: 'bg-amber-950/30', border: 'border-amber-800' },
 };
 
 export default function Compare() {
@@ -124,9 +124,14 @@ export default function Compare() {
               return await getKickChannel(username);
             } else if (platform === 'bluesky') {
               return await getBlueskyProfile(username);
-            } else if (platform === 'spotify') {
-              const dbCreator = await getCreatorByUsername('spotify', username);
-              if (dbCreator?.platform_id) return await getSpotifyArtist(dbCreator.platform_id);
+            } else if (platform === 'music') {
+              const MBID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+              const dbCreator = await getCreatorByUsername('music', username);
+              if (dbCreator?.platform_id) {
+                return MBID_RE.test(dbCreator.platform_id)
+                  ? await getArtistByMbid(dbCreator.platform_id)
+                  : await getArtistByName(dbCreator.display_name || username);
+              }
             }
           } catch (err) {
             // Skip creators that fail to load
@@ -652,17 +657,16 @@ export default function Compare() {
                       <ComparisonRow
                         label="Subscribers / Followers"
                         icon={Users}
-                        tooltip="YouTube and Kick track subscribers. Twitch, TikTok, Bluesky, and Spotify track followers. Kick shows paid subscribers only, not total followers."
+                        tooltip="YouTube and Kick track subscribers. Twitch, TikTok, and Bluesky track followers. Music tracks monthly listeners. Kick shows paid subscribers only, not total followers."
                         values={filledCreators.map(c => formatNumber(c.subscribers || c.followers))}
                         highlight={getWinner(filledCreators.map(c => c.subscribers || c.followers))}
                       />
                       <ComparisonRow
                         label="Views / Watch Hrs"
                         icon={Eye}
-                        tooltip="Twitch and Kick show monthly watch hours (we don't track total views for streaming platforms). For TikTok, this shows total likes. Bluesky has no views metric. Spotify shows popularity score (0-100)."
+                        tooltip="Twitch and Kick show monthly watch hours (we don't track total views for streaming platforms). For TikTok, this shows total likes. Bluesky has no views metric. Music shows total plays."
                         values={filledCreators.map(c => {
                           if (c.platform === 'bluesky') return '—';
-                          if (c.platform === 'spotify') return `${c.popularity ?? c.totalViews ?? '—'}/100`;
                           if (c.platform === 'twitch' || c.platform === 'kick') {
                             const hrs = growthData[c.platformId]?.hoursWatched;
                             return hrs ? `${formatNumber(hrs)} hrs` : '—';
@@ -678,21 +682,21 @@ export default function Compare() {
                       <ComparisonRow
                         label="Videos / Content"
                         icon={Video}
-                        tooltip="For Twitch, video counts are not tracked. For Kick and Spotify, content counts are not available. For Bluesky, this shows total posts."
+                        tooltip="For Twitch, video counts are not tracked. For Kick and Music, content counts are not available. For Bluesky, this shows total posts."
                         values={filledCreators.map(c =>
-                          (c.platform === 'twitch' || c.platform === 'kick' || c.platform === 'spotify') ? '—' : formatNumber(c.totalPosts)
+                          (c.platform === 'twitch' || c.platform === 'kick' || c.platform === 'music') ? '—' : formatNumber(c.totalPosts)
                         )}
-                        highlight={filledCreators.every(c => c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'spotify') ? getWinner(filledCreators.map(c => c.totalPosts)) : null}
+                        highlight={filledCreators.every(c => c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'music') ? getWinner(filledCreators.map(c => c.totalPosts)) : null}
                       />
                       <ComparisonRow
                         label="Avg Views per Video"
                         icon={TrendingUp}
-                        tooltip="Not available for Twitch, Kick, Bluesky, or Spotify. For TikTok, calculated as total likes divided by videos."
+                        tooltip="Not available for Twitch, Kick, Bluesky, or Music. For TikTok, calculated as total likes divided by videos."
                         values={filledCreators.map(c =>
-                          (c.platform === 'twitch' || c.platform === 'kick' || c.platform === 'bluesky' || c.platform === 'spotify') ? '—' :
+                          (c.platform === 'twitch' || c.platform === 'kick' || c.platform === 'bluesky' || c.platform === 'music') ? '—' :
                           c.totalPosts > 0 ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—'
                         )}
-                        highlight={filledCreators.every(c => c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'bluesky' && c.platform !== 'spotify') ?
+                        highlight={filledCreators.every(c => c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'bluesky' && c.platform !== 'music') ?
                           getWinner(filledCreators.map(c => c.totalPosts > 0 ? c.totalViews / c.totalPosts : 0)) : null}
                       />
                       {/* Growth Rates */}
@@ -845,7 +849,7 @@ function CreatorCard({ creator, onRemove, growthData }) {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-gray-800/50 rounded-xl p-3">
-            <p className="text-xs text-gray-300 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' || creator.platform === 'spotify' ? 'Followers' : 'Subs'}</p>
+            <p className="text-xs text-gray-300 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' ? 'Followers' : creator.platform === 'music' ? 'Listeners' : 'Subs'}</p>
             <p className="font-bold text-gray-100">{formatNumber(creator.subscribers || creator.followers)}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-3">
@@ -860,8 +864,8 @@ function CreatorCard({ creator, onRemove, growthData }) {
               </>
             ) : (
               <>
-                <p className="text-xs text-gray-300 mb-1">{creator.platform === 'tiktok' ? 'Likes' : creator.platform === 'bluesky' ? 'Posts' : creator.platform === 'spotify' ? 'Popularity' : 'Views'}</p>
-                <p className="font-bold text-gray-100">{creator.platform === 'bluesky' ? formatNumber(creator.totalPosts) : creator.platform === 'spotify' ? `${creator.popularity ?? creator.totalViews ?? '—'}/100` : formatNumber(creator.totalViews)}</p>
+                <p className="text-xs text-gray-300 mb-1">{creator.platform === 'tiktok' ? 'Likes' : creator.platform === 'bluesky' ? 'Posts' : creator.platform === 'music' ? 'Total Plays' : 'Views'}</p>
+                <p className="font-bold text-gray-100">{creator.platform === 'bluesky' ? formatNumber(creator.totalPosts) : formatNumber(creator.totalViews)}</p>
               </>
             )}
           </div>
@@ -919,8 +923,8 @@ function SearchableSlot({ onSelect, onRemove }) {
         results = await searchKick(searchQuery, 5);
       } else if (searchPlatform === 'bluesky') {
         results = await searchBluesky(searchQuery, 5);
-      } else if (searchPlatform === 'spotify') {
-        results = await searchSpotify(searchQuery, 5);
+      } else if (searchPlatform === 'music') {
+        results = await searchMusic(searchQuery, 5);
       }
       setSearchResults(results);
     } catch (err) {
@@ -955,7 +959,7 @@ function SearchableSlot({ onSelect, onRemove }) {
           { id: 'twitch',   Icon: Twitch,      color: 'text-purple-400', bg: 'bg-purple-950/30', ring: 'ring-purple-700', label: 'Twitch' },
           { id: 'kick',     Icon: KickIcon,    color: 'text-green-400',  bg: 'bg-green-950/30',  ring: 'ring-green-700',  label: 'Kick' },
           { id: 'bluesky',  Icon: BlueskyIcon, color: 'text-sky-400',    bg: 'bg-sky-950/30',    ring: 'ring-sky-700',    label: 'Bluesky' },
-          { id: 'spotify',  Icon: SpotifyIcon, color: 'text-green-400',  bg: 'bg-green-950/30',  ring: 'ring-green-700',  label: 'Spotify' },
+          { id: 'music',    Icon: Music,       color: 'text-amber-400',  bg: 'bg-amber-950/30',  ring: 'ring-amber-700',  label: 'Music' },
         ].map(({ id, Icon, color, bg, ring, label }) => (
           <button
             key={id}
@@ -1026,7 +1030,7 @@ function SearchableSlot({ onSelect, onRemove }) {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-gray-100 truncate">{result.displayName}</p>
                   <p className="text-xs text-gray-300 truncate">
-                    {formatNumber(result.subscribers || result.followers)} {result.platform === 'twitch' || result.platform === 'bluesky' || result.platform === 'spotify' ? 'followers' : 'subs'}
+                    {formatNumber(result.subscribers || result.followers)} {result.platform === 'twitch' || result.platform === 'bluesky' ? 'followers' : result.platform === 'music' ? 'listeners' : 'subs'}
                   </p>
                 </div>
                 <div className={`p-1 rounded ${platformConfig[result.platform]?.bg}`}>
@@ -1129,16 +1133,14 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
     },
     {
       label: 'Views / Hrs',
-      tooltip: 'Twitch and Kick show monthly watch hours. For TikTok, this shows total likes. Bluesky has no views metric. Spotify shows popularity score.',
+      tooltip: 'Twitch and Kick show monthly watch hours. For TikTok, this shows total likes. Bluesky has no views metric. Music shows total plays.',
       nums: creators.map(c => {
         if (c.platform === 'bluesky') return null;
-        if (c.platform === 'spotify') return null;
         if (c.platform === 'twitch' || c.platform === 'kick') return null; // different unit, skip winner calc
         return c.totalViews || 0;
       }),
       display: creators.map(c => {
         if (c.platform === 'bluesky') return ['—', null];
-        if (c.platform === 'spotify') return [`${c.popularity ?? c.totalViews ?? '—'}/100`, null];
         if (c.platform === 'twitch' || c.platform === 'kick') {
           const hrs = growthData[c.platformId]?.hoursWatched;
           return [hrs ? `${formatNumber(hrs)} hrs` : '—', null];
@@ -1148,9 +1150,9 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
     },
     {
       label: 'Videos',
-      tooltip: 'For Twitch, Kick, and Spotify, video counts are not tracked. For Bluesky, this shows total posts.',
-      nums: creators.map(c => (c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'spotify') ? (c.totalPosts || 0) : null),
-      display: creators.map(c => [(c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'spotify') ? formatNumber(c.totalPosts || 0) : '—', null]),
+      tooltip: 'For Twitch, Kick, and Music, video counts are not tracked. For Bluesky, this shows total posts.',
+      nums: creators.map(c => (c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'music') ? (c.totalPosts || 0) : null),
+      display: creators.map(c => [(c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'music') ? formatNumber(c.totalPosts || 0) : '—', null]),
     },
     {
       label: 'Avg/Video',
@@ -1279,8 +1281,8 @@ function ComparisonRadarChart({ creators, growthData, loadingGrowth }) {
 
   const metrics = [
     { label: 'Followers',    getValue: (c) => c.subscribers || c.followers || 0 },
-    { label: 'Views',        getValue: (c) => (c.platform === 'bluesky' || c.platform === 'spotify') ? 0 : (c.totalViews || 0) },
-    { label: 'Avg/Video',    getValue: (c) => (c.platform !== 'twitch' && c.platform !== 'bluesky' && c.platform !== 'spotify' && c.totalPosts > 0) ? c.totalViews / c.totalPosts : 0 },
+    { label: 'Views',        getValue: (c) => (c.platform === 'bluesky') ? 0 : (c.totalViews || 0) },
+    { label: 'Avg/Video',    getValue: (c) => (c.platform !== 'twitch' && c.platform !== 'bluesky' && c.platform !== 'music' && c.totalPosts > 0) ? c.totalViews / c.totalPosts : 0 },
     { label: '7-Day Growth', getValue: (c) => Math.max(0, growthData[c.platformId]?.growth7Day || 0) },
     { label: '30-Day Growth',getValue: (c) => Math.max(0, growthData[c.platformId]?.growth30Day || 0) },
   ];
