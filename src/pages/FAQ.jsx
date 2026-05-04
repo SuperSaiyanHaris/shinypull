@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Music } from 'lucide-react';
 import SEO from '../components/SEO';
 
 const faqs = [
@@ -9,7 +9,7 @@ const faqs = [
     questions: [
       {
         q: 'What is ShinyPull?',
-        a: 'ShinyPull tracks public statistics for content creators across YouTube, TikTok, Twitch, Kick, and Bluesky. We collect subscriber counts, follower counts, view totals, and more every day, then present the data as charts and historical trends. Think of it as a stats tracker for the creator economy.',
+        a: 'ShinyPull tracks public statistics for content creators and artists across YouTube, TikTok, Twitch, Kick, Bluesky, and Music (via Last.fm). We collect subscriber counts, follower counts, listener counts, view totals, and more every day, then present the data as charts and historical trends. Think of it as a stats tracker for the creator economy.',
       },
       {
         q: 'Is ShinyPull free?',
@@ -34,15 +34,15 @@ const faqs = [
     questions: [
       {
         q: 'How often is data updated?',
-        a: 'Creator stats are collected multiple times per day. YouTube, Twitch, Kick, and Bluesky run on an automated schedule three times daily. TikTok profiles refresh four times daily. Stream monitoring for Twitch and Kick runs every three hours to track live viewership.',
+        a: 'Creator stats are collected multiple times per day. YouTube, Twitch, Kick, Bluesky, and Music (Last.fm) run on an automated schedule three times daily. TikTok profiles refresh four times daily. Stream monitoring for Twitch and Kick runs every three hours to track live viewership.',
       },
       {
         q: 'Is the data accurate?',
-        a: 'We pull directly from official platform APIs and public data. One known limitation: YouTube has rounded subscriber counts to three significant figures since 2019 (so 1,230,000 becomes 1,230,000, but 1,234,567 would show as 1,230,000). This is a YouTube policy, not a ShinyPull issue. All other platform data is as precise as the platform provides.',
+        a: 'We pull directly from official platform APIs and public data. One known limitation: YouTube has rounded subscriber counts to three significant figures since 2019 (so 1,234,567 would show as 1,230,000). This is a YouTube policy, not a ShinyPull issue. All other platform data is as precise as the platform provides.',
       },
       {
         q: 'Where does the data come from?',
-        a: 'All data is publicly available. We use the YouTube Data API, Twitch Helix API, Kick API, and Bluesky AT Protocol API for those platforms. For TikTok, we collect publicly available profile statistics. We never access private account information.',
+        a: 'All data is publicly available. We use the YouTube Data API, Twitch Helix API, Kick API, Bluesky AT Protocol API, and Last.fm API for those platforms. For TikTok, we collect publicly available profile statistics. We never access private account information.',
       },
       {
         q: 'Why does my favorite creator not show up?',
@@ -72,6 +72,10 @@ const faqs = [
       {
         q: 'What does Bluesky track?',
         a: 'We track follower count and post count for Bluesky accounts. Bluesky does not have profile-level view counts, so we only show the metrics the platform provides.',
+      },
+      {
+        q: 'What does Music track?',
+        a: 'The Music platform is powered by Last.fm data. We track monthly listeners (how many unique listeners an artist had in the last 30 days) and total play count (cumulative scrobbles across all Last.fm users). Artist genre tags are also shown. Last.fm deprecated artist profile images in 2019, so we show a fallback icon instead.',
       },
     ],
   },

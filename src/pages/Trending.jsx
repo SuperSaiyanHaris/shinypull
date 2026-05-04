@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, Loader2 } from 'lucide-react';
+import { TrendingUp, Loader2, Music } from 'lucide-react';
 import { Youtube, Twitch } from 'lucide-react';
 import SEO from '../components/SEO';
 import KickIcon from '../components/KickIcon';
@@ -15,6 +15,7 @@ const PLATFORMS = [
   { id: 'twitch', name: 'Twitch', icon: Twitch, textColor: 'text-purple-400', activeBg: 'bg-purple-950/40', activeBorder: 'border-purple-500/60', followerLabel: 'followers', growthLabel: 'watch hours gained', growthNote: 'Twitch growth is measured by hours watched per month, the standard streaming metric.' },
   { id: 'kick', name: 'Kick', icon: KickIcon, textColor: 'text-green-400', activeBg: 'bg-green-950/40', activeBorder: 'border-green-500/60', followerLabel: 'paid subs', growthLabel: 'paid subs gained', growthNote: 'Kick\'s API only exposes paid subscriber counts, not free follower counts.' },
   { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, textColor: 'text-sky-400', activeBg: 'bg-sky-950/40', activeBorder: 'border-sky-500/60', followerLabel: 'followers', growthLabel: 'followers gained', growthNote: null },
+  { id: 'music', name: 'Music', icon: Music, textColor: 'text-amber-400', activeBg: 'bg-amber-950/40', activeBorder: 'border-amber-500/60', followerLabel: 'listeners', growthLabel: 'listeners gained', growthNote: 'Monthly listener growth via Last.fm. Reflects how many more unique listeners an artist reached this month vs. last.' },
 ];
 
 export default function Trending() {
@@ -43,7 +44,7 @@ export default function Trending() {
     <>
       <SEO
         title="Trending Creators"
-        description="See the fastest growing YouTube, TikTok, Twitch, Kick, and Bluesky creators this month. Rankings updated daily."
+        description="See the fastest growing YouTube, TikTok, Twitch, Kick, Bluesky, and Music artists this month. Rankings updated daily."
         keywords="trending creators, fastest growing youtubers, fastest growing tiktok accounts, trending streamers, creator growth rankings"
       />
       <div className="min-h-screen bg-[#0a0a0f]">

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Youtube, Twitch, Clock, Database, RefreshCw, ShieldCheck } from 'lucide-react';
+import { Youtube, Twitch, Clock, Database, RefreshCw, ShieldCheck, Music } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
@@ -86,6 +86,22 @@ const platforms = [
       'Bluesky has no profile-level view counts, so we only track followers and posts.',
     ],
   },
+  {
+    icon: Music,
+    name: 'Music',
+    color: 'text-amber-400',
+    borderColor: 'border-amber-800',
+    bgColor: 'bg-amber-950/20',
+    iconBg: 'from-amber-500 to-orange-500',
+    shadow: 'shadow-amber-500/20',
+    metrics: ['Monthly listeners', 'Total play count', 'Genre tags'],
+    source: 'Last.fm API (public, API key only, no user auth)',
+    frequency: '3x daily',
+    notes: [
+      'Monthly listeners reflects unique listeners over the last 30 days. Total plays is the cumulative scrobble count across all Last.fm users who have listened to an artist.',
+      'Last.fm deprecated artist profile images in May 2019. All artist image URLs now return a placeholder star graphic, so ShinyPull displays a fallback icon on music profiles instead.',
+    ],
+  },
 ];
 
 const principles = [
@@ -124,7 +140,7 @@ export default function Methodology() {
     <>
       <SEO
         title="Data Methodology"
-        description="Learn how ShinyPull collects and maintains creator statistics across YouTube, TikTok, Twitch, Kick, and Bluesky."
+        description="Learn how ShinyPull collects and maintains creator statistics across YouTube, TikTok, Twitch, Kick, Bluesky, and Music (Last.fm)."
       />
 
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">

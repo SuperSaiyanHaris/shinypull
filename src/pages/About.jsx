@@ -7,7 +7,7 @@ export default function About() {
     <>
       <SEO
         title="About Us"
-        description="Learn about ShinyPull - the leading social media analytics platform for tracking YouTube, Twitch, and other creator statistics."
+        description="Learn about ShinyPull - the leading social media analytics platform for tracking YouTube, TikTok, Twitch, Kick, Bluesky, and Music artist statistics."
       />
 
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">
@@ -25,8 +25,8 @@ export default function About() {
           <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8 mb-6">
             <h2 className="text-2xl font-bold text-gray-100 mb-4">What We Do</h2>
             <p className="text-gray-300 mb-4 leading-relaxed">
-              ShinyPull tracks public statistics for content creators across YouTube, TikTok, Twitch, Kick, and Bluesky.
-              We collect stats every day and build them into historical charts so you can see how channels grow over time.
+              ShinyPull tracks public statistics for content creators and music artists across YouTube, TikTok, Twitch, Kick, Bluesky, and Music (via Last.fm).
+              We collect stats every day and build them into historical charts so you can see how channels and artists grow over time.
             </p>
             <p className="text-gray-300 mb-4 leading-relaxed">
               We built this because we wanted a clean, accurate alternative to the tools that already exist.
@@ -42,7 +42,7 @@ export default function About() {
               { icon: Users, title: 'Live counts', text: 'Subscriber and follower counts updated multiple times per day.' },
               { icon: TrendingUp, title: 'Growth charts', text: 'Historical trends going back to when we first started tracking a creator.' },
               { icon: BarChart3, title: 'Rankings', text: 'Top creators by platform, updated daily with real numbers.' },
-              { icon: Globe, title: 'Cross-platform', text: 'YouTube, TikTok, Twitch, Kick, and Bluesky all in one place.' },
+              { icon: Globe, title: 'Cross-platform', text: 'YouTube, TikTok, Twitch, Kick, Bluesky, and Music all in one place.' },
               { icon: Database, title: 'Stream tracking', text: 'Hours watched, peak viewers, and stream history for Twitch and Kick.' },
               { icon: RefreshCw, title: 'Always current', text: 'Automated collection runs around the clock. No stale data.' },
             ].map((item, i) => (
