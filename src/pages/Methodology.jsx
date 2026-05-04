@@ -15,11 +15,11 @@ const platforms = [
     iconBg: 'from-red-500 to-red-600',
     shadow: 'shadow-red-500/20',
     metrics: ['Subscriber count', 'Total video views', 'Video count'],
-    source: 'YouTube Data API v3 (official)',
+    source: 'YouTube Data API',
     frequency: '3x daily',
     notes: [
-      'YouTube rounds subscriber counts to 3 significant figures for all channels. A channel with 4,230,000 subs displays as 4,230,000 but one with 4,237,591 also shows 4,230,000. This has been YouTube policy since 2019.',
-      'Because of rounding, daily subscriber changes on large channels are often 0. We default to showing view growth on YouTube profiles since views are precise.',
+      'YouTube rounds subscriber counts to 3 significant figures for all channels — a policy in place since 2019. A channel at 4,237,591 and one at 4,230,000 both display as 4,230,000.',
+      'Because rounding makes subscriber changes invisible on large channels, ShinyPull defaults to showing view growth on YouTube profiles. Views are always precise.',
     ],
   },
   {
@@ -31,11 +31,10 @@ const platforms = [
     iconBg: 'from-pink-500 to-pink-600',
     shadow: 'shadow-pink-500/20',
     metrics: ['Follower count', 'Total likes', 'Video count'],
-    source: 'Publicly available profile data',
+    source: 'Public profile pages',
     frequency: '4x daily',
     notes: [
-      'We collect publicly available profile statistics for TikTok creators. All data shown is visible to anyone who visits a creator\'s public profile.',
-      'Total likes are stored in our system as the "views" metric since TikTok has no profile-level view count.',
+      'All TikTok data shown is publicly visible on creator profiles. We refresh TikTok more frequently than other platforms to keep up with faster-moving accounts.',
     ],
   },
   {
@@ -47,11 +46,11 @@ const platforms = [
     iconBg: 'from-purple-500 to-purple-600',
     shadow: 'shadow-purple-500/20',
     metrics: ['Follower count', 'Hours watched (daily, weekly, monthly)', 'Stream count', 'Peak and average viewers per stream'],
-    source: 'Twitch Helix API (official)',
+    source: 'Twitch API',
     frequency: 'Followers 3x daily. Streams monitored every 3 hours.',
     notes: [
-      "Twitch deprecated their total view count in 2022. Hours watched is now the standard industry metric and is what we track.",
-      'Hours watched is calculated from live viewer samples taken every few minutes during active streams, multiplied by time elapsed. We aggregate these into daily, weekly, and monthly totals.',
+      'Twitch removed total view counts in 2022. Hours watched is the replacement — the metric used by streamers, sponsors, and analytics tools across the industry.',
+      'Hours watched is built from live viewer samples collected every few minutes during each stream, then rolled up into daily, weekly, and monthly totals.',
     ],
   },
   {
@@ -63,11 +62,11 @@ const platforms = [
     iconBg: 'from-green-500 to-green-600',
     shadow: 'shadow-green-500/20',
     metrics: ['Paid subscriber count', 'Hours watched (daily, weekly, monthly)', 'Stream count', 'Peak and average viewers per stream'],
-    source: "Kick API v1 (official)",
+    source: 'Kick API',
     frequency: 'Subscribers 3x daily. Streams monitored every 3 hours.',
     notes: [
-      "Kick's public API does not expose free follower counts. The subscriber number shown on Kick profiles is paid subscribers only, which is a smaller number than total followers.",
-      'Hours watched is calculated the same way as Twitch, from viewer samples taken during live streams.',
+      "Kick only exposes paid subscriber counts, not free follower totals. The number on Kick profiles represents paying subscribers only, which is always smaller than the total audience.",
+      'Hours watched is tracked the same way as Twitch — viewer samples taken during live streams, aggregated into daily, weekly, and monthly figures.',
     ],
   },
   {
@@ -79,11 +78,11 @@ const platforms = [
     iconBg: 'from-sky-400 to-sky-600',
     shadow: 'shadow-sky-500/20',
     metrics: ['Follower count', 'Post count'],
-    source: 'AT Protocol public API (no authentication required)',
+    source: 'Bluesky public API',
     frequency: '3x daily',
     notes: [
-      'Bluesky uses a decentralized protocol (AT Protocol) with a fully public API. No API key or approval needed.',
-      'Bluesky has no profile-level view counts, so we only track followers and posts.',
+      'Bluesky is a decentralized social network where all profile data is public by design. No private information is collected.',
+      'Bluesky has no profile-level view counts, so we track followers and posts only.',
     ],
   },
   {
@@ -95,11 +94,11 @@ const platforms = [
     iconBg: 'from-amber-500 to-orange-500',
     shadow: 'shadow-amber-500/20',
     metrics: ['Monthly listeners', 'Total play count', 'Genre tags'],
-    source: 'Last.fm API (public, API key only, no user auth)',
+    source: 'Last.fm',
     frequency: '3x daily',
     notes: [
-      'Monthly listeners reflects unique listeners over the last 30 days. Total plays is the cumulative scrobble count across all Last.fm users who have listened to an artist.',
-      'Last.fm deprecated artist profile images in May 2019. All artist image URLs now return a placeholder star graphic, so ShinyPull displays a fallback icon on music profiles instead.',
+      'Monthly listeners counts unique listeners over the past 30 days and resets each month. Total plays is a running lifetime total across all Last.fm users.',
+      'Genre tags are pulled from community-curated tags on Last.fm and reflect the most commonly applied labels for each artist.',
     ],
   },
 ];
@@ -123,8 +122,8 @@ const principles = [
     icon: RefreshCw,
     color: 'from-amber-500 to-orange-500',
     shadow: 'shadow-amber-500/30',
-    title: 'Failed calls are skipped',
-    body: 'If an API call fails or returns unexpected data, we skip the write entirely. A missing row is always better than a corrupt one with 0 values that would trash a chart.',
+    title: 'Data integrity first',
+    body: 'If a collection run fails or returns unexpected data, we skip it entirely rather than write a bad value. A missing day shows as a gap in the chart. A bad data point distorts everything around it.',
   },
   {
     icon: Clock,
@@ -179,7 +178,7 @@ export default function Methodology() {
           <section>
             <h2 className="text-2xl font-bold text-gray-100 mb-2">Platform Details</h2>
             <p className="text-gray-400 mb-8">
-              Every platform has its own API, quirks, and limitations. Here's exactly what we track and how.
+              Each platform works differently. Here's what we track and any limitations worth knowing about.
             </p>
             <div className="space-y-6">
               {platforms.map((p) => (
