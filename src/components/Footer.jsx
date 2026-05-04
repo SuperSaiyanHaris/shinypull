@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BarChart3, Youtube, Twitch } from 'lucide-react';
+import { BarChart3, Youtube, Twitch, Music } from 'lucide-react';
 import KickIcon from './KickIcon';
 import TikTokIcon from './TikTokIcon';
 import BlueskyIcon from './BlueskyIcon';
@@ -100,6 +100,12 @@ export default function Footer() {
                 <Link to="/rankings/bluesky" className="text-gray-300 hover:text-indigo-400 transition-colors flex items-center gap-2">
                   <BlueskyIcon className="w-4 h-4" />
                   Bluesky Stats
+                </Link>
+              </li>
+              <li>
+                <Link to="/rankings/music" className="text-gray-300 hover:text-indigo-400 transition-colors flex items-center gap-2">
+                  <Music className="w-4 h-4" />
+                  Music Stats
                 </Link>
               </li>
             </ul>

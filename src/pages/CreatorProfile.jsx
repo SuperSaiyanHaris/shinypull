@@ -10,7 +10,7 @@ import { getChannelByUsername as getYouTubeChannel, getChannelById as getYouTube
 import { getChannelByUsername as getTwitchChannel, getLiveStreams as getTwitchLiveStreams } from '../services/twitchService';
 import { getChannelByUsername as getKickChannel, getLiveStreams as getKickLiveStreams } from '../services/kickService';
 import { getBlueskyProfile } from '../services/blueskyService';
-import { getArtistByMbid, getArtistByName } from '../services/musicService';
+import { getArtistByMbid, getArtistByName, getArtistTopTracks, getArtistTopAlbums } from '../services/musicService';
 import { Music } from 'lucide-react';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import { followCreator, unfollowCreator, isFollowing as checkIsFollowing, getFollowedCreators } from '../services/followService';
@@ -78,6 +78,8 @@ export default function CreatorProfile() {
   const [isLive, setIsLive] = useState(false);
   const [liveStreamInfo, setLiveStreamInfo] = useState(null);
   const [latestVideo, setLatestVideo] = useState(null);
+  const [musicTracks, setMusicTracks] = useState([]);
+  const [musicAlbums, setMusicAlbums] = useState([]);
   const [showSharePanel, setShowSharePanel] = useState(false);
   const [copiedProfile, setCopiedProfile] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
@@ -217,6 +219,21 @@ export default function CreatorProfile() {
           getYouTubeLatestVideo(channelData.platformId).then(video => {
             if (video) setLatestVideo(video);
           });
+        }
+
+        // Load music-specific data (non-blocking)
+        if (platform === 'music') {
+          const MBID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          const isMbid = MBID_RE.test(channelData.platformId);
+          const mbidParam = isMbid ? channelData.platformId : null;
+          const nameParam = isMbid ? null : channelData.displayName;
+          Promise.all([
+            getArtistTopTracks(nameParam, mbidParam),
+            getArtistTopAlbums(nameParam, mbidParam),
+          ]).then(([tracks, albums]) => {
+            setMusicTracks(tracks);
+            setMusicAlbums(albums);
+          }).catch(() => {});
         }
 
         // Check if streamer is live (non-blocking)
@@ -843,11 +860,17 @@ export default function CreatorProfile() {
               </div>
 
               <div className="flex flex-col md:flex-row items-start gap-4 sm:gap-6">
-                <img
-                  src={creator.profileImage}
-                  alt={creator.displayName}
-                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl object-cover bg-gray-800 border-4 border-gray-800 shadow-lg"
-                />
+                {(platform === 'music' && (!creator.profileImage || creator.profileImage.includes('2a96cbd8b46e442fc41c2b86b821562f'))) ? (
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl bg-amber-950/40 border-4 border-amber-900/60 shadow-lg flex items-center justify-center flex-shrink-0">
+                    <Music className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
+                  </div>
+                ) : (
+                  <img
+                    src={creator.profileImage}
+                    alt={creator.displayName}
+                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl object-cover bg-gray-800 border-4 border-gray-800 shadow-lg flex-shrink-0"
+                  />
+                )}
                 <div className="flex-1 w-full">
                   <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-100">{creator.displayName}</h1>
@@ -902,7 +925,7 @@ export default function CreatorProfile() {
                       className="inline-flex items-center gap-1.5 sm:gap-2 text-indigo-600 hover:text-indigo-300 font-medium text-xs sm:text-sm"
                     >
                       <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span className="hidden xs:inline">View on {platform}</span>
+                      <span className="hidden xs:inline">View on {platform === 'music' ? 'Last.fm' : platformDisplayNames[platform] || platform}</span>
                       <span className="xs:hidden">View</span>
                     </a>
 
@@ -986,14 +1009,44 @@ export default function CreatorProfile() {
                         </a>
                       </>
                     )}
+
+                    {/* Music-specific links */}
+                    {platform === 'music' && (
+                      <>
+                        <a
+                          href={`https://www.last.fm/music/${encodeURIComponent(creator.displayName)}/+wiki`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
+                        >
+                          Wiki
+                        </a>
+                        <a
+                          href={`https://www.last.fm/music/${encodeURIComponent(creator.displayName)}/+similar`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
+                        >
+                          Similar Artists
+                        </a>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {creator.description && (
-                <p className="text-gray-300 text-sm mt-6 line-clamp-3 leading-relaxed">
-                  {creator.description}
-                </p>
+              {platform === 'music' ? (
+                creator.bio && (
+                  <p className="text-gray-300 text-sm mt-6 line-clamp-4 leading-relaxed">
+                    {creator.bio}
+                  </p>
+                )
+              ) : (
+                creator.description && (
+                  <p className="text-gray-300 text-sm mt-6 line-clamp-3 leading-relaxed">
+                    {creator.description}
+                  </p>
+                )
               )}
             </div>
 
@@ -1167,7 +1220,7 @@ export default function CreatorProfile() {
             {platform !== 'twitch' && platform !== 'kick' && platform !== 'bluesky' && (creator.subscribers || creator.followers) && (
               <div className={`grid gap-4 mb-6 ${
                 platform === 'youtube' ? 'grid-cols-2 lg:grid-cols-4'
-                : platform === 'tiktok' ? 'grid-cols-2'
+                : platform === 'tiktok' || platform === 'music' ? 'grid-cols-2'
                 : 'grid-cols-2 lg:grid-cols-4'
               }`}>
                 {platform === 'youtube' ? (
@@ -1211,6 +1264,21 @@ export default function CreatorProfile() {
                     />
                     <SummaryCard
                       label="Likes"
+                      sublabel="Last 30 days"
+                      value={metrics ? formatNumber(metrics.last30Days.views) : '--'}
+                      change={metrics?.last30Days.views}
+                    />
+                  </>
+                ) : platform === 'music' ? (
+                  <>
+                    <SummaryCard
+                      label="Monthly Listeners"
+                      sublabel="Last 30 days"
+                      value={metrics ? formatNumber(metrics.last30Days.subs) : '--'}
+                      change={metrics?.last30Days.subs}
+                    />
+                    <SummaryCard
+                      label="Total Plays"
                       sublabel="Last 30 days"
                       value={metrics ? formatNumber(metrics.last30Days.views) : '--'}
                       change={metrics?.last30Days.views}
@@ -1308,7 +1376,7 @@ export default function CreatorProfile() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-semibold text-sm sm:text-base truncate">
-                      Live {platform === 'twitch' ? 'Follower' : platform === 'kick' ? 'Paid Subscriber' : 'Subscriber'} Count
+                      Live {platform === 'twitch' ? 'Follower' : platform === 'kick' ? 'Paid Subscriber' : platform === 'music' ? 'Listener' : 'Subscriber'} Count
                     </p>
                     <p className="text-xs sm:text-sm text-indigo-200 truncate">Watch the count update in real-time</p>
                   </div>
@@ -1353,6 +1421,82 @@ export default function CreatorProfile() {
               />
             )}
 
+            {/* Music: Top Albums */}
+            {platform === 'music' && musicAlbums.length > 0 && (
+              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden mb-6">
+                <div className="px-6 py-4 border-b border-gray-800">
+                  <h3 className="text-lg font-semibold text-gray-100">Top Albums</h3>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-0">
+                  {musicAlbums.slice(0, 6).map((album, i) => {
+                    const img = album.image?.find(im => im.size === 'large' || im.size === 'extralarge')?.['#text'];
+                    const hasImg = img && !img.includes('2a96cbd8b46e442fc41c2b86b821562f');
+                    return (
+                      <a
+                        key={i}
+                        href={album.url || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group relative block aspect-square overflow-hidden hover:z-10"
+                      >
+                        {hasImg ? (
+                          <img
+                            src={img}
+                            alt={album.name}
+                            loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-amber-950/30 flex items-center justify-center">
+                            <Music className="w-8 h-8 text-amber-700" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-3">
+                          <p className="text-white text-xs font-semibold line-clamp-2 leading-tight">{album.name}</p>
+                          {album.playcount && (
+                            <p className="text-gray-300 text-xs mt-0.5">{formatNumber(parseInt(album.playcount))} plays</p>
+                          )}
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Music: Top Tracks */}
+            {platform === 'music' && musicTracks.length > 0 && (
+              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden mb-6">
+                <div className="px-6 py-4 border-b border-gray-800">
+                  <h3 className="text-lg font-semibold text-gray-100">Top Tracks</h3>
+                </div>
+                <div className="divide-y divide-gray-800">
+                  {musicTracks.slice(0, 10).map((track, i) => (
+                    <a
+                      key={i}
+                      href={track.url || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-4 px-6 py-3 hover:bg-gray-800/50 transition-colors group"
+                    >
+                      <span className="w-6 text-center text-sm font-mono text-gray-500 flex-shrink-0">{i + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-100 truncate group-hover:text-amber-400 transition-colors">{track.name}</p>
+                      </div>
+                      <div className="flex items-center gap-4 flex-shrink-0 text-right">
+                        {track.listeners && (
+                          <span className="text-xs text-gray-400 hidden sm:block">{formatNumber(parseInt(track.listeners))} listeners</span>
+                        )}
+                        {track.playcount && (
+                          <span className="text-xs text-gray-300 font-medium w-20 text-right">{formatNumber(parseInt(track.playcount))} plays</span>
+                        )}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Daily Metrics Table */}
             {metrics ? (
               <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
@@ -1377,11 +1521,12 @@ export default function CreatorProfile() {
                       <tr className="border-b border-gray-800 bg-gray-800/50 text-left">
                         <th className="px-6 py-4 font-semibold text-gray-300">Date</th>
                         <th className="px-6 py-4 font-semibold text-gray-300 text-right">
-                          {platform === 'tiktok' || platform === 'twitch' || platform === 'bluesky' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : 'Subscribers'}
+                          {platform === 'tiktok' || platform === 'twitch' || platform === 'bluesky' ? 'Followers' : platform === 'kick' ? 'Paid Subs' : platform === 'music' ? 'Listeners' : 'Subscribers'}
                         </th>
                         {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Likes</th>}
                         {platform === 'tiktok' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Videos</th>}
                         {platform === 'bluesky' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Posts</th>}
+                        {platform === 'music' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Total Plays</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Views</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Videos</th>}
                         {platform === 'youtube' && <th className="px-6 py-4 font-semibold text-gray-300 text-right">Est. Earnings</th>}
@@ -1400,7 +1545,7 @@ export default function CreatorProfile() {
                           <td className="px-6 py-4 text-right">
                             <div className="flex flex-col items-end">
                               <span className="font-medium text-gray-100">{formatNumber(stat.subscribers || stat.followers)}</span>
-                              {(platform === 'tiktok' || platform === 'twitch' || platform === 'kick' || platform === 'bluesky' || (platform === 'youtube' && (creator.subscribers || 0) < 1000)) && stat.subsChange !== 0 && (
+                              {(platform === 'tiktok' || platform === 'twitch' || platform === 'kick' || platform === 'bluesky' || platform === 'music' || (platform === 'youtube' && (creator.subscribers || 0) < 1000)) && stat.subsChange !== 0 && (
                                 <span className={`text-xs ${stat.subsChange > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                                   {stat.subsChange > 0 ? '+' : ''}{formatNumber(stat.subsChange)}
                                 </span>
@@ -1438,6 +1583,18 @@ export default function CreatorProfile() {
                                 {stat.videosChange !== 0 && (
                                   <span className={`text-xs ${stat.videosChange > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                                     {stat.videosChange > 0 ? '+' : ''}{stat.videosChange}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                          )}
+                          {platform === 'music' && (
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex flex-col items-end">
+                                <span className="font-medium text-gray-100">{formatNumber(stat.total_views || 0)}</span>
+                                {stat.viewsChange !== 0 && (
+                                  <span className={`text-xs ${stat.viewsChange > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
+                                    {stat.viewsChange > 0 ? '+' : ''}{formatNumber(stat.viewsChange)}
                                   </span>
                                 )}
                               </div>
@@ -1499,6 +1656,13 @@ export default function CreatorProfile() {
                             <td className="px-6 py-4 text-right"></td>
                           </>
                         )}
+                        {platform === 'music' && (
+                          <td className="px-6 py-4 text-right">
+                            <span className={metrics.dailyAverage.views >= 0 ? 'text-emerald-400' : 'text-red-500'}>
+                              {metrics.dailyAverage.views > 0 ? `+${formatNumber(metrics.dailyAverage.views)}` : '—'}
+                            </span>
+                          </td>
+                        )}
                         {platform === 'youtube' && (
                           <>
                             <td className={`px-6 py-4 text-right ${metrics.dailyAverage.views > 0 ? 'text-emerald-400' : 'text-gray-300'}`}>
@@ -1539,6 +1703,13 @@ export default function CreatorProfile() {
                             <td className="px-6 py-4 text-right"></td>
                           </>
                         )}
+                        {platform === 'music' && (
+                          <td className="px-6 py-4 text-right">
+                            <span className={metrics.weeklyAverage.views >= 0 ? 'text-emerald-400' : 'text-red-500'}>
+                              {metrics.weeklyAverage.views > 0 ? `+${formatNumber(metrics.weeklyAverage.views)}` : '—'}
+                            </span>
+                          </td>
+                        )}
                         {platform === 'youtube' && (
                           <>
                             <td className={`px-6 py-4 text-right ${metrics.weeklyAverage.views > 0 ? 'text-emerald-400' : 'text-gray-300'}`}>
@@ -1578,6 +1749,11 @@ export default function CreatorProfile() {
                               {metrics.last30Days.videos >= 0 ? '+' : ''}{metrics.last30Days.videos}
                             </td>
                           </>
+                        )}
+                        {platform === 'music' && (
+                          <td className={`px-6 py-4 text-right ${metrics.last30Days.views >= 0 ? 'text-emerald-400' : 'text-red-500'}`}>
+                            {metrics.last30Days.views >= 0 ? '+' : ''}{formatNumber(metrics.last30Days.views)}
+                          </td>
                         )}
                         {platform === 'youtube' && (
                           <>

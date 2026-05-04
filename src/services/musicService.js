@@ -1,5 +1,4 @@
-// Last.fm music artist service
-// Platform identifier: 'music'
+// Last.fm music artist service — platform identifier: 'music'
 
 function slugifyArtist(name) {
   return name
@@ -7,6 +6,15 @@ function slugifyArtist(name) {
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/[\s-]+/g, '-');
+}
+
+function stripHtml(html) {
+  if (!html) return null;
+  return html
+    .replace(/<a\b[^>]*>.*?<\/a>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim() || null;
 }
 
 function getBestImage(images) {
@@ -40,6 +48,7 @@ function normalizeArtist(raw) {
     totalViews: playcount,
     totalPosts: null,
     genres: tagNames,
+    bio: stripHtml(raw.bio?.summary) || null,
     externalUrl: raw.url || `https://www.last.fm/music/${encodeURIComponent(name)}`,
   };
 }
@@ -65,4 +74,20 @@ export async function getArtistByMbid(mbid) {
   if (!res.ok) return null;
   const json = await res.json();
   return json.data ? normalizeArtist(json.data) : null;
+}
+
+export async function getArtistTopTracks(name, mbid, limit = 10) {
+  const param = mbid ? `mbid=${encodeURIComponent(mbid)}` : `artist=${encodeURIComponent(name)}`;
+  const res = await fetch(`${BASE}?action=toptracks&${param}&limit=${limit}`);
+  if (!res.ok) return [];
+  const json = await res.json();
+  return json.data || [];
+}
+
+export async function getArtistTopAlbums(name, mbid, limit = 6) {
+  const param = mbid ? `mbid=${encodeURIComponent(mbid)}` : `artist=${encodeURIComponent(name)}`;
+  const res = await fetch(`${BASE}?action=topalbums&${param}&limit=${limit}`);
+  if (!res.ok) return [];
+  const json = await res.json();
+  return json.data || [];
 }

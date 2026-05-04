@@ -34,6 +34,26 @@ async function getTopArtists(page = 1, limit = 50) {
   return data.artists?.artist || [];
 }
 
+async function getTopTracks(name, mbid, limit = 10) {
+  const param = mbid ? `mbid=${encodeURIComponent(mbid)}` : `artist=${encodeURIComponent(name)}&autocorrect=1`;
+  const url = `${BASE}?method=artist.gettoptracks&${param}&api_key=${LASTFM_API_KEY}&format=json&limit=${limit}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Last.fm top tracks failed: ${res.status}`);
+  const data = await res.json();
+  if (data.error) return [];
+  return data.toptracks?.track || [];
+}
+
+async function getTopAlbums(name, mbid, limit = 6) {
+  const param = mbid ? `mbid=${encodeURIComponent(mbid)}` : `artist=${encodeURIComponent(name)}&autocorrect=1`;
+  const url = `${BASE}?method=artist.gettopalbums&${param}&api_key=${LASTFM_API_KEY}&format=json&limit=${limit}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Last.fm top albums failed: ${res.status}`);
+  const data = await res.json();
+  if (data.error) return [];
+  return data.topalbums?.album || [];
+}
+
 export default async function handler(req, res) {
   const allowedOrigins = [
     'https://shinypull.com',
@@ -83,7 +103,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ data: results });
     }
 
-    return res.status(400).json({ error: 'Invalid action. Use ?action=search&query=..., ?action=artist&artist=..., or ?action=top' });
+    if (action === 'toptracks' && (artist || mbid)) {
+      const results = await getTopTracks(artist, mbid, limit ? parseInt(limit, 10) : 10);
+      return res.status(200).json({ data: results });
+    }
+
+    if (action === 'topalbums' && (artist || mbid)) {
+      const results = await getTopAlbums(artist, mbid, limit ? parseInt(limit, 10) : 6);
+      return res.status(200).json({ data: results });
+    }
+
+    return res.status(400).json({ error: 'Invalid action. Use ?action=search&query=..., ?action=artist&artist=..., ?action=top, ?action=toptracks&artist=..., or ?action=topalbums&artist=...' });
   } catch (error) {
     console.error('Last.fm API error:', error);
     return res.status(500).json({ error: error.message || 'Internal server error' });
