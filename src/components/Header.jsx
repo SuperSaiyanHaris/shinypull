@@ -170,6 +170,19 @@ export default function Header() {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
 
+            {/* Rankings — primary nav item */}
+            <Link
+              to="/rankings"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActive('/rankings')
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                  : 'text-amber-400/80 hover:bg-amber-500/10 hover:text-amber-300 border border-transparent hover:border-amber-500/30'
+              }`}
+            >
+              <Trophy className="w-4 h-4" />
+              <span>Rankings</span>
+            </Link>
+
             {/* Search */}
             <Link
               to="/search"
@@ -181,19 +194,6 @@ export default function Header() {
             >
               <Search className="w-4 h-4" />
               <span>Search</span>
-            </Link>
-
-            {/* Rankings */}
-            <Link
-              to="/rankings"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                isActive('/rankings')
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
-              }`}
-            >
-              <Trophy className="w-4 h-4" />
-              <span>Rankings</span>
             </Link>
 
             {/* More launcher */}
@@ -312,6 +312,13 @@ export default function Header() {
 
           {/* Mobile action buttons */}
           <div className="md:hidden flex items-center gap-1">
+            <Link
+              to="/rankings"
+              className="p-2 rounded-lg text-amber-400/80 hover:bg-amber-500/10 hover:text-amber-300 transition-colors"
+              aria-label="Rankings"
+            >
+              <Trophy className="w-6 h-6" />
+            </Link>
             <Link
               to="/search"
               className="p-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors"

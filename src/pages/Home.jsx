@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, Calculator, X, Scale, TrendingUp } from 'lucide-react';
+import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, Calculator, X, Scale, TrendingUp, Trophy } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
@@ -209,6 +209,17 @@ export default function Home() {
                 </div>
               </form>
 
+              <div className="flex items-center justify-center mt-1 mb-1">
+                <Link
+                  to="/rankings"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-400/80 hover:text-amber-300 transition-colors"
+                >
+                  <Trophy className="w-3.5 h-3.5" />
+                  Browse top rankings
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
               {/* Trust signals */}
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2 px-4">
                 <span className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -236,15 +247,33 @@ export default function Home() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-5 sm:gap-6">
-              {/* Card 1 — Search */}
+              {/* Card 1 — Rankings */}
+              <Link
+                to="/rankings"
+                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-amber-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-amber-500/10"
+              >
+                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-colors duration-500" />
+                <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">01</span>
+
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-amber-500/30 group-hover:scale-105 transition-transform duration-300">
+                    <Trophy className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-100 mb-2">Top Rankings</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-6">See who's at the top and who's growing fastest. Leaderboards updated daily across every platform.</p>
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-400 group-hover:gap-3 transition-all duration-200">
+                    View rankings <ArrowRight className="w-4 h-4" />
+                  </span>
+                </div>
+              </Link>
+
+              {/* Card 2 — Search */}
               <Link
                 to="/search"
                 className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-sky-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-sky-500/10"
               >
-                {/* glow blob */}
                 <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-sky-500/10 rounded-full blur-3xl group-hover:bg-sky-500/20 transition-colors duration-500" />
-                {/* card number */}
-                <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">01</span>
+                <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">02</span>
 
                 <div className="relative">
                   <div className="w-14 h-14 bg-gradient-to-br from-sky-500 to-cyan-600 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-sky-500/30 group-hover:scale-105 transition-transform duration-300">
@@ -254,26 +283,6 @@ export default function Home() {
                   <p className="text-gray-400 text-sm leading-relaxed mb-6">Search across YouTube, TikTok, Twitch, Kick, and Bluesky. Real profiles with live stats.</p>
                   <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-sky-400 group-hover:gap-3 transition-all duration-200">
                     Search now <ArrowRight className="w-4 h-4" />
-                  </span>
-                </div>
-              </Link>
-
-              {/* Card 2 — Rankings */}
-              <Link
-                to="/rankings"
-                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-amber-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-amber-500/10"
-              >
-                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-colors duration-500" />
-                <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">02</span>
-
-                <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-amber-500/30 group-hover:scale-105 transition-transform duration-300">
-                    <BarChart3 className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-100 mb-2">Top Rankings</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-6">See who's growing the fastest. Leaderboards updated daily across every platform.</p>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-400 group-hover:gap-3 transition-all duration-200">
-                    View rankings <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
               </Link>
@@ -482,15 +491,24 @@ export default function Home() {
               <div className="relative">
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-3">Ready to dive in?</h2>
                 <p className="text-gray-400 mb-8 max-w-lg mx-auto text-base sm:text-lg">
-                  Search for any creator and get real-time analytics instantly.
+                  Browse the rankings or search for any creator.
                 </p>
-                <Link
-                  to="/search"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5"
-                >
-                  Get Started
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <Link
+                    to="/rankings"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5"
+                  >
+                    <Trophy className="w-5 h-5" />
+                    Browse Rankings
+                  </Link>
+                  <Link
+                    to="/search"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 text-gray-100 font-semibold rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-200 hover:-translate-y-0.5"
+                  >
+                    <Search className="w-5 h-5" />
+                    Search Creators
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
