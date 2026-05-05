@@ -183,6 +183,10 @@ function RankingsOverview() {
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-100">Creator Rankings</h1>
+              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Live
+              </span>
             </div>
             <p className="text-sm sm:text-base text-gray-400">Top creators across all platforms. Updated daily.</p>
           </div>
@@ -207,19 +211,13 @@ function RankingsOverview() {
                 return (
                   <div key={platform.id} className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
                     {/* Platform Header */}
-                    <div className={`flex items-center justify-between px-5 py-4 ${platform.lightBg} border-b border-gray-800`}>
+                    <div className={`flex items-center px-5 py-4 ${platform.lightBg} border-b border-gray-800`}>
                       <div className="flex items-center gap-2.5">
                         <div className={`w-8 h-8 ${platform.color} rounded-lg flex items-center justify-center`}>
                           <Icon className="w-5 h-5 text-white" />
                         </div>
                         <h2 className="font-bold text-gray-100">Top {platform.name} Creators</h2>
                       </div>
-                      <Link
-                        to={`/rankings/${platform.id}`}
-                        className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
-                      >
-                        View All &rarr;
-                      </Link>
                     </div>
 
                     {/* Mini Rankings List */}
@@ -282,10 +280,10 @@ function RankingsOverview() {
                               className="flex items-center gap-3 px-5 py-3 hover:bg-gray-800/50 transition-colors group"
                             >
                               <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                                index === 0 ? 'bg-yellow-900/30 text-yellow-400' :
-                                index === 1 ? 'bg-gray-800 text-gray-300' :
-                                index === 2 ? 'bg-orange-900/30 text-orange-400' :
-                                'bg-gray-800/50 text-gray-300'
+                                index === 0 ? 'bg-yellow-500/20 text-yellow-300 ring-1 ring-yellow-500/40' :
+                                index === 1 ? 'bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/30' :
+                                index === 2 ? 'bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/40' :
+                                'bg-gray-800/50 text-gray-500'
                               }`}>
                                 {index + 1}
                               </span>
@@ -293,7 +291,7 @@ function RankingsOverview() {
                                 src={creator.profile_image || '/placeholder-avatar.svg'}
                                 alt={creator.display_name}
                                 loading="lazy"
-                                className="w-8 h-8 rounded-lg object-cover bg-gray-800 flex-shrink-0"
+                                className="w-8 h-8 rounded-full object-cover bg-gray-800 flex-shrink-0"
                                 onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
                               />
                               <div className="min-w-0 flex-1">
@@ -511,6 +509,10 @@ function PlatformRankings({ urlPlatform }) {
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-100">{getH1Text(currentPlatform, topCount)}</h1>
+              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Live
+              </span>
             </div>
             <p className="text-sm sm:text-base text-gray-300">{getSubheading(currentPlatform)}</p>
           </div>
@@ -551,14 +553,14 @@ function PlatformRankings({ urlPlatform }) {
                 <button
                   key={type.id}
                   onClick={() => setSelectedRankType(type.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
                     selectedRankType === type.id
                       ? 'bg-gray-900 text-gray-100 shadow-sm'
-                      : 'text-gray-300 hover:text-gray-300'
+                      : 'text-gray-400 hover:text-gray-300'
                   }`}
                 >
-                  <type.icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{type.name}</span>
+                  <type.icon className="w-4 h-4 flex-shrink-0" />
+                  <span className={selectedRankType === type.id ? 'inline' : 'hidden sm:inline'}>{type.name}</span>
                 </button>
               ))}
             </div>
@@ -746,7 +748,7 @@ function PlatformRankings({ urlPlatform }) {
                         src={creator.profile_image || '/placeholder-avatar.svg'}
                         alt={creator.display_name}
                         loading="lazy"
-                        className="w-12 h-12 rounded-xl object-cover bg-gray-800 flex-shrink-0"
+                        className="w-12 h-12 rounded-full object-cover bg-gray-800 flex-shrink-0"
                         onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
                       />
                       <div className="min-w-0">
@@ -762,7 +764,6 @@ function PlatformRankings({ urlPlatform }) {
                             {isPremium ? '⭐ Premium' : 'Sponsored'}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-300 truncate">@{creator.username}</p>
                       </div>
                     </div>
 
@@ -785,10 +786,10 @@ function PlatformRankings({ urlPlatform }) {
                   {/* Rank */}
                   <div className="col-span-2 md:col-span-1">
                     <span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm ${
-                      creator.originalRank === 1 ? 'bg-yellow-900/30 text-yellow-400' :
-                      creator.originalRank === 2 ? 'bg-gray-800 text-gray-300' :
-                      creator.originalRank === 3 ? 'bg-orange-900/30 text-orange-400' :
-                      'bg-gray-800/50 text-gray-300'
+                      creator.originalRank === 1 ? 'bg-yellow-500/20 text-yellow-300 ring-1 ring-yellow-500/50' :
+                      creator.originalRank === 2 ? 'bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/30' :
+                      creator.originalRank === 3 ? 'bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/40' :
+                      'bg-gray-800/50 text-gray-500'
                     }`}>
                       {creator.originalRank}
                     </span>
@@ -800,14 +801,13 @@ function PlatformRankings({ urlPlatform }) {
                       src={creator.profile_image || '/placeholder-avatar.svg'}
                       alt={creator.display_name}
                       loading="lazy"
-                      className="w-12 h-12 rounded-xl object-cover bg-gray-800 flex-shrink-0"
+                      className="w-12 h-12 rounded-full object-cover bg-gray-800 flex-shrink-0"
                       onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
                     />
                     <div className="min-w-0">
                       <p className="font-semibold text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
                         {creator.display_name}
                       </p>
-                      <p className="text-sm text-gray-300 truncate">@{creator.username}</p>
                     </div>
                   </div>
 
@@ -831,20 +831,17 @@ function PlatformRankings({ urlPlatform }) {
                     </span>
                   </div>
 
-                  {/* Stats - Mobile */}
-                  <div className="col-span-12 md:hidden flex flex-wrap gap-3 text-xs pl-11">
-                    <span className="text-gray-300">
-                      <span className="font-medium text-gray-100">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
+                  {/* Stats - Mobile (inline in creator column) */}
+                  <div className="md:hidden col-span-12 pl-[52px] -mt-2 pb-1">
+                    <span className="text-xs text-gray-400">
+                      <span className="font-semibold text-gray-200">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
+                      {selectedPlatform === 'tiktok' && (
+                        <span className="ml-2 text-gray-500">· <span className="font-semibold text-gray-300">{formatNumber(creator.totalLikes || creator.totalViews)}</span> likes</span>
+                      )}
+                      {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
+                        <span className="ml-2 text-gray-500">· <span className="font-semibold text-gray-300">{formatNumber(creator.totalViews)}</span> views</span>
+                      )}
                     </span>
-                    {selectedPlatform === 'tiktok' ? (
-                      <span className="text-gray-300">
-                        <span className="font-medium text-gray-100">{formatNumber(creator.totalLikes || creator.totalViews)}</span> likes
-                      </span>
-                    ) : selectedPlatform !== 'kick' && selectedPlatform !== 'bluesky' && (
-                      <span className="text-gray-300">
-                        <span className="font-medium text-gray-100">{formatNumber(creator.totalViews)}</span> views
-                      </span>
-                    )}
                   </div>
                 </Link>
               );
