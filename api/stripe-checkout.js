@@ -34,7 +34,7 @@ const VALID_PLATFORMS = new Set(['youtube', 'tiktok', 'twitch', 'kick', 'bluesky
 const SAFE_ORIGINS = new Set(['https://shinypull.com', 'http://localhost:3000']);
 
 function isSafeReturnUrl(url) {
-  if (!url) return true;
+  if (!url) return false;
   try {
     const parsed = new URL(url);
     return SAFE_ORIGINS.has(parsed.origin);

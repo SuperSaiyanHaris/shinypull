@@ -710,7 +710,7 @@ export default function CreatorProfile() {
         keywords={seoKeywords}
         image={creator.profileImage || undefined}
       />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(profileSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(profileSchema).replace(/<\/script>/gi, '<\\/script>') }} />
 
       <div className="min-h-screen bg-gray-800/50">
         {/* Banner */}
@@ -1051,7 +1051,7 @@ export default function CreatorProfile() {
             </div>
 
             {/* Stats Grid */}
-            <div className={`grid gap-4 mb-6 ${
+            <div className={`grid gap-2 sm:gap-4 mb-6 ${
               platform === 'tiktok' ? 'grid-cols-3'
               : platform === 'kick' ? (creator.category ? 'grid-cols-2' : 'grid-cols-1 max-w-md')
               : platform === 'twitch' ? 'grid-cols-3'
@@ -1168,7 +1168,7 @@ export default function CreatorProfile() {
 
             {/* Growth Rate Cards + Summary - Combined row for Twitch/Kick/Bluesky */}
             {(platform === 'twitch' || platform === 'kick' || platform === 'bluesky') && metrics && metrics.growthRates && statsHistory.length >= 7 && (
-              <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
                 <GrowthRateCard
                   label="7-Day Growth"
                   value={metrics.growthRates.sevenDay}

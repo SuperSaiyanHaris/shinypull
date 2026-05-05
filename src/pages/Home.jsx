@@ -128,7 +128,7 @@ export default function Home() {
                   })}
                 </div>
                 {/* Mobile: row 2 — Kick, Bluesky */}
-                <div className="flex sm:hidden items-center justify-center gap-6">
+                <div className="flex sm:hidden items-center justify-center gap-3">
                   {platforms.slice(3).map((platform) => {
                     const Icon = platform.icon;
                     return (

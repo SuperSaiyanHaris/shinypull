@@ -360,7 +360,7 @@ export default function Pricing() {
           <div className="mt-16">
             <h2 className="text-xl font-extrabold text-gray-100 text-center mb-8">Compare plans</h2>
             <div className="overflow-x-auto rounded-2xl border border-gray-800">
-              <table className="w-full text-sm border-collapse">
+              <table className="w-full min-w-[520px] text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-gray-800 bg-gray-900/60">
                     <th className="text-left py-3 px-5 text-gray-400 font-semibold w-1/2">Feature</th>

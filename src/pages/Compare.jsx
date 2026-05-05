@@ -1314,7 +1314,7 @@ function ComparisonRadarChart({ creators, growthData, loadingGrowth }) {
         <span className="text-xs text-gray-300">100 = top among compared</span>
       </div>
       <ResponsiveContainer width="100%" height={300}>
-        <RadarChart data={radarData} margin={{ top: 10, right: 40, bottom: 10, left: 40 }}>
+        <RadarChart data={radarData} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
           <PolarGrid stroke="#374151" />
           <PolarAngleAxis dataKey="metric" tick={{ fill: '#9ca3af', fontSize: 11, fontWeight: 500 }} />
           <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />

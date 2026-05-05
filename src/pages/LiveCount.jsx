@@ -324,7 +324,7 @@ export default function LiveCount() {
 
             {/* The Big Counter */}
             <div className="mb-8 sm:mb-12">
-              <div className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black ${config.color} tracking-tight`}>
+              <div className={`text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-black ${config.color} tracking-tight`}>
                 {estimatedCount !== null && (
                   <Odometer value={estimatedCount} duration={300} />
                 )}

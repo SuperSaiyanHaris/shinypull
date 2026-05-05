@@ -832,7 +832,7 @@ function PlatformRankings({ urlPlatform }) {
                   </div>
 
                   {/* Stats - Mobile */}
-                  <div className="col-span-12 md:hidden flex flex-wrap gap-4 text-sm pl-11">
+                  <div className="col-span-12 md:hidden flex flex-wrap gap-3 text-xs pl-11">
                     <span className="text-gray-300">
                       <span className="font-medium text-gray-100">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
                     </span>
