@@ -26,14 +26,26 @@ export default function About() {
             <h2 className="text-2xl font-bold text-gray-100 mb-4">What We Do</h2>
             <p className="text-gray-300 mb-4 leading-relaxed">
               ShinyPull tracks public statistics for content creators and music artists across YouTube, TikTok, Twitch, Kick, Bluesky, and Music (via Last.fm).
-              We collect stats every day and build them into historical charts so you can see how channels and artists grow over time.
+              We collect stats every day and store them as historical snapshots, so you can see exactly how channels and artists have grown over time.
             </p>
             <p className="text-gray-300 mb-4 leading-relaxed">
-              We built this because we wanted a clean, accurate alternative to the tools that already exist.
-              No clutter, no outdated data, no guessing. Just real numbers from real APIs, updated daily.
+              Every chart on ShinyPull is built from real data collected at a real point in time. No estimates, no synthetic fills, no smoothing. If we missed a day, the chart shows a gap. We think that's more honest than showing made-up continuity.
             </p>
             <p className="text-gray-300 leading-relaxed">
               Everything on ShinyPull is free to browse. No account required to search creators, view charts, or check rankings.
+            </p>
+          </div>
+
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8 mb-6">
+            <h2 className="text-2xl font-bold text-gray-100 mb-4">Why We Built This</h2>
+            <p className="text-gray-300 mb-4 leading-relaxed">
+              The creator economy moves fast. Sponsorship deals, channel acquisitions, platform migrations, audience shifts. The people making decisions in this space need accurate data, not estimates from tools that haven't been updated in years.
+            </p>
+            <p className="text-gray-300 mb-4 leading-relaxed">
+              We started building ShinyPull because we kept running into the same problem: existing analytics tools were either too expensive, too slow to update, or showing data that clearly didn't match what the platforms themselves were displaying. We figured we could do better.
+            </p>
+            <p className="text-gray-300 leading-relaxed">
+              The result is a site that collects data multiple times per day, stores every snapshot, and presents it without editorializing. Subscriber counts are shown exactly as the platform provides them. We note known limitations (like YouTube's rounding policy) but we don't hide them or pretend they don't exist. The goal is transparency, not flattery.
             </p>
           </div>
 

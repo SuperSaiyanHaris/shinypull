@@ -58,7 +58,13 @@ export default function Trending() {
               <span className="text-xs font-semibold uppercase tracking-widest text-emerald-400">Updated Daily</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-100 mb-2">Trending Creators</h1>
-            <p className="text-gray-400 text-base sm:text-lg">Fastest growing channels and accounts over the last 30 days.</p>
+            <p className="text-gray-400 text-base sm:text-lg mb-4">Fastest growing channels and accounts over the last 30 days.</p>
+            <p className="text-gray-500 text-sm sm:text-base leading-relaxed max-w-2xl">
+              These rankings show which creators are gaining the most ground right now. Each platform uses the metric that best captures real growth.
+              YouTube ranks by total views gained since subscriber counts are rounded by policy.
+              Twitch and Kick rank by hours watched, which is the standard metric sponsors and analytics platforms use.
+              TikTok, Bluesky, and Music rank by follower and listener growth directly.
+            </p>
           </div>
         </div>
 
@@ -103,6 +109,7 @@ export default function Trending() {
           ) : (
             <div className="space-y-2">
               {creators.map((creator, i) => {
+
                 const baseSubs = creator.latestStats.subscribers - creator.growth30d;
                 const growthPct = baseSubs > 0 ? ((creator.growth30d / baseSubs) * 100).toFixed(1) : null;
                 return (
@@ -129,6 +136,18 @@ export default function Trending() {
                   </Link>
                 );
               })}
+            </div>
+          )}
+
+          {/* Methodology note */}
+          {!loading && creators.length > 0 && (
+            <div className="mt-10 bg-gray-900/60 border border-gray-800 rounded-2xl p-6 sm:p-8">
+              <h2 className="text-base font-bold text-gray-100 mb-3">How growth is calculated</h2>
+              <div className="space-y-2 text-sm text-gray-400 leading-relaxed">
+                <p>Growth is the difference between a creator's latest stat and their stat from 30 days ago. All data comes directly from platform APIs or public profile pages, collected multiple times per day.</p>
+                <p>YouTube uses total view growth instead of subscribers because YouTube rounds subscriber counts to three significant figures by policy. Twitch and Kick use hours watched, the metric the streaming industry uses to measure audience engagement. TikTok, Bluesky, and Music use follower and listener growth, which are the primary public metrics on those platforms.</p>
+                <p>Only creators with positive growth appear here. Creators are tracked daily, so rankings update as new data comes in.</p>
+              </div>
             </div>
           )}
         </div>

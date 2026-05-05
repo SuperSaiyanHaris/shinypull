@@ -100,6 +100,26 @@ export default function Home() {
         description="Track YouTube, TikTok, Twitch, and Kick statistics. View subscriber counts, follower growth, earnings estimates, rankings and analytics for your favorite creators."
         keywords="youtube statistics, tiktok statistics, twitch statistics, kick statistics, subscriber count, follower count, creator analytics, earnings calculator"
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'ShinyPull',
+            url: 'https://shinypull.com',
+            description: 'Social media analytics platform tracking subscriber counts, follower growth, and creator statistics across YouTube, TikTok, Twitch, Kick, Bluesky, and Music.',
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: {
+                '@type': 'EntryPoint',
+                urlTemplate: 'https://shinypull.com/search?q={search_term_string}',
+              },
+              'query-input': 'required name=search_term_string',
+            },
+          }).replace(/<\/script>/gi, '<\\/script>'),
+        }}
+      />
 
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Hero Section */}

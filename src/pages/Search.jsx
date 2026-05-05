@@ -323,7 +323,8 @@ export default function Search() {
     <>
       <SEO
         title="Search Creators"
-        description="Search for social media creators to view their statistics and analytics."
+        description="Search for any YouTube, TikTok, Twitch, Kick, Bluesky, or music artist to view their subscriber count, follower growth, stream history, and full analytics."
+        keywords="search youtube channels, search tiktok creators, find twitch streamers, kick channel stats, bluesky analytics, creator subscriber count"
       />
 
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">
