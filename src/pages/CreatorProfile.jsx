@@ -1385,8 +1385,9 @@ export default function CreatorProfile() {
               </Link>
             )}
 
-            {/* Milestone Predictions */}
-            {metrics && (
+            {/* Milestone Predictions — hidden for music since monthly listeners fluctuate
+                (rolling 30-day window, not monotonically increasing like subs/followers) */}
+            {metrics && platform !== 'music' && (
               platform === 'youtube'
                 ? creator.totalViews && metrics.dailyAverage.views > 0
                 : creator.subscribers || creator.followers
@@ -1920,6 +1921,7 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
 
   const metricLabel = platform === 'youtube' ? 'views'
     : platform === 'kick' ? 'paid subscribers'
+    : platform === 'music' ? 'listeners'
     : 'followers';
 
   if (dailyGrowth <= 0) return null;
@@ -2097,6 +2099,20 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
       label: 'Post Count',
       dataKey: 'videos',
       color: '#38bdf8'
+    });
+  } else if (platform === 'music') {
+    // Music (Last.fm): listener growth + total plays growth
+    metrics.push({
+      value: 'subscribers',
+      label: 'Listener Growth',
+      dataKey: 'subscribers',
+      color: '#f59e0b'
+    });
+    metrics.push({
+      value: 'views',
+      label: 'Play Growth',
+      dataKey: 'views',
+      color: '#fb923c'
     });
   } else {
     // Other platforms
