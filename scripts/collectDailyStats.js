@@ -14,7 +14,7 @@ const LASTFM_API_KEY = process.env.LASTFM_CLIENT_ID;
 // Batch sizes
 const YOUTUBE_BATCH_SIZE = 50;  // YouTube allows up to 50 channel IDs per request
 const TWITCH_BATCH_SIZE = 100;  // Twitch allows up to 100 logins per request
-const TWITCH_PARALLEL_FOLLOWERS = 10;  // Parallel follower requests
+const TWITCH_FOLLOWER_DELAY_MS = 150;  // Sequential delay between follower requests (~6/s, under 800/min Twitch limit)
 const KICK_BATCH_SIZE = 50;    // Kick allows up to 50 slugs per request
 const BLUESKY_BATCH_SIZE = 25;  // AT Protocol getProfiles allows up to 25 actors per request
 
@@ -120,32 +120,46 @@ async function fetchTwitchUsersBatch(usernames) {
 }
 
 /**
- * Fetch follower count for a single Twitch user
+ * Fetch follower count for a single Twitch user.
+ * Retries up to 3 times on 429, honouring the Ratelimit-Reset header.
  */
 async function fetchTwitchFollowers(broadcasterId) {
   const token = await getTwitchAccessToken();
 
-  const response = await fetch(
-    `https://api.twitch.tv/helix/channels/followers?broadcaster_id=${broadcasterId}&first=1`,
-    {
-      headers: {
-        'Client-ID': TWITCH_CLIENT_ID,
-        'Authorization': `Bearer ${token}`,
-      },
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const response = await fetch(
+      `https://api.twitch.tv/helix/channels/followers?broadcaster_id=${broadcasterId}&first=1`,
+      {
+        headers: {
+          'Client-ID': TWITCH_CLIENT_ID,
+          'Authorization': `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === 429) {
+      const resetHeader = response.headers.get('Ratelimit-Reset');
+      const waitMs = resetHeader
+        ? Math.max(1000, parseInt(resetHeader) * 1000 - Date.now() + 500)
+        : (attempt + 1) * 2000;
+      console.warn(`   ⏳ Twitch rate limited, waiting ${Math.round(waitMs / 1000)}s...`);
+      await new Promise(r => setTimeout(r, waitMs));
+      continue;
     }
-  );
 
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Followers API ${response.status}: ${text}`);
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Followers API ${response.status}: ${text}`);
+    }
+
+    const data = await response.json();
+    if (data.total === undefined) {
+      throw new Error(`Followers API returned no total field`);
+    }
+    return data.total;
   }
 
-  const data = await response.json();
-  // data.total can be 0 for real (brand new channel), but undefined means API failure
-  if (data.total === undefined) {
-    throw new Error(`Followers API returned no total field`);
-  }
-  return data.total;
+  throw new Error(`Followers API: rate limited, max retries exceeded`);
 }
 
 /**
@@ -269,28 +283,6 @@ function chunk(array, size) {
   return chunks;
 }
 
-/**
- * Process promises in parallel with concurrency limit
- */
-async function parallelLimit(tasks, limit) {
-  const results = [];
-  const executing = [];
-
-  for (const task of tasks) {
-    const p = Promise.resolve().then(() => task());
-    results.push(p);
-
-    if (limit <= tasks.length) {
-      const e = p.then(() => executing.splice(executing.indexOf(e), 1));
-      executing.push(e);
-      if (executing.length >= limit) {
-        await Promise.race(executing);
-      }
-    }
-  }
-
-  return Promise.all(results);
-}
 
 async function collectDailyStats() {
   const today = getTodayLocal();
@@ -405,32 +397,25 @@ async function collectDailyStats() {
         // Get all user info in one request
         const userMap = await fetchTwitchUsersBatch(usernames);
 
-        // Prepare follower fetch tasks
-        const followerTasks = batch.map((creator) => async () => {
+        // Fetch followers sequentially with a delay to stay under Twitch's 800 req/min limit
+        const results = [];
+        for (const creator of batch) {
           const userData = userMap.get(creator.username.toLowerCase());
           if (!userData) {
-            return { creator, error: 'User not found' };
+            results.push({ creator, error: 'User not found' });
+            continue;
           }
-
           try {
             const [followers, vodViews] = await Promise.all([
               fetchTwitchFollowers(userData.id),
               fetchTwitchVODViews(userData.id),
             ]);
-            return {
-              creator,
-              stats: {
-                followers,
-                total_views: vodViews,
-              },
-            };
+            results.push({ creator, stats: { followers, total_views: vodViews } });
           } catch (err) {
-            return { creator, error: err.message };
+            results.push({ creator, error: err.message });
           }
-        });
-
-        // Fetch followers in parallel (with limit)
-        const results = await parallelLimit(followerTasks, TWITCH_PARALLEL_FOLLOWERS);
+          await new Promise(r => setTimeout(r, TWITCH_FOLLOWER_DELAY_MS));
+        }
 
         for (const result of results) {
           if (result.error) {
