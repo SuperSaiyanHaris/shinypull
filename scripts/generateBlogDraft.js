@@ -275,7 +275,7 @@ function pickArchetype(postType) {
 
 // Retry wrapper for Anthropic API calls — handles 529 overloaded + 503/502 transient errors.
 // SDK auto-retries 429s, but NOT 529s, so we handle those manually here.
-async function callWithRetry(fn, retries = 3) {
+async function callWithRetry(fn, retries = 6) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       return await fn();
@@ -283,7 +283,7 @@ async function callWithRetry(fn, retries = 3) {
       const status = err.status || 0;
       const isRetryable = status === 529 || status === 503 || status === 502;
       if (isRetryable && attempt < retries) {
-        const delaySec = 20 * attempt; // 20s, 40s
+        const delaySec = 30 * attempt; // 30s, 60s, 90s, 120s, 150s
         console.warn(`⚠️  API ${status} overloaded (attempt ${attempt}/${retries}), retrying in ${delaySec}s...`);
         await sleep(delaySec * 1000);
         continue;
