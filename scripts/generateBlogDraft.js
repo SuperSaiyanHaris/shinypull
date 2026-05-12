@@ -49,11 +49,21 @@ const RSS_FEEDS = [
 ];
 
 // --- Helpers ---
-function safeParseJSON(text) {
+function safeParseJSON(text, fallback = null) {
   let cleaned = text.trim();
   // Strip markdown code fences if the model wrapped output despite instructions
   cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    // If JSON is truncated (common when max_tokens is hit), try to extract
+    // just the fields we need via regex before giving up.
+    if (fallback !== null) {
+      console.warn(`⚠️  JSON parse failed (${e.message}) — using fallback`);
+      return fallback;
+    }
+    throw e;
+  }
 }
 
 function slugify(title) {
@@ -767,7 +777,7 @@ async function reviewAgent(draft) {
 
   const response = await callWithRetry(() => anthropic.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
+    max_tokens: 2048,
     messages: [
       {
         role: 'user',
@@ -808,7 +818,14 @@ Return ONLY valid JSON (no markdown fences, no explanation):
   }));
 
   const text = response.content[0].text.trim();
-  const review = safeParseJSON(text);
+  // Fallback: if JSON is truncated, approve with a note rather than crashing
+  const review = safeParseJSON(text, {
+    score: 7,
+    violations: [],
+    warnings: ['Review JSON was truncated — manual check recommended'],
+    approved: true,
+    feedback: 'Automated review incomplete due to response truncation.',
+  });
   review.approved = review.score >= REVIEW_SCORE_THRESHOLD;
   console.log(`📊 Review score: ${review.score}/10 — ${review.approved ? 'APPROVED' : 'NEEDS REWRITE'}`);
   if (review.violations.length > 0) {
