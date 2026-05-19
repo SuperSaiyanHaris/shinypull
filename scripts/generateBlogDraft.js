@@ -9,7 +9,7 @@ import Parser from 'rss-parser';
 // --- Config ---
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const gemini = genAI.getGenerativeModel({
-  model: 'gemini-2.5-flash-preview-05-20',
+  model: 'gemini-1.5-flash',
   generationConfig: { temperature: 0.7 },
 });
 
