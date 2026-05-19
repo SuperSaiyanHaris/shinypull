@@ -401,9 +401,16 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
   "keyFacts": ["fact 1", "fact 2", "fact 3"],
   "suggestedTitle": "catchy blog post title under 70 chars",
   "suggestedCategory": "one of: Creator Economy, Industry News, Platform Updates, Analytics, Tips & Strategy, Growth Tips, Industry Insights, Streaming Gear, Tutorials, YouTube News, Twitch Trends, Creator Spotlight, Rankings"
-}`, 1024));
+}`, 4096));
 
-  const research = safeParseJSON(text);
+  const research = safeParseJSON(text, {
+    selectedTitle: articles[0]?.title || 'Unknown',
+    source: articles[0]?.feed || 'Unknown',
+    angle: 'General creator economy news',
+    keyFacts: [],
+    suggestedTitle: articles[0]?.title?.substring(0, 70) || 'Creator News',
+    suggestedCategory: 'Industry News',
+  });
   console.log(`✅ Research: "${research.suggestedTitle}"`);
   return research;
 }
@@ -530,7 +537,7 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
       { "value": "$31.5B", "label": "Ad revenue in 2023" }
     ]
   }
-}`, 2048));
+}`, 4096));
 
   try {
     const enrichment = safeParseJSON(enrichmentRaw);
@@ -722,8 +729,13 @@ Return ONLY valid JSON (no markdown fences, no explanation):
   "category": "${research.suggestedCategory}"
 }`;
 
-  const metaRaw = await callWithRetry(() => geminiGenerate(metaPrompt, 512));
-  const meta = safeParseJSON(metaRaw);
+  const metaRaw = await callWithRetry(() => geminiGenerate(metaPrompt, 2048));
+  const meta = safeParseJSON(metaRaw, {
+    title: research.suggestedTitle,
+    slug: slugify(research.suggestedTitle),
+    description: research.angle,
+    category: research.suggestedCategory,
+  });
 
   await sleep(1000);
 
