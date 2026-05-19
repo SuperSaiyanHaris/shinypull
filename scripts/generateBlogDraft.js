@@ -1,13 +1,26 @@
 import { config } from 'dotenv';
 config();
 
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import Parser from 'rss-parser';
 
 // --- Config ---
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const gemini = genAI.getGenerativeModel({
+  model: 'gemini-2.0-flash',
+  generationConfig: { temperature: 0.7 },
+});
+
+// Helper: call Gemini and return plain text response
+async function geminiGenerate(prompt, maxOutputTokens = 2048) {
+  const result = await gemini.generateContent({
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: { maxOutputTokens, temperature: 0.7 },
+  });
+  return result.response.text().trim();
+}
 
 // Current date injected into all agent prompts so the model knows what year it is
 // and doesn't reason as if it's still in its training window.
@@ -283,18 +296,19 @@ function pickArchetype(postType) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-// Retry wrapper for Anthropic API calls — handles 529 overloaded + 503/502 transient errors.
-// SDK auto-retries 429s, but NOT 529s, so we handle those manually here.
+// Retry wrapper for Gemini API calls — handles 429 (quota), 503/502 (transient) errors.
 async function callWithRetry(fn, retries = 6) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       return await fn();
     } catch (err) {
-      const status = err.status || 0;
-      const isRetryable = status === 529 || status === 503 || status === 502;
+      const status = err.status || err.httpStatusCode || 0;
+      const msg = (err.message || '').toLowerCase();
+      const isRetryable = status === 429 || status === 503 || status === 502
+        || msg.includes('rate limit') || msg.includes('quota') || msg.includes('overload');
       if (isRetryable && attempt < retries) {
         const delaySec = 30 * attempt; // 30s, 60s, 90s, 120s, 150s
-        console.warn(`⚠️  API ${status} overloaded (attempt ${attempt}/${retries}), retrying in ${delaySec}s...`);
+        console.warn(`⚠️  API ${status || 'error'} (attempt ${attempt}/${retries}), retrying in ${delaySec}s...`);
         await sleep(delaySec * 1000);
         continue;
       }
@@ -359,13 +373,7 @@ async function researchAgent(articles, recentTitles) {
     ? `\nALREADY COVERED in the last 30 days — do NOT select these topics or anything closely overlapping:\n${recentTitles.map((t) => `- ${t}`).join('\n')}\n`
     : '';
 
-  const response = await callWithRetry(() => anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
-    messages: [
-      {
-        role: 'user',
-        content: `You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky stats.
+  const text = await callWithRetry(() => geminiGenerate(`You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky stats.
 
 Today's date: ${TODAY}. All articles below are from this week. Write as if you know it is ${THIS_YEAR}.
 
@@ -393,12 +401,8 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
   "keyFacts": ["fact 1", "fact 2", "fact 3"],
   "suggestedTitle": "catchy blog post title under 70 chars",
   "suggestedCategory": "one of: Creator Economy, Industry News, Platform Updates, Analytics, Tips & Strategy, Growth Tips, Industry Insights, Streaming Gear, Tutorials, YouTube News, Twitch Trends, Creator Spotlight, Rankings"
-}`,
-      },
-    ],
-  }));
+}`, 1024));
 
-  const text = response.content[0].text.trim();
   const research = safeParseJSON(text);
   console.log(`✅ Research: "${research.suggestedTitle}"`);
   return research;
@@ -459,13 +463,7 @@ async function validateEnrichmentUrls(enrichment) {
 async function enrichmentAgent(research) {
   console.log('📊 Enrichment Agent: gathering stats, tables, and sources...');
 
-  const response = await callWithRetry(() => anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 2048,
-    messages: [
-      {
-        role: 'user',
-        content: `You are a research enrichment specialist for ShinyPull, a creator analytics platform (YouTube, TikTok, Twitch, Kick, Bluesky stats).
+  const enrichmentRaw = await callWithRetry(() => geminiGenerate(`You are a research enrichment specialist for ShinyPull, a creator analytics platform (YouTube, TikTok, Twitch, Kick, Bluesky stats).
 
 Today's date: ${TODAY}. The post being written is current — it reflects events happening now in ${THIS_YEAR}.
 
@@ -532,13 +530,10 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
       { "value": "$31.5B", "label": "Ad revenue in 2023" }
     ]
   }
-}`,
-      },
-    ],
-  }));
+}`, 2048));
 
   try {
-    const enrichment = safeParseJSON(response.content[0].text.trim());
+    const enrichment = safeParseJSON(enrichmentRaw);
     console.log(`✅ Enrichment: ${enrichment.postType} post, ${enrichment.stats.length} stats, table: ${enrichment.table.applicable}, chart: ${enrichment.chart?.applicable}, case study: ${enrichment.caseStudy.applicable}`);
     return enrichment;
   } catch {
@@ -727,12 +722,8 @@ Return ONLY valid JSON (no markdown fences, no explanation):
   "category": "${research.suggestedCategory}"
 }`;
 
-  const metaResponse = await callWithRetry(() => anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 512,
-    messages: [{ role: 'user', content: metaPrompt }],
-  }));
-  const meta = safeParseJSON(metaResponse.content[0].text.trim());
+  const metaRaw = await callWithRetry(() => geminiGenerate(metaPrompt, 512));
+  const meta = safeParseJSON(metaRaw);
 
   await sleep(1000);
 
@@ -758,12 +749,8 @@ Post title: ${meta.title}
 
 Write the full blog post content now. Output ONLY the markdown content — no JSON, no code fences, no preamble, no title heading. Follow the archetype structure above EXACTLY — that's what makes each post visually different from the last one.`;
 
-  const contentResponse = await callWithRetry(() => anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 4096,
-    messages: [{ role: 'user', content: contentPrompt }],
-  }));
-  const content = stripEmDashes(contentResponse.content[0].text.trim());
+  const contentRaw = await callWithRetry(() => geminiGenerate(contentPrompt, 4096));
+  const content = stripEmDashes(contentRaw);
 
   const draft = { ...meta, content };
   draft.readTime = estimateReadTime(draft.content);
@@ -775,13 +762,7 @@ Write the full blog post content now. Output ONLY the markdown content — no JS
 async function reviewAgent(draft) {
   console.log('🔎 Review Agent: auditing draft...');
 
-  const response = await callWithRetry(() => anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 2048,
-    messages: [
-      {
-        role: 'user',
-        content: `You are a strict editor reviewing a blog post for ShinyPull. Check for violations of the style guide.
+  const reviewRaw = await callWithRetry(() => geminiGenerate(`You are a strict editor reviewing a blog post for ShinyPull. Check for violations of the style guide.
 
 Today's date: ${TODAY}. The post should reflect ${THIS_YEAR} as the present year.
 
@@ -812,14 +793,10 @@ Return ONLY valid JSON (no markdown fences, no explanation):
   "warnings": ["warning description"],
   "approved": true,
   "feedback": "1-2 sentence overall note for the author"
-}`,
-      },
-    ],
-  }));
+}`, 2048));
 
-  const text = response.content[0].text.trim();
   // Fallback: if JSON is truncated, approve with a note rather than crashing
-  const review = safeParseJSON(text, {
+  const review = safeParseJSON(reviewRaw, {
     score: 7,
     violations: [],
     warnings: ['Review JSON was truncated — manual check recommended'],
@@ -840,13 +817,7 @@ async function rewriteAgent(draft, review) {
 
   const issueList = [...review.violations, ...review.warnings].join('\n- ');
 
-  const response = await callWithRetry(() => anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 2048,
-    messages: [
-      {
-        role: 'user',
-        content: `Rewrite the following blog post to fix these specific style issues:
+  const rewritten = await callWithRetry(() => geminiGenerate(`Rewrite the following blog post to fix these specific style issues:
 - ${issueList}
 
 Today's date: ${TODAY}. The post is publishing in ${THIS_YEAR}. Do not present stats from ${THIS_YEAR - 2} or earlier as current without clearly labeling them as historical.
@@ -861,12 +832,9 @@ MANDATORY style rules to follow throughout the rewrite (do not introduce new vio
 - Return ONLY the rewritten markdown content (no JSON, no explanation, no code fences)
 
 Original content:
-${draft.content}`,
-      },
-    ],
-  }));
+${draft.content}`, 4096));
 
-  draft.content = stripEmDashes(response.content[0].text.trim());
+  draft.content = stripEmDashes(rewritten);
   draft.readTime = estimateReadTime(draft.content);
   console.log('✅ Rewrite complete');
   return draft;
