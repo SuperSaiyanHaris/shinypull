@@ -61,6 +61,28 @@ const RSS_FEEDS = [
   { url: 'https://deadline.com/feed/', name: 'Deadline' },
 ];
 
+// ---------------------------------------------------------------------------
+// Forbidden Title Patterns
+// Any generated title matching these gets sent to the refinement agent.
+// These formulas make the blog look like a content farm.
+// ---------------------------------------------------------------------------
+const FORBIDDEN_TITLE_PATTERNS = [
+  { re: /what creators (need|must|should) (to )?know/i,              label: 'lazy-what-creators-know' },
+  { re: /what (it|this) means for creators/i,                         label: 'lazy-what-it-means' },
+  { re: /changes? the game/i,                                          label: 'cliche-changes-game' },
+  { re: /^(\d+)\s+(tips?|ways?|steps?|reasons?|things?|lessons?|mistakes?|secrets?|tricks?)/i, label: 'numbered-listicle' },
+  { re: /: a (guide|warning|lesson|playbook|wake.?up call|primer|breakdown) for creators/i,     label: 'subtitle-for-creators' },
+  { re: /everything (you|creators) (need|should|must) (to )?know/i,  label: 'everything-you-need' },
+  { re: /the (ultimate|complete|definitive|comprehensive) (guide|breakdown|playbook)/i,          label: 'ultimate-guide' },
+  { re: /for creators in \d{4}$/i,                                     label: 'year-trailing-suffix' },
+  { re: /why (every|all) creator(s)? (should|must|need)/i,            label: 'generic-every-creator' },
+];
+
+function titlePassesFilter(title) {
+  const violations = FORBIDDEN_TITLE_PATTERNS.filter(f => f.re.test(title));
+  return { passes: violations.length === 0, violations: violations.map(f => f.label) };
+}
+
 // --- Helpers ---
 function safeParseJSON(text, fallback = null) {
   let cleaned = text.trim();
@@ -288,12 +310,38 @@ const ARCHETYPES = [
     structure: '4 H2 sections: the moment, the backstory, the numbers, what it means for other creators. Use a {{stats}} strip with 3 key numbers from this creator. Use one {{callout:insight}}.',
     requiredCallouts: ['insight'],
   },
+  {
+    name: 'myth-busting',
+    fitsPostType: ['analysis', 'data-driven'],
+    opening: 'Open with a single sentence stating the wrong belief most creators hold about this topic. Follow immediately with the counter-claim. No setup, no preamble.',
+    structure: '4 H2 sections: name the myth and trace its origin, show the data that contradicts it, explain why the myth persists, what the reality means practically. One {{callout:insight}} for the key correction. One > blockquote with the most counterintuitive stat.',
+    requiredCallouts: ['insight'],
+  },
+  {
+    name: 'reported-story',
+    fitsPostType: ['news', 'drama', 'analysis'],
+    opening: 'Open with a tight journalist lede: who did what, when, and why it matters. Exactly 2-3 sentences. No rhetorical questions, no "Here\'s...".',
+    structure: '4-5 H2 sections in inverted pyramid: main development, context/backstory, reactions and implications, what happens next. {{tldr}} block right after the intro. One {{callout:update}} for a key quote or stat.',
+    requiredCallouts: ['update'],
+    tldrRequired: true,
+  },
+  {
+    name: 'counter-narrative',
+    fitsPostType: ['analysis', 'drama'],
+    opening: 'Open by restating the dominant take on this topic in 1-2 sentences, then immediately follow with the opposing interpretation. No hedging.',
+    structure: '3-4 H2 sections building the counter case with evidence. One strong > blockquote for the most compelling counter-evidence. End with what changes if the counter-narrative is right. One {{callout:insight}}.',
+    requiredCallouts: ['insight'],
+  },
 ];
 
-function pickArchetype(postType) {
+function pickArchetype(postType, recentArchetypeNames = []) {
   const candidates = ARCHETYPES.filter(a => a.fitsPostType.includes(postType));
   const pool = candidates.length > 0 ? candidates : ARCHETYPES;
-  return pool[Math.floor(Math.random() * pool.length)];
+  // Avoid the last 2 archetypes used — enforces structural rotation
+  const recentSet = new Set(recentArchetypeNames.slice(0, 2));
+  const preferred = pool.filter(a => !recentSet.has(a.name));
+  const finalPool = preferred.length > 0 ? preferred : pool;
+  return finalPool[Math.floor(Math.random() * finalPool.length)];
 }
 
 // Retry wrapper for Gemini API calls — handles 429 (quota), 503/502 (transient) errors.
@@ -347,30 +395,58 @@ async function fetchArticles() {
   return articles;
 }
 
-// --- Fetch recently published post titles to avoid repeats ---
-async function fetchRecentPostTitles() {
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+// --- Load all post data for full deduplication and context ---
+// Returns all-time titles (dedup), recent titles (strong exclusion),
+// category distribution (balance), and recent slugs (archetype rotation).
+async function fetchAllPostData() {
   const { data } = await supabase
     .from('blog_posts')
-    .select('title, published_at')
-    .gte('published_at', thirtyDaysAgo.split('T')[0])
-    .order('published_at', { ascending: false });
-  return (data || []).map((p) => p.title);
+    .select('title, category, published_at, slug')
+    .order('published_at', { ascending: false })
+    .limit(200);
+
+  const posts = data || [];
+  const allTitles = posts.map(p => p.title);
+
+  // Which categories are over-represented (> 20% of total)
+  const counts = {};
+  posts.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1; });
+  const total = posts.length || 1;
+  const saturatedCategories = Object.entries(counts)
+    .filter(([, n]) => n / total > 0.20)
+    .map(([cat]) => cat);
+
+  // Last 5 slugs — used to infer archetype rotation
+  const recentSlugs = posts.slice(0, 5).map(p => p.slug);
+
+  // Last 30 days — strongest exclusion zone
+  const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const recentTitles = posts.filter(p => p.published_at >= cutoff).map(p => p.title);
+
+  return { allTitles, recentTitles, saturatedCategories, recentSlugs };
 }
 
 // --- Research Agent ---
-async function researchAgent(articles, recentTitles) {
+async function researchAgent(articles, postData) {
+  const { allTitles, recentTitles, saturatedCategories } = postData;
   console.log('🔍 Research Agent: selecting best topic...');
-  if (recentTitles.length > 0) {
-    console.log(`   Excluding ${recentTitles.length} recently covered topics`);
-  }
+  console.log(`   Deduplicating against ${allTitles.length} all-time titles, ${recentTitles.length} recent`);
 
   const articleList = articles
     .map((a, i) => `${i + 1}. [${a.source}] ${a.title}\n   ${a.description}`)
     .join('\n\n');
 
+  // Pass all-time titles capped at 60 to keep prompt size manageable
+  const allTitleBlock = allTitles.length > 0
+    ? `\nALL-TIME PUBLISHED TITLES — avoid picking ANY topic that closely overlaps (check for similar angle, not just identical wording):\n${allTitles.slice(0, 60).map(t => `- ${t}`).join('\n')}\n`
+    : '';
+
   const recentBlock = recentTitles.length > 0
-    ? `\nALREADY COVERED in the last 30 days — do NOT select these topics or anything closely overlapping:\n${recentTitles.map((t) => `- ${t}`).join('\n')}\n`
+    ? `\nRECENT (last 30 days) — strongest exclusion zone:\n${recentTitles.map(t => `- ${t}`).join('\n')}\n`
+    : '';
+
+  const categoryHint = saturatedCategories.length > 0
+    ? `\nOVER-REPRESENTED categories (> 20% of all posts — pick a different category unless the story is exceptional): ${saturatedCategories.join(', ')}\n`
     : '';
 
   const text = await callWithRetry(() => geminiGenerate(`You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky stats.
@@ -378,17 +454,29 @@ async function researchAgent(articles, recentTitles) {
 Today's date: ${TODAY}. All articles below are from this week. Write as if you know it is ${THIS_YEAR}.
 
 Our audience: streamers, YouTubers, TikTokers, aspiring creators, and people into creator economy data and analytics.
+${allTitleBlock}
 ${recentBlock}
-From the articles below, select the SINGLE most interesting and relevant topic for our audience that has NOT already been covered. Prioritize recency and pick the most recent article when quality is similar. Cover a wide range of topic types — rotate between:
+${categoryHint}
+MANDATORY: The "suggestedTitle" must NOT match any of these lazy formulas:
+- "[X]: What Creators Need/Must Know"
+- "[X]: What It/This Means for Creators"
+- "X Changes the Game"
+- "N Tips/Ways/Steps/Reasons..."
+- "[X]: A Guide/Warning/Lesson/Playbook for Creators"
+- "Everything Creators Need to Know About X"
+- "The Ultimate/Complete Guide to X"
+Good titles: specific to THIS story, use a strong verb, state something counterintuitive, or name the company/creator + what they did.
+
+From the articles below, select the SINGLE most interesting and relevant topic. Prioritize recency. Cover varied topic types:
 - Platform policy or algorithm changes affecting creators
 - Monetization and creator economy shifts
-- Creator drama, controversies, or community moments that have broader lessons
+- Creator drama, controversies, or community moments with broader lessons
 - Streaming and creator industry trends
 - Platform feature launches (YouTube, TikTok, Twitch, Kick)
 - Creator growth, analytics, or business strategy
-- Viral moments that reveal something interesting about the platform or creator business
+- Viral moments that reveal something about the platform or creator business
 
-Avoid: celebrity gossip unrelated to the creator economy, movies/TV unrelated to streaming, politics, general business news with no creator angle.
+Avoid: celebrity gossip unrelated to creator economy, movies/TV unrelated to streaming, politics, general business news with no creator angle.
 
 Articles:
 ${articleList}
@@ -399,19 +487,68 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
   "source": "publication name",
   "angle": "what unique angle to take for our creator-focused audience (1-2 sentences)",
   "keyFacts": ["fact 1", "fact 2", "fact 3"],
-  "suggestedTitle": "catchy blog post title under 70 chars",
+  "suggestedTitle": "specific, fresh title under 70 chars — must NOT match any forbidden formula above",
   "suggestedCategory": "one of: Creator Economy, Industry News, Platform Updates, Analytics, Tips & Strategy, Growth Tips, Industry Insights, Streaming Gear, Tutorials, YouTube News, Twitch Trends, Creator Spotlight, Rankings"
 }`, 4096));
 
   const research = safeParseJSON(text, {
     selectedTitle: articles[0]?.title || 'Unknown',
-    source: articles[0]?.feed || 'Unknown',
+    source: articles[0]?.source || 'Unknown',
     angle: 'General creator economy news',
     keyFacts: [],
     suggestedTitle: articles[0]?.title?.substring(0, 70) || 'Creator News',
     suggestedCategory: 'Industry News',
   });
   console.log(`✅ Research: "${research.suggestedTitle}"`);
+  return research;
+}
+
+// --- Title Refinement Agent ---
+// If the Research Agent produced a lazy/formulaic title, generate 5 alternatives
+// and pick the best one that passes the filter.
+async function refineTitleIfNeeded(research, allTitles) {
+  const { passes, violations } = titlePassesFilter(research.suggestedTitle);
+  if (passes) return research;
+
+  console.log(`⚠️  Title matches forbidden pattern (${violations.join(', ')}) — refining...`);
+
+  const raw = await callWithRetry(() => geminiGenerate(`The blog post title "${research.suggestedTitle}" is too formulaic and was rejected.
+
+Topic angle: ${research.angle}
+Source article: ${research.selectedTitle}
+
+BANNED formulas (the original title violated one):
+- "[X]: What Creators Need/Must Know"
+- "[X]: What It/This Means for Creators"
+- "X Changes the Game" or "game-changer"
+- "N Tips/Ways/Steps/Reasons..."
+- ": A Guide/Warning/Lesson/Playbook for Creators"
+- "Everything Creators Need to Know"
+- "The Ultimate/Complete Guide"
+
+Generate 5 replacement titles that:
+1. Are under 70 characters
+2. Are specific to THIS exact story, not generic
+3. Sound like a human trade journalist wrote them
+4. Use one of: strong verb showing what changed, counterintuitive claim, specific number from the story, [person/company] + what they did, a direct declarative about consequence
+5. Match none of the banned formulas
+
+Already-published titles to avoid duplicating style/angle:
+${allTitles.slice(0, 20).map(t => `- ${t}`).join('\n')}
+
+Return ONLY a valid JSON array of exactly 5 strings:
+["Title 1", "Title 2", "Title 3", "Title 4", "Title 5"]`, 2048));
+
+  try {
+    const options = safeParseJSON(raw, null);
+    if (Array.isArray(options) && options.length > 0) {
+      const best = options.find(t => titlePassesFilter(t).passes) || options[0];
+      console.log(`✅ Refined title: "${best}"`);
+      return { ...research, suggestedTitle: best };
+    }
+  } catch {
+    console.warn('⚠️  Title refinement JSON parse failed — keeping original');
+  }
   return research;
 }
 
@@ -615,8 +752,8 @@ function buildChartUrl(chart, paletteName = 'indigo') {
 }
 
 // --- Writer Agent ---
-async function writerAgent(research, enrichment, creatorList = '', archetype = null) {
-  const arch = archetype || pickArchetype(enrichment.postType || 'analysis');
+async function writerAgent(research, enrichment, creatorList = '', archetype = null, recentArchetypeNames = []) {
+  const arch = archetype || pickArchetype(enrichment.postType || 'analysis', recentArchetypeNames);
   console.log(`✍️  Writer Agent: drafting post (archetype: ${arch.name})...`);
 
   const styleGuide = `MANDATORY writing style rules (violating these is a failure):
@@ -630,14 +767,15 @@ async function writerAgent(research, enrichment, creatorList = '', archetype = n
 - State opinions directly. No hedging with qualifiers.
 - Vary sentence length — mix short punchy lines with longer explanations.`;
 
-  const wordTarget = enrichment.postType === 'data-driven' ? '900-1100' : '700-900';
+  const wordTarget = enrichment.postType === 'data-driven' ? '1000-1200' : '800-1000';
 
   const blogFormat = `Blog format rules:
 - Start with an intro paragraph (NO H1 title in content — title is displayed separately in the header)
 - Use ## for section headings (H2 only)
-- ${wordTarget} words total
+- ${wordTarget} words total — do not cut the post short. Hit the word target.
 - End with a 2-3 sentence takeaway paragraph
-- No bullet lists in the intro paragraph`;
+- No bullet lists in the intro paragraph
+- MANDATORY visual elements: every post must include at minimum (1) one callout block, (2) either a {{tldr}} or {{stats}} strip, (3) one > blockquote. These are not optional.`;
 
   // Build the enrichment context block for the writer
   const statsBlock = enrichment.stats.length > 0
@@ -787,7 +925,9 @@ FAIL conditions (deduct 2 points each from a starting score of 10):
 6. H1 heading (#) used anywhere in the content body
 7. First paragraph is a bullet list instead of prose
 8. More than 3 hyperlinks total in the post — over-linking is the #1 AI tell. Real writers link sparingly. Wrapping a bolded number or a full sentence in a link is an automatic fail.
-9. Stale year problem: time-sensitive stats (earnings, revenue, MAU, market share) cited for a year earlier than ${THIS_YEAR - 1} without being explicitly framed as historical context. E.g. presenting "Q1 2024 revenue" as if it is current data is a fail. Historical stats are fine if clearly labeled as such.
+9. Stale year problem: time-sensitive stats (earnings, revenue, MAU, market share) cited for a year earlier than ${THIS_YEAR - 1} without being explicitly framed as historical context.
+10. Post body is fewer than 650 words — too thin to be useful. Count every word in the content.
+11. Title matches a lazy formula: "[X]: What Creators Need/Must Know", "[X]: What It/This Means for Creators", "Changes the Game", "N Tips/Ways/Steps/Reasons...", "The Ultimate/Complete Guide"
 
 WARN conditions (deduct 0.5 points each):
 - More than two sentences over 25 words
@@ -971,16 +1111,23 @@ async function main() {
   console.log(`\n🚀 Blog Draft Generator`);
   console.log('='.repeat(60));
 
-  // 1. Research: fetch articles + existing post titles for deduplication
-  const [articles, recentTitles] = await Promise.all([
+  // 1. Research: fetch articles + all-time post data for deduplication + context
+  const [articles, postData] = await Promise.all([
     fetchArticles(),
-    fetchRecentPostTitles(),
+    fetchAllPostData(),
   ]);
   if (articles.length === 0) throw new Error('No articles fetched from any RSS feed');
-  console.log(`📋 ${recentTitles.length} recent posts loaded for deduplication`);
+  console.log(`📋 ${postData.allTitles.length} all-time titles loaded for deduplication`);
+  if (postData.saturatedCategories.length > 0) {
+    console.log(`   Saturated categories: ${postData.saturatedCategories.join(', ')}`);
+  }
 
   await sleep(1000);
-  const research = await researchAgent(articles, recentTitles);
+  const rawResearch = await researchAgent(articles, postData);
+
+  // 1b. Enforce title quality — refine if it hit a forbidden formula
+  await sleep(500);
+  const research = await refineTitleIfNeeded(rawResearch, postData.allTitles);
 
   // 2. Enrich: gather stats, tables, case studies, and links for the writer
   await sleep(1500);
@@ -1001,9 +1148,14 @@ async function main() {
     .join(', ');
   console.log(`👤 Loaded ${topCreators?.length || 0} creators for internal linking`);
 
-  // 4. Write (enrichment context included in first draft — no second pass needed)
+  // 4. Write — pass recent archetype names for rotation enforcement
+  // Infer archetypes from recent slugs using a simple hash (avoids schema changes)
+  const recentArchetypeNames = postData.recentSlugs.map(slug => {
+    const idx = Math.abs(slug.split('').reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0)) % ARCHETYPES.length;
+    return ARCHETYPES[idx].name;
+  });
   await sleep(2000);
-  let draft = await writerAgent(research, enrichment, creatorList);
+  let draft = await writerAgent(research, enrichment, creatorList, null, recentArchetypeNames);
 
   // 5. Review
   await sleep(2000);
