@@ -466,15 +466,26 @@ async function researchAgent(articles, postData) {
 
   // Pass all-time titles capped at 60 to keep prompt size manageable
   const allTitleBlock = allTitles.length > 0
-    ? `\nALL-TIME PUBLISHED TITLES — avoid picking ANY topic that closely overlaps (check for similar angle, not just identical wording):\n${allTitles.slice(0, 60).map(t => `- ${t}`).join('\n')}\n`
+    ? `\nALL-TIME PUBLISHED TITLES — topic-level exclusion zone. If an article involves the SAME person, company, platform event, or story as any title below, SKIP IT — even if the angle or wording is different. "Jonah Peretti BuzzFeed post-mortem" and "Jonah Peretti explains BuzzFeed sale" are the same topic. Same creator + same controversy = duplicate. Same platform feature + same time period = duplicate:\n${allTitles.slice(0, 60).map(t => `- ${t}`).join('\n')}\n`
     : '';
 
   const recentBlock = recentTitles.length > 0
-    ? `\nRECENT (last 30 days) — strongest exclusion zone:\n${recentTitles.map(t => `- ${t}`).join('\n')}\n`
+    ? `\nRECENT (last 30 days) — strongest exclusion. Any article about the same person, company, or event as these titles is off-limits:\n${recentTitles.map(t => `- ${t}`).join('\n')}\n`
     : '';
 
   const categoryHint = saturatedCategories.length > 0
     ? `\nOVER-REPRESENTED categories (> 20% of all posts — pick a different category unless the story is exceptional): ${saturatedCategories.join(', ')}\n`
+    : '';
+
+  // Extract proper nouns from all titles as an entity-level exclusion signal
+  const entityBlacklist = [...new Set(
+    allTitles.flatMap(t =>
+      (t.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*|YouTube|TikTok|Twitch|Kick|Instagram|Netflix|Meta|Spotify|Bluesky|MrBeast|BuzzFeed)\b/g) || [])
+    )
+  )].slice(0, 80);
+
+  const entityBlock = entityBlacklist.length > 0
+    ? `\nKEY ENTITIES already covered (people, companies, platforms, products — if a new article is primarily ABOUT one of these and we already covered a story about them, skip it unless it is a genuinely separate event at least 60 days apart):\n${entityBlacklist.join(', ')}\n`
     : '';
 
   const text = await callWithRetry(() => geminiGenerate(`You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky stats.
@@ -484,6 +495,7 @@ Today's date: ${TODAY}. All articles below are from this week. Write as if you k
 Our audience: streamers, YouTubers, TikTokers, aspiring creators, and people into creator economy data and analytics.
 ${allTitleBlock}
 ${recentBlock}
+${entityBlock}
 ${categoryHint}
 MANDATORY: The "suggestedTitle" must NOT match any of these lazy formulas:
 - "[X]: What Creators Need/Must Know"
