@@ -447,18 +447,24 @@ async function fetchAllPostData() {
   // Last 5 slugs — used to infer archetype rotation
   const recentSlugs = posts.slice(0, 5).map(p => p.slug);
 
+  // Last 5 categories in order — used to detect and break category streaks
+  const recentCategories = posts.slice(0, 5).map(p => p.category);
+
   // Last 30 days — strongest exclusion zone
   const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const recentTitles = posts.filter(p => p.published_at >= cutoff).map(p => p.title);
 
-  return { allTitles, recentTitles, saturatedCategories, recentSlugs };
+  return { allTitles, recentTitles, saturatedCategories, recentSlugs, recentCategories };
 }
 
 // --- Research Agent ---
 async function researchAgent(articles, postData) {
-  const { allTitles, recentTitles, saturatedCategories } = postData;
+  const { allTitles, recentTitles, saturatedCategories, recentCategories } = postData;
   console.log('🔍 Research Agent: selecting best topic...');
   console.log(`   Deduplicating against ${allTitles.length} all-time titles, ${recentTitles.length} recent`);
+  if (recentCategories.length > 0) {
+    console.log(`   Recent category streak: ${recentCategories.slice(0, 3).join(' → ')}`);
+  }
 
   const articleList = articles
     .map((a, i) => `${i + 1}. [${a.source}] ${a.title}\n   ${a.description}`)
@@ -473,9 +479,26 @@ async function researchAgent(articles, postData) {
     ? `\nRECENT (last 30 days) — strongest exclusion. Any article about the same person, company, or event as these titles is off-limits:\n${recentTitles.map(t => `- ${t}`).join('\n')}\n`
     : '';
 
-  const categoryHint = saturatedCategories.length > 0
-    ? `\nOVER-REPRESENTED categories (> 20% of all posts — pick a different category unless the story is exceptional): ${saturatedCategories.join(', ')}\n`
-    : '';
+  // Detect streaks — same category used 2+ times in the last 3 posts
+  const last3 = recentCategories.slice(0, 3);
+  const streakCategory = last3.length >= 2 && last3[0] === last3[1] ? last3[0] : null;
+  const hardBlock = streakCategory && last3[0] === last3[1] && last3[1] === last3[2]
+    ? streakCategory  // 3 in a row = hard block
+    : null;
+
+  const categoryHint = [
+    saturatedCategories.length > 0
+      ? `OVER-REPRESENTED all-time (> 20% of total posts — deprioritize): ${saturatedCategories.join(', ')}`
+      : '',
+    streakCategory && !hardBlock
+      ? `RECENT STREAK WARNING: the last 2 posts were both "${streakCategory}". Pick a different category this time unless the story is genuinely exceptional.`
+      : '',
+    hardBlock
+      ? `HARD CATEGORY BLOCK: the last 3 posts in a row were all "${hardBlock}". You MUST pick a different category. No exceptions.`
+      : '',
+  ].filter(Boolean).join('\n');
+
+  const categoryBlock = categoryHint ? `\n${categoryHint}\n` : '';
 
   // Extract proper nouns from all titles as an entity-level exclusion signal
   const entityBlacklist = [...new Set(
@@ -496,7 +519,7 @@ Our audience: streamers, YouTubers, TikTokers, aspiring creators, and people int
 ${allTitleBlock}
 ${recentBlock}
 ${entityBlock}
-${categoryHint}
+${categoryBlock}
 MANDATORY: The "suggestedTitle" must NOT match any of these lazy formulas:
 - "[X]: What Creators Need/Must Know"
 - "[X]: What It/This Means for Creators"
@@ -1159,7 +1182,12 @@ async function main() {
   if (articles.length === 0) throw new Error('No articles fetched from any RSS feed');
   console.log(`📋 ${postData.allTitles.length} all-time titles loaded for deduplication`);
   if (postData.saturatedCategories.length > 0) {
-    console.log(`   Saturated categories: ${postData.saturatedCategories.join(', ')}`);
+    console.log(`   Over-represented categories: ${postData.saturatedCategories.join(', ')}`);
+  }
+  if (postData.recentCategories.length > 0) {
+    const last3 = postData.recentCategories.slice(0, 3);
+    const streak = last3[0] === last3[1] ? `⚠️  "${last3[0]}" streak detected` : 'varied';
+    console.log(`   Recent categories: ${last3.join(' → ')} (${streak})`);
   }
 
   await sleep(1000);
