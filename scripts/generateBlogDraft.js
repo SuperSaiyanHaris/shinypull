@@ -332,6 +332,34 @@ const ARCHETYPES = [
     structure: '3-4 H2 sections building the counter case with evidence. One strong > blockquote for the most compelling counter-evidence. End with what changes if the counter-narrative is right. One {{callout:insight}}.',
     requiredCallouts: ['insight'],
   },
+  {
+    name: 'platform-comparison',
+    fitsPostType: ['data-driven', 'analysis'],
+    opening: 'Open with a single sentence that names both sides being compared and the core tension between them. Then 1-2 sentences on why the comparison matters right now.',
+    structure: '3 H2 sections — one per platform/option being compared, each with the same sub-structure (what it offers, the catch, the numbers). Then a final "Verdict" H2 that picks a winner or declares a draw with a clear reason. The markdown comparison table is MANDATORY. Use one {{callout:stat}} for the most decisive number.',
+    requiredCallouts: ['stat'],
+  },
+  {
+    name: 'money-breakdown',
+    fitsPostType: ['data-driven', 'analysis', 'news'],
+    opening: 'Open with the dollar figure or revenue number that frames the whole story. One sentence. Then 2-3 sentences of context — where that money comes from and who gets it.',
+    structure: '4 H2 sections that follow the money: what the total opportunity is, how the split actually works (platform vs creator), which creators are positioned to win, and what changes if the model shifts. {{stats}} strip with 3 dollar/percentage figures is MANDATORY. One {{callout:insight}} for the key structural insight about where the leverage is.',
+    requiredCallouts: ['insight'],
+  },
+  {
+    name: 'timeline-story',
+    fitsPostType: ['analysis', 'news', 'data-driven'],
+    opening: 'Open with where things stand TODAY in 2-3 sentences. Then immediately zoom out with one sentence framing how different things looked 12-24 months ago.',
+    structure: '4 H2 sections ordered chronologically: where it started, the turning point, where it is now, where it is going. A line chart showing the progression is MANDATORY if the data supports it — embed it where the trend becomes clear. One {{callout:insight}} for the single most significant inflection point.',
+    requiredCallouts: ['insight'],
+  },
+  {
+    name: 'creator-qa',
+    fitsPostType: ['news', 'analysis'],
+    opening: 'Open with 1-2 sentences framing why creators are confused or asking questions about this topic right now. No scene-setting, no stats — just the context for why the Q&A format makes sense.',
+    structure: 'The body is structured as 5 H2 sections, each phrased as a direct question a creator would actually ask ("Does this affect small channels?" "How much can I actually earn?" "Do I need to do anything right now?"). Each answer is 2-4 sentences max — direct, no fluff, no restating the question. One {{callout:tip}} for the most actionable answer. End with a short "Bottom line" paragraph, not another question.',
+    requiredCallouts: ['tip'],
+  },
 ];
 
 function pickArchetype(postType, recentArchetypeNames = []) {
