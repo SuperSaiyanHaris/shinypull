@@ -20,9 +20,12 @@ import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
 import { useAuth } from '../contexts/AuthContext';
-import { useSubscription } from '../contexts/SubscriptionContext';
-import { Lock } from 'lucide-react';
 import logger from '../lib/logger';
+
+// Compare cap — keep a sensible UI limit so the chart stays readable.
+// No tier system anymore; everyone can compare up to MAX_COMPARE creators.
+const MAX_COMPARE = 10;
+const MAX_SAVED_COMPARES = 50;
 
 const POPULAR_MATCHUPS = [
   { url: 'youtube:pewdiepie,youtube:mrbeast',   aName: 'PewDiePie',      bName: 'MrBeast',   aPlatform: 'youtube', bPlatform: 'youtube' },
@@ -57,7 +60,8 @@ export default function Compare() {
   const navigate = useNavigate();
   const skipNextUrlLoad = useRef(false);
   const { user, isAuthenticated } = useAuth();
-  const { tier, maxCompare, maxSavedCompares, openUpgradePanel } = useSubscription();
+  const maxCompare = MAX_COMPARE;
+  const maxSavedCompares = MAX_SAVED_COMPARES;
 
   const updateUrl = (newCreators) => {
     skipNextUrlLoad.current = true;
@@ -191,8 +195,6 @@ export default function Compare() {
   const addSlot = () => {
     if (creators.length < maxCompare) {
       setCreators([...creators, null]);
-    } else {
-      openUpgradePanel('compare');
     }
   };
 
@@ -540,7 +542,7 @@ export default function Compare() {
                 )}
               </div>
             ))}
-            {/* Add slot button — only when below tier limit */}
+            {/* Add slot button */}
             {creators.length < maxCompare && (
               <button
                 onClick={addSlot}
@@ -548,35 +550,6 @@ export default function Compare() {
               >
                 <Plus className="w-7 h-7" />
                 <span className="text-sm font-medium">Add creator</span>
-              </button>
-            )}
-            {/* Locked slot — shown when at tier limit and upgrades are available */}
-            {creators.length >= maxCompare && tier !== 'mod' && (
-              <button
-                onClick={() => openUpgradePanel('compare')}
-                className="relative min-h-[280px] border-2 border-dashed border-violet-800/60 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-violet-600/80 transition-colors overflow-hidden"
-              >
-                {/* Blurred fake content */}
-                <div className="absolute inset-0 pointer-events-none select-none opacity-20 p-5 flex flex-col gap-3">
-                  <div className="h-12 w-12 rounded-xl bg-gray-600 mb-2" />
-                  <div className="h-4 w-3/4 rounded-full bg-gray-600" />
-                  <div className="h-3 w-1/2 rounded-full bg-gray-700" />
-                  <div className="h-3 w-2/3 rounded-full bg-gray-700 mt-2" />
-                  <div className="h-3 w-1/3 rounded-full bg-gray-700" />
-                </div>
-                <div className="relative z-10 flex flex-col items-center gap-2 px-4 text-center">
-                  <div className="w-10 h-10 rounded-full bg-violet-950/60 border border-violet-800 flex items-center justify-center mb-1">
-                    <Lock className="w-4 h-4 text-violet-400" />
-                  </div>
-                  <p className="text-sm font-semibold text-gray-200">
-                    {tier === 'lurker'
-                      ? 'Compare up to 5 creators with Sub'
-                      : 'Compare up to 10 creators with Mod'}
-                  </p>
-                  <span className="px-3 py-1 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-lg transition-colors">
-                    Upgrade
-                  </span>
-                </div>
               </button>
             )}
           </div>

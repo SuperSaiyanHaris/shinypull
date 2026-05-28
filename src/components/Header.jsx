@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings, FileSpreadsheet, ChevronDown, LayoutGrid, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthPanel from './AuthPanel';
-import UpgradePanel from './UpgradePanel';
 
 const moreLinks = [
   {
@@ -78,8 +77,6 @@ export default function Header() {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [authPanelMessage, setAuthPanelMessage] = useState('');
   const [authPanelReturnTo, setAuthPanelReturnTo] = useState(null);
-  const [upgradePanelOpen, setUpgradePanelOpen] = useState(false);
-  const [upgradePanelFeature, setUpgradePanelFeature] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut, isAuthenticated } = useAuth();
@@ -133,16 +130,6 @@ export default function Header() {
       setAuthPanelReturnTo(null);
     }
   }, [isAuthenticated, authPanelReturnTo, navigate]);
-
-  // Listen for custom event to open upgrade panel
-  useEffect(() => {
-    const handleOpenUpgradePanel = (e) => {
-      setUpgradePanelFeature(e.detail?.feature || null);
-      setUpgradePanelOpen(true);
-    };
-    window.addEventListener('openUpgradePanel', handleOpenUpgradePanel);
-    return () => window.removeEventListener('openUpgradePanel', handleOpenUpgradePanel);
-  }, []);
 
   const isActive = (path) => {
     if (path === '/rankings') return location.pathname.startsWith('/rankings');
@@ -454,16 +441,6 @@ export default function Header() {
           setAuthPanelMessage('');
         }}
         message={authPanelMessage}
-      />
-
-      {/* Upgrade Panel */}
-      <UpgradePanel
-        isOpen={upgradePanelOpen}
-        onClose={() => {
-          setUpgradePanelOpen(false);
-          setUpgradePanelFeature(null);
-        }}
-        feature={upgradePanelFeature}
       />
     </header>
   );

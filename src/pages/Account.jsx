@@ -1,13 +1,12 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   User, Mail, Lock, Calendar, Star, CheckCircle, AlertCircle,
-  Eye, EyeOff, ArrowLeft, Zap, Crown, ExternalLink, Megaphone,
+  Eye, EyeOff, ArrowLeft, ExternalLink, Megaphone,
   X, Search, Loader, LogOut, Shield, ChevronRight,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { useSubscription, TIER_DISPLAY, TIER_LIMITS } from '../contexts/SubscriptionContext';
 import { getFollowedCreators } from '../services/followService';
 import SEO from '../components/SEO';
 
@@ -33,7 +32,6 @@ function Toast({ message, type, onDismiss }) {
 }
 
 const TABS = [
-  { id: 'subscription', label: 'Subscription', icon: Zap },
   { id: 'listings', label: 'Listings', icon: Megaphone },
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'security', label: 'Security', icon: Shield },
@@ -45,11 +43,10 @@ const PLATFORM_PILL_ACTIVE = { youtube: 'bg-red-600', tiktok: 'bg-pink-600', twi
 
 export default function Account() {
   const { user, signOut } = useAuth();
-  const { tier, status: subStatus, refresh: refreshTier } = useSubscription();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(() => {
     const tab = searchParams.get('tab');
-    return TABS.some(t => t.id === tab) ? tab : 'subscription';
+    return TABS.some(t => t.id === tab) ? tab : 'listings';
   });
   const [managingBilling, setManagingBilling] = useState(false);
 
@@ -80,7 +77,6 @@ export default function Account() {
   const [alreadyListed, setAlreadyListed] = useState(false);
   const [purchasingListing, setPurchasingListing] = useState(false);
   const [purchasingPremiumListing, setPurchasingPremiumListing] = useState(false);
-  const [activatingFree, setActivatingFree] = useState(false);
   const [premiumSlotsLeft, setPremiumSlotsLeft] = useState(2);
   const [tikTokAdding, setTikTokAdding] = useState(false);
   const [tikTokAddError, setTikTokAddError] = useState('');
@@ -103,65 +99,19 @@ export default function Account() {
     loadFeaturedListings();
   }, [user, loadFeaturedListings]);
 
-  // Post-payment: poll for tier/listing changes after Stripe redirects back
-  const initialTierRef = useRef(null);
-  const pollTimerRef = useRef(null);
-
+  // Post-payment: refresh listings after Stripe redirects back from featured listing checkout
   useEffect(() => {
-    const isUpgrade = searchParams.get('upgrade') === 'success';
     const isFeatured = searchParams.get('featured') === 'success';
-    if (!isUpgrade && !isFeatured) return;
+    if (!isFeatured) return;
 
     window.history.replaceState({}, '', '/account');
-
-    if (isFeatured) {
-      // Featured listing: reload listings after short delay for webhook to land
-      setTimeout(() => {
-        loadFeaturedListings();
-        setActiveTab('listings');
-        setToast({ message: 'Featured listing activated. Your creator will appear in rankings shortly.', type: 'success' });
-      }, 2000);
-      return;
-    }
-
-    // Upgrade: poll until tier changes (webhook is async)
-    initialTierRef.current = tier;
-    let attempts = 0;
-    const MAX_ATTEMPTS = 8;
-
-    function poll() {
-      refreshTier().then(() => {
-        attempts++;
-        if (attempts < MAX_ATTEMPTS) {
-          pollTimerRef.current = setTimeout(poll, 2000);
-        } else {
-          setToast({ message: "Upgrade complete! Refresh if your plan doesn't update.", type: 'success' });
-          initialTierRef.current = null;
-        }
-      });
-    }
-
-    pollTimerRef.current = setTimeout(poll, 1500);
-    return () => clearTimeout(pollTimerRef.current);
+    setTimeout(() => {
+      loadFeaturedListings();
+      setActiveTab('listings');
+      setToast({ message: 'Featured listing activated. Your creator will appear in rankings shortly.', type: 'success' });
+    }, 2000);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Detect tier change during polling and show success toast
-  useEffect(() => {
-    if (initialTierRef.current === null) return;
-    if (tier !== initialTierRef.current) {
-      clearTimeout(pollTimerRef.current);
-      setToast({ message: `You're now on the ${TIER_DISPLAY[tier]?.label} plan. Welcome!`, type: 'success' });
-      initialTierRef.current = null;
-    }
-  }, [tier]);
-
-  const modFreeUsedThisMonth = featuredListings.some(l => {
-    if (!l.is_mod_free) return false;
-    const d = new Date(l.created_at || '');
-    const now = new Date();
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  });
 
   // Debounced creator search for listings
   useEffect(() => {
@@ -224,34 +174,6 @@ export default function Account() {
       setTikTokAddError(err.message || 'Could not find that TikTok account.');
     } finally {
       setTikTokAdding(false);
-    }
-  };
-
-  const handleActivateModFree = async () => {
-    if (!selectedCreator) return;
-    setActivatingFree(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      const res = await fetch('/api/stripe-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({
-          priceKey: 'featured-free',
-          creatorId: selectedCreator.id,
-          platform: selectedCreator.platform,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to activate listing');
-      showToast('Featured listing activated. Your profile will appear in rankings within a few minutes.');
-      setSelectedCreator(null);
-      setListingQuery('');
-      loadFeaturedListings();
-    } catch (err) {
-      showToast(err.message || 'Failed to activate listing.', 'error');
-    } finally {
-      setActivatingFree(false);
     }
   };
 
@@ -418,24 +340,12 @@ export default function Account() {
           {/* Profile summary card */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-8 flex items-center gap-4">
             {/* Avatar */}
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-base font-extrabold text-white flex-shrink-0 bg-gradient-to-br ${
-              tier === 'mod' ? 'from-amber-500 to-orange-600' : tier === 'sub' ? 'from-indigo-500 to-purple-600' : 'from-gray-600 to-gray-700'
-            }`}>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-extrabold text-white flex-shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600">
               {initials}
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                <span className="font-semibold text-gray-100 truncate">{nameForDisplay}</span>
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${TIER_DISPLAY[tier]?.bg} ${TIER_DISPLAY[tier]?.color} border ${TIER_DISPLAY[tier]?.border}`}>
-                  {TIER_DISPLAY[tier]?.label}
-                </span>
-                {subStatus === 'past_due' && (
-                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-950/40 text-red-400 border border-red-800">
-                    Payment past due
-                  </span>
-                )}
-              </div>
+              <p className="font-semibold text-gray-100 truncate mb-0.5">{nameForDisplay}</p>
               <p className="text-sm text-gray-400 truncate">{user.email}</p>
             </div>
 
@@ -513,94 +423,6 @@ export default function Account() {
                 })}
               </div>
 
-              {/* ── Subscription tab ── */}
-              {activeTab === 'subscription' && (
-                <div className={`bg-gray-900 rounded-2xl border p-6 ${
-                  tier === 'mod' ? 'border-amber-800/50' : tier === 'sub' ? 'border-indigo-800/50' : 'border-gray-800'
-                }`}>
-                  <div className="flex items-center gap-2 mb-5">
-                    {tier === 'mod'
-                      ? <Crown className="w-5 h-5 text-amber-400" />
-                      : tier === 'sub'
-                      ? <Zap className="w-5 h-5 text-indigo-400" />
-                      : <Zap className="w-5 h-5 text-gray-500" />
-                    }
-                    <h2 className="text-base font-semibold text-gray-100">Your Plan</h2>
-                  </div>
-
-                  {tier === 'lurker' ? (
-                    <>
-                      <p className="text-sm text-gray-400 mb-6">
-                        You're on the free plan. Upgrade to unlock more follows, longer history, and an ad-free experience.
-                      </p>
-                      <div className="grid sm:grid-cols-2 gap-3 mb-6">
-                        {[
-                          ['Follow creators', '5 max'],
-                          ['Compare creators', '2 at a time'],
-                          ['Saved comparisons', '3 max'],
-                          ['Stat history', '30 days'],
-                          ['Reports', 'No'],
-                          ['CSV export', 'No'],
-                          ['Ads', 'Shown'],
-                        ].map(([feature, value]) => (
-                          <div key={feature} className="flex items-center justify-between px-4 py-3 bg-gray-800/50 rounded-xl">
-                            <span className="text-sm text-gray-400">{feature}</span>
-                            <span className={`text-sm font-medium ${value === 'No' || value === 'Shown' ? 'text-gray-500' : 'text-gray-300'}`}>{value}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex gap-3 flex-wrap">
-                        <button
-                          onClick={() => window.dispatchEvent(new CustomEvent('openUpgradePanel', { detail: { feature: 'pricing' } }))}
-                          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-colors"
-                        >
-                          <Zap className="w-3.5 h-3.5" />
-                          Upgrade to Sub
-                        </button>
-                        <Link
-                          to="/pricing"
-                          className="flex items-center gap-2 px-5 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-sm font-medium rounded-xl transition-colors"
-                        >
-                          Compare plans
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </Link>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="grid sm:grid-cols-2 gap-3 mb-6">
-                        {[
-                          ['Follow creators', TIER_LIMITS[tier].maxFollows === Infinity ? 'Unlimited' : `Up to ${TIER_LIMITS[tier].maxFollows}`],
-                          ['Compare creators', `Up to ${TIER_LIMITS[tier].maxCompare}`],
-                          ['Saved comparisons', TIER_LIMITS[tier].maxSavedCompares === Infinity ? 'Unlimited' : `${TIER_LIMITS[tier].maxSavedCompares} max`],
-                          ['Stat history', TIER_LIMITS[tier].historyDays === Infinity ? 'Full history' : `${TIER_LIMITS[tier].historyDays} days`],
-                          ['Reports', tier === 'mod' ? 'Yes' : 'No'],
-                          ['CSV export', tier === 'mod' ? 'Bulk' : 'Yes'],
-                          ['Ads', 'None'],
-                          ...(tier === 'mod' ? [
-                            ['Shareable links', 'Yes'],
-                            ['Featured listings', '1 free/month'],
-                          ] : []),
-                        ].map(([feature, value]) => (
-                          <div key={feature} className="flex items-center justify-between px-4 py-3 bg-gray-800/50 rounded-xl">
-                            <span className="text-sm text-gray-400">{feature}</span>
-                            <span className={`text-sm font-medium ${value === 'No' ? 'text-gray-500' : 'text-gray-200'}`}>{value}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <button
-                        onClick={handleManageBilling}
-                        disabled={managingBilling}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-sm font-medium rounded-xl transition-colors disabled:opacity-50"
-                      >
-                        {managingBilling ? 'Opening...' : 'Manage Subscription'}
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
-
               {/* ── Listings tab ── */}
               {activeTab === 'listings' && (
                 <div className="space-y-4">
@@ -612,7 +434,7 @@ export default function Account() {
                     <div className="mt-2 mb-5 space-y-2">
                       <div className="flex items-start gap-3 px-3 py-2.5 bg-gray-800/50 rounded-xl border border-gray-700/50">
                         <span className="mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex-shrink-0">Basic</span>
-                        <p className="text-xs text-gray-400">$49/mo. Your creator appears starting at rank 15, then every 5 rows (15, 20, 25...). Works across all platform rankings.{tier === 'mod' && !modFreeUsedThisMonth && <span className="ml-1 text-amber-400 font-medium">1 free listing available this month.</span>}</p>
+                        <p className="text-xs text-gray-400">$49/mo. Your creator appears starting at rank 15, then every 5 rows (15, 20, 25...). Works across all platform rankings.</p>
                       </div>
                       <div className="flex items-start gap-3 px-3 py-2.5 bg-amber-950/20 rounded-xl border border-amber-700/30">
                         <span className="mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex-shrink-0">Premium</span>
@@ -641,7 +463,7 @@ export default function Account() {
                                 <p className="text-xs text-gray-400">
                                   {listing.platform}
                                   {until && isActive ? ` · Until ${until}` : ''}
-                                  {listing.is_mod_free ? ' · Free with Mod' : ''}
+                                  {listing.is_mod_free ? ' · Promotional' : ''}
                                 </p>
                               </div>
                               <span className={`px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${
@@ -786,13 +608,13 @@ export default function Account() {
                             <div className="grid grid-cols-2 gap-2">
                               {/* Basic tile */}
                               <button
-                                onClick={tier === 'mod' && !modFreeUsedThisMonth ? handleActivateModFree : handlePurchaseListing}
-                                disabled={activatingFree || purchasingListing}
+                                onClick={handlePurchaseListing}
+                                disabled={purchasingListing}
                                 className="flex flex-col items-start gap-0.5 px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 disabled:opacity-50 rounded-xl transition-colors text-left"
                               >
                                 <span className="text-xs font-bold text-gray-200">Basic</span>
                                 <span className="text-sm font-semibold text-indigo-400">
-                                  {activatingFree ? 'Activating...' : purchasingListing ? 'Redirecting...' : tier === 'mod' && !modFreeUsedThisMonth ? 'Free this month' : '$49/mo'}
+                                  {purchasingListing ? 'Redirecting...' : '$49/mo'}
                                 </span>
                                 <span className="text-[10px] text-gray-500 mt-0.5">Rank 15 and beyond</span>
                               </button>

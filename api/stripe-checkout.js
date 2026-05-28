@@ -1,20 +1,20 @@
 /**
- * Create a Stripe Checkout session, or activate a Mod free featured listing.
+ * Create a Stripe Checkout session for Featured Listings, or cancel an active listing.
  *
  * POST /api/stripe-checkout
  * Headers: Authorization: Bearer <supabase-jwt>
  *
- * Plan upgrade:
- *   Body: { priceKey: 'sub' | 'mod', returnUrl: string }
- *
- * Featured listing ($49/mo):
+ * Featured listing — Basic ($49/mo, rank 15 and beyond):
  *   Body: { priceKey: 'featured', creatorId: string, platform: string, returnUrl: string }
- *   Webhook creates+activates the row after payment — no pre-created rows.
  *
- * Mod free featured listing (1/month perk, no Stripe payment):
- *   Body: { priceKey: 'featured-free', creatorId: string, platform: string }
- *   Server verifies Mod tier and monthly usage, then inserts active row directly.
- *   Returns { success: true } — no Stripe redirect.
+ * Featured listing — Premium ($149/mo, top-10 placement, 2 slots/platform):
+ *   Body: { priceKey: 'featured-premium', creatorId: string, platform: string, returnUrl: string }
+ *
+ * Cancel a listing:
+ *   Body: { priceKey: 'cancel-listing', listingId: string }
+ *
+ * Featured Listings is the only paid product — subscription tiers (Lurker/Sub/Mod) are deprecated.
+ * The webhook creates the listing row only after payment succeeds; no orphan rows from abandoned checkouts.
  */
 
 import Stripe from 'stripe';
@@ -22,10 +22,6 @@ import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIdentifier } from './_ratelimit.js';
 
 const PRICE_IDS = {
-  sub: process.env.STRIPE_SUB_PRICE_ID,
-  mod: process.env.STRIPE_MOD_PRICE_ID,
-  sub_annual: process.env.STRIPE_SUB_ANNUAL_PRICE_ID,
-  mod_annual: process.env.STRIPE_MOD_ANNUAL_PRICE_ID,
   featured: process.env.STRIPE_FEATURED_BASIC_PRICE_ID,
   'featured-premium': process.env.STRIPE_FEATURED_PREMIUM_PRICE_ID,
 };
@@ -80,11 +76,8 @@ export default async function handler(req, res) {
     if (authError || !user) return res.status(401).json({ error: 'Unauthorized' });
 
     const { priceKey, returnUrl, creatorId, platform, listingId } = req.body;
-    if (!priceKey || (!PRICE_IDS[priceKey] && priceKey !== 'featured-free' && priceKey !== 'cancel-listing')) {
-      return res.status(400).json({ error: 'Invalid price key' });
-    }
 
-    // Cancel a featured listing — works for both mod-free (direct DB) and paid (Stripe cancel)
+    // Cancel a featured listing
     if (priceKey === 'cancel-listing') {
       if (!listingId) return res.status(400).json({ error: 'Missing listingId' });
 
@@ -99,10 +92,10 @@ export default async function handler(req, res) {
       if (listing.status !== 'active') return res.status(400).json({ error: 'Listing is not active' });
 
       if (listing.stripe_subscription_id) {
-        // Paid listing — cancel Stripe subscription; webhook will set status to 'canceled'
+        // Stripe-backed listing — cancel subscription; webhook flips status to 'canceled'
         await stripe.subscriptions.cancel(listing.stripe_subscription_id);
       } else {
-        // Mod free — no Stripe, update DB directly via service role
+        // Promotional / legacy listing — update DB directly
         const { error: updateError } = await supabase
           .from('featured_listings')
           .update({ status: 'canceled' })
@@ -113,86 +106,58 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true });
     }
 
+    if (!priceKey || !PRICE_IDS[priceKey]) {
+      return res.status(400).json({ error: 'Invalid price key' });
+    }
+
     // Validate returnUrl to prevent open redirects
     const origin = getSiteOrigin(req);
     if (returnUrl && !isSafeReturnUrl(returnUrl)) {
       return res.status(400).json({ error: 'Invalid return URL' });
     }
 
-    // Validate platform is one of our supported values (when provided)
-    if (platform && !VALID_PLATFORMS.has(platform)) {
+    // Validate platform
+    if (!platform || !VALID_PLATFORMS.has(platform)) {
       return res.status(400).json({ error: 'Invalid platform' });
     }
 
-    // Mod free featured listing — no Stripe payment, server-side only
-    if (priceKey === 'featured-free') {
-      if (!creatorId || !platform) {
-        return res.status(400).json({ error: 'Missing creatorId or platform' });
-      }
+    if (!creatorId) {
+      return res.status(400).json({ error: 'Missing creatorId for featured listing' });
+    }
 
-      // Verify user is on Mod tier
-      const { data: userRecord } = await supabase
-        .from('users')
-        .select('subscription_tier')
-        .eq('id', user.id)
-        .maybeSingle();
-      if (userRecord?.subscription_tier !== 'mod') {
-        return res.status(403).json({ error: 'Mod plan required for free featured listing' });
-      }
+    const placementTier = priceKey === 'featured-premium' ? 'premium' : 'basic';
 
-      // Verify not already used this calendar month (UTC)
-      const startOfMonth = new Date();
-      startOfMonth.setUTCDate(1);
-      startOfMonth.setUTCHours(0, 0, 0, 0);
-      const { count } = await supabase
+    const { data: creator } = await supabase
+      .from('creators')
+      .select('id')
+      .eq('id', creatorId)
+      .eq('platform', platform)
+      .maybeSingle();
+    if (!creator) return res.status(400).json({ error: 'Creator not found' });
+
+    // Prevent duplicate: block if this creator already has any active listing
+    const { count: dupCount } = await supabase
+      .from('featured_listings')
+      .select('id', { count: 'exact', head: true })
+      .eq('creator_id', creatorId)
+      .eq('status', 'active')
+      .gt('active_until', new Date().toISOString());
+    if (dupCount > 0) {
+      return res.status(409).json({ error: 'This creator already has an active featured listing' });
+    }
+
+    // Premium: enforce maximum 2 slots per platform
+    if (placementTier === 'premium') {
+      const { count: premiumCount } = await supabase
         .from('featured_listings')
         .select('id', { count: 'exact', head: true })
-        .eq('purchased_by_user_id', user.id)
-        .eq('is_mod_free', true)
-        .gte('created_at', startOfMonth.toISOString());
-      if (count > 0) {
-        return res.status(400).json({ error: 'Free listing already used this month' });
-      }
-
-      // Validate creator exists
-      const { data: creator } = await supabase
-        .from('creators')
-        .select('id')
-        .eq('id', creatorId)
         .eq('platform', platform)
-        .maybeSingle();
-      if (!creator) return res.status(400).json({ error: 'Creator not found' });
-
-      // Prevent duplicate: block if this creator already has an active listing (globally)
-      const { count: dupCount } = await supabase
-        .from('featured_listings')
-        .select('id', { count: 'exact', head: true })
-        .eq('creator_id', creatorId)
+        .eq('placement_tier', 'premium')
         .eq('status', 'active')
         .gt('active_until', new Date().toISOString());
-      if (dupCount > 0) {
-        return res.status(409).json({ error: 'This creator already has an active featured listing' });
+      if (premiumCount >= 2) {
+        return res.status(409).json({ error: 'All premium spots for this platform are taken. Try again later.' });
       }
-
-      const activeFrom = new Date();
-      const activeUntil = new Date(activeFrom);
-      activeUntil.setDate(activeUntil.getDate() + 30);
-
-      const { error: insertError } = await supabase
-        .from('featured_listings')
-        .insert({
-          creator_id: creatorId,
-          platform,
-          placement_tier: 'basic',
-          status: 'active',
-          purchased_by_user_id: user.id,
-          active_from: activeFrom.toISOString(),
-          active_until: activeUntil.toISOString(),
-          is_mod_free: true,
-        });
-      if (insertError) throw insertError;
-
-      return res.status(200).json({ success: true });
     }
 
     // Get or create Stripe customer
@@ -216,66 +181,19 @@ export default async function handler(req, res) {
         .eq('id', user.id);
     }
 
-    let sessionMetadata = { supabase_user_id: user.id };
-    let successUrl = (returnUrl || `${origin}/account`) + '?upgrade=success';
-    let cancelUrl = `${origin}/pricing`;
-
-    // Featured listing (basic or premium): validate creator then pass IDs in metadata.
-    // The webhook creates+activates the row only after payment succeeds —
-    // no DB row is created here so abandoned checkouts leave no orphan records.
-    if (priceKey === 'featured' || priceKey === 'featured-premium') {
-      const placementTier = priceKey === 'featured-premium' ? 'premium' : 'basic';
-
-      if (!creatorId || !platform) {
-        return res.status(400).json({ error: 'Missing creatorId or platform for featured listing' });
-      }
-
-      const { data: creator } = await supabase
-        .from('creators')
-        .select('id')
-        .eq('id', creatorId)
-        .eq('platform', platform)
-        .maybeSingle();
-      if (!creator) return res.status(400).json({ error: 'Creator not found' });
-
-      // Prevent duplicate: block if this creator already has any active listing
-      const { count: dupCount } = await supabase
-        .from('featured_listings')
-        .select('id', { count: 'exact', head: true })
-        .eq('creator_id', creatorId)
-        .eq('status', 'active')
-        .gt('active_until', new Date().toISOString());
-      if (dupCount > 0) {
-        return res.status(409).json({ error: 'This creator already has an active featured listing' });
-      }
-
-      // Premium: enforce maximum 2 slots per platform
-      if (placementTier === 'premium') {
-        const { count: premiumCount } = await supabase
-          .from('featured_listings')
-          .select('id', { count: 'exact', head: true })
-          .eq('platform', platform)
-          .eq('placement_tier', 'premium')
-          .eq('status', 'active')
-          .gt('active_until', new Date().toISOString());
-        if (premiumCount >= 2) {
-          return res.status(409).json({ error: 'All premium spots for this platform are taken. Try again later.' });
-        }
-      }
-
-      sessionMetadata.featuredCreatorId = creatorId;
-      sessionMetadata.featuredPlatform = platform;
-      sessionMetadata.featuredPlacementTier = placementTier;
-      successUrl = (returnUrl || `${origin}/account`) + '?featured=success';
-      cancelUrl = `${origin}/account`;
-    }
+    const sessionMetadata = {
+      supabase_user_id: user.id,
+      featuredCreatorId: creatorId,
+      featuredPlatform: platform,
+      featuredPlacementTier: placementTier,
+    };
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
       line_items: [{ price: PRICE_IDS[priceKey], quantity: 1 }],
-      success_url: successUrl,
-      cancel_url: cancelUrl,
+      success_url: (returnUrl || `${origin}/account`) + '?featured=success',
+      cancel_url: `${origin}/account`,
       allow_promotion_codes: true,
       metadata: sessionMetadata,
     });

@@ -6,7 +6,6 @@ import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AuthProvider } from './contexts/AuthContext';
-import { SubscriptionProvider } from './contexts/SubscriptionContext';
 
 // Eagerly load the homepage (critical path)
 import Home from './pages/Home';
@@ -52,7 +51,6 @@ const ResetPassword = lazyWithRetry(() => import('./pages/ResetPassword'));
 const Calculator = lazyWithRetry(() => import('./pages/Calculator'));
 const Support = lazyWithRetry(() => import('./pages/Support'));
 const Account = lazyWithRetry(() => import('./pages/Account'));
-const Pricing = lazyWithRetry(() => import('./pages/Pricing'));
 const Refunds = lazyWithRetry(() => import('./pages/Refunds'));
 const ShareProfile = lazyWithRetry(() => import('./pages/ShareProfile'));
 const Reports = lazyWithRetry(() => import('./pages/Reports'));
@@ -125,7 +123,6 @@ function LayoutWrapper() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/support" element={<Support />} />
-          <Route path="/pricing" element={<Pricing />} />
           <Route path="/refunds" element={<Refunds />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/admin" element={<BlogAdmin />} />
@@ -145,9 +142,7 @@ function LayoutWrapper() {
 function App() {
   return (
     <AuthProvider>
-      <SubscriptionProvider>
-        <LayoutWrapper />
-      </SubscriptionProvider>
+      <LayoutWrapper />
     </AuthProvider>
   );
 }

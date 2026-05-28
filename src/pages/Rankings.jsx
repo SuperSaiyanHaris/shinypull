@@ -230,42 +230,22 @@ function RankingsOverview() {
                         const items = [];
 
                         const pushPremiumSlot = (slotKey, advertiser) => {
-                          if (advertiser) {
-                            const c = advertiser.creators;
-                            items.push(
-                              <Link
-                                key={slotKey}
-                                to={`/${c?.platform}/${c?.username}`}
-                                className="flex items-center gap-3 px-5 py-3 bg-amber-950/15 hover:bg-amber-950/25 transition-colors group"
-                              >
-                                <span className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 bg-amber-900/30 text-amber-500">Ad</span>
-                                <img src={c?.profile_image || '/placeholder-avatar.svg'} alt={c?.display_name} loading="lazy" className="w-8 h-8 rounded-lg object-cover bg-gray-800 flex-shrink-0" onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }} />
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-amber-300 transition-colors">{c?.display_name}</p>
-                                </div>
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex-shrink-0">⭐ Premium</span>
-                              </Link>
-                            );
-                          } else {
-                            items.push(
-                              <Link
-                                key={slotKey}
-                                to="/pricing"
-                                className="flex items-center gap-3 px-5 py-3 bg-amber-950/5 hover:bg-amber-950/15 border-y border-dashed border-amber-800/30 transition-colors group"
-                              >
-                                <div className="w-6 h-6 rounded-md bg-gray-800/60 border border-dashed border-gray-700 flex-shrink-0 flex items-center justify-center">
-                                  <span className="text-gray-600 text-[10px]">?</span>
-                                </div>
-                                <div className="w-8 h-8 rounded-lg bg-gray-800/60 border border-dashed border-gray-700 flex-shrink-0 flex items-center justify-center">
-                                  <span className="text-gray-600 text-sm">?</span>
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-semibold text-gray-600 group-hover:text-amber-500 transition-colors">This could be you</p>
-                                </div>
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20 flex-shrink-0">Premium spot</span>
-                              </Link>
-                            );
-                          }
+                          if (!advertiser) return; // No empty placeholder rows — only render when sold
+                          const c = advertiser.creators;
+                          items.push(
+                            <Link
+                              key={slotKey}
+                              to={`/${c?.platform}/${c?.username}`}
+                              className="flex items-center gap-3 px-5 py-3 bg-amber-950/15 hover:bg-amber-950/25 transition-colors group"
+                            >
+                              <span className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 bg-amber-900/30 text-amber-500">Ad</span>
+                              <img src={c?.profile_image || '/placeholder-avatar.svg'} alt={c?.display_name} loading="lazy" className="w-8 h-8 rounded-lg object-cover bg-gray-800 flex-shrink-0" onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }} />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-amber-300 transition-colors">{c?.display_name}</p>
+                              </div>
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex-shrink-0">⭐ Premium</span>
+                            </Link>
+                          );
                         };
 
                         creators.forEach((creator, index) => {
@@ -428,35 +408,28 @@ function PlatformRankings({ urlPlatform }) {
     let basicIdx = 0;
     let nextBasicSlot = 14; // 0-indexed: inject before organic index 14 (between rank 14 and 15)
 
+    // Inject paid slots ONLY when sold. No ghost placeholders — empty rows in a
+    // ranked table read as broken or amateur. Active listings appear in their reserved slot.
     for (let i = 0; i < sortedRankings.length; i++) {
-      // Premium slot 1: between rank 4 and 5 (before organic index 4)
-      if (i === 4) {
-        if (premiumIdx < premiumListings.length) {
-          const listing = premiumListings[premiumIdx];
-          const c = listing.creators;
-          result.push({ ...c, isSponsored: true, isPremium: true, listingId: listing.id,
-            display_name: c?.display_name, username: c?.username,
-            profile_image: c?.profile_image, platform: c?.platform });
-        } else {
-          // Ghost slot — promotes the product to potential buyers
-          result.push({ isSponsored: true, isPremium: true, isGhost: true, listingId: 'ghost-1' });
-        }
+      // Premium slot 1: between rank 4 and 5
+      if (i === 4 && premiumIdx < premiumListings.length) {
+        const listing = premiumListings[premiumIdx];
+        const c = listing.creators;
+        result.push({ ...c, isSponsored: true, isPremium: true, listingId: listing.id,
+          display_name: c?.display_name, username: c?.username,
+          profile_image: c?.profile_image, platform: c?.platform });
         premiumIdx++;
       }
-      // Premium slot 2: between rank 9 and 10 (before organic index 9)
-      if (i === 9) {
-        if (premiumIdx < premiumListings.length) {
-          const listing = premiumListings[premiumIdx];
-          const c = listing.creators;
-          result.push({ ...c, isSponsored: true, isPremium: true, listingId: listing.id,
-            display_name: c?.display_name, username: c?.username,
-            profile_image: c?.profile_image, platform: c?.platform });
-        } else {
-          result.push({ isSponsored: true, isPremium: true, isGhost: true, listingId: 'ghost-2' });
-        }
+      // Premium slot 2: between rank 9 and 10
+      if (i === 9 && premiumIdx < premiumListings.length) {
+        const listing = premiumListings[premiumIdx];
+        const c = listing.creators;
+        result.push({ ...c, isSponsored: true, isPremium: true, listingId: listing.id,
+          display_name: c?.display_name, username: c?.username,
+          profile_image: c?.profile_image, platform: c?.platform });
         premiumIdx++;
       }
-      // Basic slots: starting at organic index 14 (between rank 14-15), every 5
+      // Basic slots: starting at organic index 14, every 5 rows
       if (basicIdx < basicListings.length && i === nextBasicSlot) {
         const listing = basicListings[basicIdx];
         const c = listing.creators;
@@ -686,43 +659,6 @@ function PlatformRankings({ urlPlatform }) {
             {/* Rankings List */}
             {!loading && !error && displayList.map((creator, index) => {
               if (creator.isSponsored) {
-                // Ghost slot — no real advertiser, promotes the premium product
-                if (creator.isGhost) {
-                  return (
-                    <Link
-                      key={creator.listingId}
-                      to="/pricing"
-                      className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-dashed border-amber-800/30 bg-amber-950/5 hover:bg-amber-950/15 transition-colors group"
-                    >
-                      <div className="col-span-2 md:col-span-1 flex items-center">
-                        <span className="inline-flex items-center px-2 py-1 rounded-lg bg-amber-900/20 border border-amber-800/30 text-amber-600 text-xs font-bold tracking-wide">
-                          Ad
-                        </span>
-                      </div>
-                      <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-7' : 'md:col-span-5'}`}>
-                        <div className="w-12 h-12 rounded-xl bg-gray-800/60 border border-dashed border-gray-700 flex-shrink-0 flex items-center justify-center">
-                          <span className="text-gray-600 text-lg">?</span>
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="font-semibold text-gray-600 group-hover:text-amber-500 transition-colors">
-                              This could be you
-                            </p>
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20 flex-shrink-0">
-                              Premium spot available
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="hidden md:block col-span-2 text-right" />
-                      {selectedPlatform !== 'kick' && selectedPlatform !== 'bluesky' && (
-                        <div className="hidden md:block col-span-2 text-right" />
-                      )}
-                      <div className="hidden md:block col-span-2 text-right" />
-                    </Link>
-                  );
-                }
-
                 // Real sponsored row — premium gets slightly brighter gold treatment
                 const isPremium = creator.isPremium;
                 return (

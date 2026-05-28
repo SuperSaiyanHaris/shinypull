@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
-import { useSubscription } from '../contexts/SubscriptionContext';
 import { supabase } from '../lib/supabase';
 import { formatNumber } from '../lib/utils';
 
@@ -76,8 +75,8 @@ function fmtDelta(n) {
 
 export default function Reports() {
   const { user, loading: authLoading } = useAuth();
-  const { tier, openUpgradePanel } = useSubscription();
-  const isMod = tier === 'mod';
+  // Reports open to all signed-in users now (was Mod-only). Featured Listings is the only paid product.
+  const isMod = true;
 
   /* ---------- creator search / picker ---------- */
   const [searchQuery, setSearchQuery] = useState('');
@@ -473,98 +472,7 @@ export default function Reports() {
     );
   }
 
-  /* ─── mod gate ─── */
-  if (!isMod) {
-    return (
-      <>
-        <SEO title="Reports" description="Build custom reports and export creator stats across platforms." />
-        <div className="min-h-screen bg-[#0a0a0f]">
-          <div className="max-w-4xl mx-auto px-4 pt-20 pb-32">
-            {/* Preview of what Reports looks like */}
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
-                <Crown className="w-3.5 h-3.5" />
-                Mod feature
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-100 mb-4">
-                Custom Reports
-              </h1>
-              <p className="text-lg text-gray-400 max-w-xl mx-auto">
-                Pull stats for any creators, pick your date range and metrics, preview the data, and export. Save report templates so you can re-run them anytime.
-              </p>
-            </div>
-
-            {/* Blurred preview */}
-            <div className="relative">
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0a0f]/60 backdrop-blur-sm rounded-2xl">
-                <Lock className="w-10 h-10 text-amber-400 mb-4" />
-                <p className="text-lg font-semibold text-gray-100 mb-2">Upgrade to Mod</p>
-                <p className="text-sm text-gray-400 mb-6 max-w-sm text-center">
-                  Reports is a Mod-only feature. Build custom multi-creator reports with full history access and bulk export.
-                </p>
-                <button
-                  onClick={() => openUpgradePanel('reports')}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-sm font-semibold transition-colors"
-                >
-                  See Mod plan
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Fake preview content */}
-              <div className="pointer-events-none select-none opacity-40">
-                <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-4">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gray-800 rounded-xl" />
-                    <div className="h-4 w-40 bg-gray-800 rounded" />
-                    <div className="ml-auto h-8 w-28 bg-gray-800 rounded-lg" />
-                  </div>
-                  <div className="flex gap-2 mb-4">
-                    {['YouTube', 'TikTok', 'Twitch'].map(p => (
-                      <div key={p} className="px-3 py-1.5 bg-gray-800 rounded-lg text-xs text-gray-500">{p}</div>
-                    ))}
-                  </div>
-                  <div className="h-8 w-full bg-gray-800/50 rounded mb-2" />
-                  <div className="space-y-2">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className="h-10 w-full bg-gray-800/30 rounded" />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature list */}
-            <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-              {[
-                'Search and add any creator from our database',
-                'Pick date range: 7 days to full history',
-                'Choose metrics: subs, views, hours watched, and more',
-                'Preview data before exporting',
-                'Summary CSV or detailed day-by-day export',
-                'Save report templates for one-click re-runs',
-              ].map(f => (
-                <div key={f} className="flex items-start gap-2.5 text-sm text-gray-400">
-                  <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-400" />
-                  {f}
-                </div>
-              ))}
-            </div>
-
-            <div className="text-center mt-10">
-              <Link
-                to="/pricing"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors"
-              >
-                Compare plans
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
+  // Mod gate removed — Reports is open to all signed-in users.
 
   /* ──────────────────────────────────────────
      MOD VIEW — The actual reports interface

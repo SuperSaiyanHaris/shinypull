@@ -15,7 +15,6 @@ import { Music } from 'lucide-react';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import { followCreator, unfollowCreator, isFollowing as checkIsFollowing, getFollowedCreators } from '../services/followService';
 import { useAuth } from '../contexts/AuthContext';
-import { useSubscription } from '../contexts/SubscriptionContext';
 import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
@@ -64,7 +63,11 @@ export default function CreatorProfile() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const { maxFollows, historyDays, hasExport, openUpgradePanel, tier } = useSubscription();
+  // No tier gates — every signed-in user gets full features.
+  // Featured Listings is the only paid product; profile features are free.
+  const maxFollows = Infinity;
+  const historyDays = Infinity;
+  const hasExport = true;
   const [creator, setCreator] = useState(null);
   const [statsHistory, setStatsHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -336,13 +339,7 @@ export default function CreatorProfile() {
         setIsFollowing(false);
       } else {
         // Check follow limit before adding
-        if (isFinite(maxFollows)) {
-          const followed = await getFollowedCreators(user.id);
-          if (followed.length >= maxFollows) {
-            openUpgradePanel('follow');
-            return;
-          }
-        }
+        // Follow limit gate removed — unlimited follows for everyone.
         await followCreator(user.id, dbCreatorId);
         setIsFollowing(true);
       }
@@ -356,7 +353,8 @@ export default function CreatorProfile() {
   const profileUrl = `${window.location.origin}/${platform}/${creator?.username || username}`;
   const shareUrl = `${window.location.origin}/s/${platform}/${creator?.username || username}`;
   const embedCode = `<iframe src="${shareUrl}" width="520" height="400" frameborder="0" style="border-radius:16px;border:1px solid #1f2937" allowfullscreen></iframe>`;
-  const isMod = tier === 'mod';
+  // Share + embed are free for everyone — kept variable for minimal blast radius.
+  const isMod = true;
 
   useEffect(() => {
     if (!showSharePanel) return;
@@ -396,7 +394,6 @@ export default function CreatorProfile() {
   const colors = platformColors[platform] || platformColors.youtube;
 
   const handleExportCSV = () => {
-    if (!hasExport) { openUpgradePanel('export'); return; }
     if (!statsHistory.length) return;
 
     const sorted = [...statsHistory].sort((a, b) => new Date(a.recorded_at) - new Date(b.recorded_at));
@@ -1405,10 +1402,6 @@ export default function CreatorProfile() {
                 data={statsHistory}
                 range={chartRange}
                 onRangeChange={(val) => {
-                  if (isFinite(historyDays) && val > historyDays) {
-                    openUpgradePanel('history');
-                    return;
-                  }
                   setChartRange(val);
                 }}
                 metric={chartMetric}

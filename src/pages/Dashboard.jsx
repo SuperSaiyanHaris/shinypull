@@ -10,7 +10,6 @@ import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
-import { useSubscription, TIER_DISPLAY } from '../contexts/SubscriptionContext';
 import { getFollowedCreators } from '../services/followService';
 import { getSavedCompares, deleteSavedCompare } from '../services/compareService';
 import { getCreatorStats } from '../services/creatorService';
@@ -50,7 +49,6 @@ const METRIC_LABEL = {
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
-  const { tier } = useSubscription();
 
   // Data
   const [followedCreators, setFollowedCreators] = useState([]);
@@ -473,19 +471,12 @@ export default function Dashboard() {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-8">
             <div className="flex items-center gap-4">
               {/* Avatar */}
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-base font-extrabold text-white flex-shrink-0 bg-gradient-to-br ${
-                tier === 'mod' ? 'from-amber-500 to-orange-600' : tier === 'sub' ? 'from-indigo-500 to-purple-600' : 'from-gray-600 to-gray-700'
-              }`}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-extrabold text-white flex-shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600">
                 {initials}
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                  <span className="font-semibold text-gray-100">Welcome back, {displayName}</span>
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${TIER_DISPLAY[tier]?.bg} ${TIER_DISPLAY[tier]?.color} border ${TIER_DISPLAY[tier]?.border}`}>
-                    {TIER_DISPLAY[tier]?.label}
-                  </span>
-                </div>
+                <p className="font-semibold text-gray-100 mb-0.5">Welcome back, {displayName}</p>
                 <p className="text-sm text-gray-500 truncate">{user.email}</p>
               </div>
 
@@ -581,16 +572,6 @@ export default function Dashboard() {
                   <Settings className="w-4 h-4 flex-shrink-0" />
                   Account Settings
                 </Link>
-
-                {tier === 'lurker' && (
-                  <button
-                    onClick={() => window.dispatchEvent(new CustomEvent('openUpgradePanel', { detail: { feature: 'pricing' } }))}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-indigo-400 hover:text-indigo-300 hover:bg-indigo-950/30 transition-all"
-                  >
-                    <Zap className="w-4 h-4 flex-shrink-0" />
-                    Upgrade Plan
-                  </button>
-                )}
               </div>
             </aside>
 
@@ -728,25 +709,14 @@ export default function Dashboard() {
                           </button>
                         )}
 
-                        {tier === 'mod' ? (
-                          <button
-                            onClick={handleBulkExport}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-950/40 hover:bg-amber-950/60 text-amber-400 border border-amber-800/60 transition-colors"
-                          >
-                            <Download className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">Export CSV</span>
-                            <span className="sm:hidden">Export</span>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => window.dispatchEvent(new CustomEvent('openUpgradePanel', { detail: { feature: 'export' } }))}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-800/50 text-gray-600 border border-gray-800 hover:text-gray-500 transition-colors"
-                            title="Bulk CSV export requires Mod plan"
-                          >
-                            <Lock className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">Export CSV</span>
-                          </button>
-                        )}
+                        <button
+                          onClick={handleBulkExport}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-950/40 hover:bg-indigo-950/60 text-indigo-400 border border-indigo-800/60 transition-colors"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Export CSV</span>
+                          <span className="sm:hidden">Export</span>
+                        </button>
                       </div>
                     </div>
                   )}

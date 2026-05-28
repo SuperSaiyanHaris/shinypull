@@ -1,15 +1,14 @@
 /**
- * Stripe webhook handler — updates subscription tier in Supabase
- * and manages featured listing activations.
+ * Stripe webhook handler — manages Featured Listings activations/cancellations.
+ *
+ * Subscription tiers (Lurker/Sub/Mod) were deprecated. Featured Listings is the only paid product.
  *
  * Configured at: https://dashboard.stripe.com/webhooks
  * Endpoint: https://shinypull.com/api/stripe-webhook
  * Events to enable:
  *   - checkout.session.completed      (activates featured listings)
- *   - customer.subscription.created
- *   - customer.subscription.updated
- *   - customer.subscription.deleted   (also cancels featured listings)
- *   - invoice.payment_failed
+ *   - customer.subscription.deleted   (cancels featured listings)
+ *   - invoice.payment_failed          (cancels listing on failed renewal)
  */
 
 import Stripe from 'stripe';
@@ -27,13 +26,6 @@ function getRawBody(req) {
 // Disable body parser so we can verify Stripe signature against raw body
 export const config = { api: { bodyParser: false } };
 
-const PRICE_TIER_MAP = {
-  [process.env.STRIPE_SUB_PRICE_ID]: 'sub',
-  [process.env.STRIPE_MOD_PRICE_ID]: 'mod',
-  [process.env.STRIPE_SUB_ANNUAL_PRICE_ID]: 'sub',
-  [process.env.STRIPE_MOD_ANNUAL_PRICE_ID]: 'mod',
-};
-
 const FEATURED_PRICE_IDS = new Set([
   process.env.STRIPE_FEATURED_BASIC_PRICE_ID,
   process.env.STRIPE_FEATURED_PREMIUM_PRICE_ID,
@@ -41,14 +33,6 @@ const FEATURED_PRICE_IDS = new Set([
 
 function isFeaturedSubscription(subscription) {
   return subscription.items.data.some(item => FEATURED_PRICE_IDS.has(item.price.id));
-}
-
-function getTierFromSubscription(subscription) {
-  for (const item of subscription.items.data) {
-    const tier = PRICE_TIER_MAP[item.price.id];
-    if (tier) return tier;
-  }
-  return 'lurker';
 }
 
 export default async function handler(req, res) {
@@ -82,9 +66,9 @@ export default async function handler(req, res) {
         const creatorId = session.metadata?.featuredCreatorId;
         const platform = session.metadata?.featuredPlatform;
         const userId = session.metadata?.supabase_user_id;
-        if (!creatorId || !platform || !userId) break; // not a featured listing checkout
+        if (!creatorId || !platform || !userId) break;
 
-        // Idempotency guard: Stripe retries events on 5xx — prevent duplicate rows
+        // Idempotency guard: Stripe retries events on 5xx
         if (session.subscription) {
           const { count: existing } = await supabase
             .from('featured_listings')
@@ -123,139 +107,41 @@ export default async function handler(req, res) {
         break;
       }
 
-      case 'customer.subscription.created':
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object;
-        const customerId = subscription.customer;
-
-        // Featured listing subscriptions are handled via checkout.session.completed.
-        // Skip tier updates for featured listing price IDs.
-        if (isFeaturedSubscription(subscription)) break;
-
-        // Find user by stripe_customer_id
-        const { data: user } = await supabase
-          .from('users')
-          .select('id')
-          .eq('stripe_customer_id', customerId)
-          .maybeSingle();
-
-        if (!user) {
-          console.warn('No user found for Stripe customer:', customerId);
-          break;
-        }
-
-        const tier = getTierFromSubscription(subscription);
-        const status = subscription.status === 'active' ? 'active'
-          : subscription.status === 'past_due' ? 'past_due'
-          : subscription.status === 'canceled' ? 'canceled'
-          : subscription.status;
-
-        await supabase
-          .from('users')
-          .update({
-            subscription_tier: tier,
-            subscription_status: status,
-            stripe_subscription_id: subscription.id,
-          })
-          .eq('id', user.id);
-
-        console.log(`Updated user ${user.id} to tier=${tier}, status=${status}`);
-        break;
-      }
-
       case 'customer.subscription.deleted': {
         const subscription = event.data.object;
-        const customerId = subscription.customer;
+        if (!isFeaturedSubscription(subscription)) break;
 
-        // If this is a featured listing subscription, cancel the listing
-        if (isFeaturedSubscription(subscription)) {
-          await supabase
-            .from('featured_listings')
-            .update({ status: 'canceled' })
-            .eq('stripe_subscription_id', subscription.id);
-          console.log(`Canceled featured listing for subscription ${subscription.id}`);
-          break;
-        }
-
-        const { data: user } = await supabase
-          .from('users')
-          .select('id')
-          .eq('stripe_customer_id', customerId)
-          .maybeSingle();
-
-        if (!user) break;
-
-        await supabase
-          .from('users')
-          .update({
-            subscription_tier: 'lurker',
-            subscription_status: 'active',
-            stripe_subscription_id: null,
-          })
-          .eq('id', user.id);
-
-        // Cancel any active mod-free featured listings — perk no longer valid
         await supabase
           .from('featured_listings')
           .update({ status: 'canceled' })
-          .eq('purchased_by_user_id', user.id)
-          .eq('is_mod_free', true)
-          .eq('status', 'active');
-
-        console.log(`Reverted user ${user.id} to Lurker (subscription canceled)`);
+          .eq('stripe_subscription_id', subscription.id);
+        console.log(`Canceled featured listing for subscription ${subscription.id}`);
         break;
       }
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object;
-        const customerId = invoice.customer;
         const failedSubscriptionId = invoice.subscription;
+        if (!failedSubscriptionId) break;
 
         // If the failed invoice belongs to a featured listing subscription, cancel the listing
-        if (failedSubscriptionId) {
-          const { count: featuredCount } = await supabase
-            .from('featured_listings')
-            .select('id', { count: 'exact', head: true })
-            .eq('stripe_subscription_id', failedSubscriptionId)
-            .eq('status', 'active');
-          if (featuredCount > 0) {
-            await supabase
-              .from('featured_listings')
-              .update({ status: 'canceled' })
-              .eq('stripe_subscription_id', failedSubscriptionId);
-            console.log(`Canceled featured listing for failed payment on subscription ${failedSubscriptionId}`);
-            break;
-          }
-        }
-
-        // Tier subscription payment failed — remove access immediately (no grace period)
-        const { data: user } = await supabase
-          .from('users')
-          .select('id')
-          .eq('stripe_customer_id', customerId)
-          .maybeSingle();
-
-        if (!user) break;
-
-        await supabase
-          .from('users')
-          .update({ subscription_tier: 'lurker', subscription_status: 'past_due' })
-          .eq('id', user.id);
-
-        // Cancel any mod-free featured listings — perk no longer valid
-        await supabase
+        const { count: featuredCount } = await supabase
           .from('featured_listings')
-          .update({ status: 'canceled' })
-          .eq('purchased_by_user_id', user.id)
-          .eq('is_mod_free', true)
+          .select('id', { count: 'exact', head: true })
+          .eq('stripe_subscription_id', failedSubscriptionId)
           .eq('status', 'active');
-
-        console.log(`Downgraded user ${user.id} to Lurker (payment failed)`);
+        if (featuredCount > 0) {
+          await supabase
+            .from('featured_listings')
+            .update({ status: 'canceled' })
+            .eq('stripe_subscription_id', failedSubscriptionId);
+          console.log(`Canceled featured listing for failed payment on subscription ${failedSubscriptionId}`);
+        }
         break;
       }
 
       default:
-        // Ignore other events
+        // Ignore other events (Lurker/Sub/Mod tier events no longer processed)
     }
 
     return res.status(200).json({ received: true });
