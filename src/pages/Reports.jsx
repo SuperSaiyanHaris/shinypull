@@ -553,10 +553,10 @@ export default function Reports() {
                 <button
                   key={p}
                   onClick={() => { setPlatformFilter(p); setSearchQuery(''); setSearchResults([]); }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
                     platformFilter === p
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700'
+                      ? 'bg-neutral-900 text-white border-neutral-900'
+                      : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
                   }`}
                 >
                   {PLATFORM_LABELS[p]}
@@ -566,7 +566,7 @@ export default function Reports() {
 
             {/* Creator search */}
             <div className="relative mb-5">
-              <div className="flex items-center bg-neutral-100 border border-neutral-300 rounded-xl px-4 h-11">
+              <div className="flex items-center bg-white border border-neutral-200 rounded-xl px-4 h-11 focus-within:border-neutral-400 focus-within:shadow-sm transition-all">
                 <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
                 <input
                   type="text"
@@ -643,10 +643,10 @@ export default function Reports() {
                     <button
                       key={r.id}
                       onClick={() => setDateRange(r.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
                         dateRange === r.id
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
+                          ? 'bg-neutral-900 text-white border-neutral-900'
+                          : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
                       }`}
                     >
                       {r.label}
@@ -666,10 +666,10 @@ export default function Reports() {
                     <button
                       key={m.id}
                       onClick={() => toggleMetric(m.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
                         selectedMetrics.has(m.id)
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
+                          ? 'bg-neutral-900 text-white border-neutral-900'
+                          : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
                       }`}
                     >
                       {m.label}

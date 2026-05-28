@@ -238,28 +238,44 @@ export default function Header() {
             <div className="ml-3 pl-3 border-l border-neutral-200">
               {isAuthenticated ? (
                 <div className="relative">
-                  <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2 p-1 rounded-lg hover:bg-neutral-100 transition-colors"
-                  >
-                    <div className="w-8 h-8 bg-neutral-900 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-white" />
-                    </div>
-                  </button>
+                  {(() => {
+                    const name = user?.user_metadata?.display_name || user?.email?.split('@')[0] || '?';
+                    const initials = name.slice(0, 2).toUpperCase();
+                    return (
+                      <button
+                        onClick={() => setUserMenuOpen(!userMenuOpen)}
+                        className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-neutral-200 transition-all"
+                        aria-label="Account menu"
+                      >
+                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                          {initials}
+                        </div>
+                      </button>
+                    );
+                  })()}
 
                   {userMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-                      <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-neutral-200 py-2 z-50">
-                        <div className="px-4 py-2 border-b border-neutral-200 mb-1">
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-neutral-200 py-1.5 z-50">
+                        <div className="px-4 py-2.5 border-b border-neutral-200 mb-1">
+                          <p className="text-sm font-semibold text-neutral-900 truncate">{user?.user_metadata?.display_name || user?.email?.split('@')[0]}</p>
                           <p className="text-xs text-neutral-500 truncate">{user?.email}</p>
                         </div>
                         <Link
+                          to="/dashboard"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 w-full transition-colors"
+                        >
+                          <LayoutDashboard className="w-4 h-4 text-neutral-400" />
+                          Dashboard
+                        </Link>
+                        <Link
                           to="/account"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 w-full transition-colors"
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 w-full transition-colors"
                         >
-                          <Settings className="w-4 h-4" />
+                          <Settings className="w-4 h-4 text-neutral-400" />
                           Account Settings
                         </Link>
                         <div className="border-t border-neutral-200 mt-1 pt-1">
@@ -268,9 +284,9 @@ export default function Header() {
                               signOut();
                               setUserMenuOpen(false);
                             }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-red-50 hover:text-red-600 w-full transition-colors"
+                            className="flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-700 hover:bg-red-50 hover:text-red-600 w-full transition-colors"
                           >
-                            <LogOut className="w-4 h-4" />
+                            <LogOut className="w-4 h-4 text-neutral-400" />
                             Sign Out
                           </button>
                         </div>

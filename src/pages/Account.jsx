@@ -496,10 +496,10 @@ export default function Account() {
                               setAlreadyListed(false);
                               setTikTokAddError('');
                             }}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
                               listingPlatform === p
-                                ? `${PLATFORM_PILL_ACTIVE[p]} text-white`
-                                : 'bg-neutral-100 text-neutral-500 hover:text-neutral-800 border border-neutral-300'
+                                ? `${PLATFORM_PILL_ACTIVE[p]} text-white border-transparent shadow-sm`
+                                : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
                             }`}
                           >
                             {PLATFORM_LABELS[p]}
@@ -509,7 +509,7 @@ export default function Account() {
 
                       {/* Search input with dropdown */}
                       <div className="relative">
-                        <div className="flex items-center gap-2 px-4 py-2.5 bg-neutral-100 border border-neutral-300 rounded-xl focus-within:ring-2 focus-within:ring-amber-500/50 focus-within:border-transparent">
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-white border border-neutral-200 rounded-xl focus-within:border-neutral-400 focus-within:shadow-sm transition-all">
                           {listingSearching
                             ? <Loader className="w-4 h-4 text-neutral-400 animate-spin flex-shrink-0" />
                             : <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
