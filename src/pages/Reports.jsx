@@ -481,17 +481,26 @@ export default function Reports() {
     <>
       <SEO title="Reports - ShinyPull" description="Build custom reports and export creator stats across platforms." />
       <div className="min-h-screen bg-[#fafafa]">
-        <div className="max-w-6xl mx-auto px-4 pt-16 pb-24">
 
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 flex items-center gap-3">
-                <FileSpreadsheet className="w-7 h-7 text-amber-400" />
-                Reports
-              </h1>
-              <p className="text-sm text-neutral-500 mt-1">Build a custom report for any creators, date range, and metrics.</p>
+        {/* Page header */}
+        <div className="relative overflow-hidden border-b border-neutral-200 bg-white">
+          <div className="absolute -top-32 -right-20 w-96 h-96 rounded-full bg-amber-100/40 blur-3xl pointer-events-none" />
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 mb-2">Custom report builder</p>
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900">Reports</h1>
+                <p className="mt-2 text-sm sm:text-base text-neutral-600 max-w-xl">
+                  Pick creators, choose a date range and metrics, then export the data as CSV. Save report templates to re-run them with one click.
+                </p>
+              </div>
             </div>
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Saved reports row */}
+          <div className="flex justify-end mb-6">
 
             {/* Saved reports dropdown */}
             {savedReports.length > 0 && (
@@ -587,7 +596,7 @@ export default function Reports() {
                         <p className="text-sm text-neutral-800 truncate">{c.display_name || c.username}</p>
                         <p className="text-xs text-neutral-400">@{c.username}</p>
                       </div>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${PLATFORM_COLORS[c.platform] || 'bg-gray-600'}`}>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${PLATFORM_COLORS[c.platform] || 'bg-neutral-500'}`}>
                         {PLATFORM_LABELS[c.platform] || c.platform}
                       </span>
                       <Plus className="w-4 h-4 text-neutral-400" />
@@ -605,7 +614,7 @@ export default function Reports() {
                     key={c.id}
                     className="flex items-center gap-2 pl-3 pr-1.5 py-1 bg-neutral-100 border border-neutral-300 rounded-full text-sm"
                   >
-                    <span className={`w-2 h-2 rounded-full ${PLATFORM_COLORS[c.platform] || 'bg-gray-500'}`} />
+                    <span className={`w-2 h-2 rounded-full ${PLATFORM_COLORS[c.platform] || 'bg-neutral-400'}`} />
                     <span className="text-neutral-700">{c.display_name || c.username}</span>
                     <button onClick={() => removeCreator(c.id)} className="p-0.5 hover:bg-neutral-200 rounded-full transition-colors">
                       <X className="w-3.5 h-3.5 text-neutral-400" />
@@ -841,7 +850,7 @@ export default function Reports() {
                           </Link>
                         </td>
                         <td className="py-3 px-3">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${PLATFORM_COLORS[s.creator.platform] || 'bg-gray-600'}`}>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${PLATFORM_COLORS[s.creator.platform] || 'bg-neutral-500'}`}>
                             {PLATFORM_LABELS[s.creator.platform] || s.creator.platform}
                           </span>
                         </td>
@@ -907,7 +916,7 @@ export default function Reports() {
           {/* Empty state when no report yet */}
           {!reportData && !loadingReport && selectedCreators.length === 0 && (
             <div className="text-center py-20 text-neutral-400">
-              <FileSpreadsheet className="w-12 h-12 mx-auto mb-4 text-neutral-300" />
+              <FileSpreadsheet className="w-12 h-12 mx-auto mb-4 text-neutral-400" />
               <p className="text-lg font-semibold text-neutral-500 mb-2">No report yet</p>
               <p className="text-sm">Search for creators above, configure your filters, and hit Generate.</p>
             </div>

@@ -245,7 +245,7 @@ export default function Account() {
                   returnTo: '/account?tab=listings',
                 },
               }))}
-              className="inline-flex items-center gap-2 w-full justify-center px-6 py-3 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 w-full justify-center px-6 py-3 bg-amber-500 hover:bg-amber-400 text-neutral-900 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5"
             >
               Sign in / Sign up
             </button>
@@ -314,20 +314,25 @@ export default function Account() {
 
       <div className="min-h-screen bg-[#fafafa]">
         {/* Page header */}
-        <div className="border-b border-neutral-200">
-          <div className="max-w-5xl mx-auto px-4 py-6">
+        <div className="relative overflow-hidden border-b border-neutral-200 bg-white">
+          <div className="absolute -top-32 -right-20 w-96 h-96 rounded-full bg-indigo-100/40 blur-3xl pointer-events-none" />
+          <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-indigo-600 transition-colors mb-4"
+              className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors mb-4"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Link>
-            <h1 className="text-2xl font-extrabold text-neutral-900">Account Settings</h1>
+            <p className="text-xs font-semibold uppercase tracking-widest text-indigo-600 mb-2">Settings</p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900">Account</h1>
+            <p className="mt-2 text-sm sm:text-base text-neutral-600">
+              Manage your featured listings, profile, and security settings.
+            </p>
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
           {/* Profile summary card */}
           <div className="bg-white border border-neutral-200 rounded-2xl p-5 mb-8 flex items-center gap-4">
@@ -382,7 +387,7 @@ export default function Account() {
               <div className="mt-6 pt-5 border-t border-neutral-200">
                 <button
                   onClick={signOut}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-neutral-500 hover:text-red-600 hover:bg-red-950/20 transition-all"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-neutral-500 hover:text-red-600 hover:bg-red-50 transition-all"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign Out
@@ -453,8 +458,8 @@ export default function Account() {
                                 </p>
                               </div>
                               <span className={`px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${
-                                isActive ? 'bg-emerald-950/50 text-emerald-600 border border-emerald-200' :
-                                isPending ? 'bg-amber-950/50 text-amber-700 border border-amber-200' :
+                                isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                                isPending ? 'bg-amber-50 text-amber-700 border border-amber-200' :
                                 'bg-neutral-100 text-neutral-400 border border-neutral-300'
                               }`}>
                                 {listing.status}
@@ -773,7 +778,7 @@ export default function Account() {
                     <p className="text-sm text-neutral-500 mb-4">Sign out of your account on this device.</p>
                     <button
                       onClick={signOut}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-neutral-100 hover:bg-red-50 border border-neutral-300 hover:border-red-900 text-neutral-700 hover:text-red-600 font-medium rounded-xl transition-all text-sm"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-neutral-100 hover:bg-red-50 border border-neutral-300 hover:border-red-300 text-neutral-700 hover:text-red-600 font-medium rounded-xl transition-all text-sm"
                     >
                       <LogOut className="w-4 h-4" />
                       Sign Out

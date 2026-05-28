@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   Youtube, Twitch, Star, Users, Loader2, TrendingUp, TrendingDown,
   Scale, Clock, ChevronRight, ChevronLeft, Check, X, Trash2,
-  ExternalLink, Download, Lock, Settings, Zap,
+  ExternalLink, Download, Lock, Settings, Zap, Radio,
 } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -221,7 +221,7 @@ export default function Dashboard() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className="h-4 w-32 bg-neutral-200 rounded" />
-                      <div className="h-4 w-12 bg-indigo-900 rounded-full" />
+                      <div className="h-4 w-12 bg-neutral-200 rounded-full" />
                     </div>
                     <div className="flex gap-3">
                       {[1, 2, 3].map(i => (
@@ -246,7 +246,7 @@ export default function Dashboard() {
                           <div className="h-3 w-16 bg-neutral-100 rounded" />
                         </div>
                         <div className="h-4 w-16 bg-neutral-200 rounded" />
-                        <div className="h-4 w-14 bg-emerald-900/60 rounded" />
+                        <div className="h-4 w-14 bg-neutral-200 rounded" />
                       </div>
                     ))}
                   </div>
@@ -462,82 +462,48 @@ export default function Dashboard() {
       <div className="min-h-screen bg-[#fafafa]">
 
         {/* Page header */}
-        <div className="border-b border-neutral-200">
-          <div className="max-w-5xl mx-auto px-4 py-6">
-            <h1 className="text-2xl font-extrabold text-neutral-900">Dashboard</h1>
+        <div className="relative overflow-hidden border-b border-neutral-200 bg-white">
+          <div className="absolute -top-32 -right-20 w-96 h-96 rounded-full bg-indigo-100/40 blur-3xl pointer-events-none" />
+          <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+            <p className="text-xs font-semibold uppercase tracking-widest text-indigo-600 mb-2">Dashboard</p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900">
+              Welcome back{displayName ? `, ${displayName}` : ''}.
+            </h1>
+            <p className="mt-2 text-sm sm:text-base text-neutral-600">
+              Track creators you follow, see who's live, and revisit your saved comparisons.
+            </p>
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-          {/* Profile summary strip */}
-          <div className="bg-white border border-neutral-200 rounded-2xl p-5 mb-8">
-            <div className="flex items-center gap-4">
-              {/* Avatar */}
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-extrabold text-white flex-shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600">
-                {initials}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-neutral-900 mb-0.5">Welcome back, {displayName}</p>
-                <p className="text-sm text-neutral-400 truncate">{user.email}</p>
-              </div>
-
-              {/* Desktop stats */}
-              <div className="hidden sm:flex items-center gap-8 flex-shrink-0 pr-2">
-                <div className="text-center">
-                  <p className="text-xl font-bold text-neutral-900 tabular-nums">
-                    <CountUp value={followedCreators.length} format="comma" />
-                  </p>
-                  <p className="text-xs text-neutral-400 mt-0.5">Following</p>
-                </div>
-                {liveCount > 0 && (
-                  <div className="text-center">
-                    <p className="text-xl font-bold text-red-600 tabular-nums">
-                      <CountUp value={liveCount} format="comma" />
-                    </p>
-                    <p className="text-xs text-neutral-400 mt-0.5">Live now</p>
+          {/* Quick stats grid — 3 KPI cards */}
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
+            {[
+              { label: 'Following', value: followedCreators.length, Icon: Star, accent: 'indigo' },
+              { label: 'Live now',  value: liveCount,                Icon: Radio, accent: 'red' },
+              { label: 'Saved',     value: savedCompares.length,     Icon: Scale, accent: 'violet' },
+            ].map(({ label, value, Icon, accent }) => {
+              const colorMap = {
+                indigo: { bg: 'bg-indigo-50', border: 'border-indigo-100', text: 'text-indigo-600' },
+                red:    { bg: 'bg-red-50',    border: 'border-red-100',    text: 'text-red-600' },
+                violet: { bg: 'bg-violet-50', border: 'border-violet-100', text: 'text-violet-600' },
+              };
+              const c = colorMap[accent];
+              return (
+                <div key={label} className="bg-white border border-neutral-200 rounded-2xl p-4 sm:p-5 hover:border-neutral-300 transition-colors">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className={`w-8 h-8 rounded-lg border ${c.bg} ${c.border} flex items-center justify-center`}>
+                      <Icon className={`w-4 h-4 ${c.text}`} />
+                    </div>
+                    <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-500">{label}</p>
                   </div>
-                )}
-                <div className="text-center">
-                  <p className="text-xl font-bold text-neutral-900 tabular-nums">
-                    <CountUp value={savedCompares.length} format="comma" />
+                  <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tabular-nums">
+                    <CountUp value={value} format="comma" />
                   </p>
-                  <p className="text-xs text-neutral-400 mt-0.5">Saved compares</p>
                 </div>
-              </div>
-
-              {/* Mobile settings icon */}
-              <Link
-                to="/account"
-                className="sm:hidden p-2 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors flex-shrink-0"
-                title="Account Settings"
-              >
-                <Settings className="w-4 h-4" />
-              </Link>
-            </div>
-
-            {/* Mobile stats row */}
-            <div className="flex sm:hidden items-center gap-0 mt-3 pt-3 border-t border-neutral-200">
-              <div className="flex-1 text-center">
-                <p className="text-base font-bold text-neutral-900">{followedCreators.length}</p>
-                <p className="text-xs text-neutral-400">Following</p>
-              </div>
-              <div className="w-px h-8 bg-neutral-100" />
-              {liveCount > 0 ? (
-                <>
-                  <div className="flex-1 text-center">
-                    <p className="text-base font-bold text-red-600">{liveCount}</p>
-                    <p className="text-xs text-neutral-400">Live now</p>
-                  </div>
-                  <div className="w-px h-8 bg-neutral-100" />
-                </>
-              ) : null}
-              <div className="flex-1 text-center">
-                <p className="text-base font-bold text-neutral-900">{savedCompares.length}</p>
-                <p className="text-xs text-neutral-400">Saved compares</p>
-              </div>
-            </div>
+              );
+            })}
           </div>
 
           {/* Sidebar + content */}
@@ -621,7 +587,7 @@ export default function Dashboard() {
                 <div>
                   {/* Compare mode banner — full card, mobile-first */}
                   {compareMode && (
-                    <div className="mb-4 bg-indigo-950/50 border border-indigo-700/60 rounded-xl p-4">
+                    <div className="mb-4 bg-indigo-50 border border-indigo-200 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
                           <Scale className="w-4 h-4 text-indigo-600 flex-shrink-0" />
@@ -720,7 +686,7 @@ export default function Dashboard() {
 
                         <button
                           onClick={handleBulkExport}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 hover:bg-indigo-950/60 text-indigo-600 border border-indigo-200 transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 transition-colors"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span className="hidden sm:inline">Export CSV</span>
@@ -818,7 +784,7 @@ export default function Dashboard() {
                                 ) : growth === 0 ? (
                                   <span className="text-xs text-neutral-400">no change</span>
                                 ) : (
-                                  <span className="text-xs text-neutral-300">–</span>
+                                  <span className="text-xs text-neutral-400">–</span>
                                 )}
                               </div>
                               {!compareMode && <ChevronRight className="w-4 h-4 text-neutral-400 flex-shrink-0" />}
@@ -904,7 +870,7 @@ export default function Dashboard() {
                             <div className="flex items-center gap-1 flex-shrink-0">
                               <button
                                 onClick={() => handleDeleteCompare(compare.id)}
-                                className="p-2 rounded-lg text-neutral-300 hover:text-red-600 hover:bg-red-950/20 transition-colors opacity-0 group-hover:opacity-100"
+                                className="p-2 rounded-lg text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
                                 title="Delete"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -1037,7 +1003,7 @@ function FilterChip({ active, onClick, label, count, icon, live, platform }) {
       {label}
       <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
         active
-          ? live ? 'bg-red-900/50 text-red-300' : 'bg-white/20 text-white'
+          ? live ? 'bg-red-100 text-red-700' : 'bg-white/20 text-white'
           : 'bg-neutral-200 text-neutral-500'
       }`}>
         {count}
