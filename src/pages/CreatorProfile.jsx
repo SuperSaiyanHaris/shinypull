@@ -96,6 +96,59 @@ export default function CreatorProfile() {
     loadCreator();
   }, [platform, username]);
 
+  // Live-refresh stats while the tab is visible.
+  // Polls supabase for the latest creator_stats row every 60s — cheap query, no external API hits.
+  // Pauses when the tab is backgrounded to avoid wasted work.
+  useEffect(() => {
+    if (!dbCreatorId) return;
+    let timer;
+
+    const refresh = async () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        const { data } = await supabase
+          .from('creator_stats')
+          .select('subscribers, followers, total_views, total_posts, hours_watched_day, peak_viewers_day, avg_viewers_day, recorded_at')
+          .eq('creator_id', dbCreatorId)
+          .order('recorded_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (data) {
+          setCreator((prev) => {
+            if (!prev) return prev;
+            const newSubs = data.subscribers ?? data.followers ?? prev.subscribers;
+            // Only update if value actually changed — avoids re-renders
+            if (
+              newSubs === prev.subscribers &&
+              (data.total_views ?? prev.totalViews) === prev.totalViews
+            ) return prev;
+            return {
+              ...prev,
+              subscribers: newSubs,
+              followers: data.followers ?? newSubs,
+              totalViews: data.total_views ?? prev.totalViews,
+              totalPosts: data.total_posts ?? prev.totalPosts,
+              hoursWatchedDay: data.hours_watched_day ?? prev.hoursWatchedDay,
+              peakViewersDay: data.peak_viewers_day ?? prev.peakViewersDay,
+              avgViewersDay: data.avg_viewers_day ?? prev.avgViewersDay,
+            };
+          });
+        }
+      } catch {
+        // Polling failure is non-fatal — keep existing numbers
+      }
+    };
+
+    timer = setInterval(refresh, 60 * 1000);
+    const onVisible = () => { if (document.visibilityState === 'visible') refresh(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [dbCreatorId]);
+
   const loadCreator = async () => {
     setLoading(true);
     setError(null);
