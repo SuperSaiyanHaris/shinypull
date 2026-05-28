@@ -13,14 +13,15 @@ import { formatNumber } from '../lib/utils';
 
 /* ───────────── constants ───────────── */
 
-const PLATFORMS = ['all', 'youtube', 'tiktok', 'twitch', 'kick', 'bluesky'];
-const PLATFORM_LABELS = { all: 'All Platforms', youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky' };
+const PLATFORMS = ['all', 'youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'music'];
+const PLATFORM_LABELS = { all: 'All Platforms', youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky', music: 'Music' };
 const PLATFORM_COLORS = {
   youtube: 'bg-red-500',
   tiktok: 'bg-pink-500',
   twitch: 'bg-purple-500',
   kick: 'bg-green-500',
   bluesky: 'bg-sky-500',
+  music: 'bg-amber-500',
 };
 
 const DATE_RANGES = [
@@ -32,12 +33,12 @@ const DATE_RANGES = [
 ];
 
 const METRIC_OPTIONS = [
-  { id: 'subscribers',        label: 'Subscribers / Followers',  platforms: ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky'] },
-  { id: 'total_views',        label: 'Total Views / Likes',      platforms: ['youtube', 'tiktok'] },
-  { id: 'total_posts',        label: 'Videos / Posts',            platforms: ['youtube', 'tiktok', 'bluesky'] },
-  { id: 'hours_watched_day',  label: 'Hours Watched (Daily)',     platforms: ['twitch', 'kick'] },
-  { id: 'peak_viewers_day',   label: 'Peak Viewers (Daily)',      platforms: ['twitch', 'kick'] },
-  { id: 'avg_viewers_day',    label: 'Avg Viewers (Daily)',       platforms: ['twitch', 'kick'] },
+  { id: 'subscribers',        label: 'Subscribers / Followers / Listeners',  platforms: ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'music'] },
+  { id: 'total_views',        label: 'Total Views / Likes / Plays',          platforms: ['youtube', 'tiktok', 'music'] },
+  { id: 'total_posts',        label: 'Videos / Posts',                       platforms: ['youtube', 'tiktok', 'bluesky'] },
+  { id: 'hours_watched_day',  label: 'Hours Watched (Daily)',                platforms: ['twitch', 'kick'] },
+  { id: 'peak_viewers_day',   label: 'Peak Viewers (Daily)',                 platforms: ['twitch', 'kick'] },
+  { id: 'avg_viewers_day',    label: 'Avg Viewers (Daily)',                  platforms: ['twitch', 'kick'] },
 ];
 
 const DEFAULT_METRICS = ['subscribers', 'total_views', 'total_posts'];

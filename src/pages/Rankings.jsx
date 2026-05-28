@@ -240,12 +240,13 @@ function RankingsOverview() {
                               to={`/${c?.platform}/${c?.username}`}
                               className="flex items-center gap-3 px-5 py-3 bg-amber-50 hover:bg-amber-100 border-y border-amber-200/60 transition-colors group"
                             >
-                              <span className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 bg-amber-200 text-amber-800">Ad</span>
+                              <span className="inline-flex items-center justify-center gap-0.5 px-1.5 h-6 rounded-md text-[10px] font-bold flex-shrink-0 bg-amber-200 border border-amber-300 text-amber-900" title="Premium featured listing">
+                                <span className="text-[9px]">★</span>Ad
+                              </span>
                               <CreatorAvatar src={c?.profile_image} name={c?.display_name} size="sm" rounded="rounded-lg" />
                               <div className="min-w-0 flex-1">
-                                <p className="text-sm font-semibold text-neutral-900 truncate group-hover:text-amber-300 transition-colors">{c?.display_name}</p>
+                                <p className="text-sm font-semibold text-neutral-900 truncate group-hover:text-amber-700 transition-colors">{c?.display_name}</p>
                               </div>
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex-shrink-0">⭐ Premium</span>
                             </Link>
                           );
                         };
@@ -679,29 +680,28 @@ function PlatformRankings({ urlPlatform }) {
                         : 'border-amber-100 bg-amber-50/50 hover:bg-amber-50'
                     }`}
                   >
-                    {/* "Ad" badge in rank column */}
+                    {/* "Ad" badge in rank column (Premium gets a small star prefix to distinguish placement quality) */}
                     <div className="col-span-2 md:col-span-1 flex items-center">
-                      <span className="inline-flex items-center px-2 py-1 rounded-lg bg-amber-100 border border-amber-200 text-amber-800 text-xs font-bold tracking-wide">
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold tracking-wide ${
+                          isPremium
+                            ? 'bg-amber-200 border border-amber-300 text-amber-900'
+                            : 'bg-amber-100 border border-amber-200 text-amber-800'
+                        }`}
+                        title={isPremium ? 'Premium featured listing' : 'Featured listing'}
+                      >
+                        {isPremium && <span className="text-[10px]">★</span>}
                         Ad
                       </span>
                     </div>
 
-                    {/* Creator Info */}
+                    {/* Creator Info — no inline pill (Ad badge in rank column already conveys this) */}
                     <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-5' : 'md:col-span-4'}`}>
                       <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="lg" />
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold truncate text-neutral-900 group-hover:text-amber-700 transition-colors">
-                            {creator.display_name}
-                          </p>
-                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold flex-shrink-0 ${
-                            isPremium
-                              ? 'bg-amber-200 text-amber-800 border border-amber-300'
-                              : 'bg-amber-100 text-amber-700 border border-amber-200'
-                          }`}>
-                            {isPremium ? '⭐ Premium' : 'Sponsored'}
-                          </span>
-                        </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold truncate text-neutral-900 group-hover:text-amber-700 transition-colors">
+                          {creator.display_name}
+                        </p>
                       </div>
                     </div>
 
