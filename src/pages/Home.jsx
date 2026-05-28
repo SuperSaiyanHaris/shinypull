@@ -429,36 +429,36 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-10%' }}
             transition={{ duration: 0.5 }}
-            className="relative overflow-hidden rounded-2xl bg-neutral-900 text-white p-8 sm:p-12"
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-50 via-orange-50 to-white border border-amber-200 p-8 sm:p-12"
           >
-            {/* Subtle radial accent */}
-            <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-indigo-100 blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
+            {/* Soft amber accent blob in corner */}
+            <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-amber-200/50 blur-3xl pointer-events-none" />
 
-            <div className="relative grid lg:grid-cols-2 gap-8 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-amber-400/15 border border-amber-400/30 rounded-full text-[11px] font-semibold uppercase tracking-wider text-amber-700 mb-5">
+            <div className="relative grid lg:grid-cols-[1fr_auto] gap-8 items-center">
+              <div className="max-w-2xl">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-amber-300 rounded-full text-[11px] font-bold uppercase tracking-wider text-amber-700 mb-5 shadow-sm">
                   <Sparkles className="w-3 h-3" />
                   Featured Listings
                 </div>
-                <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+                <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 mb-3">
                   Get your creator in the rankings.
                 </h3>
-                <p className="text-base text-neutral-300 max-w-md leading-relaxed">
-                  Sponsored placements inside our live rankings tables. $49/mo for Basic, $149/mo for top-of-page Premium slots. Cancel anytime.
+                <p className="text-base text-neutral-700 leading-relaxed">
+                  Sponsored placements inside our live rankings tables. <span className="font-semibold text-neutral-900">$49/mo</span> for Basic,{' '}
+                  <span className="font-semibold text-neutral-900">$149/mo</span> for top-of-page Premium slots. Cancel anytime.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:items-end">
                 <Link
                   to="/promote"
-                  className="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-white hover:bg-neutral-100 text-neutral-900 font-bold rounded-xl transition-all duration-200 shadow-lg hover:-translate-y-0.5"
+                  className="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition-all duration-200 shadow-md shadow-amber-500/20 hover:shadow-lg hover:-translate-y-0.5 whitespace-nowrap"
                 >
                   See plans
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
                   to="/rankings"
-                  className="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold rounded-xl transition-all duration-200"
+                  className="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-white hover:bg-neutral-50 border border-neutral-200 hover:border-neutral-300 text-neutral-800 font-semibold rounded-xl transition-all duration-200 whitespace-nowrap"
                 >
                   See live rankings
                 </Link>
