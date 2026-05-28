@@ -98,7 +98,7 @@ function LayoutWrapper() {
   const isShareRoute = location.pathname.startsWith('/s/');
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+    <div className="min-h-screen bg-[#fafafa] text-neutral-900 flex flex-col">
       <RouteChangeTracker />
       <ScrollToTop />
       <BackToTop />
@@ -150,14 +150,15 @@ function App() {
       <CommandPalette />
       <Toaster
         position="bottom-right"
-        theme="dark"
+        theme="light"
         richColors
         closeButton
         toastOptions={{
           style: {
-            background: '#0a0a0f',
-            border: '1px solid rgb(31 41 55)',
-            color: '#f3f4f6',
+            background: '#ffffff',
+            border: '1px solid #e5e5e5',
+            color: '#0a0a0a',
+            boxShadow: '0 12px 24px -6px rgb(0 0 0 / 0.10), 0 6px 12px -6px rgb(0 0 0 / 0.06)',
           },
         }}
       />

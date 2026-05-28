@@ -149,16 +149,16 @@ export default function Header() {
   const isMoreActive = moreLinks.some(link => isActive(link.path));
 
   return (
-    <header ref={mobileMenuRef} className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+    <header ref={mobileMenuRef} className="bg-white/85 backdrop-blur-md border-b border-neutral-200 sticky top-0 z-50">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
           <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 group flex-shrink-0">
-            <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:shadow-xl group-hover:shadow-indigo-500/30 transition-shadow">
+            <div className="w-9 h-9 bg-neutral-900 rounded-[10px] flex items-center justify-center group-hover:bg-neutral-800 transition-colors">
               <BarChart3 className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-100">
+            <span className="text-lg font-bold text-neutral-900 tracking-tight">
               Shiny<span className="text-indigo-600">Pull</span>
             </span>
           </Link>
@@ -166,13 +166,13 @@ export default function Header() {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
 
-            {/* Rankings — primary nav item */}
+            {/* Rankings */}
             <Link
               to="/rankings"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive('/rankings')
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  : 'text-amber-400/80 hover:bg-amber-500/10 hover:text-amber-300 border border-transparent hover:border-amber-500/30'
+                  ? 'bg-neutral-100 text-neutral-900'
+                  : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'
               }`}
             >
               <Trophy className="w-4 h-4" />
@@ -183,12 +183,12 @@ export default function Header() {
             <button
               type="button"
               onClick={() => window.dispatchEvent(new CustomEvent('openCommandPalette'))}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent group"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors group"
               aria-label="Open command palette"
             >
               <Search className="w-4 h-4" />
               <span>Search</span>
-              <kbd className="hidden lg:inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-gray-800 border border-gray-700 rounded text-gray-400 group-hover:text-gray-300 group-hover:border-gray-600">
+              <kbd className="hidden lg:inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-white border border-neutral-200 rounded text-neutral-500">
                 <span className="text-xs leading-none">⌘</span>K
               </kbd>
             </button>
@@ -197,22 +197,22 @@ export default function Header() {
             <div className="relative">
               <button
                 onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
                   moreMenuOpen || isMoreActive
-                    ? 'bg-gray-800 text-gray-100 border border-gray-700'
-                    : 'text-gray-300 hover:bg-gray-800/60 hover:text-gray-100 border border-gray-700/50 hover:border-gray-600'
+                    ? 'bg-neutral-100 text-neutral-900'
+                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'
                 }`}
               >
                 <LayoutGrid className="w-4 h-4" />
                 <span>More</span>
-                <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${moreMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${moreMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {moreMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setMoreMenuOpen(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-[400px] bg-[#0d0d14] border border-gray-800 rounded-2xl shadow-2xl shadow-black/70 z-50 p-3">
-                    <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest px-1 mb-2.5">Features</p>
+                  <div className="absolute right-0 top-full mt-2 w-[400px] bg-white border border-neutral-200 rounded-2xl shadow-xl z-50 p-3">
+                    <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest px-1 mb-2.5">Features</p>
                     <div className="grid grid-cols-2 gap-1.5">
                       {moreLinks.map(link => {
                         const Icon = link.icon;
@@ -224,23 +224,23 @@ export default function Header() {
                             onClick={() => setMoreMenuOpen(false)}
                             className={`group flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 ${
                               active
-                                ? 'bg-gray-800 border-gray-600'
-                                : `bg-gray-900/60 border-gray-800/60 ${link.hoverBorder} ${link.hoverBg}`
+                                ? 'bg-neutral-50 border-neutral-300'
+                                : 'bg-white border-transparent hover:bg-neutral-50 hover:border-neutral-200'
                             }`}
                           >
-                            <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${link.gradient} flex items-center justify-center flex-shrink-0 shadow-lg`}>
+                            <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${link.gradient} flex items-center justify-center flex-shrink-0`}>
                               <Icon className="w-[18px] h-[18px] text-white" />
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5 flex-wrap">
-                                <p className="font-semibold text-gray-100 text-sm leading-tight">{link.label}</p>
+                                <p className="font-semibold text-neutral-900 text-sm leading-tight">{link.label}</p>
                                 {link.badge && (
-                                  <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 leading-none flex-shrink-0">
+                                  <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200 leading-none flex-shrink-0">
                                     {link.badge}
                                   </span>
                                 )}
                               </div>
-                              <p className="text-xs text-gray-500 leading-tight mt-0.5 truncate">{link.description}</p>
+                              <p className="text-xs text-neutral-500 leading-tight mt-0.5 truncate">{link.description}</p>
                             </div>
                           </Link>
                         );
@@ -252,14 +252,14 @@ export default function Header() {
             </div>
 
             {/* Auth section */}
-            <div className="ml-4 pl-4 border-l border-gray-700">
+            <div className="ml-3 pl-3 border-l border-neutral-200">
               {isAuthenticated ? (
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex items-center gap-2 p-1 rounded-lg hover:bg-neutral-100 transition-colors"
                   >
-                    <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-neutral-900 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-white" />
                     </div>
                   </button>
@@ -267,25 +267,25 @@ export default function Header() {
                   {userMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-                      <div className="absolute right-0 mt-2 w-48 bg-gray-900 rounded-xl shadow-lg border border-gray-800 py-2 z-50">
-                        <div className="px-4 py-2 border-b border-gray-800 mb-1">
-                          <p className="text-xs text-gray-300 truncate">{user?.email}</p>
+                      <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-neutral-200 py-2 z-50">
+                        <div className="px-4 py-2 border-b border-neutral-200 mb-1">
+                          <p className="text-xs text-neutral-500 truncate">{user?.email}</p>
                         </div>
                         <Link
                           to="/account"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-gray-100 w-full transition-colors"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 w-full transition-colors"
                         >
                           <Settings className="w-4 h-4" />
                           Account Settings
                         </Link>
-                        <div className="border-t border-gray-800 mt-1 pt-1">
+                        <div className="border-t border-neutral-200 mt-1 pt-1">
                           <button
                             onClick={() => {
                               signOut();
                               setUserMenuOpen(false);
                             }}
-                            className="flex items-center gap-2 px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-red-400 w-full transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-red-50 hover:text-red-600 w-full transition-colors"
                           >
                             <LogOut className="w-4 h-4" />
                             Sign Out
@@ -298,10 +298,9 @@ export default function Header() {
               ) : (
                 <button
                   onClick={() => setAuthPanelOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-500 transition-colors"
+                  className="flex items-center gap-2 px-3.5 py-2 bg-neutral-900 text-white rounded-lg text-sm font-semibold hover:bg-neutral-800 transition-colors"
                 >
-                  <User className="w-4 h-4" />
-                  Sign Up / Sign In
+                  Sign in
                 </button>
               )}
             </div>
@@ -311,53 +310,52 @@ export default function Header() {
           <div className="md:hidden flex items-center gap-1">
             <Link
               to="/rankings"
-              className="p-2 rounded-lg text-amber-400/80 hover:bg-amber-500/10 hover:text-amber-300 transition-colors"
+              className="p-2 rounded-lg text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors"
               aria-label="Rankings"
             >
-              <Trophy className="w-6 h-6" />
-            </Link>
-            <Link
-              to="/search"
-              className="p-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors"
-              aria-label="Search"
-            >
-              <Search className="w-6 h-6" />
+              <Trophy className="w-5 h-5" />
             </Link>
             <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('openCommandPalette'))}
+              className="p-2 rounded-lg text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+            <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors"
+              className="p-2 rounded-lg text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors"
               aria-label="Menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Nav */}
         {mobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-gray-800">
+          <nav className="md:hidden py-4 border-t border-neutral-200 bg-white">
             <div className="flex flex-col gap-1">
 
-              {/* Primary links */}
-              <Link
-                to="/search"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                  isActive('/search')
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400'
-                }`}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  window.dispatchEvent(new CustomEvent('openCommandPalette'));
+                }}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 transition-colors w-full"
               >
                 <Search className="w-5 h-5" />
                 <span>Search</span>
-              </Link>
+              </button>
               <Link
                 to="/rankings"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
                   isActive('/rankings')
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400'
+                    ? 'bg-neutral-100 text-neutral-900'
+                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
                 }`}
               >
                 <Trophy className="w-5 h-5" />
@@ -365,8 +363,8 @@ export default function Header() {
               </Link>
 
               {/* Features grid */}
-              <div className="mt-3 pt-3 border-t border-gray-800">
-                <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest px-1 mb-2">Features</p>
+              <div className="mt-3 pt-3 border-t border-neutral-200">
+                <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest px-1 mb-2">Features</p>
                 <div className="grid grid-cols-2 gap-1.5">
                   {moreLinks.map(link => {
                     const Icon = link.icon;
@@ -378,17 +376,17 @@ export default function Header() {
                         onClick={() => setMobileMenuOpen(false)}
                         className={`flex items-center gap-2.5 p-3 rounded-xl border transition-all duration-200 ${
                           active
-                            ? 'bg-gray-800 border-gray-600'
-                            : 'bg-gray-800/40 border-gray-800'
+                            ? 'bg-neutral-50 border-neutral-300'
+                            : 'bg-white border-transparent hover:bg-neutral-50 hover:border-neutral-200'
                         }`}
                       >
                         <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${link.gradient} flex items-center justify-center flex-shrink-0`}>
                           <Icon className="w-4 h-4 text-white" />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-gray-100 text-sm leading-tight truncate">{link.label}</p>
+                          <p className="font-semibold text-neutral-900 text-sm leading-tight truncate">{link.label}</p>
                           {link.badge && (
-                            <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 leading-none">
+                            <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200 leading-none">
                               {link.badge}
                             </span>
                           )}
@@ -400,16 +398,16 @@ export default function Header() {
               </div>
 
               {/* Mobile Auth */}
-              <div className="mt-4 pt-4 border-t border-gray-800">
+              <div className="mt-4 pt-4 border-t border-neutral-200">
                 {isAuthenticated ? (
                   <>
                     <div className="px-4 py-2">
-                      <p className="text-xs text-gray-300 truncate">{user?.email}</p>
+                      <p className="text-xs text-neutral-500 truncate">{user?.email}</p>
                     </div>
                     <Link
                       to="/account"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 transition-colors"
                     >
                       <Settings className="w-5 h-5" />
                       Account Settings
@@ -419,7 +417,7 @@ export default function Header() {
                         signOut();
                         setMobileMenuOpen(false);
                       }}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-800 hover:text-red-400 transition-colors w-full"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-neutral-700 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
                     >
                       <LogOut className="w-5 h-5" />
                       Sign Out
@@ -431,10 +429,9 @@ export default function Header() {
                       setAuthPanelOpen(true);
                       setMobileMenuOpen(false);
                     }}
-                    className="flex items-center justify-center gap-2 py-3 px-6 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-500 transition-colors w-full"
+                    className="flex items-center justify-center gap-2 py-3 px-6 bg-neutral-900 text-white rounded-xl font-semibold hover:bg-neutral-800 transition-colors w-full"
                   >
-                    <User className="w-5 h-5" />
-                    Sign Up / Sign In
+                    Sign in
                   </button>
                 )}
               </div>

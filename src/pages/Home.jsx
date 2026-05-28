@@ -1,11 +1,13 @@
-import { Link } from 'react-router-dom';
-import { Search, Youtube, Twitch, BarChart3, ArrowRight, Clock, Calculator, X, Scale, TrendingUp, Trophy } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  Search, ArrowRight, ArrowUpRight, Calculator, Scale, TrendingUp, Trophy,
+  Youtube, Twitch, BarChart3, BookOpen, Sparkles, Zap, LineChart, Star,
+} from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
 import { Music } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../components/SEO';
 import { getAllPosts } from '../services/blogService';
@@ -14,78 +16,51 @@ import { supabase } from '../lib/supabase';
 import { formatNumber } from '../lib/utils';
 import CreatorAvatar from '../components/CreatorAvatar';
 import CountUp from '../components/CountUp';
+import Sparkline from '../components/Sparkline';
 
-const TRENDING_PLATFORMS = [
-  { id: 'youtube', name: 'YouTube', icon: Youtube, iconBg: 'bg-red-600', growthLabel: 'views' },
-  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, iconBg: 'bg-gray-900 border border-gray-700', growthLabel: 'followers' },
-  { id: 'twitch', name: 'Twitch', icon: Twitch, iconBg: 'bg-purple-600', growthLabel: 'watch hrs' },
+const PLATFORMS = [
+  { id: 'youtube', name: 'YouTube', Icon: Youtube,     accent: '#ef4444' },
+  { id: 'tiktok',  name: 'TikTok',  Icon: TikTokIcon,  accent: '#ec4899' },
+  { id: 'twitch',  name: 'Twitch',  Icon: Twitch,      accent: '#a855f7' },
+  { id: 'kick',    name: 'Kick',    Icon: KickIcon,    accent: '#22c55e' },
+  { id: 'bluesky', name: 'Bluesky', Icon: BlueskyIcon, accent: '#0ea5e9' },
+  { id: 'music',   name: 'Music',   Icon: Music,       accent: '#f59e0b' },
 ];
 
-const platforms = [
-  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600', bgColor: 'bg-red-950/30', textColor: 'text-red-600', ringColor: 'ring-red-800', stats: '72M+ channels', available: true },
-  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'from-pink-500 to-pink-600', bgColor: 'bg-pink-950/30', textColor: 'text-pink-400', ringColor: 'ring-pink-800', stats: '1B+ accounts', available: true },
-  { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-950/30', textColor: 'text-purple-600', ringColor: 'ring-purple-800', stats: '7M+ channels', available: true },
-  { id: 'kick', name: 'Kick', icon: KickIcon, color: 'from-green-500 to-green-600', bgColor: 'bg-green-950/30', textColor: 'text-green-600', ringColor: 'ring-green-800', stats: '10M+ channels', available: true },
-  { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, color: 'from-sky-500 to-sky-600', bgColor: 'bg-sky-950/30', textColor: 'text-sky-400', ringColor: 'ring-sky-800', stats: '40M+ accounts', available: true },
-  { id: 'music', name: 'Music', icon: Music, color: 'from-amber-500 to-orange-500', bgColor: 'bg-amber-950/30', textColor: 'text-amber-400', ringColor: 'ring-amber-800', stats: '10M+ artists', available: true },
-];
-
-const typewriterWords = [
-  { text: 'YouTube Creator', color: 'text-red-500' },
-  { text: 'TikTok Star', color: 'text-pink-400' },
-  { text: 'Twitch Streamer', color: 'text-purple-600' },
-  { text: 'Kick Channel', color: 'text-green-500' },
-  { text: 'Bluesky Creator', color: 'text-sky-400' },
-  { text: 'Music Artist', color: 'text-amber-400' },
-];
+const HEADLINE_ROTATIONS = ['YouTuber', 'TikToker', 'Streamer', 'Artist', 'Creator'];
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [latestPosts, setLatestPosts] = useState([]);
-  const [topMovers, setTopMovers] = useState([]);
-  const [liveStats, setLiveStats] = useState({ creators: null, dataPoints: null, lastUpdate: null });
+  const [topCreators, setTopCreators] = useState([]);
+  const [liveStats, setLiveStats] = useState({ creators: null, dataPoints: null });
+  const [wordIndex, setWordIndex] = useState(0);
   const navigate = useNavigate();
 
-  // Rotating accent word — replaces the typewriter that kept cutting off mid-word.
-  // AnimatePresence handles the fade-in/out, no per-character animation needed.
-  const [wordIndex, setWordIndex] = useState(0);
+  // Rotating headline word
   useEffect(() => {
-    const id = setInterval(() => {
-      setWordIndex((i) => (i + 1) % typewriterWords.length);
-    }, 2400);
+    const id = setInterval(() => setWordIndex((i) => (i + 1) % HEADLINE_ROTATIONS.length), 2400);
     return () => clearInterval(id);
   }, []);
 
-  // Load real live counts to power the hero ticker
+  // Live counts from DB
   useEffect(() => {
     Promise.all([
       supabase.from('creators').select('*', { count: 'exact', head: true }).then(r => r.count),
       supabase.from('creator_stats').select('*', { count: 'exact', head: true }).then(r => r.count),
-      supabase.from('creator_stats')
-        .select('recorded_at')
-        .order('recorded_at', { ascending: false })
-        .limit(1)
-        .then(r => r.data?.[0]?.recorded_at || null),
-    ]).then(([creators, dataPoints, lastUpdate]) => {
-      setLiveStats({ creators: creators || 0, dataPoints: dataPoints || 0, lastUpdate });
+    ]).then(([creators, dataPoints]) => {
+      setLiveStats({ creators: creators || 0, dataPoints: dataPoints || 0 });
     }).catch(() => {});
   }, []);
 
+  // Top creators preview — for the hero product mock + below-fold leaderboard
   useEffect(() => {
-    getAllPosts().then(posts => setLatestPosts(posts.slice(0, 3)));
+    getRankedCreators('youtube', 'subscribers', 5).then(setTopCreators).catch(() => {});
   }, []);
 
+  // Latest blog posts
   useEffect(() => {
-    Promise.all(
-      TRENDING_PLATFORMS.map(platform =>
-        getRankedCreators(platform.id, 'growth', 2).then(creators =>
-          (creators || [])
-            .filter(c => c.growth30d > 0)
-            .slice(0, 2)
-            .map(c => ({ creator: c, platform }))
-        )
-      )
-    ).then(results => setTopMovers(results.flat()));
+    getAllPosts().then(posts => setLatestPosts(posts.slice(0, 3))).catch(() => {});
   }, []);
 
   const handleSearch = (e) => {
@@ -99,8 +74,8 @@ export default function Home() {
     <>
       <SEO
         title="Home"
-        description="Track YouTube, TikTok, Twitch, and Kick statistics. View subscriber counts, follower growth, earnings estimates, rankings and analytics for your favorite creators."
-        keywords="youtube statistics, tiktok statistics, twitch statistics, kick statistics, subscriber count, follower count, creator analytics, earnings calculator"
+        description="Creator analytics across YouTube, TikTok, Twitch, Kick, Bluesky, and Music. Real-time subscriber counts, follower growth, earnings estimates, and rankings — updated daily."
+        keywords="youtube statistics, tiktok statistics, twitch statistics, kick statistics, subscriber count, follower count, creator analytics"
       />
       <script
         type="application/ld+json"
@@ -110,451 +85,472 @@ export default function Home() {
             '@type': 'WebSite',
             name: 'ShinyPull',
             url: 'https://shinypull.com',
-            description: 'Social media analytics platform tracking subscriber counts, follower growth, and creator statistics across YouTube, TikTok, Twitch, Kick, Bluesky, and Music.',
             potentialAction: {
               '@type': 'SearchAction',
-              target: {
-                '@type': 'EntryPoint',
-                urlTemplate: 'https://shinypull.com/search?q={search_term_string}',
-              },
+              target: { '@type': 'EntryPoint', urlTemplate: 'https://shinypull.com/search?q={search_term_string}' },
               'query-input': 'required name=search_term_string',
             },
           }).replace(/<\/script>/gi, '<\\/script>'),
         }}
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-gray-900/80 to-[#0a0a0f]">
-          {/* Subtle dot pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-[size:24px_24px] opacity-50"></div>
+      <main className="bg-[#fafafa] text-neutral-900">
 
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-16 sm:pb-24">
-            <div className="text-center max-w-4xl mx-auto">
-              {/* Platform chips - 3+2 on mobile, single row on desktop */}
-              <div className="mb-8 sm:mb-10">
-                {/* Mobile: row 1 — YouTube, TikTok, Twitch */}
-                <div className="flex sm:hidden items-center justify-center gap-2 mb-2">
-                  {platforms.slice(0, 3).map((platform) => {
-                    const Icon = platform.icon;
-                    return (
-                      <Link
-                        key={platform.id}
-                        to={`/search?platform=${platform.id}`}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 ${platform.bgColor} rounded-full hover:ring-2 ${platform.ringColor} transition-all duration-200`}
-                      >
-                        <Icon className={`w-4 h-4 ${platform.textColor}`} />
-                        <span className={`text-xs font-semibold ${platform.textColor}`}>{platform.name}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-                {/* Mobile: row 2 — Kick, Bluesky */}
-                <div className="flex sm:hidden items-center justify-center gap-3">
-                  {platforms.slice(3).map((platform) => {
-                    const Icon = platform.icon;
-                    return (
-                      <Link
-                        key={platform.id}
-                        to={`/search?platform=${platform.id}`}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 ${platform.bgColor} rounded-full hover:ring-2 ${platform.ringColor} transition-all duration-200`}
-                      >
-                        <Icon className={`w-4 h-4 ${platform.textColor}`} />
-                        <span className={`text-xs font-semibold ${platform.textColor}`}>{platform.name}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-                {/* Desktop: single row */}
-                <div className="hidden sm:flex items-center justify-center gap-3">
-                  {platforms.map((platform) => {
-                    const Icon = platform.icon;
-                    return (
-                      <Link
-                        key={platform.id}
-                        to={`/search?platform=${platform.id}`}
-                        className={`flex items-center gap-2 px-4 py-2 ${platform.bgColor} rounded-full hover:ring-2 ${platform.ringColor} transition-all duration-200`}
-                      >
-                        <Icon className={`w-4 h-4 ${platform.textColor}`} />
-                        <span className={`text-sm font-semibold ${platform.textColor}`}>{platform.name}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Rotating accent heading — never cuts mid-word */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-100 mb-5 sm:mb-6 tracking-tight leading-tight">
-                <span className="block">Find any</span>
-                <span className="relative block min-h-[1.25em] overflow-hidden">
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={wordIndex}
-                      initial={{ y: '40%', opacity: 0 }}
-                      animate={{ y: '0%', opacity: 1 }}
-                      exit={{ y: '-40%', opacity: 0 }}
-                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                      className={`inline-block ${typewriterWords[wordIndex].color}`}
-                    >
-                      {typewriterWords[wordIndex].text}
-                    </motion.span>
-                  </AnimatePresence>
-                </span>
-              </h1>
-
-              <p className="text-base sm:text-lg lg:text-xl text-gray-300 mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed">
-                Real-time stats, growth tracking, and analytics across every major platform.
-              </p>
-
-              {/* Search Bar - Glowing on focus */}
-              <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-6 px-4">
-                <div className="space-y-3">
-                  <div className="relative group">
-                    {/* Glow effect */}
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-0 group-focus-within:opacity-20 blur-lg transition-all duration-500"></div>
-                    <div className="relative flex items-center bg-gray-900 rounded-2xl shadow-lg shadow-black/20 border border-gray-700 group-focus-within:border-indigo-500 group-focus-within:shadow-indigo-500/20 transition-all duration-300">
-                      <Search className="absolute left-5 w-5 h-5 text-gray-300" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search for a creator (e.g., MrBeast, Ninja)"
-                        className="w-full pl-14 pr-12 py-4 sm:py-5 bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none text-base sm:text-lg rounded-2xl"
-                      />
-                      {searchQuery && (
-                        <button
-                          type="button"
-                          onClick={() => setSearchQuery('')}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-gray-300 transition-colors"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full sm:w-auto sm:min-w-[200px] sm:mx-auto sm:block px-8 py-3.5 sm:py-4 text-base sm:text-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-                  >
-                    Search
-                  </button>
-                </div>
-              </form>
-
-              <div className="flex items-center justify-center mt-1 mb-1">
-                <Link
-                  to="/rankings"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-400/80 hover:text-amber-300 transition-colors"
-                >
-                  <Trophy className="w-3.5 h-3.5" />
-                  Browse top rankings
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-
-              {/* Live data ticker — real counts from the DB, animated count-up */}
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-3 px-4">
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                  </span>
-                  <span className="text-sm text-gray-300 tabular-nums">
-                    <CountUp value={liveStats.creators ?? 0} className="font-bold text-gray-100" />
-                    {' '}<span className="text-gray-500">creators tracked</span>
-                  </span>
-                </div>
-                <span className="hidden sm:block w-px h-4 bg-gray-700" />
-                <span className="text-sm text-gray-300 tabular-nums">
-                  <CountUp value={liveStats.dataPoints ?? 0} className="font-bold text-gray-100" />
-                  {' '}<span className="text-gray-500">data points</span>
-                </span>
-                <span className="hidden sm:block w-px h-4 bg-gray-700" />
-                <Link to="/methodology" className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
-                  How we collect data
-                </Link>
-              </div>
-            </div>
+        {/* ============== HERO ============== */}
+        <section className="relative overflow-hidden border-b border-neutral-200">
+          {/* Soft mesh gradient */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute -top-32 -left-32 w-[40rem] h-[40rem] rounded-full bg-indigo-100/60 blur-3xl" />
+            <div className="absolute -top-20 right-0 w-[30rem] h-[30rem] rounded-full bg-purple-100/40 blur-3xl" />
+            <div className="absolute bottom-0 left-1/3 w-[30rem] h-[30rem] rounded-full bg-amber-50/60 blur-3xl" />
           </div>
-        </section>
 
-        {/* Features Section */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-[#0a0a0f]">
-          <div className="max-w-6xl mx-auto">
-            {/* Section header */}
-            <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100">Everything you need to track creators</h2>
-              <p className="mt-3 text-gray-400 text-base sm:text-lg">Real data. No guessing. Updated daily.</p>
-            </div>
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-12 sm:pb-20">
 
-            <div className="grid md:grid-cols-3 gap-5 sm:gap-6">
-              {/* Card 1 — Rankings */}
-              <Link
-                to="/rankings"
-                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-amber-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-amber-500/10"
-              >
-                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-colors duration-500" />
-                <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">01</span>
-
-                <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-amber-500/30 group-hover:scale-105 transition-transform duration-300">
-                    <Trophy className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-100 mb-2">Top Rankings</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-6">See who's at the top and who's growing fastest. Leaderboards updated daily across every platform.</p>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-400 group-hover:gap-3 transition-all duration-200">
-                    View rankings <ArrowRight className="w-4 h-4" />
-                  </span>
-                </div>
-              </Link>
-
-              {/* Card 2 — Search */}
-              <Link
-                to="/search"
-                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-sky-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-sky-500/10"
-              >
-                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-sky-500/10 rounded-full blur-3xl group-hover:bg-sky-500/20 transition-colors duration-500" />
-                <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">02</span>
-
-                <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-sky-500 to-cyan-600 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-sky-500/30 group-hover:scale-105 transition-transform duration-300">
-                    <Search className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-100 mb-2">Find Any Creator</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-6">Search across YouTube, TikTok, Twitch, Kick, and Bluesky. Real profiles with live stats.</p>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-sky-400 group-hover:gap-3 transition-all duration-200">
-                    Search now <ArrowRight className="w-4 h-4" />
-                  </span>
-                </div>
-              </Link>
-
-              {/* Card 3 — Compare */}
-              <Link
-                to="/compare"
-                className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-violet-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-violet-500/10"
-              >
-                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-violet-500/10 rounded-full blur-3xl group-hover:bg-violet-500/20 transition-colors duration-500" />
-                <span className="absolute top-6 right-7 text-3xl font-black text-gray-800 select-none group-hover:text-gray-700 transition-colors">03</span>
-
-                <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-violet-600 to-purple-700 rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-violet-500/30 group-hover:scale-105 transition-transform duration-300">
-                    <Scale className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-100 mb-2">Compare Creators</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-6">Put any creators head to head. Subscribers, views, and growth. All in one chart.</p>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-400 group-hover:gap-3 transition-all duration-200">
-                    Compare now <ArrowRight className="w-4 h-4" />
-                  </span>
-                </div>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Calculator Promo */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-[#0a0a0f]">
-          <div className="max-w-6xl mx-auto">
-            <Link
-              to="/youtube/money-calculator"
-              className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-emerald-500/50 rounded-2xl p-7 sm:p-10 flex flex-col sm:flex-row items-start gap-6 sm:gap-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10"
+            {/* Eyebrow badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex justify-center mb-7"
             >
-              {/* Glow blobs */}
-              <div className="pointer-events-none absolute -top-16 -left-16 w-56 h-56 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors duration-500" />
-              <div className="pointer-events-none absolute -bottom-16 -right-16 w-56 h-56 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/15 transition-colors duration-500" />
-
-              {/* Ghost label — bottom right, away from content */}
-              <span className="pointer-events-none absolute bottom-5 right-7 text-6xl sm:text-8xl font-black text-gray-800 select-none leading-none group-hover:text-gray-700 transition-colors">$$$</span>
-
-              {/* Icon box */}
-              <div className="relative flex-shrink-0 w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-300">
-                <Calculator className="w-8 h-8 text-white" />
-              </div>
-
-              {/* Text + CTA */}
-              <div className="relative flex-1 min-w-0">
-                <p className="text-emerald-400 text-xs font-semibold uppercase tracking-widest mb-1">Free Tool</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-2">YouTube Money Calculator</h2>
-                <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-lg mb-6">
-                  Estimate how much any YouTuber earns from their videos. Enter a channel and get a real earnings range based on view counts and CPM data.
-                </p>
-                <span className="inline-flex items-center gap-2.5 px-6 py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold rounded-xl group-hover:bg-emerald-500/20 group-hover:border-emerald-500/50 group-hover:gap-4 transition-all duration-200 whitespace-nowrap">
-                  <Calculator className="w-5 h-5" />
-                  Try Calculator
-                  <ArrowRight className="w-4 h-4" />
-                </span>
-              </div>
-            </Link>
-          </div>
-        </section>
-
-
-        {/* Trending This Month */}
-        {topMovers.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-gray-900/30">
-            <div className="max-w-6xl mx-auto">
-              <div className="flex items-end justify-between mb-10">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-emerald-400">30-Day Growth</span>
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100">Trending This Month</h2>
-                  <p className="mt-2 text-gray-400 text-base">Fastest growing creators right now.</p>
-                </div>
-                <Link
-                  to="/trending"
-                  className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400 hover:gap-3 transition-all duration-200"
-                >
-                  See all <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                {topMovers.map(({ creator, platform }) => {
-                  const PlatIcon = platform.icon;
-                  return (
-                    <Link
-                      key={`${platform.id}-${creator.id}`}
-                      to={`/${platform.id}/${creator.username}`}
-                      className="group flex items-center gap-3 p-4 bg-gray-900 border border-gray-800 hover:border-emerald-500/40 rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/5"
-                    >
-                      <div className="relative flex-shrink-0">
-                        <CreatorAvatar
-                          src={creator.profile_image}
-                          name={creator.display_name}
-                          size="lg"
-                          className="!w-11 !h-11"
-                        />
-                        <div className={`absolute -bottom-1 -right-1 w-5 h-5 ${platform.iconBg} rounded-full flex items-center justify-center`}>
-                          <PlatIcon className="w-3 h-3 text-white" />
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-100 truncate text-sm group-hover:text-white">{creator.display_name}</p>
-                        <p className="text-xs text-emerald-400 font-medium mt-0.5">+{formatNumber(creator.growth30d)} <span className="text-gray-500">{platform.growthLabel}</span></p>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-
               <Link
-                to="/trending"
-                className="mt-6 flex sm:hidden items-center justify-center gap-2 text-emerald-400 font-medium hover:gap-4 transition-all"
+                to="/promote"
+                className="group inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-neutral-200 rounded-full text-xs font-medium text-neutral-600 hover:border-neutral-300 hover:bg-white shadow-sm transition-all"
               >
-                See all trending <ArrowRight className="w-4 h-4" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span><span className="font-semibold text-neutral-900">Featured Listings</span> are live</span>
+                <ArrowRight className="w-3 h-3 text-neutral-400 group-hover:translate-x-0.5 transition-transform" />
               </Link>
-            </div>
-          </section>
-        )}
+            </motion.div>
 
-        {/* Latest Blog Posts */}
-        {latestPosts.length > 0 && (
-          <section className="w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-[#0a0a0f]">
-            <div className="max-w-6xl mx-auto">
-              {/* Section header */}
-              <div className="flex items-end justify-between mb-12 sm:mb-16">
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100">Latest from the Blog</h2>
-                  <p className="mt-3 text-gray-400 text-base sm:text-lg">Tips, guides, and insights for creators</p>
-                </div>
-                <Link
-                  to="/blog"
-                  className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-400 hover:gap-3 transition-all duration-200"
+            {/* Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.05 }}
+              className="text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] max-w-4xl mx-auto"
+            >
+              Analytics for every{' '}
+              <span className="relative inline-block">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={wordIndex}
+                    initial={{ opacity: 0, y: '30%' }}
+                    animate={{ opacity: 1, y: '0%' }}
+                    exit={{ opacity: 0, y: '-30%' }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    className="inline-block bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 bg-clip-text text-transparent"
+                  >
+                    {HEADLINE_ROTATIONS[wordIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="mt-6 max-w-2xl mx-auto text-center text-base sm:text-lg text-neutral-600 leading-relaxed"
+            >
+              Live subscriber and follower counts, 30-day growth trends, and earnings estimates across YouTube, TikTok, Twitch, Kick, Bluesky, and Music. Updated daily. Free to use.
+            </motion.p>
+
+            {/* Search */}
+            <motion.form
+              onSubmit={handleSearch}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+              className="mt-9 max-w-xl mx-auto"
+            >
+              <div className="relative flex items-center bg-white rounded-2xl border border-neutral-200 shadow-sm focus-within:border-neutral-400 focus-within:shadow-md transition-all duration-200 overflow-hidden">
+                <Search className="absolute left-4 w-5 h-5 text-neutral-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search any creator: MrBeast, Ninja, Charli D'Amelio..."
+                  className="w-full pl-12 pr-32 py-4 bg-transparent text-neutral-900 placeholder-neutral-400 focus:outline-none text-base"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-1.5 inline-flex items-center gap-1.5 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white text-sm font-semibold rounded-xl transition-colors"
                 >
-                  View all <ArrowRight className="w-4 h-4" />
-                </Link>
+                  Search
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-5 sm:gap-6">
-                {latestPosts.map((post, index) => (
-                  <Link
-                    key={post.slug}
-                    to={`/blog/${post.slug}`}
-                    className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-indigo-500/60 rounded-2xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-indigo-500/10 flex flex-col"
+              {/* Quick chips below input */}
+              <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
+                <span className="text-xs text-neutral-500">Try:</span>
+                {['mrbeast', 'ninja', 'pewdiepie', 'kaicenat', 'taylor-swift'].map((q) => (
+                  <button
+                    key={q}
+                    type="button"
+                    onClick={() => navigate(`/search?q=${encodeURIComponent(q)}`)}
+                    className="text-xs font-medium text-neutral-600 hover:text-indigo-600 bg-white border border-neutral-200 hover:border-indigo-300 rounded-full px-2.5 py-1 transition-all"
                   >
-                    {/* Glow blob */}
-                    <div className="pointer-events-none absolute -bottom-10 -right-10 w-36 h-36 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
-
-                    {/* Image */}
-                    <div className="overflow-hidden flex-shrink-0">
-                      <img
-                        src={post.image}
-                        alt={post.title}
-                        loading="lazy"
-                        className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-
-                    {/* Content */}
-                    <div className="relative p-6 flex flex-col flex-1">
-                      <span className="inline-block px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-full mb-3 self-start">
-                        {post.category}
-                      </span>
-                      <h3 className="text-lg font-bold text-gray-100 mb-2 line-clamp-2 group-hover:text-indigo-300 transition-colors duration-200">
-                        {post.title}
-                      </h3>
-                      <p className="text-gray-400 text-sm leading-relaxed mb-5 line-clamp-2 flex-1">
-                        {post.description}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                          <Clock className="w-3.5 h-3.5" />
-                          {post.read_time}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-400 group-hover:gap-3 transition-all duration-200">
-                          Read more <ArrowRight className="w-4 h-4" />
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
+                    {q}
+                  </button>
                 ))}
               </div>
+            </motion.form>
 
-              <Link
-                to="/blog"
-                className="mt-8 flex sm:hidden items-center justify-center gap-2 text-indigo-400 font-medium hover:gap-4 transition-all"
-              >
-                View all posts <ArrowRight className="w-4 h-4" />
+            {/* Platform marquee */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-12 flex items-center justify-center gap-8 sm:gap-12 flex-wrap"
+            >
+              <span className="text-xs uppercase tracking-widest text-neutral-400 font-semibold">Tracking</span>
+              {PLATFORMS.map(({ id, name, Icon, accent }) => (
+                <Link
+                  key={id}
+                  to={`/rankings/${id}`}
+                  className="group flex items-center gap-1.5 text-sm font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
+                >
+                  <Icon className="w-4 h-4 transition-colors" style={{ color: accent }} />
+                  {name}
+                </Link>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ============== PRODUCT PREVIEW ============== */}
+        <section className="relative -mt-4 mb-16 sm:mb-24">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-10%' }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="relative rounded-2xl bg-white border border-neutral-200 shadow-xl shadow-neutral-200/60 overflow-hidden"
+            >
+              {/* Mock browser chrome */}
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-200 bg-neutral-50">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                </div>
+                <div className="flex-1 max-w-md mx-auto bg-white border border-neutral-200 rounded-md px-3 py-1 text-[11px] text-neutral-500 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  shinypull.com/rankings/youtube
+                </div>
+                <div className="w-12" />
+              </div>
+
+              {/* Mock rankings table */}
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-amber-500" />
+                    <h3 className="text-sm font-bold text-neutral-900">Top YouTubers</h3>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 border border-emerald-200 rounded text-[10px] font-semibold text-emerald-700">
+                      <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                      LIVE
+                    </span>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">Updated 2 min ago</span>
+                </div>
+
+                <div className="space-y-1">
+                  {(topCreators.length > 0 ? topCreators : Array(5).fill(null)).slice(0, 5).map((creator, i) => (
+                    <div key={creator?.id || i} className="grid grid-cols-[28px_1fr_auto_auto] sm:grid-cols-[28px_1fr_100px_70px] items-center gap-3 sm:gap-4 px-3 py-2.5 rounded-lg hover:bg-neutral-50 transition-colors">
+                      <span className={`w-6 h-6 inline-flex items-center justify-center rounded text-xs font-bold ${
+                        i === 0 ? 'bg-amber-100 text-amber-700' :
+                        i === 1 ? 'bg-neutral-100 text-neutral-600' :
+                        i === 2 ? 'bg-orange-100 text-orange-700' :
+                        'bg-neutral-50 text-neutral-400'
+                      }`}>
+                        {i + 1}
+                      </span>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <CreatorAvatar src={creator?.profile_image} name={creator?.display_name || '?'} size="sm" />
+                        <p className="text-sm font-semibold text-neutral-900 truncate">
+                          {creator?.display_name || (i === 0 ? 'MrBeast' : i === 1 ? 'T-Series' : i === 2 ? 'Cocomelon' : i === 3 ? 'SET India' : 'Vlad and Niki')}
+                        </p>
+                      </div>
+                      <div className="hidden sm:flex items-center justify-end">
+                        <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20]} width={80} height={20} trend="up" />
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-neutral-900 tabular-nums">
+                          {creator?.subscribers ? formatNumber(creator.subscribers) : '—'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Link
+                  to="/rankings/youtube"
+                  className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:gap-2 transition-all"
+                >
+                  See full rankings <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Live stats strip under preview */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mt-6 grid grid-cols-3 max-w-3xl mx-auto bg-white border border-neutral-200 rounded-xl overflow-hidden"
+            >
+              {[
+                { label: 'Creators tracked',  value: liveStats.creators ?? 0 },
+                { label: 'Daily data points', value: liveStats.dataPoints ?? 0 },
+                { label: 'Platforms',         value: 6 },
+              ].map((s, i) => (
+                <div key={s.label} className={`p-4 sm:p-5 text-center ${i !== 2 ? 'border-r border-neutral-200' : ''}`}>
+                  <p className="text-xl sm:text-2xl font-extrabold text-neutral-900 tabular-nums">
+                    <CountUp value={s.value} />
+                  </p>
+                  <p className="text-[11px] sm:text-xs text-neutral-500 mt-0.5 uppercase tracking-wider">{s.label}</p>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ============== FEATURES ============== */}
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-12 sm:mb-14"
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest text-indigo-600 mb-3">What you can do</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-900">
+              Track creators like a pro
+            </h2>
+            <p className="mt-4 text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto">
+              Everything you need to follow the creator economy. No paywalls. Just data.
+            </p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {[
+              {
+                Icon: Trophy,
+                title: 'Live Rankings',
+                body: 'See the top creators on each platform updated daily. Sort by followers, views, or fastest growing.',
+                to: '/rankings',
+                accent: 'amber',
+              },
+              {
+                Icon: Search,
+                title: 'Universal Search',
+                body: 'Look up any creator across six platforms with one search. Hit ⌘K from anywhere.',
+                to: '/search',
+                accent: 'indigo',
+              },
+              {
+                Icon: Scale,
+                title: 'Head-to-Head Compare',
+                body: 'Stack creators side-by-side. Subscribers, views, watch hours, growth rates, all at once.',
+                to: '/compare',
+                accent: 'violet',
+              },
+              {
+                Icon: TrendingUp,
+                title: 'Trending This Month',
+                body: 'The fastest-growing creators across every platform. Catch trends before they peak.',
+                to: '/trending',
+                accent: 'emerald',
+              },
+              {
+                Icon: Calculator,
+                title: 'Earnings Estimator',
+                body: 'Estimate any YouTuber\'s ad revenue based on view counts and average CPM ranges.',
+                to: '/youtube/money-calculator',
+                accent: 'green',
+              },
+              {
+                Icon: LineChart,
+                title: 'Daily Growth History',
+                body: 'Look back at how a creator has grown over weeks and months. Charts, deltas, milestones.',
+                to: '/youtube/mrbeast',
+                accent: 'sky',
+              },
+            ].map((feat, i) => {
+              const colorMap = {
+                amber:    'bg-amber-50 text-amber-600 border-amber-200',
+                indigo:   'bg-indigo-50 text-indigo-600 border-indigo-200',
+                violet:   'bg-violet-50 text-violet-600 border-violet-200',
+                emerald:  'bg-emerald-50 text-emerald-600 border-emerald-200',
+                green:    'bg-green-50 text-green-600 border-green-200',
+                sky:      'bg-sky-50 text-sky-600 border-sky-200',
+              };
+              return (
+                <motion.div
+                  key={feat.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-10%' }}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
+                >
+                  <Link
+                    to={feat.to}
+                    className="group block h-full bg-white border border-neutral-200 rounded-2xl p-6 hover:border-neutral-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                  >
+                    <div className={`w-11 h-11 rounded-xl border ${colorMap[feat.accent]} flex items-center justify-center mb-5`}>
+                      <feat.Icon className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-lg font-bold text-neutral-900 mb-2">{feat.title}</h3>
+                    <p className="text-sm text-neutral-600 leading-relaxed mb-4">{feat.body}</p>
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-neutral-900 group-hover:gap-2 transition-all">
+                      Open
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </span>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ============== B2B CTA STRIP ============== */}
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={{ duration: 0.5 }}
+            className="relative overflow-hidden rounded-2xl bg-neutral-900 text-white p-8 sm:p-12"
+          >
+            {/* Subtle radial accent */}
+            <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
+
+            <div className="relative grid lg:grid-cols-2 gap-8 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-amber-400/15 border border-amber-400/30 rounded-full text-[11px] font-semibold uppercase tracking-wider text-amber-300 mb-5">
+                  <Sparkles className="w-3 h-3" />
+                  Featured Listings
+                </div>
+                <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+                  Get your creator in the rankings.
+                </h3>
+                <p className="text-base text-neutral-300 max-w-md leading-relaxed">
+                  Sponsored placements inside our live rankings tables. $49/mo for Basic, $149/mo for top-of-page Premium slots. Cancel anytime.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:items-end">
+                <Link
+                  to="/promote"
+                  className="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-white hover:bg-neutral-100 text-neutral-900 font-bold rounded-xl transition-all duration-200 shadow-lg hover:-translate-y-0.5"
+                >
+                  See plans
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/rankings"
+                  className="inline-flex items-center justify-center gap-1.5 px-6 py-3 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold rounded-xl transition-all duration-200"
+                >
+                  See live rankings
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ============== BLOG TEASER ============== */}
+        {latestPosts.length > 0 && (
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
+            <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-indigo-600 mb-2">From the blog</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-neutral-900">Latest in creator economy</h2>
+              </div>
+              <Link to="/blog" className="inline-flex items-center gap-1 text-sm font-semibold text-neutral-900 hover:gap-2 transition-all">
+                View all <ArrowRight className="w-4 h-4" />
               </Link>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-5">
+              {latestPosts.map((post, i) => (
+                <motion.div
+                  key={post.slug}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
+                >
+                  <Link
+                    to={`/blog/${post.slug}`}
+                    className="group block bg-white border border-neutral-200 rounded-2xl overflow-hidden hover:border-neutral-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                  >
+                    {post.image && (
+                      <div className="aspect-[16/9] overflow-hidden bg-neutral-100">
+                        <img
+                          src={post.image}
+                          alt={post.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                    )}
+                    <div className="p-5">
+                      {post.category && (
+                        <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-full mb-3">
+                          {post.category}
+                        </span>
+                      )}
+                      <h3 className="text-base font-bold text-neutral-900 mb-1.5 leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-neutral-600 line-clamp-2 leading-relaxed">{post.description}</p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
             </div>
           </section>
         )}
 
-        {/* CTA Section */}
-        <section className="w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-[#0a0a0f]">
-          <div className="max-w-6xl mx-auto">
-            <div className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-indigo-500/40 rounded-2xl p-10 sm:p-14 text-center transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10">
-              {/* Glow blobs */}
-              <div className="pointer-events-none absolute -top-20 -left-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
-              <div className="pointer-events-none absolute -bottom-20 -right-20 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors duration-500" />
-
-              <div className="relative">
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-3">Ready to dive in?</h2>
-                <p className="text-gray-400 mb-8 max-w-lg mx-auto text-base sm:text-lg">
-                  Browse the rankings or search for any creator.
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <Link
-                    to="/rankings"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5"
-                  >
-                    <Trophy className="w-5 h-5" />
-                    Browse Rankings
-                  </Link>
-                  <Link
-                    to="/search"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 text-gray-100 font-semibold rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-200 hover:-translate-y-0.5"
-                  >
-                    <Search className="w-5 h-5" />
-                    Search Creators
-                  </Link>
-                </div>
-              </div>
+        {/* ============== FOOTER CTA ============== */}
+        <section className="border-t border-neutral-200 bg-white">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 mb-3">
+              Start tracking creators in seconds.
+            </h2>
+            <p className="text-base text-neutral-600 max-w-xl mx-auto mb-7">
+              Free. No signup required to browse. Sign in to follow creators, save comparisons, and get growth alerts.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                to="/rankings"
+                className="inline-flex items-center gap-1.5 px-6 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-bold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                Browse rankings
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('openCommandPalette'))}
+                className="inline-flex items-center gap-1.5 px-6 py-3 bg-white hover:bg-neutral-50 border border-neutral-200 hover:border-neutral-300 text-neutral-900 font-semibold rounded-xl transition-all duration-200"
+              >
+                <Search className="w-4 h-4" />
+                Search creators
+                <kbd className="hidden sm:inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-neutral-100 border border-neutral-200 rounded text-neutral-500">
+                  <span className="text-xs leading-none">⌘</span>K
+                </kbd>
+              </button>
             </div>
           </div>
         </section>
-      </div>
+      </main>
     </>
   );
 }
