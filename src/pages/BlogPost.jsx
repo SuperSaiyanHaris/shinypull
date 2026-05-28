@@ -34,7 +34,7 @@ export default function BlogPost() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-800/50 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
       </div>
     );
@@ -42,9 +42,9 @@ export default function BlogPost() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-gray-800/50 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-100 mb-4">Post Not Found</h1>
+          <h1 className="text-2xl font-bold text-neutral-900 mb-4">Post Not Found</h1>
           <Link to="/blog" className="text-indigo-600 hover:text-indigo-300">
             Back to Blog
           </Link>
@@ -94,7 +94,7 @@ export default function BlogPost() {
       <StructuredData schema={blogPostSchema} />
       <StructuredData schema={breadcrumbSchema} />
 
-      <div className="min-h-screen bg-gray-800/50">
+      <div className="min-h-screen bg-neutral-50">
         {(() => {
           const theme = getCategoryTheme(post.category);
           return (
@@ -113,7 +113,7 @@ export default function BlogPost() {
 
               <button
                 onClick={() => navigate('/blog')}
-                className="absolute top-4 left-4 flex items-center gap-2 px-4 py-2 bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg text-white hover:bg-gray-900/80 transition-colors"
+                className="absolute top-4 left-4 flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-white/10 rounded-lg text-white hover:bg-white/80 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Blog
@@ -124,7 +124,7 @@ export default function BlogPost() {
 
         <div className="max-w-4xl mx-auto px-4 -mt-32 relative z-10">
           {/* Article Header */}
-          <article className="bg-gray-900 rounded-2xl border border-gray-800 shadow-lg overflow-hidden">
+          <article className="bg-white rounded-2xl border border-neutral-200 shadow-lg overflow-hidden">
             <div className="p-5 sm:p-8 md:p-12">
               {/* Breadcrumbs */}
               <Breadcrumbs 
@@ -141,12 +141,12 @@ export default function BlogPost() {
               </span>
 
               {/* Title */}
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-100 mb-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
                 {post.title}
               </h1>
 
               {/* Meta */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300 mb-8 pb-8 border-b border-gray-800">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-neutral-700 mb-8 pb-8 border-b border-neutral-200">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   {new Date(post.published_at).toLocaleDateString('en-US', {
@@ -179,7 +179,7 @@ export default function BlogPost() {
           {/* Related Posts */}
           {relatedPosts.length > 0 && (
             <div className="mt-12 mb-12">
-              <h2 className="text-2xl font-bold text-gray-100 mb-6">Related Articles</h2>
+              <h2 className="text-2xl font-bold text-neutral-900 mb-6">Related Articles</h2>
               <div className="grid md:grid-cols-2 gap-6">
                 {relatedPosts.map(related => (
                   <Link
@@ -187,7 +187,7 @@ export default function BlogPost() {
                     to={`/blog/${related.slug}`}
                     className="group"
                   >
-                    <article className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
+                    <article className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
                       <img
                         src={related.image}
                         alt={related.title}
@@ -195,10 +195,10 @@ export default function BlogPost() {
                         className="w-full h-40 object-cover"
                       />
                       <div className="p-6">
-                        <h3 className="font-bold text-gray-100 group-hover:text-indigo-400 transition-colors mb-2">
+                        <h3 className="font-bold text-neutral-900 group-hover:text-indigo-400 transition-colors mb-2">
                           {related.title}
                         </h3>
-                        <p className="text-sm text-gray-300">{related.read_time}</p>
+                        <p className="text-sm text-neutral-700">{related.read_time}</p>
                       </div>
                     </article>
                   </Link>
@@ -215,7 +215,7 @@ export default function BlogPost() {
             </p>
             <Link
               to="/search"
-              className="inline-block px-6 py-2 bg-gray-900 text-indigo-300 font-semibold rounded-lg hover:bg-indigo-950/50 transition-colors"
+              className="inline-block px-6 py-2 bg-white text-indigo-300 font-semibold rounded-lg hover:bg-indigo-950/50 transition-colors"
             >
               Search Creators
             </Link>

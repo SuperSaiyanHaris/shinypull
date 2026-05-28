@@ -68,10 +68,10 @@ export default function ResetPassword() {
 
         <div className="min-h-screen flex items-center justify-center px-4 py-12">
           <div className="max-w-md w-full text-center">
-            <div className="bg-gray-800 rounded-lg p-8 border border-gray-700">
+            <div className="bg-neutral-100 rounded-lg p-8 border border-neutral-300">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h1 className="text-2xl font-bold mb-2">Password Updated!</h1>
-              <p className="text-gray-300 mb-4">
+              <p className="text-neutral-700 mb-4">
                 Your password has been successfully changed. Redirecting you to the home page...
               </p>
             </div>
@@ -92,22 +92,22 @@ export default function ResetPassword() {
         <div className="max-w-md w-full">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">Set New Password</h1>
-            <p className="text-gray-300">
+            <p className="text-neutral-700">
               Enter your new password below
             </p>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-8 border border-gray-700">
+          <div className="bg-neutral-100 rounded-lg p-8 border border-neutral-300">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">New Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-700" />
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg py-3 px-10 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-white border border-neutral-300 rounded-lg py-3 px-10 focus:outline-none focus:border-blue-500"
                     placeholder="••••••••"
                     required
                     minLength={6}
@@ -118,12 +118,12 @@ export default function ResetPassword() {
               <div>
                 <label className="block text-sm font-medium mb-2">Confirm Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-700" />
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg py-3 px-10 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-white border border-neutral-300 rounded-lg py-3 px-10 focus:outline-none focus:border-blue-500"
                     placeholder="••••••••"
                     required
                     minLength={6}

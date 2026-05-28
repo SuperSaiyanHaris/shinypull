@@ -47,9 +47,9 @@ export default function Promote() {
         keywords="creator promotion, sponsored ranking, featured listing, B2B creator marketing, talent promotion, agency tools"
       />
 
-      <div className="min-h-screen bg-[#0a0a0f]">
+      <div className="min-h-screen bg-[#fafafa]">
         {/* Hero */}
-        <section className="relative overflow-hidden border-b border-gray-800/60">
+        <section className="relative overflow-hidden border-b border-neutral-200">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(251,191,36,0.08),transparent_50%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(139,92,246,0.06),transparent_50%)]" />
 
@@ -65,11 +65,11 @@ export default function Promote() {
                 Featured Listings
               </div>
 
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-gray-100 mb-5 tracking-tight leading-[1.1]">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-neutral-900 mb-5 tracking-tight leading-[1.1]">
                 Put your creator in front of <span className="text-amber-400">the people watching the data</span>
               </h1>
 
-              <p className="text-base sm:text-lg lg:text-xl text-gray-400 mb-9 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-lg lg:text-xl text-neutral-500 mb-9 max-w-2xl mx-auto leading-relaxed">
                 Get featured directly in our live rankings across every platform we track. Visibility next to MrBeast, Ninja, Charli D'Amelio. Cancel anytime.
               </p>
 
@@ -84,24 +84,24 @@ export default function Promote() {
                 </Link>
                 <Link
                   to="/rankings"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-200 font-semibold rounded-xl transition-all duration-200"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-white hover:bg-neutral-100 border border-neutral-300 text-neutral-800 font-semibold rounded-xl transition-all duration-200"
                 >
                   See live rankings
                 </Link>
               </div>
 
               {/* Quick stats strip */}
-              <div className="mt-12 grid grid-cols-3 max-w-2xl mx-auto rounded-2xl border border-gray-800 bg-gray-900/40 backdrop-blur-sm overflow-hidden">
+              <div className="mt-12 grid grid-cols-3 max-w-2xl mx-auto rounded-2xl border border-neutral-200 bg-white/60 backdrop-blur-sm overflow-hidden">
                 {[
                   { label: 'Creators tracked', value: stats.creators, format: 'number' },
                   { label: 'Platforms covered', value: 6, format: 'number' },
                   { label: 'Pages per day', value: stats.dailyVisitors, format: 'number' },
                 ].map((s, i) => (
-                  <div key={s.label} className={`p-4 sm:p-6 text-center ${i !== 2 ? 'border-r border-gray-800' : ''}`}>
-                    <p className="text-2xl sm:text-3xl font-extrabold text-gray-100 tabular-nums">
+                  <div key={s.label} className={`p-4 sm:p-6 text-center ${i !== 2 ? 'border-r border-neutral-200' : ''}`}>
+                    <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tabular-nums">
                       <CountUp value={s.value} format={s.format} />{s.label === 'Pages per day' && '+'}
                     </p>
-                    <p className="text-[11px] sm:text-xs text-gray-500 mt-1 uppercase tracking-wider">{s.label}</p>
+                    <p className="text-[11px] sm:text-xs text-neutral-400 mt-1 uppercase tracking-wider">{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -112,8 +112,8 @@ export default function Promote() {
         {/* Pricing tiers */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100">Two ways to get featured</h2>
-            <p className="mt-3 text-gray-400 text-base sm:text-lg">Pick the slot. Pick the platform. Live in minutes.</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900">Two ways to get featured</h2>
+            <p className="mt-3 text-neutral-500 text-base sm:text-lg">Pick the slot. Pick the platform. Live in minutes.</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-5 sm:gap-6 max-w-4xl mx-auto">
@@ -123,15 +123,15 @@ export default function Promote() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="group relative overflow-hidden bg-gray-900 border border-gray-800 hover:border-indigo-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/10"
+              className="group relative overflow-hidden bg-white border border-neutral-200 hover:border-indigo-300 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/10"
             >
               <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
               <div className="relative">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold rounded-full uppercase tracking-wider">Basic</span>
                 </div>
-                <p className="text-4xl font-extrabold text-gray-100 mt-3">$49<span className="text-base font-normal text-gray-500">/mo</span></p>
-                <p className="text-sm text-gray-400 mt-4 mb-6">Placed starting at rank 15, then every 5 rows. Visible on the rankings page anyone hits looking for top creators.</p>
+                <p className="text-4xl font-extrabold text-neutral-900 mt-3">$49<span className="text-base font-normal text-neutral-400">/mo</span></p>
+                <p className="text-sm text-neutral-500 mt-4 mb-6">Placed starting at rank 15, then every 5 rows. Visible on the rankings page anyone hits looking for top creators.</p>
                 <ul className="space-y-2.5 mb-7">
                   {[
                     'Rank 15, 20, 25, 30... on your chosen platform',
@@ -139,7 +139,7 @@ export default function Promote() {
                     'Marked as "Sponsored". Clear and honest.',
                     'Cancel anytime',
                   ].map((feature) => (
-                    <li key={feature} className="flex items-start gap-2.5 text-sm text-gray-300">
+                    <li key={feature} className="flex items-start gap-2.5 text-sm text-neutral-700">
                       <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-indigo-400" />
                       {feature}
                     </li>
@@ -160,16 +160,16 @@ export default function Promote() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="group relative overflow-hidden bg-gradient-to-br from-amber-950/40 via-gray-900 to-gray-900 border border-amber-700/40 hover:border-amber-500/60 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/15"
+              className="group relative overflow-hidden bg-gradient-to-br from-amber-50 to-white border border-amber-200 hover:border-amber-300 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-200/40"
             >
-              <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-amber-500/15 rounded-full blur-3xl group-hover:bg-amber-500/25 transition-colors duration-500" />
+              <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-amber-200/40 rounded-full blur-3xl group-hover:bg-amber-200/60 transition-colors duration-500" />
               <div className="relative">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2 py-0.5 bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold rounded-full uppercase tracking-wider">⭐ Premium</span>
-                  <span className="text-[10px] text-amber-400/80 font-semibold">Only 2 slots / platform</span>
+                  <span className="px-2 py-0.5 bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-bold rounded-full uppercase tracking-wider">⭐ Premium</span>
+                  <span className="text-[10px] text-amber-700/80 font-semibold">Only 2 slots / platform</span>
                 </div>
-                <p className="text-4xl font-extrabold text-gray-100 mt-3">$149<span className="text-base font-normal text-gray-400">/mo</span></p>
-                <p className="text-sm text-gray-300 mt-4 mb-6">Top-of-page placement between ranks 4-5 and 9-10. The first thing readers see when comparing top creators.</p>
+                <p className="text-4xl font-extrabold text-neutral-900 mt-3">$149<span className="text-base font-normal text-neutral-500">/mo</span></p>
+                <p className="text-sm text-neutral-700 mt-4 mb-6">Top-of-page placement between ranks 4-5 and 9-10. The first thing readers see when comparing top creators.</p>
                 <ul className="space-y-2.5 mb-7">
                   {[
                     'Between rank 4-5 and 9-10, top of fold visibility',
@@ -177,15 +177,15 @@ export default function Promote() {
                     'Maximum 2 slots per platform. Scarce inventory.',
                     'Cancel anytime',
                   ].map((feature) => (
-                    <li key={feature} className="flex items-start gap-2.5 text-sm text-gray-200">
-                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-400" />
+                    <li key={feature} className="flex items-start gap-2.5 text-sm text-neutral-800">
+                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600" />
                       {feature}
                     </li>
                   ))}
                 </ul>
                 <Link
                   to={ctaHref} onClick={handleCtaClick}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-400 hover:text-amber-300 group-hover:gap-3 transition-all"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-700 hover:text-amber-800 group-hover:gap-3 transition-all"
                 >
                   Get a Premium slot <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -195,11 +195,11 @@ export default function Promote() {
         </section>
 
         {/* How it works */}
-        <section className="bg-gray-900/40 border-y border-gray-800/60">
+        <section className="bg-white/60 border-y border-neutral-200">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
             <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100">How it works</h2>
-              <p className="mt-3 text-gray-400 text-base sm:text-lg">Live in under a minute.</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900">How it works</h2>
+              <p className="mt-3 text-neutral-500 text-base sm:text-lg">Live in under a minute.</p>
             </div>
             <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {[
@@ -213,14 +213,14 @@ export default function Promote() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.1 }}
-                  className="bg-gray-900 border border-gray-800 rounded-2xl p-6 relative overflow-hidden group hover:border-gray-700 transition-colors"
+                  className="bg-white border border-neutral-200 rounded-2xl p-6 relative overflow-hidden group hover:border-neutral-300 transition-colors"
                 >
-                  <span className="absolute top-4 right-4 text-3xl font-black text-gray-800/80 group-hover:text-gray-700 transition-colors">0{i + 1}</span>
+                  <span className="absolute top-4 right-4 text-3xl font-black text-gray-800/80 group-hover:text-neutral-300 transition-colors">0{i + 1}</span>
                   <div className={`w-11 h-11 bg-gradient-to-br ${step.accent} rounded-xl flex items-center justify-center shadow-lg ${step.shadow} mb-4`}>
                     <step.Icon className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-base font-bold text-gray-100 mb-1.5">{step.title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{step.body}</p>
+                  <h3 className="text-base font-bold text-neutral-900 mb-1.5">{step.title}</h3>
+                  <p className="text-sm text-neutral-500 leading-relaxed">{step.body}</p>
                 </motion.div>
               ))}
             </div>
@@ -229,7 +229,7 @@ export default function Promote() {
 
         {/* FAQ */}
         <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 text-center mb-10">FAQ</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 text-center mb-10">FAQ</h2>
           <div className="space-y-4">
             {[
               {
@@ -253,19 +253,19 @@ export default function Promote() {
                 a: 'Email shinypull@proton.me. We can set up agency billing and multi-slot discounts for talent management firms.',
               },
             ].map((item) => (
-              <div key={item.q} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-                <h3 className="font-semibold text-gray-100 mb-1.5">{item.q}</h3>
-                <p className="text-sm text-gray-400 leading-relaxed">{item.a}</p>
+              <div key={item.q} className="bg-white border border-neutral-200 rounded-xl p-5">
+                <h3 className="font-semibold text-neutral-900 mb-1.5">{item.q}</h3>
+                <p className="text-sm text-neutral-500 leading-relaxed">{item.a}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* Final CTA */}
-        <section className="border-t border-gray-800/60">
+        <section className="border-t border-neutral-200">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-3">Ready to get featured?</h2>
-            <p className="text-base text-gray-400 mb-6 max-w-xl mx-auto">Most listings go live in under 60 seconds.</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mb-3">Ready to get featured?</h2>
+            <p className="text-base text-neutral-500 mb-6 max-w-xl mx-auto">Most listings go live in under 60 seconds.</p>
             <Link
               to={ctaHref} onClick={handleCtaClick}
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5"

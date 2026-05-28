@@ -17,12 +17,12 @@ export default function NotFound() {
         description="The page you're looking for doesn't exist. Search for a creator or browse our rankings."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center px-4">
         <div className="text-center max-w-lg mx-auto">
           <p className="text-8xl font-black text-gray-800 select-none leading-none mb-6">404</p>
 
-          <h1 className="text-2xl font-extrabold text-gray-100 mb-3">Page not found</h1>
-          <p className="text-gray-400 mb-10">
+          <h1 className="text-2xl font-extrabold text-neutral-900 mb-3">Page not found</h1>
+          <p className="text-neutral-500 mb-10">
             This page doesn't exist. Try searching for a creator or head back to a page that does.
           </p>
 
@@ -31,7 +31,7 @@ export default function NotFound() {
               <Link
                 key={to}
                 to={to}
-                className="flex items-center gap-2 px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-gray-300 hover:text-white hover:border-indigo-500/50 hover:bg-gray-800 transition-all text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-3 bg-white border border-neutral-200 rounded-xl text-neutral-700 hover:text-white hover:border-indigo-500/50 hover:bg-neutral-100 transition-all text-sm font-medium"
               >
                 <Icon className="w-4 h-4 text-indigo-400 flex-shrink-0" />
                 {label}

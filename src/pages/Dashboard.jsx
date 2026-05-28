@@ -31,11 +31,11 @@ const platformIcons = {
 };
 
 const platformColors = {
-  youtube: { bg: 'bg-red-600', light: 'bg-red-950/30', text: 'text-red-400', border: 'border-red-800' },
-  tiktok:  { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400', border: 'border-pink-800' },
-  twitch:  { bg: 'bg-purple-600', light: 'bg-purple-950/30', text: 'text-purple-400', border: 'border-purple-800' },
-  kick:    { bg: 'bg-green-600', light: 'bg-green-950/30', text: 'text-green-400', border: 'border-green-800' },
-  bluesky: { bg: 'bg-sky-500', light: 'bg-sky-950/30', text: 'text-sky-400', border: 'border-sky-800' },
+  youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-400', border: 'border-red-800' },
+  tiktok:  { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-400', border: 'border-pink-800' },
+  twitch:  { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-400', border: 'border-purple-800' },
+  kick:    { bg: 'bg-green-600', light: 'bg-green-50', text: 'text-green-400', border: 'border-green-800' },
+  bluesky: { bg: 'bg-sky-500', light: 'bg-sky-50', text: 'text-sky-400', border: 'border-sky-800' },
 };
 
 const PLATFORM_LABELS = {
@@ -171,7 +171,7 @@ export default function Dashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
         <DashboardSkeleton />
       </div>
     );
@@ -181,7 +181,7 @@ export default function Dashboard() {
     return (
       <>
         <SEO title="Dashboard" description="Track your followed creators and see their latest stats in one place." />
-        <div className="min-h-screen bg-[#0a0a0f]">
+        <div className="min-h-screen bg-[#fafafa]">
           <div className="max-w-4xl mx-auto px-4 pt-20 pb-32">
 
             <div className="text-center mb-12">
@@ -189,20 +189,20 @@ export default function Dashboard() {
                 <Star className="w-3.5 h-3.5" />
                 Free with an account
               </div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-100 mb-4">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 mb-4">
                 Your Dashboard
               </h1>
-              <p className="text-lg text-gray-400 max-w-xl mx-auto">
+              <p className="text-lg text-neutral-500 max-w-xl mx-auto">
                 Follow creators, track their stats, and see everything in one place. Free to sign up.
               </p>
             </div>
 
             {/* Blurred preview */}
             <div className="relative">
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0a0f]/60 backdrop-blur-sm rounded-2xl">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#fafafa]/60 backdrop-blur-sm rounded-2xl">
                 <Lock className="w-10 h-10 text-indigo-400 mb-4" />
-                <p className="text-lg font-semibold text-gray-100 mb-2">Sign in to continue</p>
-                <p className="text-sm text-gray-400 mb-6 max-w-sm text-center">
+                <p className="text-lg font-semibold text-neutral-900 mb-2">Sign in to continue</p>
+                <p className="text-sm text-neutral-500 mb-6 max-w-sm text-center">
                   Create a free account to follow creators and track their stats.
                 </p>
                 <button
@@ -216,36 +216,36 @@ export default function Dashboard() {
 
               {/* Fake preview */}
               <div className="pointer-events-none select-none opacity-40">
-                <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-4 flex items-center gap-4">
+                <div className="bg-white border border-neutral-200 rounded-2xl p-5 mb-4 flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex-shrink-0" />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <div className="h-4 w-32 bg-gray-700 rounded" />
+                      <div className="h-4 w-32 bg-neutral-200 rounded" />
                       <div className="h-4 w-12 bg-indigo-900 rounded-full" />
                     </div>
                     <div className="flex gap-3">
                       {[1, 2, 3].map(i => (
-                        <div key={i} className="h-3 w-20 bg-gray-800 rounded" />
+                        <div key={i} className="h-3 w-20 bg-neutral-100 rounded" />
                       ))}
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-                  <div className="flex border-b border-gray-800 px-4">
+                <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden">
+                  <div className="flex border-b border-neutral-200 px-4">
                     {['Following', 'Saved Compares', 'Recently Viewed'].map((t, i) => (
-                      <div key={t} className={`px-4 py-3 text-sm font-medium ${i === 0 ? 'text-indigo-400 border-b-2 border-indigo-500' : 'text-gray-600'}`}>{t}</div>
+                      <div key={t} className={`px-4 py-3 text-sm font-medium ${i === 0 ? 'text-indigo-400 border-b-2 border-indigo-500' : 'text-neutral-400'}`}>{t}</div>
                     ))}
                   </div>
                   <div className="p-4 space-y-3">
                     {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/40">
-                        <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0" />
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-neutral-50">
+                        <div className="w-9 h-9 rounded-full bg-neutral-200 flex-shrink-0" />
                         <div className="flex-1">
-                          <div className="h-3.5 w-28 bg-gray-700 rounded mb-1.5" />
-                          <div className="h-3 w-16 bg-gray-800 rounded" />
+                          <div className="h-3.5 w-28 bg-neutral-200 rounded mb-1.5" />
+                          <div className="h-3 w-16 bg-neutral-100 rounded" />
                         </div>
-                        <div className="h-4 w-16 bg-gray-700 rounded" />
+                        <div className="h-4 w-16 bg-neutral-200 rounded" />
                         <div className="h-4 w-14 bg-emerald-900/60 rounded" />
                       </div>
                     ))}
@@ -264,7 +264,7 @@ export default function Dashboard() {
                 'Compare creators side by side',
                 'Free forever, no credit card needed',
               ].map(f => (
-                <div key={f} className="flex items-start gap-2.5 text-sm text-gray-400">
+                <div key={f} className="flex items-start gap-2.5 text-sm text-neutral-500">
                   <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-indigo-400" />
                   {f}
                 </div>
@@ -459,19 +459,19 @@ export default function Dashboard() {
         description="Track your favorite creators and see their latest statistics."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
 
         {/* Page header */}
-        <div className="border-b border-gray-800/60">
+        <div className="border-b border-neutral-200">
           <div className="max-w-5xl mx-auto px-4 py-6">
-            <h1 className="text-2xl font-extrabold text-gray-100">Dashboard</h1>
+            <h1 className="text-2xl font-extrabold text-neutral-900">Dashboard</h1>
           </div>
         </div>
 
         <div className="max-w-5xl mx-auto px-4 py-8">
 
           {/* Profile summary strip */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-8">
+          <div className="bg-white border border-neutral-200 rounded-2xl p-5 mb-8">
             <div className="flex items-center gap-4">
               {/* Avatar */}
               <div className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-extrabold text-white flex-shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600">
@@ -479,38 +479,38 @@ export default function Dashboard() {
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-100 mb-0.5">Welcome back, {displayName}</p>
-                <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                <p className="font-semibold text-neutral-900 mb-0.5">Welcome back, {displayName}</p>
+                <p className="text-sm text-neutral-400 truncate">{user.email}</p>
               </div>
 
               {/* Desktop stats */}
               <div className="hidden sm:flex items-center gap-8 flex-shrink-0 pr-2">
                 <div className="text-center">
-                  <p className="text-xl font-bold text-gray-100 tabular-nums">
+                  <p className="text-xl font-bold text-neutral-900 tabular-nums">
                     <CountUp value={followedCreators.length} format="comma" />
                   </p>
-                  <p className="text-xs text-gray-500 mt-0.5">Following</p>
+                  <p className="text-xs text-neutral-400 mt-0.5">Following</p>
                 </div>
                 {liveCount > 0 && (
                   <div className="text-center">
                     <p className="text-xl font-bold text-red-400 tabular-nums">
                       <CountUp value={liveCount} format="comma" />
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">Live now</p>
+                    <p className="text-xs text-neutral-400 mt-0.5">Live now</p>
                   </div>
                 )}
                 <div className="text-center">
-                  <p className="text-xl font-bold text-gray-100 tabular-nums">
+                  <p className="text-xl font-bold text-neutral-900 tabular-nums">
                     <CountUp value={savedCompares.length} format="comma" />
                   </p>
-                  <p className="text-xs text-gray-500 mt-0.5">Saved compares</p>
+                  <p className="text-xs text-neutral-400 mt-0.5">Saved compares</p>
                 </div>
               </div>
 
               {/* Mobile settings icon */}
               <Link
                 to="/account"
-                className="sm:hidden p-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors flex-shrink-0"
+                className="sm:hidden p-2 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors flex-shrink-0"
                 title="Account Settings"
               >
                 <Settings className="w-4 h-4" />
@@ -518,24 +518,24 @@ export default function Dashboard() {
             </div>
 
             {/* Mobile stats row */}
-            <div className="flex sm:hidden items-center gap-0 mt-3 pt-3 border-t border-gray-800">
+            <div className="flex sm:hidden items-center gap-0 mt-3 pt-3 border-t border-neutral-200">
               <div className="flex-1 text-center">
-                <p className="text-base font-bold text-gray-100">{followedCreators.length}</p>
-                <p className="text-xs text-gray-500">Following</p>
+                <p className="text-base font-bold text-neutral-900">{followedCreators.length}</p>
+                <p className="text-xs text-neutral-400">Following</p>
               </div>
-              <div className="w-px h-8 bg-gray-800" />
+              <div className="w-px h-8 bg-neutral-100" />
               {liveCount > 0 ? (
                 <>
                   <div className="flex-1 text-center">
                     <p className="text-base font-bold text-red-400">{liveCount}</p>
-                    <p className="text-xs text-gray-500">Live now</p>
+                    <p className="text-xs text-neutral-400">Live now</p>
                   </div>
-                  <div className="w-px h-8 bg-gray-800" />
+                  <div className="w-px h-8 bg-neutral-100" />
                 </>
               ) : null}
               <div className="flex-1 text-center">
-                <p className="text-base font-bold text-gray-100">{savedCompares.length}</p>
-                <p className="text-xs text-gray-500">Saved compares</p>
+                <p className="text-base font-bold text-neutral-900">{savedCompares.length}</p>
+                <p className="text-xs text-neutral-400">Saved compares</p>
               </div>
             </div>
           </div>
@@ -555,15 +555,15 @@ export default function Dashboard() {
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-left transition-all ${
                         isActive
-                          ? 'bg-gray-800 text-gray-100'
-                          : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/40'
+                          ? 'bg-neutral-100 text-neutral-900'
+                          : 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50'
                       }`}
                     >
                       <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-indigo-400' : ''}`} />
                       <span className="flex-1">{tab.label}</span>
                       {tab.count > 0 && (
                         <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0 ${
-                          isActive ? 'bg-indigo-500/30 text-indigo-300' : 'bg-gray-700 text-gray-400'
+                          isActive ? 'bg-indigo-500/30 text-indigo-300' : 'bg-neutral-200 text-neutral-500'
                         }`}>
                           {tab.count}
                         </span>
@@ -573,10 +573,10 @@ export default function Dashboard() {
                 })}
               </nav>
 
-              <div className="mt-6 pt-5 border-t border-gray-800 space-y-0.5">
+              <div className="mt-6 pt-5 border-t border-neutral-200 space-y-0.5">
                 <Link
                   to="/account"
-                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-800/40 transition-all"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50 transition-all"
                 >
                   <Settings className="w-4 h-4 flex-shrink-0" />
                   Account Settings
@@ -588,7 +588,7 @@ export default function Dashboard() {
             <div className="flex-1 min-w-0">
 
               {/* Mobile tabs — fixed 3-column segmented control */}
-              <div className="flex md:hidden mb-6 bg-gray-900 border border-gray-800 rounded-xl p-1 gap-1">
+              <div className="flex md:hidden mb-6 bg-white border border-neutral-200 rounded-xl p-1 gap-1">
                 {tabs.map(tab => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
@@ -599,14 +599,14 @@ export default function Dashboard() {
                       className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-1 rounded-lg text-xs font-semibold transition-all ${
                         isActive
                           ? 'bg-indigo-600 text-white shadow-sm'
-                          : 'text-gray-400 hover:text-gray-200'
+                          : 'text-neutral-500 hover:text-neutral-800'
                       }`}
                     >
                       <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                       <span>{tab.shortLabel}</span>
                       {tab.count > 0 && (
                         <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold leading-none ${
-                          isActive ? 'bg-white/20 text-white' : 'bg-gray-700 text-gray-400'
+                          isActive ? 'bg-white/20 text-white' : 'bg-neutral-200 text-neutral-500'
                         }`}>
                           {tab.count}
                         </span>
@@ -630,7 +630,7 @@ export default function Dashboard() {
                         </div>
                         <button
                           onClick={() => { setCompareMode(false); setSelectedForCompare([]); }}
-                          className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-700/50 transition-colors"
+                          className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-200/50 transition-colors"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -645,7 +645,7 @@ export default function Dashboard() {
                         className={`flex items-center justify-center gap-2 w-full py-2.5 text-sm font-semibold rounded-xl transition-colors ${
                           selectedForCompare.length >= 2
                             ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-                            : 'bg-gray-800 text-gray-600 pointer-events-none'
+                            : 'bg-neutral-100 text-neutral-400 pointer-events-none'
                         }`}
                       >
                         <Scale className="w-4 h-4" />
@@ -699,7 +699,7 @@ export default function Dashboard() {
                       <select
                         value={sortBy}
                         onChange={e => setSortBy(e.target.value)}
-                        className="text-xs bg-gray-800 border border-gray-700 text-gray-400 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-gray-600 cursor-pointer"
+                        className="text-xs bg-neutral-100 border border-neutral-300 text-neutral-500 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-neutral-300 cursor-pointer"
                       >
                         <option value="live">Live first</option>
                         <option value="growth">Top growth</option>
@@ -711,7 +711,7 @@ export default function Dashboard() {
                         {followedCreators.length >= 2 && (
                           <button
                             onClick={() => setCompareMode(true)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-gray-100 text-xs font-medium rounded-lg transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-700 hover:text-neutral-900 text-xs font-medium rounded-lg transition-colors"
                           >
                             <Scale className="w-3.5 h-3.5" />
                             Compare
@@ -720,7 +720,7 @@ export default function Dashboard() {
 
                         <button
                           onClick={handleBulkExport}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-950/40 hover:bg-indigo-950/60 text-indigo-400 border border-indigo-800/60 transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 hover:bg-indigo-950/60 text-indigo-400 border border-indigo-800/60 transition-colors"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span className="hidden sm:inline">Export CSV</span>
@@ -731,7 +731,7 @@ export default function Dashboard() {
                   )}
 
                   {/* Creator list */}
-                  <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+                  <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
                     {loadingCreators ? (
                       <div className="flex items-center justify-center p-12">
                         <Loader2 className="w-7 h-7 text-indigo-600 animate-spin" />
@@ -740,11 +740,11 @@ export default function Dashboard() {
                       <div className="text-center p-12">
                         {selectedPlatform === 'all' ? (
                           <>
-                            <div className="w-14 h-14 bg-gray-800/60 rounded-xl flex items-center justify-center mx-auto mb-3">
-                              <Star className="w-7 h-7 text-gray-600" />
+                            <div className="w-14 h-14 bg-neutral-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                              <Star className="w-7 h-7 text-neutral-400" />
                             </div>
-                            <p className="text-gray-100 font-semibold mb-1">No creators followed yet</p>
-                            <p className="text-gray-400 text-sm mb-5">Find creators to follow and track their growth.</p>
+                            <p className="text-neutral-900 font-semibold mb-1">No creators followed yet</p>
+                            <p className="text-neutral-500 text-sm mb-5">Find creators to follow and track their growth.</p>
                             <Link
                               to="/search"
                               className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-500 transition-colors text-sm"
@@ -753,16 +753,16 @@ export default function Dashboard() {
                             </Link>
                           </>
                         ) : (
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-neutral-500 text-sm">
                             {selectedPlatform === 'live' ? 'No one is live right now.' : `No ${PLATFORM_LABELS[selectedPlatform]} creators followed.`}
                           </p>
                         )}
                       </div>
                     ) : (
-                      <div className="divide-y divide-gray-800">
+                      <div className="divide-y divide-neutral-200">
                         {sortedCreators.map(creator => {
                           const PlatformIcon = platformIcons[creator.platform] || Users;
-                          const colors = platformColors[creator.platform] || { light: 'bg-gray-800/50', text: 'text-gray-400' };
+                          const colors = platformColors[creator.platform] || { light: 'bg-neutral-50', text: 'text-neutral-500' };
                           const stats = creatorStats[creator.id];
                           const isLive = (creator.platform === 'twitch' || creator.platform === 'kick') && liveStreamers.has(creator.username.toLowerCase());
                           const growth = getGrowth(creator.id, creator.platform === 'youtube' ? 'subscribers' : 'followers');
@@ -773,7 +773,7 @@ export default function Dashboard() {
                             <div className="flex items-center gap-4 px-4 py-3.5">
                               {compareMode && (
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                                  isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-gray-600 hover:border-indigo-400'
+                                  isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-neutral-300 hover:border-indigo-400'
                                 }`}>
                                   {isSelected && <Check className="w-3 h-3 text-white" />}
                                 </div>
@@ -797,17 +797,17 @@ export default function Dashboard() {
                                   <span className={`p-1 rounded ${colors.light}`}>
                                     <PlatformIcon className={`w-3 h-3 ${colors.text}`} />
                                   </span>
-                                  <p className="font-semibold text-gray-100 truncate text-sm">{creator.display_name}</p>
+                                  <p className="font-semibold text-neutral-900 truncate text-sm">{creator.display_name}</p>
                                 </div>
-                                <p className="text-xs text-gray-500 mt-0.5">@{creator.username}</p>
+                                <p className="text-xs text-neutral-400 mt-0.5">@{creator.username}</p>
                               </div>
                               <div className="text-right hidden sm:block">
                                 <div className="flex items-baseline gap-1 justify-end">
-                                  <p className="text-sm font-semibold text-gray-100">
+                                  <p className="text-sm font-semibold text-neutral-900">
                                     {stats?.current ? formatNumber(stats.current.subscribers || stats.current.followers) : '–'}
                                   </p>
                                   {stats?.current && (
-                                    <span className="text-[10px] text-gray-600 uppercase tracking-wide">{metricLabel}</span>
+                                    <span className="text-[10px] text-neutral-400 uppercase tracking-wide">{metricLabel}</span>
                                   )}
                                 </div>
                                 {growth !== null && growth !== 0 ? (
@@ -816,12 +816,12 @@ export default function Dashboard() {
                                     {growth > 0 ? '+' : ''}{formatNumber(growth)}
                                   </span>
                                 ) : growth === 0 ? (
-                                  <span className="text-xs text-gray-600">no change</span>
+                                  <span className="text-xs text-neutral-400">no change</span>
                                 ) : (
-                                  <span className="text-xs text-gray-700">–</span>
+                                  <span className="text-xs text-neutral-300">–</span>
                                 )}
                               </div>
-                              {!compareMode && <ChevronRight className="w-4 h-4 text-gray-600 flex-shrink-0" />}
+                              {!compareMode && <ChevronRight className="w-4 h-4 text-neutral-400 flex-shrink-0" />}
                             </div>
                           );
 
@@ -835,7 +835,7 @@ export default function Dashboard() {
                                   setSelectedForCompare(prev => [...prev, creator.id]);
                                 }
                               }}
-                              className={`w-full text-left transition-colors ${isSelected ? 'bg-indigo-950/30' : 'hover:bg-gray-800/40'} ${selectedForCompare.length >= 3 && !isSelected ? 'opacity-40' : ''}`}
+                              className={`w-full text-left transition-colors ${isSelected ? 'bg-indigo-50' : 'hover:bg-neutral-50'} ${selectedForCompare.length >= 3 && !isSelected ? 'opacity-40' : ''}`}
                             >
                               {rowContent}
                             </button>
@@ -843,7 +843,7 @@ export default function Dashboard() {
                             <Link
                               key={creator.id}
                               to={`/${creator.platform}/${creator.username}`}
-                              className="block hover:bg-gray-800/40 transition-colors"
+                              className="block hover:bg-neutral-50 transition-colors"
                             >
                               {rowContent}
                             </Link>
@@ -863,12 +863,12 @@ export default function Dashboard() {
                       <Loader2 className="w-7 h-7 text-indigo-600 animate-spin" />
                     </div>
                   ) : savedCompares.length === 0 ? (
-                    <div className="bg-gray-900 rounded-2xl border border-gray-800 p-12 text-center">
-                      <div className="w-14 h-14 bg-gray-800/60 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <Scale className="w-7 h-7 text-gray-600" />
+                    <div className="bg-white rounded-2xl border border-neutral-200 p-12 text-center">
+                      <div className="w-14 h-14 bg-neutral-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <Scale className="w-7 h-7 text-neutral-400" />
                       </div>
-                      <p className="text-gray-100 font-semibold mb-1">No saved comparisons</p>
-                      <p className="text-gray-400 text-sm mb-5">Head to the Compare page, set up a comparison, and hit "Save comparison".</p>
+                      <p className="text-neutral-900 font-semibold mb-1">No saved comparisons</p>
+                      <p className="text-neutral-500 text-sm mb-5">Head to the Compare page, set up a comparison, and hit "Save comparison".</p>
                       <Link
                         to="/compare"
                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-500 transition-colors text-sm"
@@ -878,20 +878,20 @@ export default function Dashboard() {
                       </Link>
                     </div>
                   ) : (
-                    <div className="bg-gray-900 rounded-2xl border border-gray-800 divide-y divide-gray-800 overflow-hidden">
+                    <div className="bg-white rounded-2xl border border-neutral-200 divide-y divide-neutral-200 overflow-hidden">
                       {savedCompares.map(compare => {
                         const entries = compare.creators_param.split(',').map(e => {
                           const [platform, username] = e.split(':');
                           return { platform, username };
                         });
                         return (
-                          <div key={compare.id} className="flex items-center gap-3 px-4 py-3.5 group hover:bg-gray-800/40 transition-colors">
+                          <div key={compare.id} className="flex items-center gap-3 px-4 py-3.5 group hover:bg-neutral-50 transition-colors">
                             <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-gray-100 text-sm mb-1.5">{compare.name}</p>
+                              <p className="font-semibold text-neutral-900 text-sm mb-1.5">{compare.name}</p>
                               <div className="flex flex-wrap gap-1.5">
                                 {entries.map((e, i) => {
                                   const Icon = platformIcons[e.platform];
-                                  const colors = platformColors[e.platform] || { light: 'bg-gray-800', text: 'text-gray-400' };
+                                  const colors = platformColors[e.platform] || { light: 'bg-neutral-100', text: 'text-neutral-500' };
                                   return (
                                     <span key={i} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${colors.light} ${colors.text}`}>
                                       {Icon && <Icon className="w-2.5 h-2.5" />}
@@ -904,7 +904,7 @@ export default function Dashboard() {
                             <div className="flex items-center gap-1 flex-shrink-0">
                               <button
                                 onClick={() => handleDeleteCompare(compare.id)}
-                                className="p-2 rounded-lg text-gray-700 hover:text-red-400 hover:bg-red-950/20 transition-colors opacity-0 group-hover:opacity-100"
+                                className="p-2 rounded-lg text-neutral-300 hover:text-red-400 hover:bg-red-950/20 transition-colors opacity-0 group-hover:opacity-100"
                                 title="Delete"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -928,12 +928,12 @@ export default function Dashboard() {
               {activeTab === 'recent' && (
                 <div>
                   {recentlyViewed.length === 0 ? (
-                    <div className="bg-gray-900 rounded-2xl border border-gray-800 p-12 text-center">
-                      <div className="w-14 h-14 bg-gray-800/60 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <Clock className="w-7 h-7 text-gray-600" />
+                    <div className="bg-white rounded-2xl border border-neutral-200 p-12 text-center">
+                      <div className="w-14 h-14 bg-neutral-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <Clock className="w-7 h-7 text-neutral-400" />
                       </div>
-                      <p className="text-gray-100 font-semibold mb-1">Nothing here yet</p>
-                      <p className="text-gray-400 text-sm">Creators you visit will show up here.</p>
+                      <p className="text-neutral-900 font-semibold mb-1">Nothing here yet</p>
+                      <p className="text-neutral-500 text-sm">Creators you visit will show up here.</p>
                     </div>
                   ) : (
                     <>
@@ -943,15 +943,15 @@ export default function Dashboard() {
                             <button
                               onClick={() => setRecentlyViewedIndex(Math.max(0, recentlyViewedIndex - 8))}
                               disabled={recentlyViewedIndex === 0}
-                              className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                              className="p-2 rounded-lg bg-white border border-neutral-300 text-neutral-500 hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                             >
                               <ChevronLeft className="w-4 h-4" />
                             </button>
-                            <span className="text-xs text-gray-500">{Math.floor(recentlyViewedIndex / 8) + 1} / {Math.ceil(recentlyViewed.length / 8)}</span>
+                            <span className="text-xs text-neutral-400">{Math.floor(recentlyViewedIndex / 8) + 1} / {Math.ceil(recentlyViewed.length / 8)}</span>
                             <button
                               onClick={() => setRecentlyViewedIndex(Math.min(recentlyViewed.length - 8, recentlyViewedIndex + 8))}
                               disabled={recentlyViewedIndex >= recentlyViewed.length - 8}
-                              className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                              className="p-2 rounded-lg bg-white border border-neutral-300 text-neutral-500 hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                             >
                               <ChevronRight className="w-4 h-4" />
                             </button>
@@ -959,7 +959,7 @@ export default function Dashboard() {
                         ) : <div />}
                         <button
                           onClick={handleClearHistory}
-                          className="text-xs text-gray-600 hover:text-red-400 transition-colors"
+                          className="text-xs text-neutral-400 hover:text-red-400 transition-colors"
                         >
                           Clear all
                         </button>
@@ -967,12 +967,12 @@ export default function Dashboard() {
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {recentlyViewed.slice(recentlyViewedIndex, recentlyViewedIndex + 8).map((creator, idx) => {
                           const PlatformIcon = platformIcons[creator.platform] || Users;
-                          const colors = platformColors[creator.platform] || { light: 'bg-gray-800/50', text: 'text-gray-400' };
+                          const colors = platformColors[creator.platform] || { light: 'bg-neutral-50', text: 'text-neutral-500' };
                           return (
                             <Link
                               key={`${creator.platform}-${creator.username}-${idx}`}
                               to={`/${creator.platform}/${creator.username}`}
-                              className="bg-gray-900 rounded-2xl border border-gray-800 p-4 hover:border-indigo-700/50 hover:bg-gray-800/50 transition-all group"
+                              className="bg-white rounded-2xl border border-neutral-200 p-4 hover:border-indigo-700/50 hover:bg-neutral-50 transition-all group"
                             >
                               <CreatorAvatar
                                 src={creator.profileImage}
@@ -982,12 +982,12 @@ export default function Dashboard() {
                                 className="!w-14 !h-14 mx-auto mb-3"
                               />
                               <div className="text-center">
-                                <p className="font-semibold text-gray-100 text-sm truncate">{creator.displayName}</p>
+                                <p className="font-semibold text-neutral-900 text-sm truncate">{creator.displayName}</p>
                                 <div className="flex items-center justify-center gap-1.5 mt-1.5">
                                   <span className={`p-0.5 rounded ${colors.light}`}>
                                     <PlatformIcon className={`w-3 h-3 ${colors.text}`} />
                                   </span>
-                                  <span className="text-xs text-gray-400">
+                                  <span className="text-xs text-neutral-500">
                                     {formatNumber(creator.subscribers || creator.followers || 0)}
                                   </span>
                                 </div>
@@ -1019,7 +1019,7 @@ const CHIP_ACTIVE_STYLES = {
 
 function FilterChip({ active, onClick, label, count, icon, live, platform }) {
   const activeClass = live
-    ? 'bg-red-950/40 border-red-700 text-red-400'
+    ? 'bg-red-50 border-red-700 text-red-400'
     : platform && CHIP_ACTIVE_STYLES[platform]
       ? CHIP_ACTIVE_STYLES[platform]
       : 'bg-indigo-600 border-indigo-600 text-white shadow-lg';
@@ -1030,7 +1030,7 @@ function FilterChip({ active, onClick, label, count, icon, live, platform }) {
       className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border ${
         active
           ? activeClass
-          : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-gray-200 hover:border-gray-600'
+          : 'bg-neutral-50 border-neutral-300 text-neutral-500 hover:text-neutral-800 hover:border-neutral-300'
       }`}
     >
       {icon}
@@ -1038,7 +1038,7 @@ function FilterChip({ active, onClick, label, count, icon, live, platform }) {
       <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
         active
           ? live ? 'bg-red-900/50 text-red-300' : 'bg-white/20 text-white'
-          : 'bg-gray-700 text-gray-400'
+          : 'bg-neutral-200 text-neutral-500'
       }`}>
         {count}
       </span>

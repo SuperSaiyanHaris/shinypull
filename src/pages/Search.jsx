@@ -31,13 +31,13 @@ const platformIcons = {
 };
 
 const platformColors = {
-  youtube: { bg: 'bg-red-600', light: 'bg-red-950/30', text: 'text-red-400' },
-  tiktok: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400' },
-  twitch: { bg: 'bg-purple-600', light: 'bg-purple-950/30', text: 'text-purple-400' },
-  kick: { bg: 'bg-green-600', light: 'bg-green-950/30', text: 'text-green-400' },
-  bluesky: { bg: 'bg-sky-500', light: 'bg-sky-950/30', text: 'text-sky-400' },
-  music: { bg: 'bg-amber-600', light: 'bg-amber-950/30', text: 'text-amber-400' },
-  instagram: { bg: 'bg-pink-600', light: 'bg-pink-950/30', text: 'text-pink-400' },
+  youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-400' },
+  tiktok: { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-400' },
+  twitch: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-400' },
+  kick: { bg: 'bg-green-600', light: 'bg-green-50', text: 'text-green-400' },
+  bluesky: { bg: 'bg-sky-500', light: 'bg-sky-50', text: 'text-sky-400' },
+  music: { bg: 'bg-amber-600', light: 'bg-amber-50', text: 'text-amber-400' },
+  instagram: { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-400' },
 };
 
 const platforms = [
@@ -328,15 +328,15 @@ export default function Search() {
         keywords="search youtube channels, search tiktok creators, find twitch streamers, kick channel stats, bluesky analytics, creator subscriber count"
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
         {/* Header */}
-        <div className="relative overflow-hidden border-b border-gray-800/60">
+        <div className="relative overflow-hidden border-b border-neutral-200">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <SearchIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-400" />
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-100">Search Creators</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-neutral-900">Search Creators</h1>
             </div>
-            <p className="text-sm sm:text-base text-gray-400">Find any creator and view their detailed statistics</p>
+            <p className="text-sm sm:text-base text-neutral-500">Find any creator and view their detailed statistics</p>
           </div>
         </div>
 
@@ -357,8 +357,8 @@ export default function Search() {
                     isSelected
                       ? `${colors.bg} text-white shadow-lg`
                       : platform.available
-                      ? 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-gray-200 transition-colors'
-                      : 'bg-gray-900/50 text-gray-600 border border-gray-800 cursor-not-allowed'
+                      ? 'bg-white text-neutral-500 border border-neutral-300 hover:border-gray-500 hover:text-neutral-800 transition-colors'
+                      : 'bg-white/50 text-neutral-400 border border-neutral-200 cursor-not-allowed'
                   }`}
                 >
                   {Icon && <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -374,20 +374,20 @@ export default function Search() {
             <div className="space-y-3">
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-15 group-focus-within:opacity-25 blur-xl transition duration-300"></div>
-                  <div className="relative flex items-center bg-gray-900 rounded-2xl shadow-lg border-2 border-gray-800 group-focus-within:border-indigo-500 transition-colors">
-                  <SearchIcon className="absolute left-5 w-5 h-5 text-gray-300 group-focus-within:text-indigo-500 transition-colors" />
+                  <div className="relative flex items-center bg-white rounded-2xl shadow-lg border-2 border-neutral-200 group-focus-within:border-indigo-500 transition-colors">
+                  <SearchIcon className="absolute left-5 w-5 h-5 text-neutral-700 group-focus-within:text-indigo-500 transition-colors" />
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={`Search ${currentPlatform?.name || ''} creators...`}
-                    className="w-full pl-14 pr-12 py-4 bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none text-lg rounded-2xl font-medium"
+                    className="w-full pl-14 pr-12 py-4 bg-transparent text-neutral-900 placeholder-neutral-400 focus:outline-none text-lg rounded-2xl font-medium"
                   />
                   {query && (
                     <button
                       type="button"
                       onClick={() => { setQuery(''); setResults([]); setSearched(false); }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-gray-300 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-neutral-700 hover:text-neutral-700 transition-colors"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -418,7 +418,7 @@ export default function Search() {
           {loading && (
             <div className="space-y-3">
               <div className="text-center mb-6">
-                <p className="text-gray-300">Searching {currentPlatform?.name}...</p>
+                <p className="text-neutral-700">Searching {currentPlatform?.name}...</p>
               </div>
               {Array.from({ length: 5 }).map((_, i) => (
                 <CreatorRowSkeleton key={i} />
@@ -428,12 +428,12 @@ export default function Search() {
 
           {/* No Results */}
           {!loading && searched && !error && results.length === 0 && (
-            <div className="text-center py-16 bg-gray-900 rounded-2xl border border-gray-800">
-              <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-8 h-8 text-gray-300" />
+            <div className="text-center py-16 bg-white rounded-2xl border border-neutral-200">
+              <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="w-8 h-8 text-neutral-700" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-100 mb-2">No creators found</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-semibold text-neutral-900 mb-2">No creators found</h3>
+              <p className="text-neutral-700 mb-4">
                 We couldn't find any {currentPlatform?.name} creators matching "{query}"
               </p>
 
@@ -442,17 +442,17 @@ export default function Search() {
                 <>
                   {requestStatus === null && (
                     <div className="mt-6 max-w-md mx-auto px-4">
-                      <p className="text-sm text-gray-300 mb-3">
+                      <p className="text-sm text-neutral-700 mb-3">
                         If you know the exact handle, enter it below — otherwise leave as-is and our smart search will find the right match.
                       </p>
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="text-gray-300 text-lg font-medium">@</span>
+                        <span className="text-neutral-700 text-lg font-medium">@</span>
                         <input
                           type="text"
                           value={normalizedUsername}
                           onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
                           placeholder="e.g. charlidamelio"
-                          className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-600 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          className="flex-1 px-4 py-2.5 bg-neutral-100 border border-neutral-300 rounded-xl text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:border-transparent"
                         />
                       </div>
                       <button
@@ -463,7 +463,7 @@ export default function Search() {
                         <Clock className="w-5 h-5" />
                         Request @{normalizedUsername || '...'}
                       </button>
-                      <p className="text-xs text-gray-300 mt-3">
+                      <p className="text-xs text-neutral-700 mt-3">
                         We'll add them within 24 hours
                       </p>
                     </div>
@@ -477,7 +477,7 @@ export default function Search() {
                   )}
 
                   {requestStatus === 'success' && (
-                    <div className="mt-6 max-w-md mx-auto p-4 bg-green-950/30 border border-green-800/50 rounded-xl">
+                    <div className="mt-6 max-w-md mx-auto p-4 bg-green-50 border border-green-800/50 rounded-xl">
                       <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
                       <p className="text-sm text-green-300 font-medium mb-1">Request Submitted!</p>
                       <p className="text-sm text-green-400">{requestMessage}</p>
@@ -485,7 +485,7 @@ export default function Search() {
                   )}
 
                   {requestStatus === 'error' && (
-                    <div className="mt-6 max-w-md mx-auto p-4 bg-red-950/30 border border-red-800 rounded-xl">
+                    <div className="mt-6 max-w-md mx-auto p-4 bg-red-50 border border-red-800 rounded-xl">
                       <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
                       <p className="text-sm text-red-300 font-medium mb-1">Request Failed</p>
                       <p className="text-sm text-red-400">{requestMessage}</p>
@@ -502,7 +502,7 @@ export default function Search() {
 
               {/* Standard platforms: Standard message */}
               {selectedPlatform !== 'tiktok' && (
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-neutral-700">
                   Try searching for a different name or check the spelling
                 </p>
               )}
@@ -512,7 +512,7 @@ export default function Search() {
           {/* Results */}
           {results.length > 0 && (
             <div className="mb-8">
-              <p className="text-gray-500 text-sm mb-4">{results.length} creators found</p>
+              <p className="text-neutral-400 text-sm mb-4">{results.length} creators found</p>
               <div className="space-y-3">
                 {results.map((creator) => {
                   const Icon = platformIcons[creator.platform] || User;
@@ -523,7 +523,7 @@ export default function Search() {
                       key={creator.platformId}
                       to={`/${creator.platform}/${creator.username}`}
                       state={{ platformId: creator.platformId }}
-                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900 border border-gray-800 rounded-2xl hover:border-indigo-500/40 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-200 group"
+                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-neutral-200 rounded-2xl hover:border-indigo-500/40 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-200 group"
                     >
                       <CreatorAvatar
                         src={creator.profileImage}
@@ -534,7 +534,7 @@ export default function Search() {
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <h3 className="font-semibold text-base sm:text-lg text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
+                          <h3 className="font-semibold text-base sm:text-lg text-neutral-900 truncate group-hover:text-indigo-400 transition-colors">
                             {creator.displayName}
                           </h3>
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium ${colors.bg} text-white`}>
@@ -542,16 +542,16 @@ export default function Search() {
                             {creator.platform}
                           </span>
                         </div>
-                        <p className="text-sm sm:text-base text-gray-300 truncate">@{creator.username}</p>
+                        <p className="text-sm sm:text-base text-neutral-700 truncate">@{creator.username}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="font-bold text-gray-100 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
-                        <p className="text-xs sm:text-sm text-gray-300">
+                        <p className="font-bold text-neutral-900 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
+                        <p className="text-xs sm:text-sm text-neutral-700">
                           {creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' ? 'followers' :
                            creator.platform === 'kick' ? 'paid subs' : 'subscribers'}
                         </p>
                       </div>
-                      <ArrowRight className="hidden sm:block w-5 h-5 text-gray-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="hidden sm:block w-5 h-5 text-neutral-400 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
                     </Link>
                   );
                 })}
@@ -567,25 +567,25 @@ export default function Search() {
 
               if (!hasExactMatch) {
                 return (
-                  <div className="text-center py-8 bg-gray-900 rounded-2xl border border-gray-800">
+                  <div className="text-center py-8 bg-white rounded-2xl border border-neutral-200">
                     <div className="max-w-md mx-auto">
-                      <p className="text-sm text-gray-300 mb-4">
+                      <p className="text-sm text-neutral-700 mb-4">
                         Can't find "@{query}"? TikTok creators are added by request.
                       </p>
 
                       {requestStatus === null && (
                         <>
-                          <p className="text-sm text-gray-300 mb-3">
+                          <p className="text-sm text-neutral-700 mb-3">
                             If you know the exact handle, enter it below — otherwise leave as-is and our smart search will find the right match.
                           </p>
                           <div className="flex items-center gap-2 mb-4">
-                            <span className="text-gray-300 text-lg font-medium">@</span>
+                            <span className="text-neutral-700 text-lg font-medium">@</span>
                             <input
                               type="text"
                               value={normalizedUsername}
                               onChange={(e) => setNormalizedUsername(normalizeToUsername(e.target.value))}
                               placeholder="e.g. charlidamelio"
-                              className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-600 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              className="flex-1 px-4 py-2.5 bg-neutral-100 border border-neutral-300 rounded-xl text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:border-transparent"
                             />
                           </div>
                           <button
@@ -596,7 +596,7 @@ export default function Search() {
                             <Clock className="w-5 h-5" />
                             Request @{normalizedUsername || '...'}
                           </button>
-                          <p className="text-xs text-gray-300 mt-3">
+                          <p className="text-xs text-neutral-700 mt-3">
                             We'll add them within 24 hours
                           </p>
                         </>
@@ -610,7 +610,7 @@ export default function Search() {
                       )}
 
                       {requestStatus === 'success' && (
-                        <div className="p-4 bg-green-950/30 border border-green-800/50 rounded-xl">
+                        <div className="p-4 bg-green-50 border border-green-800/50 rounded-xl">
                           <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
                           <p className="text-sm text-green-300 font-medium mb-1">Request Submitted!</p>
                           <p className="text-sm text-green-400">{requestMessage}</p>
@@ -618,7 +618,7 @@ export default function Search() {
                       )}
 
                       {requestStatus === 'error' && (
-                        <div className="p-4 bg-red-950/30 border border-red-800 rounded-xl">
+                        <div className="p-4 bg-red-50 border border-red-800 rounded-xl">
                           <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
                           <p className="text-sm text-red-300 font-medium mb-1">Request Failed</p>
                           <p className="text-sm text-red-400">{requestMessage}</p>

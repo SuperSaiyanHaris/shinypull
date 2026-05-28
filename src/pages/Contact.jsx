@@ -47,12 +47,12 @@ export default function Contact() {
         description="Get in touch with the ShinyPull team. We're here to help with questions, feedback, and support."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
         {/* Hero */}
-        <div className="relative overflow-hidden border-b border-gray-800/60 py-16">
+        <div className="relative overflow-hidden border-b border-neutral-200 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Contact Us</h1>
-            <p className="text-xl text-gray-400">
+            <h1 className="text-4xl font-extrabold text-neutral-900 mb-4">Contact Us</h1>
+            <p className="text-xl text-neutral-500">
               We'd love to hear from you
             </p>
           </div>
@@ -61,8 +61,8 @@ export default function Contact() {
         <div className="max-w-4xl mx-auto px-4 py-12">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8">
-                <p className="text-gray-300 mb-8">
+              <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-8">
+                <p className="text-neutral-700 mb-8">
                   Have a question, feedback, or need support? We'd love to hear from you.
                 </p>
 
@@ -72,7 +72,7 @@ export default function Contact() {
                       <Mail className="w-6 h-6 text-indigo-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Email</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">Email</h3>
                       <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-300">
                         shinypull@proton.me
                       </a>
@@ -84,22 +84,22 @@ export default function Contact() {
                       <MessageSquare className="w-6 h-6 text-emerald-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Response Time</h3>
-                      <p className="text-gray-300">We typically respond within 24-48 hours</p>
+                      <h3 className="font-semibold text-neutral-900 mb-1">Response Time</h3>
+                      <p className="text-neutral-700">We typically respond within 24-48 hours</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8">
+            <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-8">
               {status === 'success' ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="w-8 h-8 text-emerald-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-100 mb-2">Message Sent!</h3>
-                  <p className="text-gray-300">We'll get back to you soon.</p>
+                  <h3 className="text-xl font-bold text-neutral-900 mb-2">Message Sent!</h3>
+                  <p className="text-neutral-700">We'll get back to you soon.</p>
                   <button
                     onClick={() => setStatus('idle')}
                     className="mt-4 text-indigo-600 hover:text-indigo-300 font-medium"
@@ -110,14 +110,14 @@ export default function Contact() {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {status === 'error' && (
-                    <div className="flex items-center gap-2 p-3 bg-red-950/30 border border-red-800 rounded-xl text-red-700">
+                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-800 rounded-xl text-red-700">
                       <AlertCircle className="w-5 h-5 flex-shrink-0" />
                       <span className="text-sm">{errorMessage}</span>
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Name</label>
                     <input
                       type="text"
                       name="name"
@@ -125,12 +125,12 @@ export default function Contact() {
                       onChange={handleChange}
                       required
                       disabled={status === 'loading'}
-                      className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50"
+                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-300 rounded-xl text-neutral-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:border-transparent disabled:opacity-50"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Email</label>
                     <input
                       type="email"
                       name="email"
@@ -138,12 +138,12 @@ export default function Contact() {
                       onChange={handleChange}
                       required
                       disabled={status === 'loading'}
-                      className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50"
+                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-300 rounded-xl text-neutral-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:border-transparent disabled:opacity-50"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Message</label>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Message</label>
                     <textarea
                       name="message"
                       value={formData.message}
@@ -151,7 +151,7 @@ export default function Contact() {
                       required
                       disabled={status === 'loading'}
                       rows={5}
-                      className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none disabled:opacity-50"
+                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-300 rounded-xl text-neutral-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:border-transparent resize-none disabled:opacity-50"
                     ></textarea>
                   </div>
 

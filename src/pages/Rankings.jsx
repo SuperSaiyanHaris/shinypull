@@ -17,12 +17,12 @@ import { formatNumber } from '../lib/utils';
 import logger from '../lib/logger';
 
 const platforms = [
-  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600', hoverColor: 'hover:bg-red-500', lightBg: 'bg-red-950/30', textColor: 'text-red-400', available: true },
-  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'bg-pink-600', hoverColor: 'hover:bg-pink-500', lightBg: 'bg-pink-950/30', textColor: 'text-pink-400', available: true },
-  { id: 'twitch', name: 'Twitch', icon: Twitch, color: 'bg-purple-600', hoverColor: 'hover:bg-purple-500', lightBg: 'bg-purple-950/30', textColor: 'text-purple-400', available: true },
-  { id: 'kick', name: 'Kick', icon: KickIcon, color: 'bg-green-600', hoverColor: 'hover:bg-green-500', lightBg: 'bg-green-950/30', textColor: 'text-green-400', available: true },
-  { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, color: 'bg-sky-500', hoverColor: 'hover:bg-sky-400', lightBg: 'bg-sky-950/30', textColor: 'text-sky-400', available: true },
-  { id: 'music', name: 'Music', icon: Music, color: 'bg-amber-600', hoverColor: 'hover:bg-amber-500', lightBg: 'bg-amber-950/30', textColor: 'text-amber-400', available: true },
+  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-600',    hoverColor: 'hover:bg-red-500',    lightBg: 'bg-red-50',     textColor: 'text-red-700',    available: true },
+  { id: 'tiktok',  name: 'TikTok',  icon: TikTokIcon, color: 'bg-pink-600',  hoverColor: 'hover:bg-pink-500',   lightBg: 'bg-pink-50',    textColor: 'text-pink-700',   available: true },
+  { id: 'twitch',  name: 'Twitch',  icon: Twitch,   color: 'bg-purple-600', hoverColor: 'hover:bg-purple-500', lightBg: 'bg-purple-50',  textColor: 'text-purple-700', available: true },
+  { id: 'kick',    name: 'Kick',    icon: KickIcon, color: 'bg-green-600',  hoverColor: 'hover:bg-green-500',  lightBg: 'bg-green-50',   textColor: 'text-green-700',  available: true },
+  { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, color: 'bg-sky-500',  hoverColor: 'hover:bg-sky-400',    lightBg: 'bg-sky-50',     textColor: 'text-sky-700',    available: true },
+  { id: 'music',   name: 'Music',   icon: Music,    color: 'bg-amber-600',  hoverColor: 'hover:bg-amber-500',  lightBg: 'bg-amber-50',   textColor: 'text-amber-700',  available: true },
 ];
 
 const topCounts = [50, 100, 500];
@@ -178,19 +178,19 @@ function RankingsOverview() {
         description="Live rankings of the top creators across YouTube, TikTok, Twitch, Kick, Bluesky, and Music. Updated daily with subscriber counts, follower stats, and growth metrics."
         keywords="top youtubers, top tiktokers, top twitch streamers, top kick streamers, top bluesky accounts, top music artists, creator rankings, most subscribers, most followers, live rankings 2026"
       />
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
         {/* Header */}
-        <div className="relative overflow-hidden border-b border-gray-800/60">
+        <div className="relative overflow-hidden border-b border-neutral-200">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-100">Creator Rankings</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-neutral-900">Creator Rankings</h1>
               <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-xs font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Live
               </span>
             </div>
-            <p className="text-sm sm:text-base text-gray-400">Top creators across all platforms. Updated daily.</p>
+            <p className="text-sm sm:text-base text-neutral-500">Top creators across all platforms. Updated daily.</p>
           </div>
         </div>
 
@@ -198,7 +198,7 @@ function RankingsOverview() {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[1,2,3,4].map(i => (
-                <div key={i} className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6">
+                <div key={i} className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6">
                   <TableSkeleton rows={5} />
                 </div>
               ))}
@@ -211,21 +211,21 @@ function RankingsOverview() {
                 const follLabel = platform.id === 'tiktok' || platform.id === 'twitch' || platform.id === 'bluesky' ? 'followers' : platform.id === 'music' ? 'listeners' : platform.id === 'kick' ? 'paid subs' : 'subscribers';
 
                 return (
-                  <div key={platform.id} className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
+                  <div key={platform.id} className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
                     {/* Platform Header */}
-                    <div className={`flex items-center px-5 py-4 ${platform.lightBg} border-b border-gray-800`}>
+                    <div className={`flex items-center px-5 py-4 ${platform.lightBg} border-b border-neutral-200`}>
                       <div className="flex items-center gap-2.5">
                         <div className={`w-8 h-8 ${platform.color} rounded-lg flex items-center justify-center`}>
                           <Icon className="w-5 h-5 text-white" />
                         </div>
-                        <h2 className="font-bold text-gray-100">Top {platform.name} Creators</h2>
+                        <h2 className="font-bold text-neutral-900">Top {platform.name} Creators</h2>
                       </div>
                     </div>
 
                     {/* Mini Rankings List */}
                     <div className="divide-y divide-gray-800/70">
                       {creators.length === 0 ? (
-                        <div className="px-5 py-8 text-center text-gray-300 text-sm">No data available</div>
+                        <div className="px-5 py-8 text-center text-neutral-700 text-sm">No data available</div>
                       ) : (() => {
                         const listings = sponsoredByPlatform[platform.id] || [];
                         const premiumListings = listings.filter(l => l.placement_tier === 'premium');
@@ -238,12 +238,12 @@ function RankingsOverview() {
                             <Link
                               key={slotKey}
                               to={`/${c?.platform}/${c?.username}`}
-                              className="flex items-center gap-3 px-5 py-3 bg-amber-950/15 hover:bg-amber-950/25 transition-colors group"
+                              className="flex items-center gap-3 px-5 py-3 bg-amber-50 hover:bg-amber-100 border-y border-amber-200/60 transition-colors group"
                             >
-                              <span className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 bg-amber-900/30 text-amber-500">Ad</span>
+                              <span className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 bg-amber-200 text-amber-800">Ad</span>
                               <CreatorAvatar src={c?.profile_image} name={c?.display_name} size="sm" rounded="rounded-lg" />
                               <div className="min-w-0 flex-1">
-                                <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-amber-300 transition-colors">{c?.display_name}</p>
+                                <p className="text-sm font-semibold text-neutral-900 truncate group-hover:text-amber-300 transition-colors">{c?.display_name}</p>
                               </div>
                               <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex-shrink-0">⭐ Premium</span>
                             </Link>
@@ -259,23 +259,23 @@ function RankingsOverview() {
                             <Link
                               key={creator.id}
                               to={`/${creator.platform}/${creator.username}`}
-                              className="flex items-center gap-3 px-5 py-3 hover:bg-gray-800/50 transition-colors group"
+                              className="flex items-center gap-3 px-5 py-3 hover:bg-neutral-50 transition-colors group"
                             >
                               <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                                 index === 0 ? 'bg-yellow-500/20 text-yellow-300 ring-1 ring-yellow-500/40' :
                                 index === 1 ? 'bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/30' :
                                 index === 2 ? 'bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/40' :
-                                'bg-gray-800/50 text-gray-500'
+                                'bg-neutral-50 text-neutral-400'
                               }`}>
                                 {index + 1}
                               </span>
                               <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="sm" />
                               <div className="min-w-0 flex-1">
-                                <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
+                                <p className="text-sm font-semibold text-neutral-900 truncate group-hover:text-indigo-400 transition-colors">
                                   {creator.display_name}
                                 </p>
                               </div>
-                              <span className="text-sm font-medium text-gray-300 flex-shrink-0">
+                              <span className="text-sm font-medium text-neutral-700 flex-shrink-0">
                                 {formatNumber(creator.subscribers)} {follLabel}
                               </span>
                             </Link>
@@ -286,7 +286,7 @@ function RankingsOverview() {
                     </div>
 
                     {/* View Full Rankings Button */}
-                    <div className="px-5 py-3 border-t border-gray-800">
+                    <div className="px-5 py-3 border-t border-neutral-200">
                       <Link
                         to={`/rankings/${platform.id}`}
                         className={`block w-full text-center py-2.5 rounded-xl text-sm font-medium ${platform.color} text-white ${platform.hoverColor} transition-colors`}
@@ -452,7 +452,7 @@ function PlatformRankings({ urlPlatform }) {
   }, [sortedRankings, sponsoredListings]);
 
   const SortIcon = ({ column }) => {
-    if (sortColumn !== column) return <ArrowUpDown className="w-3.5 h-3.5 text-gray-300" />;
+    if (sortColumn !== column) return <ArrowUpDown className="w-3.5 h-3.5 text-neutral-700" />;
     return sortDirection === 'desc'
       ? <ArrowDown className="w-3.5 h-3.5 text-indigo-500" />
       : <ArrowUp className="w-3.5 h-3.5 text-indigo-500" />;
@@ -482,19 +482,19 @@ function PlatformRankings({ urlPlatform }) {
       />
       {listSchema && <StructuredData schema={listSchema} />}
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
         {/* Header */}
-        <div className="relative overflow-hidden border-b border-gray-800/60">
+        <div className="relative overflow-hidden border-b border-neutral-200">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-100">{getH1Text(currentPlatform, topCount)}</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900">{getH1Text(currentPlatform, topCount)}</h1>
               <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-xs font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Live
               </span>
             </div>
-            <p className="text-sm sm:text-base text-gray-300">{getSubheading(currentPlatform)}</p>
+            <p className="text-sm sm:text-base text-neutral-700">{getSubheading(currentPlatform)}</p>
           </div>
         </div>
 
@@ -514,8 +514,8 @@ function PlatformRankings({ urlPlatform }) {
                     isSelected
                       ? `${platform.color} text-white shadow-lg`
                       : platform.available
-                      ? 'bg-gray-900 text-gray-300 border border-gray-700 hover:border-gray-600 hover:shadow-md'
-                      : 'bg-gray-800 text-gray-300 cursor-not-allowed'
+                      ? 'bg-gray-900 text-neutral-700 border border-neutral-300 hover:border-gray-600 hover:shadow-md'
+                      : 'bg-neutral-100 text-neutral-700 cursor-not-allowed'
                   }`}
                 >
                   {Icon && <Icon className="w-5 h-5" />}
@@ -528,15 +528,15 @@ function PlatformRankings({ urlPlatform }) {
 
           {/* Rank Type Tabs + Top Count Selector */}
           <div className="flex flex-wrap items-center gap-3 mb-6">
-            <div className="flex gap-1 p-1 bg-gray-800 rounded-xl w-fit">
+            <div className="flex gap-1 p-1 bg-neutral-100 rounded-xl w-fit">
               {rankTypes.map((type) => (
                 <button
                   key={type.id}
                   onClick={() => setSelectedRankType(type.id)}
                   className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
                     selectedRankType === type.id
-                      ? 'bg-gray-900 text-gray-100 shadow-sm'
-                      : 'text-gray-400 hover:text-gray-300'
+                      ? 'bg-gray-900 text-neutral-900 shadow-sm'
+                      : 'text-neutral-500 hover:text-neutral-700'
                   }`}
                 >
                   <type.icon className="w-4 h-4 flex-shrink-0" />
@@ -549,16 +549,16 @@ function PlatformRankings({ urlPlatform }) {
             <div className="relative">
               <button
                 onClick={() => setTopCountOpen(!topCountOpen)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-xl font-medium text-gray-300 hover:border-gray-600 hover:shadow-md transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 border border-neutral-300 rounded-xl font-medium text-neutral-700 hover:border-gray-600 hover:shadow-md transition-all"
               >
                 <Trophy className="w-4 h-4 text-indigo-500" />
                 Top {topCount}
-                <ChevronDown className={`w-4 h-4 text-gray-300 transition-transform ${topCountOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-neutral-700 transition-transform ${topCountOpen ? 'rotate-180' : ''}`} />
               </button>
               {topCountOpen && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setTopCountOpen(false)} />
-                  <div className="absolute left-0 top-full mt-1 bg-gray-900 border border-gray-700 rounded-xl shadow-lg z-40 min-w-[120px] overflow-hidden">
+                  <div className="absolute left-0 top-full mt-1 bg-gray-900 border border-neutral-300 rounded-xl shadow-lg z-40 min-w-[120px] overflow-hidden">
                     {topCounts.map(count => (
                       <button
                         key={count}
@@ -569,7 +569,7 @@ function PlatformRankings({ urlPlatform }) {
                         className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors ${
                           topCount === count
                             ? 'bg-indigo-950/50 text-indigo-300'
-                            : 'text-gray-300 hover:bg-gray-800/50'
+                            : 'text-neutral-700 hover:bg-neutral-50'
                         }`}
                       >
                         Top {count}
@@ -582,14 +582,14 @@ function PlatformRankings({ urlPlatform }) {
           </div>
 
           {/* Rankings Table */}
-          <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
             {/* Sticky Table Header */}
-            <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 sticky top-0 z-10 bg-gray-900/95 backdrop-blur-md border-b border-gray-800 text-sm font-semibold text-gray-300 uppercase tracking-wider">
+            <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-neutral-200 text-sm font-semibold text-neutral-700 uppercase tracking-wider">
               <div className="col-span-1">Rank</div>
               <div className={selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'col-span-5' : 'col-span-4'}>Creator</div>
               <button
                 onClick={() => handleSort('subscribers')}
-                className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-300 transition-colors cursor-pointer"
+                className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-neutral-700 transition-colors cursor-pointer"
               >
                 <span>{followerLabel}</span>
                 <SortIcon column="subscribers" />
@@ -598,7 +598,7 @@ function PlatformRankings({ urlPlatform }) {
               {selectedPlatform === 'tiktok' && (
                 <button
                   onClick={() => handleSort('views')}
-                  className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-300 transition-colors cursor-pointer"
+                  className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-neutral-700 transition-colors cursor-pointer"
                 >
                   <span>Likes</span>
                   <SortIcon column="views" />
@@ -607,7 +607,7 @@ function PlatformRankings({ urlPlatform }) {
               {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
                 <button
                   onClick={() => handleSort('views')}
-                  className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-300 transition-colors cursor-pointer"
+                  className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-neutral-700 transition-colors cursor-pointer"
                 >
                   <span>Views</span>
                   <SortIcon column="views" />
@@ -615,12 +615,12 @@ function PlatformRankings({ urlPlatform }) {
               )}
               <button
                 onClick={() => handleSort('growth')}
-                className="col-span-1 flex items-center justify-end gap-1.5 text-right hover:text-gray-300 transition-colors cursor-pointer group"
+                className="col-span-1 flex items-center justify-end gap-1.5 text-right hover:text-neutral-700 transition-colors cursor-pointer group"
               >
                 <span>Growth</span>
                 <SortIcon column="growth" />
                 <div className="relative">
-                  <Info className="w-3.5 h-3.5 text-gray-300 cursor-help" />
+                  <Info className="w-3.5 h-3.5 text-neutral-700 cursor-help" />
                   <div className="absolute right-0 top-6 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none normal-case tracking-normal font-normal">
                     {selectedPlatform === 'youtube'
                       ? 'YouTube growth based on total views'
@@ -656,11 +656,11 @@ function PlatformRankings({ urlPlatform }) {
             {/* Empty State */}
             {!loading && !error && rankings.length === 0 && (
               <div className="px-6 py-16 text-center">
-                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Trophy className="w-8 h-8 text-gray-300" />
+                <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Trophy className="w-8 h-8 text-neutral-700" />
                 </div>
-                <p className="text-gray-300 font-medium mb-2">No ranking data available yet</p>
-                <p className="text-sm text-gray-300">Rankings will appear here once creators are tracked</p>
+                <p className="text-neutral-700 font-medium mb-2">No ranking data available yet</p>
+                <p className="text-sm text-neutral-700">Rankings will appear here once creators are tracked</p>
               </div>
             )}
 
@@ -675,13 +675,13 @@ function PlatformRankings({ urlPlatform }) {
                     to={`/${creator.platform}/${creator.username}`}
                     className={`grid grid-cols-12 gap-4 px-6 py-4 items-center border-b transition-colors group ${
                       isPremium
-                        ? 'border-amber-800/50 bg-amber-950/20 hover:bg-amber-950/30'
-                        : 'border-amber-900/30 bg-amber-950/10 hover:bg-amber-950/20'
+                        ? 'border-amber-200/60 bg-amber-50 hover:bg-amber-100'
+                        : 'border-amber-100 bg-amber-50/50 hover:bg-amber-50'
                     }`}
                   >
                     {/* "Ad" badge in rank column */}
                     <div className="col-span-2 md:col-span-1 flex items-center">
-                      <span className="inline-flex items-center px-2 py-1 rounded-lg bg-amber-900/40 border border-amber-800/50 text-amber-400 text-xs font-bold tracking-wide">
+                      <span className="inline-flex items-center px-2 py-1 rounded-lg bg-amber-100 border border-amber-200 text-amber-800 text-xs font-bold tracking-wide">
                         Ad
                       </span>
                     </div>
@@ -691,13 +691,13 @@ function PlatformRankings({ urlPlatform }) {
                       <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="lg" />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className={`font-semibold truncate transition-colors ${isPremium ? 'text-gray-100 group-hover:text-amber-300' : 'text-gray-100 group-hover:text-amber-400'}`}>
+                          <p className="font-semibold truncate text-neutral-900 group-hover:text-amber-700 transition-colors">
                             {creator.display_name}
                           </p>
                           <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold flex-shrink-0 ${
                             isPremium
-                              ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                              : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                              ? 'bg-amber-200 text-amber-800 border border-amber-300'
+                              : 'bg-amber-100 text-amber-700 border border-amber-200'
                           }`}>
                             {isPremium ? '⭐ Premium' : 'Sponsored'}
                           </span>
@@ -720,7 +720,7 @@ function PlatformRankings({ urlPlatform }) {
                 <Link
                   key={creator.id}
                   to={`/${creator.platform}/${creator.username}`}
-                  className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-gray-800 hover:bg-gray-800/50 transition-colors group"
+                  className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-neutral-200 hover:bg-neutral-50 transition-colors group"
                 >
                   {/* Rank */}
                   <div className="col-span-2 md:col-span-1">
@@ -728,7 +728,7 @@ function PlatformRankings({ urlPlatform }) {
                       creator.originalRank === 1 ? 'bg-yellow-500/20 text-yellow-300 ring-1 ring-yellow-500/50' :
                       creator.originalRank === 2 ? 'bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/30' :
                       creator.originalRank === 3 ? 'bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/40' :
-                      'bg-gray-800/50 text-gray-500'
+                      'bg-neutral-50 text-neutral-400'
                     }`}>
                       {creator.originalRank}
                     </span>
@@ -738,7 +738,7 @@ function PlatformRankings({ urlPlatform }) {
                   <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-5' : 'md:col-span-4'}`}>
                     <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="lg" />
                     <div className="min-w-0">
-                      <p className="font-semibold text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
+                      <p className="font-semibold text-neutral-900 truncate group-hover:text-indigo-400 transition-colors">
                         {creator.display_name}
                       </p>
                     </div>
@@ -746,7 +746,7 @@ function PlatformRankings({ urlPlatform }) {
 
                   {/* Subscribers / Followers */}
                   <div className="hidden md:block col-span-2 text-right">
-                    <span className="font-semibold text-gray-100 tabular-nums">{formatNumber(creator.subscribers)}</span>
+                    <span className="font-semibold text-neutral-900 tabular-nums">{formatNumber(creator.subscribers)}</span>
                   </div>
 
                   {/* Sparkline trend */}
@@ -757,12 +757,12 @@ function PlatformRankings({ urlPlatform }) {
                   {/* Views / Likes (platform-dependent) */}
                   {selectedPlatform === 'tiktok' && (
                     <div className="hidden md:block col-span-2 text-right">
-                      <span className="text-gray-300 tabular-nums">{formatNumber(creator.totalViews)}</span>
+                      <span className="text-neutral-700 tabular-nums">{formatNumber(creator.totalViews)}</span>
                     </div>
                   )}
                   {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
                     <div className="hidden md:block col-span-2 text-right">
-                      <span className="text-gray-300 tabular-nums">{formatNumber(creator.totalViews)}</span>
+                      <span className="text-neutral-700 tabular-nums">{formatNumber(creator.totalViews)}</span>
                     </div>
                   )}
 
@@ -783,7 +783,7 @@ function PlatformRankings({ urlPlatform }) {
                       const denom = typeof base === 'number' && base > Math.abs(g) ? base - g : null;
                       const pct = denom && denom > 0 ? (g / denom) * 100 : null;
                       const showPct = pct !== null && Math.abs(pct) < 1000;
-                      const color = g > 0 ? 'text-emerald-400' : g < 0 ? 'text-red-400' : 'text-gray-500';
+                      const color = g > 0 ? 'text-emerald-400' : g < 0 ? 'text-red-400' : 'text-neutral-400';
                       const arrow = g > 0 ? '▲' : g < 0 ? '▼' : '·';
                       return (
                         <>
@@ -802,13 +802,13 @@ function PlatformRankings({ urlPlatform }) {
 
                   {/* Stats - Mobile (inline in creator column) */}
                   <div className="md:hidden col-span-12 pl-[52px] -mt-2 pb-1">
-                    <span className="text-xs text-gray-400">
-                      <span className="font-semibold text-gray-200">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
+                    <span className="text-xs text-neutral-500">
+                      <span className="font-semibold text-neutral-800">{formatNumber(creator.subscribers)}</span> {followerLabel.toLowerCase()}
                       {selectedPlatform === 'tiktok' && (
-                        <span className="ml-2 text-gray-500">· <span className="font-semibold text-gray-300">{formatNumber(creator.totalLikes || creator.totalViews)}</span> likes</span>
+                        <span className="ml-2 text-neutral-400">· <span className="font-semibold text-neutral-700">{formatNumber(creator.totalLikes || creator.totalViews)}</span> likes</span>
                       )}
                       {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
-                        <span className="ml-2 text-gray-500">· <span className="font-semibold text-gray-300">{formatNumber(creator.totalViews)}</span> views</span>
+                        <span className="ml-2 text-neutral-400">· <span className="font-semibold text-neutral-700">{formatNumber(creator.totalViews)}</span> views</span>
                       )}
                     </span>
                   </div>
@@ -819,23 +819,23 @@ function PlatformRankings({ urlPlatform }) {
 
           {/* SEO FAQ Section */}
           {!loading && !error && rankings.length > 0 && (
-            <div className="mt-12 bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-6 sm:p-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-6">
+            <div className="mt-12 bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 mb-6">
                 {currentPlatform?.name} Rankings FAQ
               </h2>
-              <div className="space-y-6 text-gray-300 text-sm sm:text-base leading-relaxed">
+              <div className="space-y-6 text-neutral-700 text-sm sm:text-base leading-relaxed">
                 {selectedPlatform === 'youtube' && (
                   <>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Who has the most YouTube subscribers?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">Who has the most YouTube subscribers?</h3>
                       <p>{rankings[0]?.display_name} currently holds the top spot with {formatNumber(rankings[0]?.subscribers)} subscribers. Our rankings are updated daily using the YouTube Data API.</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">How are the top YouTuber rankings calculated?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">How are the top YouTuber rankings calculated?</h3>
                       <p>We track subscriber counts, total views, and 30-day growth for every channel in our database. You can sort by subscribers, views, or fastest growing to find the top YouTubers by any metric.</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">How often are these rankings updated?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">How often are these rankings updated?</h3>
                       <p>Stats are collected multiple times per day, so the rankings reflect the latest publicly available data from YouTube.</p>
                     </div>
                   </>
@@ -843,11 +843,11 @@ function PlatformRankings({ urlPlatform }) {
                 {selectedPlatform === 'tiktok' && (
                   <>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Who has the most TikTok followers?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">Who has the most TikTok followers?</h3>
                       <p>{rankings[0]?.display_name} sits at the top with {formatNumber(rankings[0]?.subscribers)} followers. We track follower counts and likes for TikTok's biggest creators.</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Who has the most TikTok likes?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">Who has the most TikTok likes?</h3>
                       <p>Our TikTok rankings track both followers and total likes. Sort by different metrics to see who's leading in each category.</p>
                     </div>
                   </>
@@ -855,11 +855,11 @@ function PlatformRankings({ urlPlatform }) {
                 {selectedPlatform === 'twitch' && (
                   <>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Who is the most followed Twitch streamer?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">Who is the most followed Twitch streamer?</h3>
                       <p>{rankings[0]?.display_name} leads with {formatNumber(rankings[0]?.subscribers)} followers. We track all major Twitch streamers with daily updates.</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Which Twitch streamer has the most watch hours?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">Which Twitch streamer has the most watch hours?</h3>
                       <p>We track hours watched for every Twitch streamer in our database. Sort by growth to see which streamers are pulling the most watch hours over the last 30 days.</p>
                     </div>
                   </>
@@ -867,11 +867,11 @@ function PlatformRankings({ urlPlatform }) {
                 {selectedPlatform === 'kick' && (
                   <>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Who is the top Kick streamer?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">Who is the top Kick streamer?</h3>
                       <p>{rankings[0]?.display_name} leads the Kick rankings with {formatNumber(rankings[0]?.subscribers)} paid subscribers. We track all major Kick streamers with daily updates.</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">How are Kick rankings different from Twitch?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">How are Kick rankings different from Twitch?</h3>
                       <p>Kick rankings are based on paid subscriber counts rather than free followers. This makes the numbers smaller but more meaningful in terms of direct creator support.</p>
                     </div>
                   </>
@@ -879,11 +879,11 @@ function PlatformRankings({ urlPlatform }) {
                 {selectedPlatform === 'bluesky' && (
                   <>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Who has the most Bluesky followers?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">Who has the most Bluesky followers?</h3>
                       <p>{rankings[0]?.display_name} holds the top spot with {formatNumber(rankings[0]?.subscribers)} followers. We track major Bluesky accounts with daily updates via the AT Protocol API.</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">How are Bluesky rankings calculated?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">How are Bluesky rankings calculated?</h3>
                       <p>We track follower counts and post activity for Bluesky accounts. Rankings are updated daily using the public AT Protocol API, which requires no authentication.</p>
                     </div>
                   </>
@@ -891,11 +891,11 @@ function PlatformRankings({ urlPlatform }) {
                 {selectedPlatform === 'music' && (
                   <>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">Who has the most monthly listeners?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">Who has the most monthly listeners?</h3>
                       <p>{rankings[0]?.display_name} holds the top spot with {formatNumber(rankings[0]?.subscribers)} monthly listeners. Rankings update daily using the Last.fm API.</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-100 mb-1">What do the listener counts mean?</h3>
+                      <h3 className="font-semibold text-neutral-900 mb-1">What do the listener counts mean?</h3>
                       <p>Monthly listeners count the number of unique people who played an artist's music in the last 30 days. Total plays count every stream ever recorded. Both metrics come from Last.fm's global tracking data.</p>
                     </div>
                   </>

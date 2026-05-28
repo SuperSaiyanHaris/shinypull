@@ -29,7 +29,7 @@ const QUICK_LINKS = [
   { label: 'Reports',          to: '/reports',                   Icon: FileSpreadsheet, color: 'text-amber-400'   },
   { label: 'Blog',             to: '/blog',                      Icon: BookOpen,        color: 'text-sky-400'     },
   { label: 'Dashboard',        to: '/dashboard',                 Icon: LayoutDashboard, color: 'text-indigo-400'  },
-  { label: 'Account',          to: '/account',                   Icon: Settings,        color: 'text-gray-400'    },
+  { label: 'Account',          to: '/account',                   Icon: Settings,        color: 'text-neutral-500'    },
 ];
 
 const PLATFORM_LINKS = [
@@ -130,32 +130,32 @@ export default function CommandPalette() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: -4 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-2xl bg-[#0d0d14] border border-gray-800 rounded-2xl shadow-2xl shadow-indigo-500/10 overflow-hidden"
+            className="w-full max-w-2xl bg-white border border-neutral-200 rounded-2xl shadow-2xl shadow-indigo-500/10 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <Command label="Command Menu" shouldFilter={false} className="text-gray-100">
-              <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-800">
-                <Search className="w-5 h-5 text-gray-500 flex-shrink-0" />
+            <Command label="Command Menu" shouldFilter={false} className="text-neutral-900">
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-neutral-200">
+                <Search className="w-5 h-5 text-neutral-400 flex-shrink-0" />
                 <Command.Input
                   autoFocus
                   value={query}
                   onValueChange={setQuery}
                   placeholder="Search creators, jump anywhere... (try MrBeast, rankings, compare)"
-                  className="flex-1 bg-transparent text-base text-gray-100 placeholder-gray-500 focus:outline-none"
+                  className="flex-1 bg-transparent text-base text-neutral-900 placeholder-neutral-400 focus:outline-none"
                 />
-                <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-gray-800 border border-gray-700 rounded text-gray-400">
+                <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-neutral-100 border border-neutral-300 rounded text-neutral-500">
                   ESC
                 </kbd>
               </div>
 
               <Command.List className="max-h-[60vh] overflow-y-auto p-2">
-                <Command.Empty className="px-4 py-8 text-center text-sm text-gray-500">
+                <Command.Empty className="px-4 py-8 text-center text-sm text-neutral-400">
                   {searching ? 'Searching…' : query.trim().length >= 2 ? 'No creators found.' : 'Type at least 2 characters to search creators.'}
                 </Command.Empty>
 
                 {/* Creator results — only when user is searching */}
                 {results.length > 0 && (
-                  <Command.Group heading="Creators" className="px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
+                  <Command.Group heading="Creators" className="px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
                     {results.map((c) => {
                       const platformMeta = PLATFORM_ICONS[c.platform] || PLATFORM_ICONS.youtube;
                       const PIcon = platformMeta.Icon;
@@ -164,12 +164,12 @@ export default function CommandPalette() {
                           key={`${c.platform}-${c.id || c.username}`}
                           value={`${c.platform}-${c.username}-${c.display_name}`}
                           onSelect={() => go(`/${c.platform}/${c.username}`)}
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer aria-selected:bg-gray-800 hover:bg-gray-800/70 transition-colors"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer aria-selected:bg-neutral-100 hover:bg-neutral-100 transition-colors"
                         >
                           <CreatorAvatar src={c.profile_image} name={c.display_name} size="sm" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-100 truncate">{c.display_name}</p>
-                            <p className="text-xs text-gray-500 truncate">@{c.username}</p>
+                            <p className="text-sm font-semibold text-neutral-900 truncate">{c.display_name}</p>
+                            <p className="text-xs text-neutral-400 truncate">@{c.username}</p>
                           </div>
                           <PIcon className={`w-3.5 h-3.5 ${platformMeta.color} flex-shrink-0`} />
                         </Command.Item>
@@ -181,30 +181,30 @@ export default function CommandPalette() {
                 {/* Quick links — shown when no search query */}
                 {!query.trim() && (
                   <>
-                    <Command.Group heading="Jump to" className="px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
+                    <Command.Group heading="Jump to" className="px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
                       {QUICK_LINKS.map((link) => (
                         <Command.Item
                           key={link.to}
                           value={link.label}
                           onSelect={() => go(link.to)}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-gray-800 hover:bg-gray-800/70 transition-colors"
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-neutral-100 hover:bg-neutral-100 transition-colors"
                         >
                           <link.Icon className={`w-4 h-4 ${link.color}`} />
-                          <span className="text-sm text-gray-200">{link.label}</span>
+                          <span className="text-sm text-neutral-800">{link.label}</span>
                         </Command.Item>
                       ))}
                     </Command.Group>
 
-                    <Command.Group heading="Rankings" className="px-2 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
+                    <Command.Group heading="Rankings" className="px-2 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
                       {PLATFORM_LINKS.map((link) => (
                         <Command.Item
                           key={link.to}
                           value={link.label}
                           onSelect={() => go(link.to)}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-gray-800 hover:bg-gray-800/70 transition-colors"
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-neutral-100 hover:bg-neutral-100 transition-colors"
                         >
                           <link.Icon className={`w-4 h-4 ${link.color}`} />
-                          <span className="text-sm text-gray-200">{link.label}</span>
+                          <span className="text-sm text-neutral-800">{link.label}</span>
                         </Command.Item>
                       ))}
                     </Command.Group>
@@ -212,14 +212,14 @@ export default function CommandPalette() {
                 )}
               </Command.List>
 
-              <div className="flex items-center justify-between px-4 py-2.5 border-t border-gray-800 text-[11px] text-gray-500 bg-gray-900/40">
+              <div className="flex items-center justify-between px-4 py-2.5 border-t border-neutral-200 text-[11px] text-neutral-400 bg-white/60">
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 bg-gray-800 border border-gray-700 rounded text-gray-400">↑↓</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-neutral-100 border border-neutral-300 rounded text-neutral-500">↑↓</kbd>
                     <span>navigate</span>
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 bg-gray-800 border border-gray-700 rounded text-gray-400">↵</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-neutral-100 border border-neutral-300 rounded text-neutral-500">↵</kbd>
                     <span>open</span>
                   </span>
                 </div>

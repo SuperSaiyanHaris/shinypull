@@ -142,12 +142,12 @@ export default function Methodology() {
         description="Learn how ShinyPull collects and maintains creator statistics across YouTube, TikTok, Twitch, Kick, Bluesky, and Music (Last.fm)."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
         {/* Hero */}
-        <div className="relative overflow-hidden border-b border-gray-800/60 py-16">
+        <div className="relative overflow-hidden border-b border-neutral-200 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Data Methodology</h1>
-            <p className="text-xl text-gray-400">
+            <h1 className="text-4xl font-extrabold text-neutral-900 mb-4">Data Methodology</h1>
+            <p className="text-xl text-neutral-500">
               How we collect, store, and maintain creator statistics.
             </p>
           </div>
@@ -157,18 +157,18 @@ export default function Methodology() {
 
           {/* Core principles */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-100 mb-2">Our Principles</h2>
-            <p className="text-gray-400 mb-8">
+            <h2 className="text-2xl font-bold text-neutral-900 mb-2">Our Principles</h2>
+            <p className="text-neutral-500 mb-8">
               Accurate data is the whole point of this site. These are the rules we follow to keep it that way.
             </p>
             <div className="grid sm:grid-cols-2 gap-5">
               {principles.map((p) => (
-                <div key={p.title} className="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-colors">
+                <div key={p.title} className="group bg-white border border-neutral-200 rounded-2xl p-6 hover:border-neutral-300 transition-colors">
                   <div className={`w-12 h-12 bg-gradient-to-br ${p.color} rounded-xl flex items-center justify-center shadow-lg ${p.shadow} mb-4`}>
                     <p.icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="font-bold text-gray-100 mb-2">{p.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{p.body}</p>
+                  <h3 className="font-bold text-neutral-900 mb-2">{p.title}</h3>
+                  <p className="text-neutral-500 text-sm leading-relaxed">{p.body}</p>
                 </div>
               ))}
             </div>
@@ -176,32 +176,32 @@ export default function Methodology() {
 
           {/* Per-platform */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-100 mb-2">Platform Details</h2>
-            <p className="text-gray-400 mb-8">
+            <h2 className="text-2xl font-bold text-neutral-900 mb-2">Platform Details</h2>
+            <p className="text-neutral-500 mb-8">
               Each platform works differently. Here's what we track and any limitations worth knowing about.
             </p>
             <div className="space-y-6">
               {platforms.map((p) => (
-                <div key={p.name} className={`bg-gray-900 border ${p.borderColor} rounded-2xl p-6`}>
+                <div key={p.name} className={`bg-white border ${p.borderColor} rounded-2xl p-6`}>
                   <div className="flex items-center gap-3 mb-5">
                     <div className={`w-10 h-10 bg-gradient-to-br ${p.iconBg} rounded-xl flex items-center justify-center shadow-lg ${p.shadow}`}>
                       <p.icon className="w-5 h-5 text-white" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-100">{p.name}</h3>
+                    <h3 className="text-lg font-bold text-neutral-900">{p.name}</h3>
                   </div>
 
                   <div className="grid sm:grid-cols-3 gap-4 mb-5 text-sm">
                     <div>
-                      <p className="text-gray-500 uppercase text-xs font-semibold tracking-wider mb-1">Data Source</p>
-                      <p className="text-gray-300">{p.source}</p>
+                      <p className="text-neutral-400 uppercase text-xs font-semibold tracking-wider mb-1">Data Source</p>
+                      <p className="text-neutral-700">{p.source}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 uppercase text-xs font-semibold tracking-wider mb-1">Update Frequency</p>
-                      <p className="text-gray-300">{p.frequency}</p>
+                      <p className="text-neutral-400 uppercase text-xs font-semibold tracking-wider mb-1">Update Frequency</p>
+                      <p className="text-neutral-700">{p.frequency}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 uppercase text-xs font-semibold tracking-wider mb-1">Metrics Tracked</p>
-                      <ul className="text-gray-300 space-y-0.5">
+                      <p className="text-neutral-400 uppercase text-xs font-semibold tracking-wider mb-1">Metrics Tracked</p>
+                      <ul className="text-neutral-700 space-y-0.5">
                         {p.metrics.map((m) => <li key={m}>{m}</li>)}
                       </ul>
                     </div>
@@ -210,7 +210,7 @@ export default function Methodology() {
                   {p.notes.length > 0 && (
                     <div className={`${p.bgColor} rounded-xl p-4 space-y-2`}>
                       {p.notes.map((note, i) => (
-                        <p key={i} className="text-sm text-gray-300 leading-relaxed">{note}</p>
+                        <p key={i} className="text-sm text-neutral-700 leading-relaxed">{note}</p>
                       ))}
                     </div>
                   )}
@@ -220,15 +220,15 @@ export default function Methodology() {
           </section>
 
           {/* Footer CTA */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
-            <h2 className="text-xl font-bold text-gray-100 mb-2">Questions about the data?</h2>
-            <p className="text-gray-400 mb-6">
+          <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center">
+            <h2 className="text-xl font-bold text-neutral-900 mb-2">Questions about the data?</h2>
+            <p className="text-neutral-500 mb-6">
               If something looks off or you want to know more, reach out.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 to="/faq"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-100 font-semibold rounded-xl transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 font-semibold rounded-xl transition-colors"
               >
                 Browse FAQ
               </Link>

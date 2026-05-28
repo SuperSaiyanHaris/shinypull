@@ -466,7 +466,7 @@ export default function Reports() {
   /* ─── auth loading ─── */
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
       </div>
     );
@@ -480,17 +480,17 @@ export default function Reports() {
   return (
     <>
       <SEO title="Reports - ShinyPull" description="Build custom reports and export creator stats across platforms." />
-      <div className="min-h-screen bg-[#0a0a0f]">
+      <div className="min-h-screen bg-[#fafafa]">
         <div className="max-w-6xl mx-auto px-4 pt-16 pb-24">
 
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-100 flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 flex items-center gap-3">
                 <FileSpreadsheet className="w-7 h-7 text-amber-400" />
                 Reports
               </h1>
-              <p className="text-sm text-gray-400 mt-1">Build a custom report for any creators, date range, and metrics.</p>
+              <p className="text-sm text-neutral-500 mt-1">Build a custom report for any creators, date range, and metrics.</p>
             </div>
 
             {/* Saved reports dropdown */}
@@ -501,29 +501,29 @@ export default function Reports() {
                 )}
                 <button
                   onClick={() => setShowSavedDropdown(v => !v)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-sm text-gray-300 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-xl text-sm text-neutral-700 transition-colors"
                 >
                   <Clock className="w-4 h-4" />
                   Saved reports ({savedReports.length})
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-150 ${showSavedDropdown ? 'rotate-180' : ''}`} />
                 </button>
                 {showSavedDropdown && (
-                  <div className="absolute right-0 top-full mt-2 w-72 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl py-2 z-40">
+                  <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-neutral-300 rounded-xl shadow-2xl py-2 z-40">
                     {savedReports.map(r => (
-                      <div key={r.id} className="flex items-center gap-2 px-3 py-2 hover:bg-gray-800 transition-colors">
+                      <div key={r.id} className="flex items-center gap-2 px-3 py-2 hover:bg-neutral-100 transition-colors">
                         <button
                           onClick={() => { loadReport(r); setShowSavedDropdown(false); }}
-                          className="flex-1 text-left text-sm text-gray-300 truncate"
+                          className="flex-1 text-left text-sm text-neutral-700 truncate"
                           title={r.name}
                         >
                           {r.name}
                         </button>
-                        <span className="text-xs text-gray-600">
+                        <span className="text-xs text-neutral-400">
                           {(r.config?.creator_names?.length || 0)} creators
                         </span>
                         <button
                           onClick={() => deleteReport(r.id)}
-                          className="p-1 text-gray-600 hover:text-red-400 transition-colors"
+                          className="p-1 text-neutral-400 hover:text-red-400 transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -536,7 +536,7 @@ export default function Reports() {
           </div>
 
           {/* ──── Config panel ──── */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
+          <div className="bg-white border border-neutral-200 rounded-2xl p-6 mb-6">
 
             {/* Platform filter pills */}
             <div className="flex flex-wrap gap-2 mb-5">
@@ -547,7 +547,7 @@ export default function Reports() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                     platformFilter === p
                       ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+                      : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700'
                   }`}
                 >
                   {PLATFORM_LABELS[p]}
@@ -557,40 +557,40 @@ export default function Reports() {
 
             {/* Creator search */}
             <div className="relative mb-5">
-              <div className="flex items-center bg-gray-800 border border-gray-700 rounded-xl px-4 h-11">
-                <Search className="w-4 h-4 text-gray-500 flex-shrink-0" />
+              <div className="flex items-center bg-neutral-100 border border-neutral-300 rounded-xl px-4 h-11">
+                <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={e => handleSearch(e.target.value)}
                   placeholder="Search creators to add to report..."
-                  className="flex-1 bg-transparent text-[16px] sm:text-sm text-gray-200 placeholder-gray-500 ml-3 outline-none"
+                  className="flex-1 bg-transparent text-[16px] sm:text-sm text-neutral-800 placeholder-neutral-400 ml-3 outline-none"
                 />
-                {searching && <Loader2 className="w-4 h-4 text-gray-500 animate-spin" />}
+                {searching && <Loader2 className="w-4 h-4 text-neutral-400 animate-spin" />}
               </div>
 
               {/* Search dropdown */}
               {searchResults.length > 0 && (
-                <div className="absolute left-0 right-0 top-full mt-1 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl z-30 max-h-64 overflow-y-auto">
+                <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-neutral-300 rounded-xl shadow-2xl z-30 max-h-64 overflow-y-auto">
                   {searchResults.map(c => (
                     <button
                       key={c.id}
                       onClick={() => addCreator(c)}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-800 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-100 transition-colors text-left"
                     >
                       {c.profile_image ? (
                         <img src={c.profile_image} alt="" className="w-7 h-7 rounded-full object-cover" />
                       ) : (
-                        <div className="w-7 h-7 rounded-full bg-gray-700" />
+                        <div className="w-7 h-7 rounded-full bg-neutral-200" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-200 truncate">{c.display_name || c.username}</p>
-                        <p className="text-xs text-gray-500">@{c.username}</p>
+                        <p className="text-sm text-neutral-800 truncate">{c.display_name || c.username}</p>
+                        <p className="text-xs text-neutral-400">@{c.username}</p>
                       </div>
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${PLATFORM_COLORS[c.platform] || 'bg-gray-600'}`}>
                         {PLATFORM_LABELS[c.platform] || c.platform}
                       </span>
-                      <Plus className="w-4 h-4 text-gray-600" />
+                      <Plus className="w-4 h-4 text-neutral-400" />
                     </button>
                   ))}
                 </div>
@@ -603,18 +603,18 @@ export default function Reports() {
                 {selectedCreators.map(c => (
                   <div
                     key={c.id}
-                    className="flex items-center gap-2 pl-3 pr-1.5 py-1 bg-gray-800 border border-gray-700 rounded-full text-sm"
+                    className="flex items-center gap-2 pl-3 pr-1.5 py-1 bg-neutral-100 border border-neutral-300 rounded-full text-sm"
                   >
                     <span className={`w-2 h-2 rounded-full ${PLATFORM_COLORS[c.platform] || 'bg-gray-500'}`} />
-                    <span className="text-gray-300">{c.display_name || c.username}</span>
-                    <button onClick={() => removeCreator(c.id)} className="p-0.5 hover:bg-gray-700 rounded-full transition-colors">
-                      <X className="w-3.5 h-3.5 text-gray-500" />
+                    <span className="text-neutral-700">{c.display_name || c.username}</span>
+                    <button onClick={() => removeCreator(c.id)} className="p-0.5 hover:bg-neutral-200 rounded-full transition-colors">
+                      <X className="w-3.5 h-3.5 text-neutral-400" />
                     </button>
                   </div>
                 ))}
                 <button
                   onClick={() => { setSelectedCreators([]); setReportData(null); }}
-                  className="px-3 py-1 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                  className="px-3 py-1 text-xs text-neutral-400 hover:text-neutral-700 transition-colors"
                 >
                   Clear all
                 </button>
@@ -625,7 +625,7 @@ export default function Reports() {
             <div className="flex flex-col sm:flex-row gap-4">
               {/* Date range */}
               <div className="flex-1">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">
                   <Calendar className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
                   Date Range
                 </label>
@@ -637,7 +637,7 @@ export default function Reports() {
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                         dateRange === r.id
                           ? 'bg-indigo-600 text-white'
-                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                          : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
                       }`}
                     >
                       {r.label}
@@ -648,7 +648,7 @@ export default function Reports() {
 
               {/* Metrics */}
               <div className="flex-1">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">
                   <Filter className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
                   Metrics
                 </label>
@@ -660,7 +660,7 @@ export default function Reports() {
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                         selectedMetrics.has(m.id)
                           ? 'bg-emerald-600 text-white'
-                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                          : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
                       }`}
                     >
                       {m.label}
@@ -682,7 +682,7 @@ export default function Reports() {
               </button>
 
               {selectedCreators.length === 0 && (
-                <span className="text-xs text-gray-600">Add at least one creator to generate a report.</span>
+                <span className="text-xs text-neutral-400">Add at least one creator to generate a report.</span>
               )}
               {reportError && (
                 <span className="text-xs text-red-400">{reportError}</span>
@@ -692,11 +692,11 @@ export default function Reports() {
 
           {/* ──── Results ──── */}
           {reportData && (
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+            <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden">
 
               {/* Results toolbar */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-5 border-b border-gray-800">
-                <p className="text-sm text-gray-400">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-5 border-b border-neutral-200">
+                <p className="text-sm text-neutral-500">
                   {reportData.summary.length} creator{reportData.summary.length !== 1 ? 's' : ''} · {DATE_RANGES.find(r => r.id === dateRange)?.label}
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
@@ -709,7 +709,7 @@ export default function Reports() {
                         onChange={e => setSaveName(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && saveReport()}
                         placeholder="Report name..."
-                        className="w-44 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-[16px] sm:text-sm text-gray-200 placeholder-gray-500 outline-none focus:border-indigo-500"
+                        className="w-44 px-3 py-1.5 bg-neutral-100 border border-neutral-300 rounded-lg text-[16px] sm:text-sm text-neutral-800 placeholder-neutral-400 outline-none focus:border-indigo-500"
                         autoFocus
                       />
                       <button
@@ -719,14 +719,14 @@ export default function Reports() {
                       >
                         <Check className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => { setShowSaveInput(false); setSaveName(''); }} className="p-1.5 text-gray-500 hover:text-gray-300">
+                      <button onClick={() => { setShowSaveInput(false); setSaveName(''); }} className="p-1.5 text-neutral-400 hover:text-neutral-700">
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ) : (
                     <button
                       onClick={() => setShowSaveInput(true)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-xs text-gray-300 transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg text-xs text-neutral-700 transition-colors"
                     >
                       <Save className="w-3.5 h-3.5" />
                       Save template
@@ -736,7 +736,7 @@ export default function Reports() {
                   {/* Copy */}
                   <button
                     onClick={copyToClipboard}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-xs text-gray-300 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg text-xs text-neutral-700 transition-colors"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied ? 'Copied' : 'Copy'}
@@ -745,7 +745,7 @@ export default function Reports() {
                   {/* Summary CSV */}
                   <button
                     onClick={exportCsv}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-xs text-gray-300 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg text-xs text-neutral-700 transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Summary CSV
@@ -766,34 +766,34 @@ export default function Reports() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-800 bg-gray-900/60">
-                      <th className="text-left py-3 px-4 text-gray-400 font-semibold">Creator</th>
-                      <th className="text-left py-3 px-3 text-gray-400 font-semibold">Platform</th>
+                    <tr className="border-b border-neutral-200 bg-white/60">
+                      <th className="text-left py-3 px-4 text-neutral-500 font-semibold">Creator</th>
+                      <th className="text-left py-3 px-3 text-neutral-500 font-semibold">Platform</th>
                       {selectedMetrics.has('subscribers') && (
                         <th
-                          className="text-right py-3 px-3 text-gray-400 font-semibold cursor-pointer hover:text-gray-200 transition-colors select-none"
+                          className="text-right py-3 px-3 text-neutral-500 font-semibold cursor-pointer hover:text-neutral-800 transition-colors select-none"
                           onClick={() => handleSort('subscribers')}
                         >
                           Subs / Followers {sortCol === 'subscribers' ? (sortAsc ? '↑' : '↓') : ''}
                         </th>
                       )}
                       {selectedMetrics.has('subscribers') && (
-                        <th className="text-right py-3 px-3 text-gray-400 font-semibold">Growth</th>
+                        <th className="text-right py-3 px-3 text-neutral-500 font-semibold">Growth</th>
                       )}
                       {selectedMetrics.has('total_views') && (
                         <th
-                          className="text-right py-3 px-3 text-gray-400 font-semibold cursor-pointer hover:text-gray-200 transition-colors select-none"
+                          className="text-right py-3 px-3 text-neutral-500 font-semibold cursor-pointer hover:text-neutral-800 transition-colors select-none"
                           onClick={() => handleSort('total_views')}
                         >
                           Views / Likes {sortCol === 'total_views' ? (sortAsc ? '↑' : '↓') : ''}
                         </th>
                       )}
                       {selectedMetrics.has('total_views') && (
-                        <th className="text-right py-3 px-3 text-gray-400 font-semibold">Growth</th>
+                        <th className="text-right py-3 px-3 text-neutral-500 font-semibold">Growth</th>
                       )}
                       {selectedMetrics.has('total_posts') && (
                         <th
-                          className="text-right py-3 px-3 text-gray-400 font-semibold cursor-pointer hover:text-gray-200 transition-colors select-none"
+                          className="text-right py-3 px-3 text-neutral-500 font-semibold cursor-pointer hover:text-neutral-800 transition-colors select-none"
                           onClick={() => handleSort('total_posts')}
                         >
                           Posts {sortCol === 'total_posts' ? (sortAsc ? '↑' : '↓') : ''}
@@ -801,7 +801,7 @@ export default function Reports() {
                       )}
                       {selectedMetrics.has('hours_watched_day') && (
                         <th
-                          className="text-right py-3 px-3 text-gray-400 font-semibold cursor-pointer hover:text-gray-200 transition-colors select-none"
+                          className="text-right py-3 px-3 text-neutral-500 font-semibold cursor-pointer hover:text-neutral-800 transition-colors select-none"
                           onClick={() => handleSort('hours_watched_day')}
                         >
                           Hrs Watched {sortCol === 'hours_watched_day' ? (sortAsc ? '↑' : '↓') : ''}
@@ -809,7 +809,7 @@ export default function Reports() {
                       )}
                       {selectedMetrics.has('peak_viewers_day') && (
                         <th
-                          className="text-right py-3 px-3 text-gray-400 font-semibold cursor-pointer hover:text-gray-200 transition-colors select-none"
+                          className="text-right py-3 px-3 text-neutral-500 font-semibold cursor-pointer hover:text-neutral-800 transition-colors select-none"
                           onClick={() => handleSort('peak_viewers_day')}
                         >
                           Peak {sortCol === 'peak_viewers_day' ? (sortAsc ? '↑' : '↓') : ''}
@@ -817,7 +817,7 @@ export default function Reports() {
                       )}
                       {selectedMetrics.has('avg_viewers_day') && (
                         <th
-                          className="text-right py-3 px-3 text-gray-400 font-semibold cursor-pointer hover:text-gray-200 transition-colors select-none"
+                          className="text-right py-3 px-3 text-neutral-500 font-semibold cursor-pointer hover:text-neutral-800 transition-colors select-none"
                           onClick={() => handleSort('avg_viewers_day')}
                         >
                           Avg Viewers {sortCol === 'avg_viewers_day' ? (sortAsc ? '↑' : '↓') : ''}
@@ -827,15 +827,15 @@ export default function Reports() {
                   </thead>
                   <tbody>
                     {getSortedSummary().map((s, i) => (
-                      <tr key={s.creator.id} className={`border-b border-gray-800/40 hover:bg-gray-800/30 transition-colors ${i % 2 === 0 ? '' : 'bg-gray-900/30'}`}>
+                      <tr key={s.creator.id} className={`border-b border-neutral-200/40 hover:bg-neutral-50 transition-colors ${i % 2 === 0 ? '' : 'bg-white/30'}`}>
                         <td className="py-3 px-4">
                           <Link to={`/${s.creator.platform}/${s.creator.username}`} className="flex items-center gap-2.5 group/link">
                             {s.creator.profile_image ? (
                               <img src={s.creator.profile_image} alt="" className="w-7 h-7 rounded-full object-cover" />
                             ) : (
-                              <div className="w-7 h-7 rounded-full bg-gray-700" />
+                              <div className="w-7 h-7 rounded-full bg-neutral-200" />
                             )}
-                            <span className="text-gray-200 group-hover/link:text-indigo-400 transition-colors truncate max-w-[180px]">
+                            <span className="text-neutral-800 group-hover/link:text-indigo-400 transition-colors truncate max-w-[180px]">
                               {s.creator.display_name || s.creator.username}
                             </span>
                           </Link>
@@ -846,46 +846,46 @@ export default function Reports() {
                           </span>
                         </td>
                         {selectedMetrics.has('subscribers') && (
-                          <td className="py-3 px-3 text-right text-gray-200 font-medium tabular-nums">
+                          <td className="py-3 px-3 text-right text-neutral-800 font-medium tabular-nums">
                             {formatNumber(s.subscribers)}
                           </td>
                         )}
                         {selectedMetrics.has('subscribers') && (
                           <td className={`py-3 px-3 text-right text-xs tabular-nums ${
-                            s.subscribersGrowth > 0 ? 'text-emerald-400' : s.subscribersGrowth < 0 ? 'text-red-400' : 'text-gray-600'
+                            s.subscribersGrowth > 0 ? 'text-emerald-400' : s.subscribersGrowth < 0 ? 'text-red-400' : 'text-neutral-400'
                           }`}>
                             {fmtDelta(s.subscribersGrowth)}
                           </td>
                         )}
                         {selectedMetrics.has('total_views') && (
-                          <td className="py-3 px-3 text-right text-gray-200 tabular-nums">
+                          <td className="py-3 px-3 text-right text-neutral-800 tabular-nums">
                             {formatNumber(s.total_views)}
                           </td>
                         )}
                         {selectedMetrics.has('total_views') && (
                           <td className={`py-3 px-3 text-right text-xs tabular-nums ${
-                            s.viewsGrowth > 0 ? 'text-emerald-400' : s.viewsGrowth < 0 ? 'text-red-400' : 'text-gray-600'
+                            s.viewsGrowth > 0 ? 'text-emerald-400' : s.viewsGrowth < 0 ? 'text-red-400' : 'text-neutral-400'
                           }`}>
                             {fmtDelta(s.viewsGrowth)}
                           </td>
                         )}
                         {selectedMetrics.has('total_posts') && (
-                          <td className="py-3 px-3 text-right text-gray-200 tabular-nums">
+                          <td className="py-3 px-3 text-right text-neutral-800 tabular-nums">
                             {formatNumber(s.total_posts)}
                           </td>
                         )}
                         {selectedMetrics.has('hours_watched_day') && (
-                          <td className="py-3 px-3 text-right text-gray-200 tabular-nums">
+                          <td className="py-3 px-3 text-right text-neutral-800 tabular-nums">
                             {s.hours_watched_day ? formatNumber(s.hours_watched_day) : '—'}
                           </td>
                         )}
                         {selectedMetrics.has('peak_viewers_day') && (
-                          <td className="py-3 px-3 text-right text-gray-200 tabular-nums">
+                          <td className="py-3 px-3 text-right text-neutral-800 tabular-nums">
                             {s.peak_viewers_day ? formatNumber(s.peak_viewers_day) : '—'}
                           </td>
                         )}
                         {selectedMetrics.has('avg_viewers_day') && (
-                          <td className="py-3 px-3 text-right text-gray-200 tabular-nums">
+                          <td className="py-3 px-3 text-right text-neutral-800 tabular-nums">
                             {s.avg_viewers_day ? formatNumber(s.avg_viewers_day) : '—'}
                           </td>
                         )}
@@ -897,7 +897,7 @@ export default function Reports() {
 
               {/* Empty state */}
               {reportData.summary.length === 0 && (
-                <div className="py-16 text-center text-gray-500 text-sm">
+                <div className="py-16 text-center text-neutral-400 text-sm">
                   No data found for the selected creators and date range.
                 </div>
               )}
@@ -906,9 +906,9 @@ export default function Reports() {
 
           {/* Empty state when no report yet */}
           {!reportData && !loadingReport && selectedCreators.length === 0 && (
-            <div className="text-center py-20 text-gray-500">
-              <FileSpreadsheet className="w-12 h-12 mx-auto mb-4 text-gray-700" />
-              <p className="text-lg font-semibold text-gray-400 mb-2">No report yet</p>
+            <div className="text-center py-20 text-neutral-400">
+              <FileSpreadsheet className="w-12 h-12 mx-auto mb-4 text-neutral-300" />
+              <p className="text-lg font-semibold text-neutral-500 mb-2">No report yet</p>
               <p className="text-sm">Search for creators above, configure your filters, and hit Generate.</p>
             </div>
           )}

@@ -3,8 +3,8 @@ import SEO from '../components/SEO';
 function Section({ title, children }) {
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-bold text-gray-100 mb-3">{title}</h2>
-      <div className="text-gray-300 leading-relaxed space-y-3">{children}</div>
+      <h2 className="text-xl font-bold text-neutral-900 mb-3">{title}</h2>
+      <div className="text-neutral-700 leading-relaxed space-y-3">{children}</div>
     </div>
   );
 }
@@ -17,17 +17,17 @@ export default function Refunds() {
         description="ShinyPull's refund policy for Sub and Mod subscriptions."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
         {/* Hero */}
-        <div className="relative overflow-hidden border-b border-gray-800/60 py-16">
+        <div className="relative overflow-hidden border-b border-neutral-200 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Refund Policy</h1>
-            <p className="text-gray-400">Last updated: February 28, 2026</p>
+            <h1 className="text-4xl font-extrabold text-neutral-900 mb-4">Refund Policy</h1>
+            <p className="text-neutral-500">Last updated: February 28, 2026</p>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto px-4 py-12">
-          <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8">
+          <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-8">
             <div className="prose max-w-none">
 
               <Section title="No Refunds">

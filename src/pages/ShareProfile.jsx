@@ -89,7 +89,7 @@ export default function ShareProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -97,8 +97,8 @@ export default function ShareProfile() {
 
   if (error || !creator) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <p className="text-gray-400">Creator not found.</p>
+      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
+        <p className="text-neutral-500">Creator not found.</p>
       </div>
     );
   }
@@ -110,9 +110,9 @@ export default function ShareProfile() {
         description={`${creator.display_name}'s ${platform} stats. ${formatNumber(latestCount)} ${config.primary.toLowerCase()}${growth30d !== null ? `, ${growth30d >= 0 ? '+' : ''}${formatNumber(growth30d)} in the last 30 days` : ''}.`}
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center p-4">
         <div className="w-full max-w-lg">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+          <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden shadow-2xl">
             {/* Platform accent bar */}
             <div className={`h-1.5 ${colors.bg}`} />
 
@@ -124,12 +124,12 @@ export default function ShareProfile() {
                   name={creator.display_name}
                   size="xl"
                   rounded="rounded-2xl"
-                  className="!w-16 !h-16 sm:!w-20 sm:!h-20 border-2 border-gray-700"
+                  className="!w-16 !h-16 sm:!w-20 sm:!h-20 border-2 border-neutral-300"
                 />
                 <div className="min-w-0">
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-100 truncate">{creator.display_name}</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 truncate">{creator.display_name}</h1>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className="text-sm text-gray-400">@{creator.username}</span>
+                    <span className="text-sm text-neutral-500">@{creator.username}</span>
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${colors.bg} text-white`}>
                       {Icon && <Icon className="w-3 h-3" />}
                       {platform}
@@ -141,15 +141,15 @@ export default function ShareProfile() {
               {/* Stats grid */}
               <div className={`grid gap-3 mb-6 ${secondary ? 'grid-cols-3' : 'grid-cols-2'}`}>
                 {/* Primary */}
-                <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4">
-                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">{config.primary}</p>
-                  <p className="text-xl sm:text-2xl font-black text-gray-100">{formatNumber(latestCount)}</p>
+                <div className="bg-neutral-50 rounded-xl p-3 sm:p-4">
+                  <p className="text-xs text-neutral-500 uppercase tracking-wider mb-1">{config.primary}</p>
+                  <p className="text-xl sm:text-2xl font-black text-neutral-900">{formatNumber(latestCount)}</p>
                 </div>
 
                 {/* 30-day growth */}
                 {growth30d !== null && (
-                  <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Last 30d</p>
+                  <div className="bg-neutral-50 rounded-xl p-3 sm:p-4">
+                    <p className="text-xs text-neutral-500 uppercase tracking-wider mb-1">Last 30d</p>
                     <p className={`text-xl sm:text-2xl font-black ${growth30d >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                       {growth30d >= 0 ? '+' : ''}{formatNumber(growth30d)}
                     </p>
@@ -166,9 +166,9 @@ export default function ShareProfile() {
 
                 {/* Secondary (views / likes / posts) */}
                 {secondary && (
-                  <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">{secondary.label}</p>
-                    <p className="text-xl sm:text-2xl font-black text-gray-100">{formatNumber(secondary.value)}</p>
+                  <div className="bg-neutral-50 rounded-xl p-3 sm:p-4">
+                    <p className="text-xs text-neutral-500 uppercase tracking-wider mb-1">{secondary.label}</p>
+                    <p className="text-xl sm:text-2xl font-black text-neutral-900">{formatNumber(secondary.value)}</p>
                   </div>
                 )}
               </div>
@@ -210,8 +210,8 @@ export default function ShareProfile() {
               )}
 
               {/* Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-800">
-                <p className="text-xs text-gray-600">
+              <div className="flex items-center justify-between pt-4 border-t border-neutral-200">
+                <p className="text-xs text-neutral-400">
                   {trackingSince ? `Tracked since ${trackingSince} · ` : ''}Powered by ShinyPull
                 </p>
                 <Link

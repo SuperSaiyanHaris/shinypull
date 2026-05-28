@@ -108,19 +108,19 @@ function FAQItem({ q, a }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border border-gray-800 rounded-xl overflow-hidden">
+    <div className="border border-neutral-200 rounded-xl overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left bg-gray-900 hover:bg-gray-800/60 transition-colors"
+        className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left bg-white hover:bg-neutral-50 transition-colors"
       >
-        <span className="font-semibold text-gray-100">{q}</span>
+        <span className="font-semibold text-neutral-900">{q}</span>
         {open
           ? <ChevronUp className="w-5 h-5 text-indigo-400 flex-shrink-0" />
-          : <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+          : <ChevronDown className="w-5 h-5 text-neutral-400 flex-shrink-0" />
         }
       </button>
       {open && (
-        <div className="px-6 py-4 bg-gray-900/50 border-t border-gray-800 text-gray-300 leading-relaxed">
+        <div className="px-6 py-4 bg-white/50 border-t border-neutral-200 text-neutral-700 leading-relaxed">
           {typeof a === 'string' ? a : a}
         </div>
       )}
@@ -136,12 +136,12 @@ export default function FAQ() {
         description="Frequently asked questions about ShinyPull. Learn how we track creator stats, how often data updates, and how to add a creator."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
         {/* Hero */}
-        <div className="relative overflow-hidden border-b border-gray-800/60 py-16">
+        <div className="relative overflow-hidden border-b border-neutral-200 py-16">
           <div className="max-w-3xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Frequently Asked Questions</h1>
-            <p className="text-xl text-gray-400">
+            <h1 className="text-4xl font-extrabold text-neutral-900 mb-4">Frequently Asked Questions</h1>
+            <p className="text-xl text-neutral-500">
               Common questions about ShinyPull, our data, and how everything works.
             </p>
           </div>
@@ -161,9 +161,9 @@ export default function FAQ() {
             </div>
           ))}
 
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
-            <h2 className="text-xl font-bold text-gray-100 mb-2">Still have questions?</h2>
-            <p className="text-gray-400 mb-6">
+          <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center">
+            <h2 className="text-xl font-bold text-neutral-900 mb-2">Still have questions?</h2>
+            <p className="text-neutral-500 mb-6">
               We're happy to help. Reach out and we'll get back to you within 24-48 hours.
             </p>
             <Link

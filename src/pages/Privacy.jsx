@@ -8,17 +8,17 @@ export default function Privacy() {
         description="Learn how ShinyPull collects, uses, and protects your personal information."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
         {/* Hero */}
-        <div className="relative overflow-hidden border-b border-gray-800/60 py-16">
+        <div className="relative overflow-hidden border-b border-neutral-200 py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-extrabold text-gray-100 mb-4">Privacy Policy</h1>
-            <p className="text-gray-400">Last updated: February 11, 2026</p>
+            <h1 className="text-4xl font-extrabold text-neutral-900 mb-4">Privacy Policy</h1>
+            <p className="text-neutral-500">Last updated: February 11, 2026</p>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto px-4 py-12">
-          <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-8">
+          <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-8">
             <div className="prose max-w-none">
               <Section title="Legal Notes">
                 <p className="mb-4">
@@ -114,7 +114,7 @@ export default function Privacy() {
                   settings page.
                 </p>
                 <p className="mb-2">ShinyPull may share your information for the following reasons:</p>
-                <ul className="list-disc list-inside text-gray-300 space-y-1 mb-4">
+                <ul className="list-disc list-inside text-neutral-700 space-y-1 mb-4">
                   <li>We may disclose the information we collect from you to comply with the law, a court order, or other legal process.</li>
                   <li>We may disclose the information we collect from you where we believe it is necessary to investigate, or prevent illegal activities, suspected fraud, situations involving potential threats to the safety of any person, violations of our Terms of Use or this Policy, or as evidence in litigation in which we are involved.</li>
                   <li>We may share aggregate information about users with third parties for marketing, advertising, research, or similar purposes.</li>
@@ -171,7 +171,7 @@ export default function Privacy() {
             </div>
           </div>
 
-          <div className="text-center text-sm text-gray-300 mt-8">
+          <div className="text-center text-sm text-neutral-700 mt-8">
             <p>Copyright ©2026 ShinyPull</p>
           </div>
         </div>
@@ -183,8 +183,8 @@ export default function Privacy() {
 function Section({ title, children }) {
   return (
     <section className="mb-8">
-      <h2 className="text-xl font-bold text-gray-100 mb-4">{title}</h2>
-      <div className="text-gray-300 leading-relaxed">{children}</div>
+      <h2 className="text-xl font-bold text-neutral-900 mb-4">{title}</h2>
+      <div className="text-neutral-700 leading-relaxed">{children}</div>
     </section>
   );
 }

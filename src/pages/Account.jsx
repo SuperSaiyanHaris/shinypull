@@ -229,13 +229,13 @@ export default function Account() {
     return (
       <>
         <SEO title="Sign in to manage your account" description="Sign in to ShinyPull to manage featured listings and your account." />
-        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4">
-          <div className="max-w-md w-full bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
+        <div className="min-h-screen bg-[#fafafa] flex items-center justify-center px-4">
+          <div className="max-w-md w-full bg-white border border-neutral-200 rounded-2xl p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
               <Megaphone className="w-7 h-7 text-white" />
             </div>
-            <h1 className="text-2xl font-extrabold text-gray-100 mb-2">Sign in to continue</h1>
-            <p className="text-sm text-gray-400 mb-6">
+            <h1 className="text-2xl font-extrabold text-neutral-900 mb-2">Sign in to continue</h1>
+            <p className="text-sm text-neutral-500 mb-6">
               You need an account to manage featured listings, follow creators, and access your dashboard. Takes 10 seconds.
             </p>
             <button
@@ -249,7 +249,7 @@ export default function Account() {
             >
               Sign in / Sign up
             </button>
-            <Link to="/promote" className="block mt-4 text-sm text-gray-500 hover:text-gray-300 transition-colors">
+            <Link to="/promote" className="block mt-4 text-sm text-neutral-400 hover:text-neutral-700 transition-colors">
               Back to Featured Listings overview
             </Link>
           </div>
@@ -312,43 +312,43 @@ export default function Account() {
         description="Manage your ShinyPull account, display name, and password."
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+      <div className="min-h-screen bg-[#fafafa]">
         {/* Page header */}
-        <div className="border-b border-gray-800/60">
+        <div className="border-b border-neutral-200">
           <div className="max-w-5xl mx-auto px-4 py-6">
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-indigo-400 transition-colors mb-4"
+              className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-indigo-400 transition-colors mb-4"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Link>
-            <h1 className="text-2xl font-extrabold text-gray-100">Account Settings</h1>
+            <h1 className="text-2xl font-extrabold text-neutral-900">Account Settings</h1>
           </div>
         </div>
 
         <div className="max-w-5xl mx-auto px-4 py-8">
 
           {/* Profile summary card */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-8 flex items-center gap-4">
+          <div className="bg-white border border-neutral-200 rounded-2xl p-5 mb-8 flex items-center gap-4">
             {/* Avatar */}
             <div className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-extrabold text-white flex-shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600">
               {initials}
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-100 truncate mb-0.5">{nameForDisplay}</p>
-              <p className="text-sm text-gray-400 truncate">{user.email}</p>
+              <p className="font-semibold text-neutral-900 truncate mb-0.5">{nameForDisplay}</p>
+              <p className="text-sm text-neutral-500 truncate">{user.email}</p>
             </div>
 
             <div className="hidden sm:flex items-center gap-8 flex-shrink-0 pr-2">
               <div className="text-center">
-                <p className="text-xl font-bold text-gray-100">{followCount ?? '—'}</p>
-                <p className="text-xs text-gray-500 mt-0.5">Following</p>
+                <p className="text-xl font-bold text-neutral-900">{followCount ?? '—'}</p>
+                <p className="text-xs text-neutral-400 mt-0.5">Following</p>
               </div>
               <div className="text-center">
-                <p className="text-sm font-semibold text-gray-100">{memberSince}</p>
-                <p className="text-xs text-gray-500 mt-0.5">Member since</p>
+                <p className="text-sm font-semibold text-neutral-900">{memberSince}</p>
+                <p className="text-xs text-neutral-400 mt-0.5">Member since</p>
               </div>
             </div>
           </div>
@@ -368,21 +368,21 @@ export default function Account() {
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-left transition-all ${
                         isActive
-                          ? 'bg-gray-800 text-gray-100'
-                          : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/40'
+                          ? 'bg-neutral-100 text-neutral-900'
+                          : 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50'
                       }`}
                     >
                       <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-indigo-400' : ''}`} />
                       {tab.label}
-                      {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto text-gray-600" />}
+                      {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto text-neutral-400" />}
                     </button>
                   );
                 })}
               </nav>
-              <div className="mt-6 pt-5 border-t border-gray-800">
+              <div className="mt-6 pt-5 border-t border-neutral-200">
                 <button
                   onClick={signOut}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:text-red-400 hover:bg-red-950/20 transition-all"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-neutral-500 hover:text-red-400 hover:bg-red-950/20 transition-all"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign Out
@@ -394,7 +394,7 @@ export default function Account() {
             <div className="flex-1 min-w-0">
 
               {/* Mobile tabs — fixed 4-column segmented control, no scroll */}
-              <div className="flex md:hidden mb-6 bg-gray-900 border border-gray-800 rounded-xl p-1 gap-1">
+              <div className="flex md:hidden mb-6 bg-white border border-neutral-200 rounded-xl p-1 gap-1">
                 {TABS.map(tab => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
@@ -405,7 +405,7 @@ export default function Account() {
                       className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg text-[10px] font-semibold transition-all ${
                         isActive
                           ? 'bg-indigo-600 text-white shadow-sm'
-                          : 'text-gray-400 hover:text-gray-200'
+                          : 'text-neutral-500 hover:text-neutral-800'
                       }`}
                     >
                       <Icon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -418,22 +418,22 @@ export default function Account() {
               {/* ── Listings tab ── */}
               {activeTab === 'listings' && (
                 <div className="space-y-4">
-                  <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+                  <div className="bg-white border border-neutral-200 rounded-2xl p-6">
                     <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
                       <div className="flex items-center gap-2">
                         <Megaphone className="w-4 h-4 text-amber-400" />
-                        <h2 className="text-base font-semibold text-gray-100">Featured Listings</h2>
+                        <h2 className="text-base font-semibold text-neutral-900">Featured Listings</h2>
                       </div>
                       <Link to="/promote" className="text-xs font-medium text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
                         Learn more <ExternalLink className="w-3 h-3" />
                       </Link>
                     </div>
-                    <p className="text-sm text-gray-400 mt-1 mb-5">Promote any creator across our rankings. Cancel anytime.</p>
+                    <p className="text-sm text-neutral-500 mt-1 mb-5">Promote any creator across our rankings. Cancel anytime.</p>
 
                     {/* Existing listings */}
                     {featuredListings.length > 0 && (
                       <div className="mb-6 space-y-2">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Active Listings</p>
+                        <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Active Listings</p>
                         {featuredListings.map(listing => {
                           const c = listing.creators;
                           const isActive = listing.status === 'active';
@@ -442,11 +442,11 @@ export default function Account() {
                             ? new Date(listing.active_until).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                             : null;
                           return (
-                            <div key={listing.id} className="flex items-center gap-3 p-3.5 bg-gray-800/50 rounded-xl border border-gray-700/50">
+                            <div key={listing.id} className="flex items-center gap-3 p-3.5 bg-neutral-50 rounded-xl border border-neutral-300">
                               <CreatorAvatar src={c?.profile_image} name={c?.display_name} size="md" rounded="rounded-lg" />
                               <div className="min-w-0 flex-1">
-                                <p className="text-sm font-semibold text-gray-100 truncate">{c?.display_name || 'Unknown creator'}</p>
-                                <p className="text-xs text-gray-400">
+                                <p className="text-sm font-semibold text-neutral-900 truncate">{c?.display_name || 'Unknown creator'}</p>
+                                <p className="text-xs text-neutral-500">
                                   {listing.platform}
                                   {until && isActive ? ` · Until ${until}` : ''}
                                   {listing.is_mod_free ? ' · Promotional' : ''}
@@ -455,14 +455,14 @@ export default function Account() {
                               <span className={`px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${
                                 isActive ? 'bg-emerald-950/50 text-emerald-400 border border-emerald-800' :
                                 isPending ? 'bg-amber-950/50 text-amber-400 border border-amber-800' :
-                                'bg-gray-800 text-gray-500 border border-gray-700'
+                                'bg-neutral-100 text-neutral-400 border border-neutral-300'
                               }`}>
                                 {listing.status}
                               </span>
                               {isActive && !isPending && (
                                 <button
                                   onClick={() => handleCancelListing(listing.id)}
-                                  className="p-1.5 text-gray-500 hover:text-red-400 transition-colors flex-shrink-0"
+                                  className="p-1.5 text-neutral-400 hover:text-red-400 transition-colors flex-shrink-0"
                                   title="Cancel listing"
                                 >
                                   <X className="w-3.5 h-3.5" />
@@ -476,7 +476,7 @@ export default function Account() {
 
                     {/* Add new listing */}
                     <div className="space-y-3">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Add a listing</p>
+                      <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Add a listing</p>
 
                       {/* Platform selector */}
                       <div className="flex flex-wrap gap-2">
@@ -494,7 +494,7 @@ export default function Account() {
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                               listingPlatform === p
                                 ? `${PLATFORM_PILL_ACTIVE[p]} text-white`
-                                : 'bg-gray-800 text-gray-400 hover:text-gray-200 border border-gray-700'
+                                : 'bg-neutral-100 text-neutral-500 hover:text-neutral-800 border border-neutral-300'
                             }`}
                           >
                             {PLATFORM_LABELS[p]}
@@ -504,10 +504,10 @@ export default function Account() {
 
                       {/* Search input with dropdown */}
                       <div className="relative">
-                        <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl focus-within:ring-2 focus-within:ring-amber-500/50 focus-within:border-transparent">
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-neutral-100 border border-neutral-300 rounded-xl focus-within:ring-2 focus-within:ring-amber-500/50 focus-within:border-transparent">
                           {listingSearching
-                            ? <Loader className="w-4 h-4 text-gray-500 animate-spin flex-shrink-0" />
-                            : <Search className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                            ? <Loader className="w-4 h-4 text-neutral-400 animate-spin flex-shrink-0" />
+                            : <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
                           }
                           <input
                             type="text"
@@ -518,12 +518,12 @@ export default function Account() {
                               setAlreadyListed(false);
                             }}
                             placeholder={`Search ${PLATFORM_LABELS[listingPlatform]} creators...`}
-                            className="flex-1 bg-transparent text-gray-100 placeholder-gray-500 text-[16px] sm:text-sm focus:outline-none"
+                            className="flex-1 bg-transparent text-neutral-900 placeholder-neutral-400 text-[16px] sm:text-sm focus:outline-none"
                           />
                           {listingQuery && (
                             <button
                               onClick={() => { setListingQuery(''); setSelectedCreator(null); setListingResults([]); setAlreadyListed(false); setTikTokAddError(''); }}
-                              className="text-gray-500 hover:text-gray-300"
+                              className="text-neutral-400 hover:text-neutral-700"
                             >
                               <X className="w-3.5 h-3.5" />
                             </button>
@@ -532,17 +532,17 @@ export default function Account() {
 
                         {/* Dropdown results */}
                         {listingResults.length > 0 && !selectedCreator && (
-                          <div className="absolute top-full mt-1 left-0 right-0 z-10 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
+                          <div className="absolute top-full mt-1 left-0 right-0 z-10 bg-white border border-neutral-300 rounded-xl shadow-2xl overflow-hidden">
                             {listingResults.map(c => (
                               <button
                                 key={c.id}
                                 onClick={() => handleSelectCreator(c)}
-                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-800 transition-colors text-left"
+                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-100 transition-colors text-left"
                               >
                                 <CreatorAvatar src={c.profile_image} name={c.display_name} size="sm" rounded="rounded-lg" />
                                 <div className="min-w-0">
-                                  <p className="text-sm font-semibold text-gray-100 truncate">{c.display_name}</p>
-                                  <p className="text-xs text-gray-400">@{c.username}</p>
+                                  <p className="text-sm font-semibold text-neutral-900 truncate">{c.display_name}</p>
+                                  <p className="text-xs text-neutral-500">@{c.username}</p>
                                 </div>
                               </button>
                             ))}
@@ -553,8 +553,8 @@ export default function Account() {
                       {/* TikTok: not in DB — offer instant lookup */}
                       {listingPlatform === 'tiktok' && listingQuery.trim().length >= 2 && !listingSearching && listingResults.length === 0 && !selectedCreator && (
                         <div className="flex items-center gap-3 px-1">
-                          <p className="text-xs text-gray-500 flex-1 min-w-0">
-                            Not in our database. Add <span className="text-gray-300 font-medium">@{listingQuery.trim()}</span> directly.
+                          <p className="text-xs text-neutral-400 flex-1 min-w-0">
+                            Not in our database. Add <span className="text-neutral-700 font-medium">@{listingQuery.trim()}</span> directly.
                           </p>
                           <button
                             onClick={handleTikTokInstantAdd}
@@ -572,14 +572,14 @@ export default function Account() {
                       {selectedCreator && (
                         <div className="space-y-2">
                           {/* Creator info */}
-                          <div className="flex items-center gap-3 p-3.5 bg-gray-800/60 border border-gray-700/60 rounded-xl">
+                          <div className="flex items-center gap-3 p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl">
                             <CreatorAvatar src={selectedCreator.profile_image} name={selectedCreator.display_name} size="md" rounded="rounded-lg" />
                             <div className="min-w-0 flex-1">
-                              <p className="text-sm font-semibold text-gray-100 truncate">{selectedCreator.display_name}</p>
-                              <p className="text-xs text-gray-400">@{selectedCreator.username} · {selectedCreator.platform}</p>
+                              <p className="text-sm font-semibold text-neutral-900 truncate">{selectedCreator.display_name}</p>
+                              <p className="text-xs text-neutral-500">@{selectedCreator.username} · {selectedCreator.platform}</p>
                             </div>
                             {alreadyListed && (
-                              <span className="px-3 py-1.5 bg-gray-700 text-gray-400 text-xs font-semibold rounded-lg flex-shrink-0">
+                              <span className="px-3 py-1.5 bg-neutral-200 text-neutral-500 text-xs font-semibold rounded-lg flex-shrink-0">
                                 Already listed
                               </span>
                             )}
@@ -588,22 +588,22 @@ export default function Account() {
                           {/* Tier selection — proper visual cards with clear value */}
                           {!alreadyListed && (
                             <div className="space-y-2.5">
-                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider pt-1">Choose your slot</p>
+                              <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider pt-1">Choose your slot</p>
                               <div className="grid sm:grid-cols-2 gap-3">
                                 {/* Basic */}
                                 <button
                                   onClick={handlePurchaseListing}
                                   disabled={purchasingListing}
-                                  className="group relative overflow-hidden text-left bg-gray-900 hover:bg-gray-800 border border-gray-700 hover:border-indigo-500/60 disabled:opacity-50 rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/10"
+                                  className="group relative overflow-hidden text-left bg-white hover:bg-neutral-100 border border-neutral-300 hover:border-indigo-300 disabled:opacity-50 rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/10"
                                 >
                                   <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-colors" />
                                   <div className="relative">
                                     <div className="flex items-center justify-between mb-2">
                                       <span className="px-1.5 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold rounded uppercase tracking-wider">Basic</span>
-                                      <span className="text-[10px] text-gray-500">Cancel anytime</span>
+                                      <span className="text-[10px] text-neutral-400">Cancel anytime</span>
                                     </div>
-                                    <p className="text-2xl font-extrabold text-gray-100">$49<span className="text-sm font-normal text-gray-500">/mo</span></p>
-                                    <p className="text-xs text-gray-400 mt-2">Placed at rank 15, 20, 25... on the {PLATFORM_LABELS[listingPlatform]} rankings.</p>
+                                    <p className="text-2xl font-extrabold text-neutral-900">$49<span className="text-sm font-normal text-neutral-400">/mo</span></p>
+                                    <p className="text-xs text-neutral-500 mt-2">Placed at rank 15, 20, 25... on the {PLATFORM_LABELS[listingPlatform]} rankings.</p>
                                     <span className="inline-flex items-center gap-1 mt-3 text-xs font-semibold text-indigo-400 group-hover:gap-2 transition-all">
                                       {purchasingListing ? 'Redirecting…' : <>Get this slot <ChevronRight className="w-3 h-3" /></>}
                                     </span>
@@ -616,8 +616,8 @@ export default function Account() {
                                   disabled={premiumSlotsLeft === 0 || purchasingPremiumListing}
                                   className={`group relative overflow-hidden text-left rounded-2xl p-4 border transition-all duration-200 ${
                                     premiumSlotsLeft > 0
-                                      ? 'bg-gradient-to-br from-amber-950/40 to-gray-900 hover:from-amber-950/60 border-amber-700/40 hover:border-amber-500/60 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/15'
-                                      : 'bg-gray-900/60 border-gray-800 opacity-60 cursor-not-allowed'
+                                      ? 'bg-gradient-to-br from-amber-950/40 to-gray-900 hover:from-amber-950/60 border-amber-700/40 hover:border-amber-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/15'
+                                      : 'bg-white/60 border-neutral-200 opacity-60 cursor-not-allowed'
                                   }`}
                                 >
                                   {premiumSlotsLeft > 0 && (
@@ -626,16 +626,16 @@ export default function Account() {
                                   <div className="relative">
                                     <div className="flex items-center justify-between mb-2">
                                       <span className="px-1.5 py-0.5 bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold rounded uppercase tracking-wider">⭐ Premium</span>
-                                      <span className={`text-[10px] font-semibold ${premiumSlotsLeft > 0 ? 'text-amber-400' : 'text-gray-500'}`}>
+                                      <span className={`text-[10px] font-semibold ${premiumSlotsLeft > 0 ? 'text-amber-400' : 'text-neutral-400'}`}>
                                         {premiumSlotsLeft > 0 ? `${premiumSlotsLeft} of 2 left` : 'Sold out'}
                                       </span>
                                     </div>
-                                    <p className={`text-2xl font-extrabold ${premiumSlotsLeft > 0 ? 'text-gray-100' : 'text-gray-500'}`}>
-                                      $149<span className="text-sm font-normal text-gray-500">/mo</span>
+                                    <p className={`text-2xl font-extrabold ${premiumSlotsLeft > 0 ? 'text-neutral-900' : 'text-neutral-400'}`}>
+                                      $149<span className="text-sm font-normal text-neutral-400">/mo</span>
                                     </p>
-                                    <p className="text-xs text-gray-400 mt-2">Top-10 placement between rank 4-5 and 9-10. Maximum visibility.</p>
+                                    <p className="text-xs text-neutral-500 mt-2">Top-10 placement between rank 4-5 and 9-10. Maximum visibility.</p>
                                     <span className={`inline-flex items-center gap-1 mt-3 text-xs font-semibold transition-all ${
-                                      premiumSlotsLeft > 0 ? 'text-amber-400 group-hover:gap-2' : 'text-gray-500'
+                                      premiumSlotsLeft > 0 ? 'text-amber-400 group-hover:gap-2' : 'text-neutral-400'
                                     }`}>
                                       {purchasingPremiumListing ? 'Redirecting…' : premiumSlotsLeft > 0
                                         ? <>Get this slot <ChevronRight className="w-3 h-3" /></>
@@ -657,42 +657,42 @@ export default function Account() {
               {activeTab === 'profile' && (
                 <div className="space-y-4">
                   {/* Stats */}
-                  <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-                    <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Account Info</h2>
+                  <div className="bg-white border border-neutral-200 rounded-2xl p-6">
+                    <h2 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4">Account Info</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      <div className="flex items-center gap-3 px-4 py-3.5 bg-gray-800/50 rounded-xl">
-                        <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl">
+                        <Calendar className="w-4 h-4 text-neutral-500 flex-shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-xs text-gray-500 mb-0.5">Member since</p>
-                          <p className="text-sm font-semibold text-gray-100 truncate">{memberSince}</p>
+                          <p className="text-xs text-neutral-400 mb-0.5">Member since</p>
+                          <p className="text-sm font-semibold text-neutral-900 truncate">{memberSince}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 px-4 py-3.5 bg-gray-800/50 rounded-xl">
+                      <div className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl">
                         <Star className="w-4 h-4 text-yellow-500 flex-shrink-0" />
                         <div>
-                          <p className="text-xs text-gray-500 mb-0.5">Following</p>
-                          <p className="text-sm font-semibold text-gray-100">
+                          <p className="text-xs text-neutral-400 mb-0.5">Following</p>
+                          <p className="text-sm font-semibold text-neutral-900">
                             {followCount === null ? '...' : `${followCount} creator${followCount !== 1 ? 's' : ''}`}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 px-4 py-3.5 bg-gray-800/50 rounded-xl col-span-2 sm:col-span-1">
-                        <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div className="flex items-center gap-3 px-4 py-3.5 bg-neutral-50 rounded-xl col-span-2 sm:col-span-1">
+                        <Mail className="w-4 h-4 text-neutral-500 flex-shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-xs text-gray-500 mb-0.5">Email</p>
-                          <p className="text-sm font-semibold text-gray-100 truncate">{user.email}</p>
+                          <p className="text-xs text-neutral-400 mb-0.5">Email</p>
+                          <p className="text-sm font-semibold text-neutral-900 truncate">{user.email}</p>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Display name */}
-                  <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+                  <div className="bg-white border border-neutral-200 rounded-2xl p-6">
                     <div className="flex items-center gap-2 mb-1">
                       <User className="w-4 h-4 text-indigo-400" />
-                      <h2 className="text-base font-semibold text-gray-100">Display Name</h2>
+                      <h2 className="text-base font-semibold text-neutral-900">Display Name</h2>
                     </div>
-                    <p className="text-sm text-gray-400 mb-5">This is how your name appears on your dashboard.</p>
+                    <p className="text-sm text-neutral-500 mb-5">This is how your name appears on your dashboard.</p>
                     <form onSubmit={handleSaveName} className="flex gap-3">
                       <input
                         type="text"
@@ -700,7 +700,7 @@ export default function Account() {
                         onChange={(e) => setDisplayName(e.target.value)}
                         placeholder="Your name"
                         maxLength={50}
-                        className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                        className="flex-1 px-4 py-2.5 bg-neutral-100 border border-neutral-300 rounded-xl text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:border-transparent text-sm"
                       />
                       <button
                         type="submit"
@@ -718,12 +718,12 @@ export default function Account() {
               {activeTab === 'security' && (
                 <div className="space-y-4">
                   {/* Change password */}
-                  <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+                  <div className="bg-white border border-neutral-200 rounded-2xl p-6">
                     <div className="flex items-center gap-2 mb-1">
                       <Lock className="w-4 h-4 text-indigo-400" />
-                      <h2 className="text-base font-semibold text-gray-100">Change Password</h2>
+                      <h2 className="text-base font-semibold text-neutral-900">Change Password</h2>
                     </div>
-                    <p className="text-sm text-gray-400 mb-5">Pick a strong password, at least 8 characters.</p>
+                    <p className="text-sm text-neutral-500 mb-5">Pick a strong password, at least 8 characters.</p>
                     <form onSubmit={handleChangePassword} className="space-y-3">
                       <div className="relative">
                         <input
@@ -731,12 +731,12 @@ export default function Account() {
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           placeholder="New password"
-                          className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm pr-11"
+                          className="w-full px-4 py-2.5 bg-neutral-100 border border-neutral-300 rounded-xl text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:border-transparent text-sm pr-11"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNew(v => !v)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700"
                         >
                           {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -747,12 +747,12 @@ export default function Account() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="Confirm new password"
-                          className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm pr-11"
+                          className="w-full px-4 py-2.5 bg-neutral-100 border border-neutral-300 rounded-xl text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:border-transparent text-sm pr-11"
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirm(v => !v)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700"
                         >
                           {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -768,12 +768,12 @@ export default function Account() {
                   </div>
 
                   {/* Sign out */}
-                  <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-                    <h2 className="text-base font-semibold text-gray-100 mb-1">Sign Out</h2>
-                    <p className="text-sm text-gray-400 mb-4">Sign out of your account on this device.</p>
+                  <div className="bg-white border border-neutral-200 rounded-2xl p-6">
+                    <h2 className="text-base font-semibold text-neutral-900 mb-1">Sign Out</h2>
+                    <p className="text-sm text-neutral-500 mb-4">Sign out of your account on this device.</p>
                     <button
                       onClick={signOut}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-gray-800 hover:bg-red-950/40 border border-gray-700 hover:border-red-900 text-gray-300 hover:text-red-400 font-medium rounded-xl transition-all text-sm"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-neutral-100 hover:bg-red-50 border border-neutral-300 hover:border-red-900 text-neutral-700 hover:text-red-400 font-medium rounded-xl transition-all text-sm"
                     >
                       <LogOut className="w-4 h-4" />
                       Sign Out
