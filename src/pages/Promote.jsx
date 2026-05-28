@@ -136,7 +136,6 @@ export default function Promote() {
                   {[
                     'Rank 15, 20, 25, 30... on your chosen platform',
                     'Shows on both desktop and mobile rankings',
-                    'Marked as "Sponsored". Clear and honest.',
                     'Cancel anytime',
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5 text-sm text-neutral-700">
