@@ -6,11 +6,14 @@ import BlueskyIcon from '../components/BlueskyIcon';
 import { Music } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../components/SEO';
 import { getAllPosts } from '../services/blogService';
 import { getRankedCreators } from '../services/creatorService';
+import { supabase } from '../lib/supabase';
 import { formatNumber } from '../lib/utils';
 import CreatorAvatar from '../components/CreatorAvatar';
+import CountUp from '../components/CountUp';
 
 const TRENDING_PLATFORMS = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, iconBg: 'bg-red-600', growthLabel: 'views' },
@@ -40,35 +43,33 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [latestPosts, setLatestPosts] = useState([]);
   const [topMovers, setTopMovers] = useState([]);
+  const [liveStats, setLiveStats] = useState({ creators: null, dataPoints: null, lastUpdate: null });
   const navigate = useNavigate();
 
-  // Typewriter effect
+  // Rotating accent word — replaces the typewriter that kept cutting off mid-word.
+  // AnimatePresence handles the fade-in/out, no per-character animation needed.
   const [wordIndex, setWordIndex] = useState(0);
-  const [displayText, setDisplayText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
-
   useEffect(() => {
-    const currentWord = typewriterWords[wordIndex].text;
-    let timeout;
+    const id = setInterval(() => {
+      setWordIndex((i) => (i + 1) % typewriterWords.length);
+    }, 2400);
+    return () => clearInterval(id);
+  }, []);
 
-    if (!isDeleting && displayText === currentWord) {
-      // Pause at full word
-      timeout = setTimeout(() => setIsDeleting(true), 2000);
-    } else if (isDeleting && displayText === '') {
-      // Move to next word
-      setIsDeleting(false);
-      setWordIndex((prev) => (prev + 1) % typewriterWords.length);
-    } else {
-      // Type or delete
-      timeout = setTimeout(() => {
-        setDisplayText(prev =>
-          isDeleting ? prev.slice(0, -1) : currentWord.slice(0, prev.length + 1)
-        );
-      }, isDeleting ? 40 : 80);
-    }
-
-    return () => clearTimeout(timeout);
-  }, [displayText, isDeleting, wordIndex]);
+  // Load real live counts to power the hero ticker
+  useEffect(() => {
+    Promise.all([
+      supabase.from('creators').select('*', { count: 'exact', head: true }).then(r => r.count),
+      supabase.from('creator_stats').select('*', { count: 'exact', head: true }).then(r => r.count),
+      supabase.from('creator_stats')
+        .select('recorded_at')
+        .order('recorded_at', { ascending: false })
+        .limit(1)
+        .then(r => r.data?.[0]?.recorded_at || null),
+    ]).then(([creators, dataPoints, lastUpdate]) => {
+      setLiveStats({ creators: creators || 0, dataPoints: dataPoints || 0, lastUpdate });
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     getAllPosts().then(posts => setLatestPosts(posts.slice(0, 3)));
@@ -182,12 +183,22 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Typewriter heading */}
+              {/* Rotating accent heading — never cuts mid-word */}
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-100 mb-5 sm:mb-6 tracking-tight leading-tight">
                 <span className="block">Find any</span>
-                <span className={`block min-h-[1.25em] ${typewriterWords[wordIndex].color}`}>
-                  {displayText}
-                  <span className="animate-pulse text-indigo-400">|</span>
+                <span className="relative block min-h-[1.25em] overflow-hidden">
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={wordIndex}
+                      initial={{ y: '40%', opacity: 0 }}
+                      animate={{ y: '0%', opacity: 1 }}
+                      exit={{ y: '-40%', opacity: 0 }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      className={`inline-block ${typewriterWords[wordIndex].color}`}
+                    >
+                      {typewriterWords[wordIndex].text}
+                    </motion.span>
+                  </AnimatePresence>
                 </span>
               </h1>
 
@@ -241,15 +252,24 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Trust signals */}
-              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2 px-4">
-                <span className="flex items-center gap-1.5 text-sm text-gray-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
-                  22,000+ creators tracked
+              {/* Live data ticker — real counts from the DB, animated count-up */}
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-3 px-4">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  </span>
+                  <span className="text-sm text-gray-300 tabular-nums">
+                    <CountUp value={liveStats.creators ?? 0} className="font-bold text-gray-100" />
+                    {' '}<span className="text-gray-500">creators tracked</span>
+                  </span>
+                </div>
+                <span className="hidden sm:block w-px h-4 bg-gray-700" />
+                <span className="text-sm text-gray-300 tabular-nums">
+                  <CountUp value={liveStats.dataPoints ?? 0} className="font-bold text-gray-100" />
+                  {' '}<span className="text-gray-500">data points</span>
                 </span>
-                <span className="text-gray-700 hidden sm:block">·</span>
-                <span className="text-sm text-gray-500">Updated daily</span>
-                <span className="text-gray-700 hidden sm:block">·</span>
+                <span className="hidden sm:block w-px h-4 bg-gray-700" />
                 <Link to="/methodology" className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
                   How we collect data
                 </Link>

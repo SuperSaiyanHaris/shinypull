@@ -170,18 +170,19 @@ export default function Header() {
               <span>Rankings</span>
             </Link>
 
-            {/* Search */}
-            <Link
-              to="/search"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                isActive('/search')
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent'
-              }`}
+            {/* Search — opens the command palette (Cmd+K) */}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('openCommandPalette'))}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 text-gray-300 hover:bg-indigo-950/50 hover:text-indigo-400 border border-transparent group"
+              aria-label="Open command palette"
             >
               <Search className="w-4 h-4" />
               <span>Search</span>
-            </Link>
+              <kbd className="hidden lg:inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-gray-800 border border-gray-700 rounded text-gray-400 group-hover:text-gray-300 group-hover:border-gray-600">
+                <span className="text-xs leading-none">⌘</span>K
+              </kbd>
+            </button>
 
             {/* More launcher */}
             <div className="relative">

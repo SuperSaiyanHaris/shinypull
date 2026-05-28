@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import ErrorBoundary from './components/ErrorBoundary';
+import CommandPalette from './components/CommandPalette';
 import { AuthProvider } from './contexts/AuthContext';
 
 // Eagerly load the homepage (critical path)
@@ -144,6 +145,7 @@ function App() {
   return (
     <AuthProvider>
       <LayoutWrapper />
+      <CommandPalette />
       <Toaster
         position="bottom-right"
         theme="dark"

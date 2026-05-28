@@ -710,22 +710,43 @@ export default function CreatorProfile() {
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(profileSchema).replace(/<\/script>/gi, '<\\/script>') }} />
 
-      <div className="min-h-screen bg-gray-800/50">
-        {/* Banner */}
-        {creator.bannerImage && (
-          <div className="h-32 md:h-48 bg-gray-800 overflow-hidden">
-            <img
-              src={creator.bannerImage}
-              alt="Channel banner"
-              className="w-full h-full object-cover opacity-90"
-            />
-          </div>
-        )}
+      <div className="min-h-screen bg-[#0a0a0f]">
+        {/* Hero banner — uses the creator's channel art as background with gradient fade.
+            When no banner exists, render a soft platform-colored gradient instead of dead space. */}
+        <div className="relative h-48 sm:h-56 md:h-72 overflow-hidden">
+          {creator.bannerImage ? (
+            <>
+              <img
+                src={creator.bannerImage}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-cover opacity-60 scale-105 blur-[2px]"
+              />
+              <img
+                src={creator.bannerImage}
+                alt="Channel banner"
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ maskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)' }}
+              />
+            </>
+          ) : (
+            <div className={`absolute inset-0 bg-gradient-to-br ${
+              platform === 'youtube' ? 'from-red-900/30 via-rose-900/15 to-transparent' :
+              platform === 'twitch' ? 'from-purple-900/40 via-violet-900/20 to-transparent' :
+              platform === 'kick' ? 'from-green-900/40 via-emerald-900/20 to-transparent' :
+              platform === 'tiktok' ? 'from-pink-900/35 via-fuchsia-900/15 to-transparent' :
+              platform === 'bluesky' ? 'from-sky-900/40 via-cyan-900/20 to-transparent' :
+              'from-amber-900/40 via-orange-900/20 to-transparent'
+            }`} />
+          )}
+          {/* Bottom gradient fade so the card hover is seamless */}
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/80 to-transparent pointer-events-none" />
+        </div>
 
         <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-6xl mx-auto">
-            {/* Profile Header */}
-            <div className={`bg-gray-900 rounded-2xl border border-gray-800 shadow-sm p-4 sm:p-6 md:p-8 mb-6 relative z-10 ${creator.bannerImage ? '-mt-16' : ''}`}>
+            {/* Profile Header — overlaps the banner */}
+            <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-2xl shadow-black/30 p-4 sm:p-6 md:p-8 mb-6 relative z-10 -mt-32 sm:-mt-36 md:-mt-40">
               {/* Action Buttons - Top Right */}
               <div ref={shareRef} className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-2">
                 {/* Compare button */}
@@ -1810,15 +1831,39 @@ export default function CreatorProfile() {
   );
 }
 
+// Pick an accent color per stat label so cards have visual identity.
+// Matches the dark-card pattern from CLAUDE.md (glow blob, ghost number, hover lift).
+const STAT_ACCENTS = {
+  Subscribers:        { glow: 'bg-red-500/10',     glowHover: 'group-hover:bg-red-500/20',     iconBg: 'from-red-500 to-rose-600',         iconShadow: 'shadow-red-500/30',      border: 'hover:border-red-500/60',     shadow: 'hover:shadow-red-500/10' },
+  Followers:          { glow: 'bg-pink-500/10',    glowHover: 'group-hover:bg-pink-500/20',    iconBg: 'from-pink-500 to-rose-600',        iconShadow: 'shadow-pink-500/30',     border: 'hover:border-pink-500/60',    shadow: 'hover:shadow-pink-500/10' },
+  'Total Views':      { glow: 'bg-indigo-500/10',  glowHover: 'group-hover:bg-indigo-500/20',  iconBg: 'from-indigo-500 to-violet-600',    iconShadow: 'shadow-indigo-500/30',   border: 'hover:border-indigo-500/60',  shadow: 'hover:shadow-indigo-500/10' },
+  Videos:             { glow: 'bg-sky-500/10',     glowHover: 'group-hover:bg-sky-500/20',     iconBg: 'from-sky-500 to-cyan-600',         iconShadow: 'shadow-sky-500/30',      border: 'hover:border-sky-500/60',     shadow: 'hover:shadow-sky-500/10' },
+  'Avg Views/Video':  { glow: 'bg-amber-500/10',   glowHover: 'group-hover:bg-amber-500/20',   iconBg: 'from-amber-500 to-orange-600',     iconShadow: 'shadow-amber-500/30',    border: 'hover:border-amber-500/60',   shadow: 'hover:shadow-amber-500/10' },
+  'Hours Watched':    { glow: 'bg-purple-500/10',  glowHover: 'group-hover:bg-purple-500/20',  iconBg: 'from-purple-500 to-fuchsia-600',   iconShadow: 'shadow-purple-500/30',   border: 'hover:border-purple-500/60',  shadow: 'hover:shadow-purple-500/10' },
+  'Paid Subscribers': { glow: 'bg-emerald-500/10', glowHover: 'group-hover:bg-emerald-500/20', iconBg: 'from-emerald-500 to-teal-600',     iconShadow: 'shadow-emerald-500/30',  border: 'hover:border-emerald-500/60', shadow: 'hover:shadow-emerald-500/10' },
+  'Monthly Listeners':{ glow: 'bg-amber-500/10',   glowHover: 'group-hover:bg-amber-500/20',   iconBg: 'from-amber-500 to-orange-600',     iconShadow: 'shadow-amber-500/30',    border: 'hover:border-amber-500/60',   shadow: 'hover:shadow-amber-500/10' },
+  Posts:              { glow: 'bg-sky-500/10',     glowHover: 'group-hover:bg-sky-500/20',     iconBg: 'from-sky-500 to-cyan-600',         iconShadow: 'shadow-sky-500/30',      border: 'hover:border-sky-500/60',     shadow: 'hover:shadow-sky-500/10' },
+};
+const DEFAULT_ACCENT = { glow: 'bg-indigo-500/10', glowHover: 'group-hover:bg-indigo-500/20', iconBg: 'from-indigo-500 to-purple-600', iconShadow: 'shadow-indigo-500/30', border: 'hover:border-indigo-500/60', shadow: 'hover:shadow-indigo-500/10' };
+
 function StatCard({ icon: Icon, label, value, sublabel }) {
+  const accent = STAT_ACCENTS[label] || DEFAULT_ACCENT;
   return (
-    <div className="bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-800 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-center gap-2 mb-2">
-        {Icon && <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-300" />}
-        <p className="text-xs sm:text-sm text-gray-300 font-medium truncate">{label}</p>
+    <div className={`group relative bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden transition-all duration-300 ${accent.border} hover:-translate-y-1 hover:shadow-2xl ${accent.shadow}`}>
+      {/* Glow blob */}
+      <div className={`pointer-events-none absolute -top-12 -right-12 w-32 h-32 ${accent.glow} rounded-full blur-3xl ${accent.glowHover} transition-colors duration-500`} />
+      <div className="relative p-4 sm:p-5">
+        <div className="flex items-center gap-2 mb-3">
+          {Icon && (
+            <div className={`w-8 h-8 bg-gradient-to-br ${accent.iconBg} rounded-lg flex items-center justify-center shadow-md ${accent.iconShadow} group-hover:scale-105 transition-transform duration-300`}>
+              <Icon className="w-4 h-4 text-white" />
+            </div>
+          )}
+          <p className="text-xs sm:text-sm text-gray-400 font-semibold uppercase tracking-wider truncate">{label}</p>
+        </div>
+        <p className="text-2xl sm:text-3xl font-extrabold text-gray-100 tabular-nums truncate">{value}</p>
+        {sublabel && <p className="text-xs text-gray-500 mt-1.5 truncate">{sublabel}</p>}
       </div>
-      <p className="text-xl sm:text-2xl font-bold text-gray-100 truncate">{value}</p>
-      {sublabel && <p className="text-xs text-gray-300 mt-1 truncate">{sublabel}</p>}
     </div>
   );
 }
