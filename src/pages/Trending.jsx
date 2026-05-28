@@ -8,6 +8,7 @@ import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
 import { getRankedCreators } from '../services/creatorService';
 import { formatNumber } from '../lib/utils';
+import CreatorAvatar from '../components/CreatorAvatar';
 
 const PLATFORMS = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, textColor: 'text-red-400', activeBg: 'bg-red-950/40', activeBorder: 'border-red-500/60', followerLabel: 'subscribers', growthLabel: 'views gained', growthNote: 'YouTube rounds subscriber counts by policy, so views are used as the growth metric.' },
@@ -119,11 +120,11 @@ export default function Trending() {
                     className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900 border border-gray-800 rounded-xl hover:border-gray-700 hover:bg-gray-800/50 transition-all duration-200 group"
                   >
                     <span className="w-6 text-center text-sm font-bold text-gray-600 flex-shrink-0">{i + 1}</span>
-                    <img
-                      src={creator.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.display_name)}&background=1f2937&color=9ca3af&size=48`}
-                      alt={creator.display_name}
-                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover bg-gray-800 flex-shrink-0"
-                      loading="lazy"
+                    <CreatorAvatar
+                      src={creator.profile_image}
+                      name={creator.display_name}
+                      size="lg"
+                      className="!w-10 !h-10 sm:!w-11 sm:!h-11"
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-100 truncate group-hover:text-white text-sm sm:text-base">{creator.display_name}</p>

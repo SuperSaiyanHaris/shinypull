@@ -10,6 +10,7 @@ import SEO from '../components/SEO';
 import { getAllPosts } from '../services/blogService';
 import { getRankedCreators } from '../services/creatorService';
 import { formatNumber } from '../lib/utils';
+import CreatorAvatar from '../components/CreatorAvatar';
 
 const TRENDING_PLATFORMS = [
   { id: 'youtube', name: 'YouTube', icon: Youtube, iconBg: 'bg-red-600', growthLabel: 'views' },
@@ -398,11 +399,11 @@ export default function Home() {
                       className="group flex items-center gap-3 p-4 bg-gray-900 border border-gray-800 hover:border-emerald-500/40 rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/5"
                     >
                       <div className="relative flex-shrink-0">
-                        <img
-                          src={creator.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.display_name)}&background=1f2937&color=9ca3af&size=48`}
-                          alt={creator.display_name}
-                          className="w-11 h-11 rounded-full object-cover bg-gray-800"
-                          loading="lazy"
+                        <CreatorAvatar
+                          src={creator.profile_image}
+                          name={creator.display_name}
+                          size="lg"
+                          className="!w-11 !h-11"
                         />
                         <div className={`absolute -bottom-1 -right-1 w-5 h-5 ${platform.iconBg} rounded-full flex items-center justify-center`}>
                           <PlatIcon className="w-3 h-3 text-white" />

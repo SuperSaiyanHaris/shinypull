@@ -13,6 +13,7 @@ import { searchBluesky } from '../services/blueskyService';
 import { searchArtists as searchMusic } from '../services/musicService';
 import { Music } from 'lucide-react';
 import { upsertCreator, saveCreatorStats, searchCreators } from '../services/creatorService';
+import CreatorAvatar from '../components/CreatorAvatar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/SEO';
@@ -524,14 +525,12 @@ export default function Search() {
                       state={{ platformId: creator.platformId }}
                       className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-900 border border-gray-800 rounded-2xl hover:border-indigo-500/40 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-200 group"
                     >
-                      <img
-                        src={creator.profileImage || '/placeholder-avatar.svg'}
-                        alt={creator.displayName}
-                        loading="lazy"
-                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover bg-gray-800 flex-shrink-0"
-                        onError={(e) => {
-                          e.target.src = '/placeholder-avatar.svg';
-                        }}
+                      <CreatorAvatar
+                        src={creator.profileImage}
+                        name={creator.displayName}
+                        size="lg"
+                        rounded="rounded-xl"
+                        className="!w-12 !h-12 sm:!w-16 sm:!h-16"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">

@@ -7,6 +7,7 @@ import BlueskyIcon from '../components/BlueskyIcon';
 import { Music } from 'lucide-react';
 import { TableSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
+import CreatorAvatar from '../components/CreatorAvatar';
 import { getRankedCreators, getFeaturedListings } from '../services/creatorService';
 import SEO from '../components/SEO';
 import StructuredData from '../components/StructuredData';
@@ -239,7 +240,7 @@ function RankingsOverview() {
                               className="flex items-center gap-3 px-5 py-3 bg-amber-950/15 hover:bg-amber-950/25 transition-colors group"
                             >
                               <span className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 bg-amber-900/30 text-amber-500">Ad</span>
-                              <img src={c?.profile_image || '/placeholder-avatar.svg'} alt={c?.display_name} loading="lazy" className="w-8 h-8 rounded-lg object-cover bg-gray-800 flex-shrink-0" onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }} />
+                              <CreatorAvatar src={c?.profile_image} name={c?.display_name} size="sm" rounded="rounded-lg" />
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-amber-300 transition-colors">{c?.display_name}</p>
                               </div>
@@ -267,13 +268,7 @@ function RankingsOverview() {
                               }`}>
                                 {index + 1}
                               </span>
-                              <img
-                                src={creator.profile_image || '/placeholder-avatar.svg'}
-                                alt={creator.display_name}
-                                loading="lazy"
-                                className="w-8 h-8 rounded-full object-cover bg-gray-800 flex-shrink-0"
-                                onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
-                              />
+                              <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="sm" />
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-semibold text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
                                   {creator.display_name}
@@ -680,13 +675,7 @@ function PlatformRankings({ urlPlatform }) {
 
                     {/* Creator Info */}
                     <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-7' : 'md:col-span-5'}`}>
-                      <img
-                        src={creator.profile_image || '/placeholder-avatar.svg'}
-                        alt={creator.display_name}
-                        loading="lazy"
-                        className="w-12 h-12 rounded-full object-cover bg-gray-800 flex-shrink-0"
-                        onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
-                      />
+                      <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="lg" />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <p className={`font-semibold truncate transition-colors ${isPremium ? 'text-gray-100 group-hover:text-amber-300' : 'text-gray-100 group-hover:text-amber-400'}`}>
@@ -733,13 +722,7 @@ function PlatformRankings({ urlPlatform }) {
 
                   {/* Creator Info */}
                   <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-7' : 'md:col-span-5'}`}>
-                    <img
-                      src={creator.profile_image || '/placeholder-avatar.svg'}
-                      alt={creator.display_name}
-                      loading="lazy"
-                      className="w-12 h-12 rounded-full object-cover bg-gray-800 flex-shrink-0"
-                      onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
-                    />
+                    <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="lg" />
                     <div className="min-w-0">
                       <p className="font-semibold text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
                         {creator.display_name}

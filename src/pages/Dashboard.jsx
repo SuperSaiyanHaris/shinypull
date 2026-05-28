@@ -10,6 +10,7 @@ import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
+import CreatorAvatar from '../components/CreatorAvatar';
 import { getFollowedCreators } from '../services/followService';
 import { getSavedCompares, deleteSavedCompare } from '../services/compareService';
 import { getCreatorStats } from '../services/creatorService';
@@ -770,11 +771,12 @@ export default function Dashboard() {
                                 </div>
                               )}
                               <div className="relative">
-                                <img
-                                  src={creator.profile_image || '/placeholder-avatar.svg'}
-                                  alt={creator.display_name}
-                                  loading="lazy"
-                                  className="w-11 h-11 rounded-xl object-cover"
+                                <CreatorAvatar
+                                  src={creator.profile_image}
+                                  name={creator.display_name}
+                                  size="lg"
+                                  rounded="rounded-xl"
+                                  className="!w-11 !h-11"
                                 />
                                 {isLive && (
                                   <span className="absolute -top-1 -right-1 px-1 py-0.5 bg-red-500 text-white text-[9px] font-bold rounded uppercase">
@@ -964,11 +966,12 @@ export default function Dashboard() {
                               to={`/${creator.platform}/${creator.username}`}
                               className="bg-gray-900 rounded-2xl border border-gray-800 p-4 hover:border-indigo-700/50 hover:bg-gray-800/50 transition-all group"
                             >
-                              <img
-                                src={creator.profileImage || '/placeholder-avatar.svg'}
-                                alt={creator.displayName}
-                                loading="lazy"
-                                className="w-14 h-14 rounded-xl object-cover mx-auto mb-3"
+                              <CreatorAvatar
+                                src={creator.profileImage}
+                                name={creator.displayName}
+                                size="xl"
+                                rounded="rounded-xl"
+                                className="!w-14 !h-14 mx-auto mb-3"
                               />
                               <div className="text-center">
                                 <p className="font-semibold text-gray-100 text-sm truncate">{creator.displayName}</p>

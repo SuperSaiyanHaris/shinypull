@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
@@ -143,6 +144,19 @@ function App() {
   return (
     <AuthProvider>
       <LayoutWrapper />
+      <Toaster
+        position="bottom-right"
+        theme="dark"
+        richColors
+        closeButton
+        toastOptions={{
+          style: {
+            background: '#0a0a0f',
+            border: '1px solid rgb(31 41 55)',
+            color: '#f3f4f6',
+          },
+        }}
+      />
     </AuthProvider>
   );
 }

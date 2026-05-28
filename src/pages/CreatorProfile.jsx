@@ -13,6 +13,7 @@ import { getBlueskyProfile } from '../services/blueskyService';
 import { getArtistByMbid, getArtistByName, getArtistTopTracks, getArtistTopAlbums } from '../services/musicService';
 import { Music } from 'lucide-react';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
+import CreatorAvatar from '../components/CreatorAvatar';
 import { followCreator, unfollowCreator, isFollowing as checkIsFollowing, getFollowedCreators } from '../services/followService';
 import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/SEO';
@@ -862,10 +863,13 @@ export default function CreatorProfile() {
                     <Music className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
                   </div>
                 ) : (
-                  <img
+                  <CreatorAvatar
                     src={creator.profileImage}
-                    alt={creator.displayName}
-                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl object-cover bg-gray-800 border-4 border-gray-800 shadow-lg flex-shrink-0"
+                    name={creator.displayName}
+                    size="2xl"
+                    rounded="rounded-2xl"
+                    loading="eager"
+                    className="sm:w-24 sm:h-24 md:w-28 md:h-28 border-4 border-gray-800 shadow-lg"
                   />
                 )}
                 <div className="flex-1 w-full">

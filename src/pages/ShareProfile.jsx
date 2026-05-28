@@ -6,6 +6,7 @@ import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
 import SEO from '../components/SEO';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import CreatorAvatar from '../components/CreatorAvatar';
 import { getCreatorByUsername, getCreatorStats } from '../services/creatorService';
 import { formatNumber } from '../lib/utils';
 
@@ -118,11 +119,12 @@ export default function ShareProfile() {
             <div className="p-6 sm:p-8">
               {/* Profile header */}
               <div className="flex items-center gap-4 mb-7">
-                <img
-                  src={creator.profile_image || '/placeholder-avatar.svg'}
-                  alt={creator.display_name}
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover bg-gray-800 border-2 border-gray-700 flex-shrink-0"
-                  onError={(e) => { e.target.src = '/placeholder-avatar.svg'; }}
+                <CreatorAvatar
+                  src={creator.profile_image}
+                  name={creator.display_name}
+                  size="xl"
+                  rounded="rounded-2xl"
+                  className="!w-16 !h-16 sm:!w-20 sm:!h-20 border-2 border-gray-700"
                 />
                 <div className="min-w-0">
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-100 truncate">{creator.display_name}</h1>
