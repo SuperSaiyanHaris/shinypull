@@ -11,6 +11,8 @@ import BlueskyIcon from '../components/BlueskyIcon';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import CreatorAvatar from '../components/CreatorAvatar';
+import CountUp from '../components/CountUp';
+import { DashboardSkeleton } from '../components/Skeleton';
 import { getFollowedCreators } from '../services/followService';
 import { getSavedCompares, deleteSavedCompare } from '../services/compareService';
 import { getCreatorStats } from '../services/creatorService';
@@ -169,8 +171,8 @@ export default function Dashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] dot-grid flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+      <div className="min-h-screen bg-[#0a0a0f] dot-grid">
+        <DashboardSkeleton />
       </div>
     );
   }
@@ -484,17 +486,23 @@ export default function Dashboard() {
               {/* Desktop stats */}
               <div className="hidden sm:flex items-center gap-8 flex-shrink-0 pr-2">
                 <div className="text-center">
-                  <p className="text-xl font-bold text-gray-100">{followedCreators.length}</p>
+                  <p className="text-xl font-bold text-gray-100 tabular-nums">
+                    <CountUp value={followedCreators.length} format="comma" />
+                  </p>
                   <p className="text-xs text-gray-500 mt-0.5">Following</p>
                 </div>
                 {liveCount > 0 && (
                   <div className="text-center">
-                    <p className="text-xl font-bold text-red-400">{liveCount}</p>
+                    <p className="text-xl font-bold text-red-400 tabular-nums">
+                      <CountUp value={liveCount} format="comma" />
+                    </p>
                     <p className="text-xs text-gray-500 mt-0.5">Live now</p>
                   </div>
                 )}
                 <div className="text-center">
-                  <p className="text-xl font-bold text-gray-100">{savedCompares.length}</p>
+                  <p className="text-xl font-bold text-gray-100 tabular-nums">
+                    <CountUp value={savedCompares.length} format="comma" />
+                  </p>
                   <p className="text-xs text-gray-500 mt-0.5">Saved compares</p>
                 </div>
               </div>

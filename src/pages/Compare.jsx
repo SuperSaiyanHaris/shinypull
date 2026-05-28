@@ -607,12 +607,15 @@ export default function Compare() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-800 bg-gray-800/50">
-                        <th className="px-6 py-4 text-left font-semibold text-gray-300">Metric</th>
-                        {filledCreators.map((creator) => (
+                      <tr className="border-b border-gray-800 bg-gray-800/50 sticky top-0 z-10 backdrop-blur-md">
+                        <th className="px-6 py-4 text-left font-semibold text-gray-400 text-xs uppercase tracking-wider">Metric</th>
+                        {filledCreators.map((creator, i) => (
                           <th key={creator.platformId} className="px-6 py-4 text-center font-semibold text-gray-100">
-                            <div className="flex items-center justify-center gap-2">
-                              <img src={creator.profileImage} alt="" loading="lazy" className="w-6 h-6 rounded-lg" />
+                            <div className="flex items-center justify-center gap-2 relative">
+                              {i > 0 && (
+                                <span className="absolute -left-1 top-1/2 -translate-y-1/2 -translate-x-full text-[10px] font-black text-gray-600 select-none uppercase tracking-widest">vs</span>
+                              )}
+                              <img src={creator.profileImage} alt="" loading="lazy" className="w-7 h-7 rounded-lg ring-2 ring-gray-700" />
                               <span className="truncate max-w-[120px]">{creator.displayName}</span>
                             </div>
                           </th>
@@ -1077,16 +1080,28 @@ function ComparisonRow({ label, icon: Icon, values, highlight, tooltip }) {
           {tooltip && <InfoTooltip text={tooltip} />}
         </div>
       </td>
-      {values.map((value, index) => (
-        <td
-          key={index}
-          className={`px-6 py-4 text-center font-semibold ${
-            highlight === index ? 'text-emerald-400 bg-emerald-950/30' : 'text-gray-100'
-          }`}
-        >
-          {value}
-        </td>
-      ))}
+      {values.map((value, index) => {
+        const isWinner = highlight === index;
+        return (
+          <td
+            key={index}
+            className={`relative px-6 py-4 text-center font-semibold tabular-nums transition-all ${
+              isWinner
+                ? 'text-emerald-300 bg-gradient-to-b from-emerald-500/15 to-emerald-500/5 ring-1 ring-inset ring-emerald-500/30'
+                : 'text-gray-300'
+            }`}
+          >
+            <span className="inline-flex items-center gap-1.5">
+              {isWinner && (
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px]" title="Leading">
+                  ▲
+                </span>
+              )}
+              {value}
+            </span>
+          </td>
+        );
+      })}
     </tr>
   );
 }
