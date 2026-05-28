@@ -512,10 +512,10 @@ function PlatformRankings({ urlPlatform }) {
                   disabled={!platform.available}
                   className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
                     isSelected
-                      ? `${platform.color} text-white shadow-lg`
+                      ? `${platform.color} text-white shadow-md`
                       : platform.available
-                      ? 'bg-gray-900 text-neutral-700 border border-neutral-300 hover:border-gray-600 hover:shadow-md'
-                      : 'bg-neutral-100 text-neutral-700 cursor-not-allowed'
+                      ? 'bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
+                      : 'bg-neutral-50 text-neutral-400 cursor-not-allowed'
                   }`}
                 >
                   {Icon && <Icon className="w-5 h-5" />}
@@ -533,10 +533,10 @@ function PlatformRankings({ urlPlatform }) {
                 <button
                   key={type.id}
                   onClick={() => setSelectedRankType(type.id)}
-                  className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                     selectedRankType === type.id
-                      ? 'bg-gray-900 text-neutral-900 shadow-sm'
-                      : 'text-neutral-500 hover:text-neutral-700'
+                      ? 'bg-white text-neutral-900 shadow-sm border border-neutral-200'
+                      : 'text-neutral-600 hover:text-neutral-900'
                   }`}
                 >
                   <type.icon className="w-4 h-4 flex-shrink-0" />
@@ -549,7 +549,7 @@ function PlatformRankings({ urlPlatform }) {
             <div className="relative">
               <button
                 onClick={() => setTopCountOpen(!topCountOpen)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 border border-neutral-300 rounded-xl font-medium text-neutral-700 hover:border-gray-600 hover:shadow-md transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 rounded-xl font-medium text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50 transition-all"
               >
                 <Trophy className="w-4 h-4 text-indigo-500" />
                 Top {topCount}

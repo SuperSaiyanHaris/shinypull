@@ -43,11 +43,13 @@ export default function Home() {
     return () => clearInterval(id);
   }, []);
 
-  // Live counts from DB
+  // Live counts from DB.
+  // `count: 'exact'` is exact-but-slow and times out on multi-million row tables;
+  // `count: 'estimated'` uses Postgres reltuples for an instant approximation.
   useEffect(() => {
     Promise.all([
       supabase.from('creators').select('*', { count: 'exact', head: true }).then(r => r.count),
-      supabase.from('creator_stats').select('*', { count: 'exact', head: true }).then(r => r.count),
+      supabase.from('creator_stats').select('*', { count: 'estimated', head: true }).then(r => r.count),
     ]).then(([creators, dataPoints]) => {
       setLiveStats({ creators: creators || 0, dataPoints: dataPoints || 0 });
     }).catch(() => {});
