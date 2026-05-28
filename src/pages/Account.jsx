@@ -5,10 +5,12 @@ import {
   Eye, EyeOff, ArrowLeft, ExternalLink, Megaphone,
   X, Search, Loader, LogOut, Shield, ChevronRight,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { getFollowedCreators } from '../services/followService';
 import SEO from '../components/SEO';
+import CreatorAvatar from '../components/CreatorAvatar';
 
 function Toast({ message, type, onDismiss }) {
   useEffect(() => {
@@ -237,7 +239,7 @@ export default function Account() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Could not cancel listing');
-      showToast('Listing canceled.');
+      toast.success('Listing canceled', { description: 'Your placement will remain active until the end of the current billing period.' });
       loadFeaturedListings();
     } catch (err) {
       showToast(err.message || 'Could not cancel listing.', 'error');
@@ -407,20 +409,16 @@ export default function Account() {
               {activeTab === 'listings' && (
                 <div className="space-y-4">
                   <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Megaphone className="w-4 h-4 text-amber-400" />
-                      <h2 className="text-base font-semibold text-gray-100">Featured Listings</h2>
-                    </div>
-                    <div className="mt-2 mb-5 space-y-2">
-                      <div className="flex items-start gap-3 px-3 py-2.5 bg-gray-800/50 rounded-xl border border-gray-700/50">
-                        <span className="mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex-shrink-0">Basic</span>
-                        <p className="text-xs text-gray-400">$49/mo. Your creator appears starting at rank 15, then every 5 rows (15, 20, 25...). Works across all platform rankings.</p>
+                    <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
+                      <div className="flex items-center gap-2">
+                        <Megaphone className="w-4 h-4 text-amber-400" />
+                        <h2 className="text-base font-semibold text-gray-100">Featured Listings</h2>
                       </div>
-                      <div className="flex items-start gap-3 px-3 py-2.5 bg-amber-950/20 rounded-xl border border-amber-700/30">
-                        <span className="mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex-shrink-0">Premium</span>
-                        <p className="text-xs text-gray-400">$149/mo. Your creator appears between ranks 4-5 and 9-10 for maximum visibility. Only 2 slots per platform, first come first served.</p>
-                      </div>
+                      <Link to="/promote" className="text-xs font-medium text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
+                        Learn more <ExternalLink className="w-3 h-3" />
+                      </Link>
                     </div>
+                    <p className="text-sm text-gray-400 mt-1 mb-5">Promote any creator across our rankings. Cancel anytime.</p>
 
                     {/* Existing listings */}
                     {featuredListings.length > 0 && (
@@ -435,9 +433,7 @@ export default function Account() {
                             : null;
                           return (
                             <div key={listing.id} className="flex items-center gap-3 p-3.5 bg-gray-800/50 rounded-xl border border-gray-700/50">
-                              {c?.profile_image && (
-                                <img src={c.profile_image} alt={c.display_name} className="w-10 h-10 rounded-lg object-cover bg-gray-700 flex-shrink-0" onError={e => { e.target.style.display = 'none'; }} />
-                              )}
+                              <CreatorAvatar src={c?.profile_image} name={c?.display_name} size="md" rounded="rounded-lg" />
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-semibold text-gray-100 truncate">{c?.display_name || 'Unknown creator'}</p>
                                 <p className="text-xs text-gray-400">
@@ -533,9 +529,7 @@ export default function Account() {
                                 onClick={() => handleSelectCreator(c)}
                                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-800 transition-colors text-left"
                               >
-                                {c.profile_image && (
-                                  <img src={c.profile_image} alt={c.display_name} className="w-8 h-8 rounded-lg object-cover bg-gray-700 flex-shrink-0" onError={e => { e.target.style.display = 'none'; }} />
-                                )}
+                                <CreatorAvatar src={c.profile_image} name={c.display_name} size="sm" rounded="rounded-lg" />
                                 <div className="min-w-0">
                                   <p className="text-sm font-semibold text-gray-100 truncate">{c.display_name}</p>
                                   <p className="text-xs text-gray-400">@{c.username}</p>
@@ -569,9 +563,7 @@ export default function Account() {
                         <div className="space-y-2">
                           {/* Creator info */}
                           <div className="flex items-center gap-3 p-3.5 bg-gray-800/60 border border-gray-700/60 rounded-xl">
-                            {selectedCreator.profile_image && (
-                              <img src={selectedCreator.profile_image} alt={selectedCreator.display_name} className="w-10 h-10 rounded-lg object-cover bg-gray-700 flex-shrink-0" onError={e => { e.target.style.display = 'none'; }} />
-                            )}
+                            <CreatorAvatar src={selectedCreator.profile_image} name={selectedCreator.display_name} size="md" rounded="rounded-lg" />
                             <div className="min-w-0 flex-1">
                               <p className="text-sm font-semibold text-gray-100 truncate">{selectedCreator.display_name}</p>
                               <p className="text-xs text-gray-400">@{selectedCreator.username} · {selectedCreator.platform}</p>
@@ -583,40 +575,65 @@ export default function Account() {
                             )}
                           </div>
 
-                          {/* Tier selection */}
+                          {/* Tier selection — proper visual cards with clear value */}
                           {!alreadyListed && (
-                            <div className="grid grid-cols-2 gap-2">
-                              {/* Basic tile */}
-                              <button
-                                onClick={handlePurchaseListing}
-                                disabled={purchasingListing}
-                                className="flex flex-col items-start gap-0.5 px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 disabled:opacity-50 rounded-xl transition-colors text-left"
-                              >
-                                <span className="text-xs font-bold text-gray-200">Basic</span>
-                                <span className="text-sm font-semibold text-indigo-400">
-                                  {purchasingListing ? 'Redirecting...' : '$49/mo'}
-                                </span>
-                                <span className="text-[10px] text-gray-500 mt-0.5">Rank 15 and beyond</span>
-                              </button>
+                            <div className="space-y-2.5">
+                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider pt-1">Choose your slot</p>
+                              <div className="grid sm:grid-cols-2 gap-3">
+                                {/* Basic */}
+                                <button
+                                  onClick={handlePurchaseListing}
+                                  disabled={purchasingListing}
+                                  className="group relative overflow-hidden text-left bg-gray-900 hover:bg-gray-800 border border-gray-700 hover:border-indigo-500/60 disabled:opacity-50 rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/10"
+                                >
+                                  <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-colors" />
+                                  <div className="relative">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <span className="px-1.5 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold rounded uppercase tracking-wider">Basic</span>
+                                      <span className="text-[10px] text-gray-500">Cancel anytime</span>
+                                    </div>
+                                    <p className="text-2xl font-extrabold text-gray-100">$49<span className="text-sm font-normal text-gray-500">/mo</span></p>
+                                    <p className="text-xs text-gray-400 mt-2">Placed at rank 15, 20, 25... on the {PLATFORM_LABELS[listingPlatform]} rankings.</p>
+                                    <span className="inline-flex items-center gap-1 mt-3 text-xs font-semibold text-indigo-400 group-hover:gap-2 transition-all">
+                                      {purchasingListing ? 'Redirecting…' : <>Get this slot <ChevronRight className="w-3 h-3" /></>}
+                                    </span>
+                                  </div>
+                                </button>
 
-                              {/* Premium tile */}
-                              <button
-                                onClick={premiumSlotsLeft > 0 ? handlePurchasePremiumListing : undefined}
-                                disabled={premiumSlotsLeft === 0 || purchasingPremiumListing}
-                                className={`flex flex-col items-start gap-0.5 px-4 py-3 rounded-xl border transition-colors text-left ${
-                                  premiumSlotsLeft > 0
-                                    ? 'bg-amber-950/30 hover:bg-amber-950/50 border-amber-700/50'
-                                    : 'bg-gray-800/40 border-gray-700 opacity-50 cursor-not-allowed'
-                                }`}
-                              >
-                                <span className="text-xs font-bold text-amber-300">⭐ Premium</span>
-                                <span className={`text-sm font-semibold ${premiumSlotsLeft > 0 ? 'text-amber-400' : 'text-gray-500'}`}>
-                                  {purchasingPremiumListing ? 'Redirecting...' : premiumSlotsLeft > 0 ? '$149/mo' : 'Sold out'}
-                                </span>
-                                <span className="text-[10px] text-gray-500 mt-0.5">
-                                  {premiumSlotsLeft > 0 ? `Top 10 · ${premiumSlotsLeft} slot${premiumSlotsLeft === 1 ? '' : 's'} left` : '0 of 2 slots available'}
-                                </span>
-                              </button>
+                                {/* Premium */}
+                                <button
+                                  onClick={premiumSlotsLeft > 0 ? handlePurchasePremiumListing : undefined}
+                                  disabled={premiumSlotsLeft === 0 || purchasingPremiumListing}
+                                  className={`group relative overflow-hidden text-left rounded-2xl p-4 border transition-all duration-200 ${
+                                    premiumSlotsLeft > 0
+                                      ? 'bg-gradient-to-br from-amber-950/40 to-gray-900 hover:from-amber-950/60 border-amber-700/40 hover:border-amber-500/60 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/15'
+                                      : 'bg-gray-900/60 border-gray-800 opacity-60 cursor-not-allowed'
+                                  }`}
+                                >
+                                  {premiumSlotsLeft > 0 && (
+                                    <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 bg-amber-500/15 rounded-full blur-2xl group-hover:bg-amber-500/25 transition-colors" />
+                                  )}
+                                  <div className="relative">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <span className="px-1.5 py-0.5 bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold rounded uppercase tracking-wider">⭐ Premium</span>
+                                      <span className={`text-[10px] font-semibold ${premiumSlotsLeft > 0 ? 'text-amber-400' : 'text-gray-500'}`}>
+                                        {premiumSlotsLeft > 0 ? `${premiumSlotsLeft} of 2 left` : 'Sold out'}
+                                      </span>
+                                    </div>
+                                    <p className={`text-2xl font-extrabold ${premiumSlotsLeft > 0 ? 'text-gray-100' : 'text-gray-500'}`}>
+                                      $149<span className="text-sm font-normal text-gray-500">/mo</span>
+                                    </p>
+                                    <p className="text-xs text-gray-400 mt-2">Top-10 placement between rank 4-5 and 9-10. Maximum visibility.</p>
+                                    <span className={`inline-flex items-center gap-1 mt-3 text-xs font-semibold transition-all ${
+                                      premiumSlotsLeft > 0 ? 'text-amber-400 group-hover:gap-2' : 'text-gray-500'
+                                    }`}>
+                                      {purchasingPremiumListing ? 'Redirecting…' : premiumSlotsLeft > 0
+                                        ? <>Get this slot <ChevronRight className="w-3 h-3" /></>
+                                        : 'Waitlist coming soon'}
+                                    </span>
+                                  </div>
+                                </button>
+                              </div>
                             </div>
                           )}
                         </div>

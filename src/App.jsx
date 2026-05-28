@@ -53,6 +53,7 @@ const ResetPassword = lazyWithRetry(() => import('./pages/ResetPassword'));
 const Calculator = lazyWithRetry(() => import('./pages/Calculator'));
 const Support = lazyWithRetry(() => import('./pages/Support'));
 const Account = lazyWithRetry(() => import('./pages/Account'));
+const Promote = lazyWithRetry(() => import('./pages/Promote'));
 const Refunds = lazyWithRetry(() => import('./pages/Refunds'));
 const ShareProfile = lazyWithRetry(() => import('./pages/ShareProfile'));
 const Reports = lazyWithRetry(() => import('./pages/Reports'));
@@ -125,6 +126,7 @@ function LayoutWrapper() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/promote" element={<Promote />} />
           <Route path="/refunds" element={<Refunds />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/admin" element={<BlogAdmin />} />

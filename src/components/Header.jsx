@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings, FileSpreadsheet, ChevronDown, LayoutGrid, TrendingUp } from 'lucide-react';
+import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings, FileSpreadsheet, ChevronDown, LayoutGrid, TrendingUp, Megaphone } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthPanel from './AuthPanel';
 
@@ -48,6 +48,15 @@ const moreLinks = [
     icon: FileSpreadsheet,
     gradient: 'from-amber-500 to-orange-500',
     hoverBorder: 'hover:border-amber-500/40',
+    hoverBg: 'hover:bg-amber-950/20',
+  },
+  {
+    path: '/promote',
+    label: 'Get Featured',
+    description: 'Promote your creator on ShinyPull',
+    icon: Megaphone,
+    gradient: 'from-amber-400 to-yellow-500',
+    hoverBorder: 'hover:border-amber-400/40',
     hoverBg: 'hover:bg-amber-950/20',
   },
   {

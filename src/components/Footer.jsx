@@ -60,6 +60,11 @@ export default function Footer() {
                   Blog
                 </Link>
               </li>
+              <li>
+                <Link to="/promote" className="text-amber-400 hover:text-amber-300 transition-colors font-medium">
+                  Get featured
+                </Link>
+              </li>
             </ul>
           </div>
 
