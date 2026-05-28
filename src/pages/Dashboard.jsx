@@ -736,7 +736,7 @@ export default function Dashboard() {
                           const metricLabel = METRIC_LABEL[creator.platform] || 'followers';
 
                           const rowContent = (
-                            <div className="flex items-center gap-4 px-4 py-3.5">
+                            <div className="flex items-center gap-4 px-5 py-4">
                               {compareMode && (
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                                   isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-neutral-300 hover:border-indigo-400'
@@ -744,47 +744,54 @@ export default function Dashboard() {
                                   {isSelected && <Check className="w-3 h-3 text-white" />}
                                 </div>
                               )}
-                              <div className="relative">
+                              <div className="relative flex-shrink-0">
                                 <CreatorAvatar
                                   src={creator.profile_image}
                                   name={creator.display_name}
                                   size="lg"
                                   rounded="rounded-xl"
-                                  className="!w-11 !h-11"
+                                  className="!w-12 !h-12"
                                 />
+                                {/* Platform corner badge */}
+                                <span className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-md ${colors.light} border-2 border-white flex items-center justify-center`}>
+                                  <PlatformIcon className={`w-3 h-3 ${colors.text}`} />
+                                </span>
                                 {isLive && (
-                                  <span className="absolute -top-1 -right-1 px-1 py-0.5 bg-red-500 text-white text-[9px] font-bold rounded uppercase">
+                                  <span className="absolute -top-1.5 -left-1.5 px-1.5 py-0.5 bg-red-500 text-white text-[9px] font-extrabold rounded uppercase tracking-wider ring-2 ring-white">
                                     Live
                                   </span>
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className={`p-1 rounded ${colors.light}`}>
-                                    <PlatformIcon className={`w-3 h-3 ${colors.text}`} />
-                                  </span>
-                                  <p className="font-semibold text-neutral-900 truncate text-sm">{creator.display_name}</p>
-                                </div>
-                                <p className="text-xs text-neutral-400 mt-0.5">@{creator.username}</p>
-                              </div>
-                              <div className="text-right hidden sm:block">
-                                <div className="flex items-baseline gap-1 justify-end">
-                                  <p className="text-sm font-semibold text-neutral-900">
+                                <p className="font-semibold text-neutral-900 truncate text-sm sm:text-[15px]">{creator.display_name}</p>
+                                <p className="text-xs text-neutral-500 mt-0.5 truncate">@{creator.username}</p>
+                                {/* Mobile-only stats inline */}
+                                <div className="sm:hidden mt-1.5 flex items-baseline gap-2">
+                                  <span className="text-sm font-bold text-neutral-900 tabular-nums">
                                     {stats?.current ? formatNumber(stats.current.subscribers || stats.current.followers) : '–'}
-                                  </p>
-                                  {stats?.current && (
-                                    <span className="text-[10px] text-neutral-400 uppercase tracking-wide">{metricLabel}</span>
+                                  </span>
+                                  <span className="text-[10px] text-neutral-400 uppercase tracking-wide">{metricLabel}</span>
+                                  {growth !== null && growth !== 0 && (
+                                    <span className={`inline-flex items-center text-[11px] font-semibold tabular-nums ${growth > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                      {growth > 0 ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
+                                      {growth > 0 ? '+' : ''}{formatNumber(growth)}
+                                    </span>
                                   )}
                                 </div>
+                              </div>
+                              {/* Desktop stats column */}
+                              <div className="text-right hidden sm:flex flex-col items-end gap-0.5 min-w-[120px]">
+                                <p className="text-base font-bold text-neutral-900 tabular-nums leading-none">
+                                  {stats?.current ? formatNumber(stats.current.subscribers || stats.current.followers) : '–'}
+                                </p>
+                                <p className="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">{metricLabel}</p>
                                 {growth !== null && growth !== 0 ? (
-                                  <span className={`flex items-center justify-end text-xs font-medium ${growth > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                  <span className={`inline-flex items-center text-xs font-semibold tabular-nums mt-1 ${growth > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                                     {growth > 0 ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
                                     {growth > 0 ? '+' : ''}{formatNumber(growth)}
                                   </span>
-                                ) : growth === 0 ? (
-                                  <span className="text-xs text-neutral-400">no change</span>
                                 ) : (
-                                  <span className="text-xs text-neutral-400">–</span>
+                                  <span className="text-xs text-neutral-400 mt-1">{growth === 0 ? 'no change' : '–'}</span>
                                 )}
                               </div>
                               {!compareMode && <ChevronRight className="w-4 h-4 text-neutral-400 flex-shrink-0" />}
