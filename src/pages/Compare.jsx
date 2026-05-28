@@ -20,6 +20,7 @@ import SEO from '../components/SEO';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
 import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 import logger from '../lib/logger';
 
 // Compare cap — keep a sensible UI limit so the chart stays readable.
@@ -325,9 +326,11 @@ export default function Compare() {
       setSaveDialogOpen(false);
       setExistingSave(saved);
       setSavedFlash(true);
+      toast.success('Comparison saved', { description: 'Find it on your Dashboard.' });
       setTimeout(() => setSavedFlash(false), 3000);
     } catch (err) {
       logger.error('Failed to save compare:', err);
+      toast.error('Could not save comparison');
     } finally {
       setSaving(false);
     }
@@ -339,8 +342,10 @@ export default function Compare() {
     try {
       await deleteSavedCompare(existingSave.id);
       setExistingSave(null);
+      toast.success('Saved comparison removed');
     } catch (err) {
       logger.error('Failed to remove saved compare:', err);
+      toast.error('Could not remove saved comparison');
     } finally {
       setRemoving(false);
     }

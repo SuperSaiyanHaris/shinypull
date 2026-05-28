@@ -84,6 +84,85 @@ export function TableSkeleton({ rows = 5 }) {
   );
 }
 
+// Creator profile page skeleton — replaces the blank → pop-in flash
+export function ProfileSkeleton() {
+  return (
+    <div className="min-h-screen bg-[#0a0a0f]">
+      {/* Banner placeholder */}
+      <div className="h-48 sm:h-56 md:h-72 bg-gradient-to-br from-gray-800 via-gray-900 to-gray-900 animate-pulse" />
+
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Hero card */}
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-2xl p-4 sm:p-6 md:p-8 mb-6 relative -mt-32 sm:-mt-36 md:-mt-40">
+            <div className="flex flex-col md:flex-row items-start gap-6">
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-gray-800 animate-pulse flex-shrink-0" />
+              <div className="flex-1 w-full">
+                <div className="h-8 w-64 bg-gray-800 rounded animate-pulse mb-3" />
+                <div className="h-4 w-40 bg-gray-800 rounded animate-pulse mb-4" />
+                <div className="h-16 w-full bg-gray-800/50 rounded animate-pulse" />
+              </div>
+            </div>
+          </div>
+
+          {/* Stat cards grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 animate-pulse">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-gray-800 rounded-lg" />
+                  <div className="h-3 w-20 bg-gray-800 rounded" />
+                </div>
+                <div className="h-7 w-24 bg-gray-800 rounded" />
+              </div>
+            ))}
+          </div>
+
+          {/* Chart placeholder */}
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 h-80 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Dashboard skeleton — sidebar + content grid
+export function DashboardSkeleton() {
+  return (
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+      {/* Profile strip */}
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-8 flex items-center gap-4 animate-pulse">
+        <div className="w-12 h-12 bg-gray-800 rounded-xl flex-shrink-0" />
+        <div className="flex-1">
+          <div className="h-4 w-40 bg-gray-800 rounded mb-2" />
+          <div className="h-3 w-32 bg-gray-800 rounded" />
+        </div>
+        <div className="hidden sm:flex gap-8">
+          <div className="h-10 w-12 bg-gray-800 rounded" />
+          <div className="h-10 w-12 bg-gray-800 rounded" />
+        </div>
+      </div>
+
+      {/* Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 animate-pulse">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 bg-gray-800 rounded-xl" />
+              <div className="flex-1">
+                <div className="h-4 w-28 bg-gray-800 rounded mb-1.5" />
+                <div className="h-3 w-20 bg-gray-800 rounded" />
+              </div>
+            </div>
+            <div className="h-3 w-full bg-gray-800/60 rounded mb-2" />
+            <div className="h-3 w-3/4 bg-gray-800/60 rounded" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Compare card skeleton
 export function CompareCardSkeleton() {
   return (

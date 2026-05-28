@@ -12,27 +12,6 @@ import { getFollowedCreators } from '../services/followService';
 import SEO from '../components/SEO';
 import CreatorAvatar from '../components/CreatorAvatar';
 
-function Toast({ message, type, onDismiss }) {
-  useEffect(() => {
-    const t = setTimeout(onDismiss, 4000);
-    return () => clearTimeout(t);
-  }, [onDismiss]);
-
-  return (
-    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium animate-fade-in ${
-      type === 'success'
-        ? 'bg-emerald-950/90 border-emerald-800 text-emerald-300'
-        : 'bg-red-950/90 border-red-800 text-red-300'
-    }`}>
-      {type === 'success'
-        ? <CheckCircle className="w-4 h-4 flex-shrink-0" />
-        : <AlertCircle className="w-4 h-4 flex-shrink-0" />
-      }
-      {message}
-    </div>
-  );
-}
-
 const TABS = [
   { id: 'listings', label: 'Listings', icon: Megaphone },
   { id: 'profile', label: 'Profile', icon: User },
@@ -62,8 +41,6 @@ export default function Account() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
 
-  // Toast
-  const [toast, setToast] = useState(null);
 
   // Stats
   const [followCount, setFollowCount] = useState(null);
@@ -109,7 +86,7 @@ export default function Account() {
     setTimeout(() => {
       loadFeaturedListings();
       setActiveTab('listings');
-      setToast({ message: 'Featured listing activated. Your creator will appear in rankings shortly.', type: 'success' });
+      toast.success('Featured listing activated', { description: 'Your creator will appear in rankings shortly.' });
     }, 2000);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -252,7 +229,11 @@ export default function Account() {
     month: 'long', day: 'numeric', year: 'numeric',
   });
 
-  const showToast = (message, type = 'success') => setToast({ message, type });
+  // Toast helper — delegates to Sonner (replaces the old local Toast state)
+  const showToast = (message, type = 'success') => {
+    if (type === 'error') toast.error(message);
+    else toast.success(message);
+  };
 
   const handleSaveName = async (e) => {
     e.preventDefault();
@@ -297,10 +278,6 @@ export default function Account() {
         title="Account Settings"
         description="Manage your ShinyPull account, display name, and password."
       />
-
-      {toast && (
-        <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />
-      )}
 
       <div className="min-h-screen bg-[#0a0a0f] dot-grid">
         {/* Page header */}

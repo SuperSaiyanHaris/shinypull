@@ -14,6 +14,8 @@ import { getArtistByMbid, getArtistByName, getArtistTopTracks, getArtistTopAlbum
 import { Music } from 'lucide-react';
 import { upsertCreator, saveCreatorStats, getCreatorByUsername, getCreatorStats, getHoursWatched } from '../services/creatorService';
 import CreatorAvatar from '../components/CreatorAvatar';
+import { ProfileSkeleton } from '../components/Skeleton';
+import { toast } from 'sonner';
 import { followCreator, unfollowCreator, isFollowing as checkIsFollowing, getFollowedCreators } from '../services/followService';
 import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/SEO';
@@ -338,14 +340,17 @@ export default function CreatorProfile() {
       if (isFollowing) {
         await unfollowCreator(user.id, dbCreatorId);
         setIsFollowing(false);
+        toast.success(`Unfollowed ${creator?.displayName || username}`);
       } else {
-        // Check follow limit before adding
-        // Follow limit gate removed — unlimited follows for everyone.
         await followCreator(user.id, dbCreatorId);
         setIsFollowing(true);
+        toast.success(`Following ${creator?.displayName || username}`, {
+          description: 'See your followed creators on the Dashboard.',
+        });
       }
     } catch (err) {
       logger.error('Failed to toggle follow:', err);
+      toast.error('Could not update follow status. Try again in a moment.');
     } finally {
       setFollowLoading(false);
     }
@@ -373,6 +378,7 @@ export default function CreatorProfile() {
   const handleCopyProfile = () => {
     navigator.clipboard.writeText(profileUrl).then(() => {
       setCopiedProfile(true);
+      toast.success('Profile link copied');
       setTimeout(() => setCopiedProfile(false), 2000);
     });
   };
@@ -380,6 +386,7 @@ export default function CreatorProfile() {
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(shareUrl).then(() => {
       setCopiedUrl(true);
+      toast.success('Share link copied');
       setTimeout(() => setCopiedUrl(false), 2000);
     });
   };
@@ -387,6 +394,7 @@ export default function CreatorProfile() {
   const handleCopyEmbed = () => {
     navigator.clipboard.writeText(embedCode).then(() => {
       setCopiedEmbed(true);
+      toast.success('Embed code copied', { description: 'Paste into Notion, your site, or anywhere iframes work.' });
       setTimeout(() => setCopiedEmbed(false), 2000);
     });
   };
@@ -583,14 +591,7 @@ export default function CreatorProfile() {
   const metrics = calculateGrowthMetrics();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-73px)] bg-gray-800/50">
-        <div className="text-center">
-          <div className="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-300">Loading {platform} channel...</p>
-        </div>
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   if (error) {

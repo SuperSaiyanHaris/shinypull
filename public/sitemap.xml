@@ -421,6 +421,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://shinypull.com/youtube/balkankinderbeats</loc>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://shinypull.com/youtube/mrbeast</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>daily</changefreq>
@@ -4803,12 +4809,6 @@
   <url>
     <loc>https://shinypull.com/youtube/funnymike_family</loc>
     <lastmod>2026-05-26</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/balkankinderbeats</loc>
-    <lastmod>2026-05-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
