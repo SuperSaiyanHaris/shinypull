@@ -396,3 +396,40 @@ export const getRankedCreators = withErrorHandling(
   },
   'creatorService.getRankedCreators'
 );
+
+// --- Sparkline data: batched 30-day stats for a set of creators ---
+// Single Supabase query, then bucket by creator_id and downsample to ~12 points each.
+// Used to render inline trend charts in the rankings table.
+const _sparklineCache = new Map();
+const SPARKLINE_TTL = 15 * 60 * 1000;
+
+export const getSparklineData = withErrorHandling(
+  async (creatorIds, days = 30) => {
+    if (!creatorIds || creatorIds.length === 0) return {};
+    const cacheKey = creatorIds.slice().sort().join(',') + `:${days}`;
+    const hit = _sparklineCache.get(cacheKey);
+    if (hit && Date.now() - hit.ts < SPARKLINE_TTL) return hit.data;
+
+    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+      .toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .from('creator_stats')
+      .select('creator_id, recorded_at, subscribers')
+      .in('creator_id', creatorIds)
+      .gte('recorded_at', cutoff)
+      .order('recorded_at', { ascending: true });
+    if (error) throw error;
+
+    // Bucket: creator_id → array of subscriber counts in chronological order
+    const result = {};
+    for (const id of creatorIds) result[id] = [];
+    for (const row of data || []) {
+      if (result[row.creator_id]) result[row.creator_id].push(row.subscribers);
+    }
+
+    _sparklineCache.set(cacheKey, { data: result, ts: Date.now() });
+    return result;
+  },
+  'creatorService.getSparklineData'
+);

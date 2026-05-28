@@ -8,7 +8,8 @@ import { Music } from 'lucide-react';
 import { TableSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
 import CreatorAvatar from '../components/CreatorAvatar';
-import { getRankedCreators, getFeaturedListings } from '../services/creatorService';
+import Sparkline from '../components/Sparkline';
+import { getRankedCreators, getFeaturedListings, getSparklineData } from '../services/creatorService';
 import SEO from '../components/SEO';
 import StructuredData from '../components/StructuredData';
 import { analytics } from '../lib/analytics';
@@ -316,6 +317,8 @@ function PlatformRankings({ urlPlatform }) {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('desc');
   const [sponsoredListings, setSponsoredListings] = useState([]);
+  // creator_id → number[] (30-day subscriber series). Loaded lazily after rankings render.
+  const [sparklines, setSparklines] = useState({});
 
   const rankTypes = [
     { id: 'subscribers', name: selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' ? 'Top Followers' : selectedPlatform === 'music' ? 'Top Listeners' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
@@ -343,9 +346,18 @@ function PlatformRankings({ urlPlatform }) {
   const loadRankings = async () => {
     setLoading(true);
     setError(null);
+    setSparklines({});
     try {
       const data = await getRankedCreators(selectedPlatform, selectedRankType, topCount);
       setRankings(data);
+
+      // Lazy-load sparkline data after the main rankings render — non-blocking.
+      // Fire-and-forget; sparklines fade in as data arrives.
+      if (data.length > 0) {
+        getSparklineData(data.map(c => c.id), 30)
+          .then(setSparklines)
+          .catch(() => {}); // sparklines are non-critical
+      }
     } catch (err) {
       logger.error('Failed to load rankings:', err);
       setError(err.message || 'Failed to load rankings');
@@ -571,10 +583,10 @@ function PlatformRankings({ urlPlatform }) {
 
           {/* Rankings Table */}
           <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
-            {/* Table Header */}
-            <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-800/50 border-b border-gray-800 text-sm font-semibold text-gray-300 uppercase tracking-wider">
+            {/* Sticky Table Header */}
+            <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 sticky top-0 z-10 bg-gray-900/95 backdrop-blur-md border-b border-gray-800 text-sm font-semibold text-gray-300 uppercase tracking-wider">
               <div className="col-span-1">Rank</div>
-              <div className={selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'col-span-7' : 'col-span-5'}>Creator</div>
+              <div className={selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'col-span-5' : 'col-span-4'}>Creator</div>
               <button
                 onClick={() => handleSort('subscribers')}
                 className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-gray-300 transition-colors cursor-pointer"
@@ -582,6 +594,7 @@ function PlatformRankings({ urlPlatform }) {
                 <span>{followerLabel}</span>
                 <SortIcon column="subscribers" />
               </button>
+              <div className="col-span-2 text-right">30-Day Trend</div>
               {selectedPlatform === 'tiktok' && (
                 <button
                   onClick={() => handleSort('views')}
@@ -602,9 +615,9 @@ function PlatformRankings({ urlPlatform }) {
               )}
               <button
                 onClick={() => handleSort('growth')}
-                className="col-span-2 flex items-center justify-end gap-1.5 text-right hover:text-gray-300 transition-colors cursor-pointer group"
+                className="col-span-1 flex items-center justify-end gap-1.5 text-right hover:text-gray-300 transition-colors cursor-pointer group"
               >
-                <span>30-Day Growth</span>
+                <span>Growth</span>
                 <SortIcon column="growth" />
                 <div className="relative">
                   <Info className="w-3.5 h-3.5 text-gray-300 cursor-help" />
@@ -674,7 +687,7 @@ function PlatformRankings({ urlPlatform }) {
                     </div>
 
                     {/* Creator Info */}
-                    <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-7' : 'md:col-span-5'}`}>
+                    <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-5' : 'md:col-span-4'}`}>
                       <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="lg" />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -693,11 +706,12 @@ function PlatformRankings({ urlPlatform }) {
                     </div>
 
                     {/* Empty stat columns to match layout */}
-                    <div className="hidden md:block col-span-2 text-right" />
+                    <div className="hidden md:block col-span-2" />
+                    <div className="hidden md:block col-span-2" />
                     {selectedPlatform !== 'kick' && selectedPlatform !== 'bluesky' && (
-                      <div className="hidden md:block col-span-2 text-right" />
+                      <div className="hidden md:block col-span-2" />
                     )}
-                    <div className="hidden md:block col-span-2 text-right" />
+                    <div className="hidden md:block col-span-1" />
                   </Link>
                 );
               }
@@ -721,7 +735,7 @@ function PlatformRankings({ urlPlatform }) {
                   </div>
 
                   {/* Creator Info */}
-                  <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-7' : 'md:col-span-5'}`}>
+                  <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-5' : 'md:col-span-4'}`}>
                     <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="lg" />
                     <div className="min-w-0">
                       <p className="font-semibold text-gray-100 truncate group-hover:text-indigo-400 transition-colors">
@@ -730,24 +744,49 @@ function PlatformRankings({ urlPlatform }) {
                     </div>
                   </div>
 
-                  {/* Stats - Desktop */}
+                  {/* Subscribers / Followers */}
                   <div className="hidden md:block col-span-2 text-right">
-                    <span className="font-semibold text-gray-100">{formatNumber(creator.subscribers)}</span>
+                    <span className="font-semibold text-gray-100 tabular-nums">{formatNumber(creator.subscribers)}</span>
                   </div>
+
+                  {/* Sparkline trend */}
+                  <div className="hidden md:flex col-span-2 justify-end items-center">
+                    <Sparkline data={sparklines[creator.id] || []} width={88} height={28} />
+                  </div>
+
+                  {/* Views / Likes (platform-dependent) */}
                   {selectedPlatform === 'tiktok' && (
                     <div className="hidden md:block col-span-2 text-right">
-                      <span className="text-gray-300">{formatNumber(creator.totalViews)}</span>
+                      <span className="text-gray-300 tabular-nums">{formatNumber(creator.totalViews)}</span>
                     </div>
                   )}
                   {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
                     <div className="hidden md:block col-span-2 text-right">
-                      <span className="text-gray-300">{formatNumber(creator.totalViews)}</span>
+                      <span className="text-gray-300 tabular-nums">{formatNumber(creator.totalViews)}</span>
                     </div>
                   )}
-                  <div className="hidden md:block col-span-2 text-right">
-                    <span className={`font-medium ${creator.growth30d > 0 ? 'text-emerald-400' : creator.growth30d < 0 ? 'text-red-500' : 'text-gray-300'}`}>
-                      {creator.growth30d > 0 ? '+' : ''}{formatNumber(creator.growth30d)}
-                    </span>
+
+                  {/* 30-Day Growth — absolute + percentage */}
+                  <div className="hidden md:flex col-span-1 flex-col items-end justify-center">
+                    {(() => {
+                      const g = creator.growth30d;
+                      const subs = creator.subscribers;
+                      const pct = subs > 0 && typeof g === 'number' ? (g / Math.max(subs - g, 1)) * 100 : null;
+                      const color = g > 0 ? 'text-emerald-400' : g < 0 ? 'text-red-400' : 'text-gray-500';
+                      const arrow = g > 0 ? '▲' : g < 0 ? '▼' : '·';
+                      return (
+                        <>
+                          <span className={`font-semibold text-sm tabular-nums ${color}`}>
+                            {g > 0 ? '+' : ''}{formatNumber(g)}
+                          </span>
+                          {pct !== null && (
+                            <span className={`text-[10px] tabular-nums ${color} opacity-80`}>
+                              {arrow} {Math.abs(pct).toFixed(pct >= 10 || pct <= -10 ? 0 : 1)}%
+                            </span>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
 
                   {/* Stats - Mobile (inline in creator column) */}
