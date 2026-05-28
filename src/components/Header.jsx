@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BarChart3, Search, Trophy, Menu, X, Scale, BookOpen, User, LogOut, LayoutDashboard, Calculator, Heart, Settings, FileSpreadsheet, ChevronDown, LayoutGrid, TrendingUp, Megaphone } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import AuthPanel from './AuthPanel';
 
 const moreLinks = [
   {
@@ -83,12 +82,14 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [authPanelOpen, setAuthPanelOpen] = useState(false);
-  const [authPanelMessage, setAuthPanelMessage] = useState('');
-  const [authPanelReturnTo, setAuthPanelReturnTo] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut, isAuthenticated } = useAuth();
+
+  // AuthPanel is rendered at the App level (see App.jsx) — Header's backdrop-blur
+  // creates a containing block which would collapse the panel's position:fixed h-full.
+  // Header just dispatches openAuthPanel events; App owns the panel state.
+  const openAuth = () => window.dispatchEvent(new CustomEvent('openAuthPanel'));
   const mobileMenuRef = useRef(null);
 
   // Close menus on route change
@@ -121,24 +122,6 @@ export default function Header() {
     return () => document.removeEventListener('keydown', handleKey);
   }, [moreMenuOpen]);
 
-  // Listen for custom event to open auth panel
-  useEffect(() => {
-    const handleOpenAuthPanel = (e) => {
-      setAuthPanelMessage(e.detail?.message || '');
-      setAuthPanelReturnTo(e.detail?.returnTo || null);
-      setAuthPanelOpen(true);
-    };
-    window.addEventListener('openAuthPanel', handleOpenAuthPanel);
-    return () => window.removeEventListener('openAuthPanel', handleOpenAuthPanel);
-  }, []);
-
-  // Navigate to returnTo after successful login
-  useEffect(() => {
-    if (isAuthenticated && authPanelReturnTo) {
-      navigate(authPanelReturnTo);
-      setAuthPanelReturnTo(null);
-    }
-  }, [isAuthenticated, authPanelReturnTo, navigate]);
 
   const isActive = (path) => {
     if (path === '/rankings') return location.pathname.startsWith('/rankings');
@@ -297,7 +280,7 @@ export default function Header() {
                 </div>
               ) : (
                 <button
-                  onClick={() => setAuthPanelOpen(true)}
+                  onClick={() => openAuth()}
                   className="flex items-center gap-2 px-3.5 py-2 bg-neutral-900 text-white rounded-lg text-sm font-semibold hover:bg-neutral-800 transition-colors"
                 >
                   Sign in
@@ -426,7 +409,7 @@ export default function Header() {
                 ) : (
                   <button
                     onClick={() => {
-                      setAuthPanelOpen(true);
+                      openAuth();
                       setMobileMenuOpen(false);
                     }}
                     className="flex items-center justify-center gap-2 py-3 px-6 bg-neutral-900 text-white rounded-xl font-semibold hover:bg-neutral-800 transition-colors w-full"
@@ -439,16 +422,6 @@ export default function Header() {
           </nav>
         )}
       </div>
-
-      {/* Auth Panel */}
-      <AuthPanel
-        isOpen={authPanelOpen}
-        onClose={() => {
-          setAuthPanelOpen(false);
-          setAuthPanelMessage('');
-        }}
-        message={authPanelMessage}
-      />
     </header>
   );
 }

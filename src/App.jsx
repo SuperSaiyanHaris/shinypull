@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect, useRef } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -7,7 +7,8 @@ import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import CommandPalette from './components/CommandPalette';
-import { AuthProvider } from './contexts/AuthContext';
+import AuthPanel from './components/AuthPanel';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // Eagerly load the homepage (critical path)
 import Home from './pages/Home';
@@ -92,6 +93,43 @@ function RouteChangeTracker() {
   return null;
 }
 
+// AuthPanel host — rendered at App level so it's a sibling of <main> and NOT
+// inside Header (which has backdrop-blur that would create a containing block
+// for the panel's position:fixed h-full and collapse it to 64px tall).
+function AuthPanelHost() {
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [returnTo, setReturnTo] = useState(null);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    const handler = (e) => {
+      setMessage(e.detail?.message || '');
+      setReturnTo(e.detail?.returnTo || null);
+      setOpen(true);
+    };
+    window.addEventListener('openAuthPanel', handler);
+    return () => window.removeEventListener('openAuthPanel', handler);
+  }, []);
+
+  // Redirect to returnTo after successful sign-in
+  useEffect(() => {
+    if (isAuthenticated && returnTo) {
+      navigate(returnTo);
+      setReturnTo(null);
+    }
+  }, [isAuthenticated, returnTo, navigate]);
+
+  return (
+    <AuthPanel
+      isOpen={open}
+      onClose={() => { setOpen(false); setMessage(''); }}
+      message={message}
+    />
+  );
+}
+
 // Extracted so we can call useLocation() to suppress chrome on share pages
 function LayoutWrapper() {
   const location = useLocation();
@@ -147,6 +185,7 @@ function App() {
   return (
     <AuthProvider>
       <LayoutWrapper />
+      <AuthPanelHost />
       <CommandPalette />
       <Toaster
         position="bottom-right"
