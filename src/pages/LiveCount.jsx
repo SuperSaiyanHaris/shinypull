@@ -10,39 +10,50 @@ import { getArtistByMbid, getArtistByName } from '../services/musicService';
 import { getCreatorByUsername } from '../services/creatorService';
 import Odometer from '../components/Odometer';
 import SEO from '../components/SEO';
+import CreatorAvatar from '../components/CreatorAvatar';
 import { analytics } from '../lib/analytics';
 import logger from '../lib/logger';
+import { toast } from 'sonner';
 
+// Neon streaming-overlay theme — per-platform glow/text-shadow values
 const platformConfig = {
   youtube: {
     icon: Youtube,
-    color: 'text-red-500',
-    bgGradient: 'from-red-500 to-red-600',
-    glowColor: 'shadow-red-500/20',
+    color: 'text-red-400',
+    bgGradient: 'from-red-500 to-rose-600',
+    glowColor: 'shadow-red-500/30',
+    neonGlow: '0 0 24px rgba(248,113,113,0.6), 0 0 60px rgba(248,113,113,0.35), 0 0 120px rgba(248,113,113,0.18)',
+    neonAccent: '#f87171',
     label: 'subscribers',
     avgGrowthPerSecond: 2.5,
   },
   twitch: {
     icon: Twitch,
-    color: 'text-purple-500',
-    bgGradient: 'from-purple-500 to-purple-600',
-    glowColor: 'shadow-purple-500/20',
+    color: 'text-purple-400',
+    bgGradient: 'from-purple-500 to-fuchsia-600',
+    glowColor: 'shadow-purple-500/30',
+    neonGlow: '0 0 24px rgba(192,132,252,0.6), 0 0 60px rgba(192,132,252,0.35), 0 0 120px rgba(192,132,252,0.18)',
+    neonAccent: '#c084fc',
     label: 'followers',
     avgGrowthPerSecond: 0.8,
   },
   kick: {
     icon: KickIcon,
-    color: 'text-green-500',
-    bgGradient: 'from-green-500 to-green-600',
-    glowColor: 'shadow-green-500/20',
+    color: 'text-green-400',
+    bgGradient: 'from-green-500 to-emerald-600',
+    glowColor: 'shadow-green-500/30',
+    neonGlow: '0 0 24px rgba(74,222,128,0.6), 0 0 60px rgba(74,222,128,0.35), 0 0 120px rgba(74,222,128,0.18)',
+    neonAccent: '#4ade80',
     label: 'paid subscribers',
     avgGrowthPerSecond: 0.3,
   },
   music: {
     icon: Music,
     color: 'text-amber-400',
-    bgGradient: 'from-amber-500 to-orange-500',
-    glowColor: 'shadow-amber-500/20',
+    bgGradient: 'from-amber-500 to-orange-600',
+    glowColor: 'shadow-amber-500/30',
+    neonGlow: '0 0 24px rgba(251,191,36,0.6), 0 0 60px rgba(251,191,36,0.35), 0 0 120px rgba(251,191,36,0.18)',
+    neonAccent: '#fbbf24',
     label: 'monthly listeners',
     avgGrowthPerSecond: 1.0,
   },
@@ -246,7 +257,7 @@ export default function LiveCount() {
     } else {
       navigator.clipboard.writeText(url);
       analytics.share(platform, username, creator?.displayName, 'copy_link');
-      alert('Link copied to clipboard!');
+      toast.success('Live count link copied');
     }
   };
 
@@ -286,27 +297,52 @@ export default function LiveCount() {
         description={`Watch ${creator.displayName}'s ${platform} ${config.label} count update in real-time. Estimated live counter.`}
       />
 
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black flex flex-col">
+      <div className="relative min-h-screen bg-black flex flex-col overflow-hidden">
+        {/* Background neon glow blobs — drift slowly behind everything */}
+        <div
+          className="absolute -top-32 -left-32 w-[40rem] h-[40rem] rounded-full blur-[120px] opacity-40 animate-pulse"
+          style={{ backgroundColor: config.neonAccent }}
+        />
+        <div
+          className="absolute -bottom-40 -right-32 w-[36rem] h-[36rem] rounded-full blur-[120px] opacity-25"
+          style={{ backgroundColor: config.neonAccent, animationDelay: '1.5s' }}
+        />
+        {/* Subtle scan lines for that broadcast-overlay feel */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          style={{ backgroundImage: 'repeating-linear-gradient(0deg, white 0px, white 1px, transparent 1px, transparent 3px)' }}
+        />
+        {/* Vignette */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.6)_100%)]" />
+
         {/* Main Content */}
-        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8">
+        <div className="relative flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8">
           <div className="text-center w-full max-w-4xl">
 
-            {/* Live Indicator */}
-            <div className="flex items-center justify-center gap-3 mb-6 sm:mb-8">
-              <span className="relative flex h-4 w-4">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
+            {/* Live Indicator — bigger, glowing */}
+            <div className="inline-flex items-center gap-3 mb-6 sm:mb-8 px-4 py-1.5 rounded-full border-2 border-red-500/50 bg-red-500/10 backdrop-blur-sm" style={{ boxShadow: '0 0 24px rgba(239,68,68,0.4)' }}>
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
               </span>
-              <span className="text-red-500 font-bold text-base sm:text-lg uppercase tracking-widest">Live</span>
+              <span className="text-red-300 font-black text-sm sm:text-base uppercase tracking-[0.3em]">On Air</span>
             </div>
 
             {/* Creator Info */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-8 sm:mb-10">
-              <img
-                src={creator.profileImage}
-                alt={creator.displayName}
-                className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl sm:rounded-3xl object-cover border-4 border-gray-700 shadow-2xl"
-              />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-10 sm:mb-12">
+              <div
+                className="rounded-2xl sm:rounded-3xl"
+                style={{ boxShadow: config.neonGlow }}
+              >
+                <CreatorAvatar
+                  src={creator.profileImage}
+                  name={creator.displayName}
+                  size="3xl"
+                  rounded="rounded-2xl sm:rounded-3xl"
+                  loading="eager"
+                  className="!w-24 !h-24 sm:!w-28 sm:!h-28 md:!w-32 md:!h-32 border-4"
+                />
+              </div>
               <div className="text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1">{creator.displayName}</h1>
                 <p className="text-gray-300 text-base sm:text-lg mb-3">@{creator.username || username}</p>
@@ -322,14 +358,20 @@ export default function LiveCount() {
               </div>
             </div>
 
-            {/* The Big Counter */}
-            <div className="mb-8 sm:mb-12">
-              <div className={`text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-black ${config.color} tracking-tight`}>
+            {/* The Big Counter — heavy neon text-shadow */}
+            <div className="mb-10 sm:mb-14">
+              <div
+                className={`text-5xl sm:text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-black ${config.color} tracking-tighter leading-none`}
+                style={{ textShadow: config.neonGlow, fontVariantNumeric: 'tabular-nums' }}
+              >
                 {estimatedCount !== null && (
                   <Odometer value={estimatedCount} duration={300} />
                 )}
               </div>
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-300 mt-4 font-medium">
+              <p
+                className="text-lg sm:text-xl md:text-2xl text-gray-400 mt-5 font-bold uppercase tracking-[0.3em]"
+                style={{ textShadow: `0 0 12px ${config.neonAccent}40` }}
+              >
                 {config.label}
               </p>
             </div>
@@ -338,14 +380,14 @@ export default function LiveCount() {
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <button
                 onClick={handleShare}
-                className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-xl transition-colors border border-gray-700"
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 bg-gray-900/80 hover:bg-gray-800 backdrop-blur-sm text-white font-medium rounded-xl transition-colors border border-gray-700"
               >
                 <Share2 className="w-5 h-5" />
                 Share
               </button>
               <Link
                 to={`/${platform}/${username}`}
-                className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-colors"
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 bg-gray-900/80 hover:bg-gray-800 backdrop-blur-sm text-white font-medium rounded-xl transition-colors border border-gray-700"
               >
                 <ExternalLink className="w-5 h-5" />
                 Full Profile

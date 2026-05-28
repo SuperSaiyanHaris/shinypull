@@ -707,7 +707,7 @@ export default function CreatorProfile() {
         title={seoTitle}
         description={seoDescription}
         keywords={seoKeywords}
-        image={creator.profileImage || undefined}
+        image={`https://shinypull.com/api/og?platform=${platform}&username=${encodeURIComponent(creator.username || username)}`}
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(profileSchema).replace(/<\/script>/gi, '<\\/script>') }} />
 
