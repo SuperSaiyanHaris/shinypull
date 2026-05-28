@@ -51,23 +51,33 @@ export default function About() {
 
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             {[
-              { icon: Users, title: 'Live counts', text: 'Subscriber and follower counts updated multiple times per day.' },
-              { icon: TrendingUp, title: 'Growth charts', text: 'Historical trends going back to when we first started tracking a creator.' },
-              { icon: BarChart3, title: 'Rankings', text: 'Top creators by platform, updated daily with real numbers.' },
-              { icon: Globe, title: 'Cross-platform', text: 'YouTube, TikTok, Twitch, Kick, Bluesky, and Music all in one place.' },
-              { icon: Database, title: 'Stream tracking', text: 'Hours watched, peak viewers, and stream history for Twitch and Kick.' },
-              { icon: RefreshCw, title: 'Always current', text: 'Automated collection runs around the clock. No stale data.' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-3 p-4 bg-neutral-50 rounded-xl">
-                <div className="w-10 h-10 bg-indigo-900/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <item.icon className="w-5 h-5 text-indigo-400" />
+              { Icon: Users,      title: 'Live counts',      text: 'Subscriber and follower counts updated multiple times per day.', accent: 'red' },
+              { Icon: TrendingUp, title: 'Growth charts',    text: 'Historical trends going back to when we first started tracking a creator.', accent: 'emerald' },
+              { Icon: BarChart3,  title: 'Rankings',         text: 'Top creators by platform, updated daily with real numbers.', accent: 'amber' },
+              { Icon: Globe,      title: 'Cross-platform',   text: 'YouTube, TikTok, Twitch, Kick, Bluesky, and Music all in one place.', accent: 'sky' },
+              { Icon: Database,   title: 'Stream tracking',  text: 'Hours watched, peak viewers, and stream history for Twitch and Kick.', accent: 'violet' },
+              { Icon: RefreshCw,  title: 'Always current',   text: 'Automated collection runs around the clock. No stale data.', accent: 'indigo' },
+            ].map((item) => {
+              const accentMap = {
+                red:     'bg-red-50 text-red-600 border-red-100',
+                emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                amber:   'bg-amber-50 text-amber-600 border-amber-100',
+                sky:     'bg-sky-50 text-sky-600 border-sky-100',
+                violet:  'bg-violet-50 text-violet-600 border-violet-100',
+                indigo:  'bg-indigo-50 text-indigo-600 border-indigo-100',
+              };
+              return (
+                <div key={item.title} className="flex items-start gap-3 p-5 bg-white border border-neutral-200 rounded-xl hover:border-neutral-300 hover:shadow-sm transition-all">
+                  <div className={`w-10 h-10 rounded-lg border ${accentMap[item.accent]} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                    <item.Icon className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-neutral-900 mb-1">{item.title}</p>
+                    <p className="text-sm text-neutral-600 leading-relaxed">{item.text}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-neutral-900 mb-0.5">{item.title}</p>
-                  <p className="text-sm text-neutral-500">{item.text}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-8 mb-6">
@@ -79,7 +89,7 @@ export default function About() {
             </p>
             <p className="text-neutral-700 leading-relaxed">
               Want to know exactly how collection works for each platform?{' '}
-              <Link to="/methodology" className="text-indigo-400 hover:text-indigo-300 font-medium">
+              <Link to="/methodology" className="text-indigo-600 hover:text-indigo-700 font-medium underline-offset-2 hover:underline">
                 Read our data methodology.
               </Link>
             </p>

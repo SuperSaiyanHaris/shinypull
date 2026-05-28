@@ -38,12 +38,12 @@ const POPULAR_MATCHUPS = [
 ];
 
 const platformConfig = {
-  youtube: { icon: Youtube, color: 'text-red-400', bg: 'bg-red-50', border: 'border-red-800' },
-  tiktok: { icon: TikTokIcon, color: 'text-pink-400', bg: 'bg-pink-50', border: 'border-pink-800' },
-  twitch: { icon: Twitch, color: 'text-purple-400', bg: 'bg-purple-50', border: 'border-purple-800' },
-  kick: { icon: KickIcon, color: 'text-green-400', bg: 'bg-green-50', border: 'border-green-800' },
-  bluesky: { icon: BlueskyIcon, color: 'text-sky-400', bg: 'bg-sky-50', border: 'border-sky-800' },
-  music: { icon: Music, color: 'text-amber-400', bg: 'bg-amber-50', border: 'border-amber-800' },
+  youtube: { icon: Youtube, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
+  tiktok: { icon: TikTokIcon, color: 'text-pink-600', bg: 'bg-pink-50', border: 'border-pink-200' },
+  twitch: { icon: Twitch, color: 'text-purple-700', bg: 'bg-purple-50', border: 'border-purple-200' },
+  kick: { icon: KickIcon, color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' },
+  bluesky: { icon: BlueskyIcon, color: 'text-sky-700', bg: 'bg-sky-50', border: 'border-sky-200' },
+  music: { icon: Music, color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
 };
 
 export default function Compare() {
@@ -369,7 +369,7 @@ export default function Compare() {
   // Helper: Get growth color
   const getGrowthColor = (percentage) => {
     if (!percentage || isNaN(percentage)) return 'text-neutral-700';
-    return percentage > 0 ? 'text-emerald-400' : 'text-red-500';
+    return percentage > 0 ? 'text-emerald-600' : 'text-red-500';
   };
 
   // Helper: Format earnings estimate (YouTube only, based on actual 30-day views)
@@ -431,7 +431,7 @@ export default function Compare() {
                 <div className="flex items-center gap-2">
                   {filledCreators.length >= 2 && (
                     savedFlash ? (
-                      <span className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-emerald-400 font-medium bg-emerald-50 border border-emerald-800 rounded-lg">
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-emerald-600 font-medium bg-emerald-50 border border-emerald-200 rounded-lg">
                         <Check className="w-3.5 h-3.5" />
                         Saved!
                       </span>
@@ -439,7 +439,7 @@ export default function Compare() {
                       <button
                         onClick={handleRemoveSave}
                         disabled={removing}
-                        className="flex items-center gap-1.5 px-3 py-2 text-sm text-neutral-700 bg-neutral-100 hover:bg-red-50 hover:text-red-400 border border-neutral-300 hover:border-red-800 rounded-lg transition-colors font-medium"
+                        className="flex items-center gap-1.5 px-3 py-2 text-sm text-neutral-700 bg-neutral-100 hover:bg-red-50 hover:text-red-600 border border-neutral-300 hover:border-red-200 rounded-lg transition-colors font-medium"
                       >
                         <Bookmark className="w-3.5 h-3.5 fill-current" />
                         {removing ? 'Removing...' : 'Saved'}
@@ -461,7 +461,7 @@ export default function Compare() {
                     navigate('/compare', { replace: true });
                     setSaveDialogOpen(false);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-neutral-700 hover:text-red-400 hover:bg-red-950/20 rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-neutral-700 hover:text-red-600 hover:bg-red-950/20 rounded-lg transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                   Clear all
@@ -516,7 +516,7 @@ export default function Compare() {
                         {AIcon && <span className={`flex-shrink-0 ${platformConfig[aPlatform]?.color}`}><AIcon className="w-3.5 h-3.5" /></span>}
                         <span className="text-sm font-semibold text-neutral-700 truncate group-hover:text-neutral-900 transition-colors">{aName}</span>
                       </div>
-                      <span className="text-[9px] font-black text-violet-400 bg-violet-950/50 border border-violet-800/60 px-2 py-0.5 rounded-full flex-shrink-0 tracking-widest">VS</span>
+                      <span className="text-[9px] font-black text-violet-700 bg-violet-950/50 border border-violet-800/60 px-2 py-0.5 rounded-full flex-shrink-0 tracking-widest">VS</span>
                       <div className="flex items-center gap-1.5 flex-1 min-w-0 justify-end">
                         <span className="text-sm font-semibold text-neutral-700 truncate text-right group-hover:text-neutral-900 transition-colors">{bName}</span>
                         {BIcon && <span className={`flex-shrink-0 ${platformConfig[bPlatform]?.color}`}><BIcon className="w-3.5 h-3.5" /></span>}
@@ -752,7 +752,7 @@ export default function Compare() {
                         >
                           <img src={creator.profileImage} alt="" loading="lazy" className="w-7 h-7 rounded-lg flex-shrink-0" />
                           <span className="flex-1 min-w-0 text-sm font-medium text-neutral-800 truncate group-hover:text-white transition-colors">{creator.displayName}</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-neutral-400 group-hover:text-violet-400 flex-shrink-0 transition-colors" />
+                          <ArrowRight className="w-3.5 h-3.5 text-neutral-400 group-hover:text-violet-700 flex-shrink-0 transition-colors" />
                         </Link>
                       );
                     })}
@@ -781,7 +781,7 @@ export default function Compare() {
                       >
                         <img src={creator.profileImage} alt="" loading="lazy" className="w-7 h-7 rounded-lg flex-shrink-0" />
                         <span className="flex-1 min-w-0 text-sm font-medium text-neutral-800 truncate group-hover:text-white transition-colors">{creator.displayName}</span>
-                        <ArrowRight className="w-3 h-3 text-neutral-400 group-hover:text-violet-400 flex-shrink-0 transition-colors" />
+                        <ArrowRight className="w-3 h-3 text-neutral-400 group-hover:text-violet-700 flex-shrink-0 transition-colors" />
                       </Link>
                     ))}
                   </div>
@@ -804,7 +804,7 @@ function CreatorCard({ creator, onRemove, growthData }) {
     <div className="relative group/card">
       <button
         onClick={(e) => { e.stopPropagation(); onRemove(); }}
-        className="absolute top-3 right-3 z-10 p-1.5 rounded-lg text-neutral-400 hover:text-red-400 hover:bg-red-50 transition-all"
+        className="absolute top-3 right-3 z-10 p-1.5 rounded-lg text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-all"
         title="Remove"
       >
         <X className="w-4 h-4" />
@@ -851,7 +851,7 @@ function CreatorCard({ creator, onRemove, growthData }) {
             )}
           </div>
         </div>
-        <p className="text-xs text-violet-400/60 text-center mt-3 group-hover/card:text-violet-400/90 transition-colors">View profile →</p>
+        <p className="text-xs text-violet-700/60 text-center mt-3 group-hover/card:text-violet-700/90 transition-colors">View profile →</p>
       </Link>
     </div>
   );
@@ -926,7 +926,7 @@ function SearchableSlot({ onSelect, onRemove }) {
       {onRemove && (
         <button
           onClick={onRemove}
-          className="absolute top-2 right-2 p-1.5 bg-neutral-100 hover:bg-red-900/30 rounded-lg text-neutral-700 hover:text-red-500 transition-all z-10"
+          className="absolute top-2 right-2 p-1.5 bg-neutral-100 hover:bg-red-50 rounded-lg text-neutral-700 hover:text-red-500 transition-all z-10"
         >
           <X className="w-4 h-4" />
         </button>
@@ -935,12 +935,12 @@ function SearchableSlot({ onSelect, onRemove }) {
       {/* Platform chips — replaces the select dropdown */}
       <div className="flex gap-1.5 mb-3">
         {[
-          { id: 'youtube',  Icon: Youtube,     color: 'text-red-400',    bg: 'bg-red-50',    ring: 'ring-red-700',    label: 'YouTube' },
-          { id: 'tiktok',   Icon: TikTokIcon,  color: 'text-pink-400',   bg: 'bg-pink-50',   ring: 'ring-pink-700',   label: 'TikTok' },
-          { id: 'twitch',   Icon: Twitch,      color: 'text-purple-400', bg: 'bg-purple-50', ring: 'ring-purple-700', label: 'Twitch' },
-          { id: 'kick',     Icon: KickIcon,    color: 'text-green-400',  bg: 'bg-green-50',  ring: 'ring-green-700',  label: 'Kick' },
-          { id: 'bluesky',  Icon: BlueskyIcon, color: 'text-sky-400',    bg: 'bg-sky-50',    ring: 'ring-sky-700',    label: 'Bluesky' },
-          { id: 'music',    Icon: Music,       color: 'text-amber-400',  bg: 'bg-amber-50',  ring: 'ring-amber-700',  label: 'Music' },
+          { id: 'youtube',  Icon: Youtube,     color: 'text-red-600',    bg: 'bg-red-50',    ring: 'ring-red-700',    label: 'YouTube' },
+          { id: 'tiktok',   Icon: TikTokIcon,  color: 'text-pink-600',   bg: 'bg-pink-50',   ring: 'ring-pink-700',   label: 'TikTok' },
+          { id: 'twitch',   Icon: Twitch,      color: 'text-purple-700', bg: 'bg-purple-50', ring: 'ring-purple-700', label: 'Twitch' },
+          { id: 'kick',     Icon: KickIcon,    color: 'text-green-700',  bg: 'bg-green-50',  ring: 'ring-green-700',  label: 'Kick' },
+          { id: 'bluesky',  Icon: BlueskyIcon, color: 'text-sky-700',    bg: 'bg-sky-50',    ring: 'ring-sky-700',    label: 'Bluesky' },
+          { id: 'music',    Icon: Music,       color: 'text-amber-700',  bg: 'bg-amber-50',  ring: 'ring-amber-700',  label: 'Music' },
         ].map(({ id, Icon, color, bg, ring, label }) => (
           <button
             key={id}
@@ -1239,7 +1239,7 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
             {creators.map((c, idx) => {
               const isWinner = winnerIdx === idx;
               const [primary, secondary] = row.display[idx];
-              const color = (row.isGrowth || row.isEarnings) ? row.colors[idx] : (isWinner ? 'text-emerald-400' : 'text-neutral-900');
+              const color = (row.isGrowth || row.isEarnings) ? row.colors[idx] : (isWinner ? 'text-emerald-600' : 'text-neutral-900');
               return (
                 <div
                   key={c.platformId}
@@ -1249,7 +1249,7 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
                   {secondary && (
                     <span className={`text-[10px] text-center leading-tight mt-0.5 opacity-70 ${color}`}>{secondary}</span>
                   )}
-                  {isWinner && <span className="text-[10px] text-emerald-400 mt-0.5">✓</span>}
+                  {isWinner && <span className="text-[10px] text-emerald-600 mt-0.5">✓</span>}
                 </div>
               );
             })}

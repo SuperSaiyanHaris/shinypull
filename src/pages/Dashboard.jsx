@@ -31,11 +31,11 @@ const platformIcons = {
 };
 
 const platformColors = {
-  youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-400', border: 'border-red-800' },
-  tiktok:  { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-400', border: 'border-pink-800' },
-  twitch:  { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-400', border: 'border-purple-800' },
-  kick:    { bg: 'bg-green-600', light: 'bg-green-50', text: 'text-green-400', border: 'border-green-800' },
-  bluesky: { bg: 'bg-sky-500', light: 'bg-sky-50', text: 'text-sky-400', border: 'border-sky-800' },
+  youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600', border: 'border-red-200' },
+  tiktok:  { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-600', border: 'border-pink-200' },
+  twitch:  { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  kick:    { bg: 'bg-green-600', light: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' },
+  bluesky: { bg: 'bg-sky-500', light: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
 };
 
 const PLATFORM_LABELS = {
@@ -185,7 +185,7 @@ export default function Dashboard() {
           <div className="max-w-4xl mx-auto px-4 pt-20 pb-32">
 
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-sm font-semibold mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-500/20 rounded-full text-indigo-600 text-sm font-semibold mb-6">
                 <Star className="w-3.5 h-3.5" />
                 Free with an account
               </div>
@@ -200,7 +200,7 @@ export default function Dashboard() {
             {/* Blurred preview */}
             <div className="relative">
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#fafafa]/60 backdrop-blur-sm rounded-2xl">
-                <Lock className="w-10 h-10 text-indigo-400 mb-4" />
+                <Lock className="w-10 h-10 text-indigo-600 mb-4" />
                 <p className="text-lg font-semibold text-neutral-900 mb-2">Sign in to continue</p>
                 <p className="text-sm text-neutral-500 mb-6 max-w-sm text-center">
                   Create a free account to follow creators and track their stats.
@@ -234,7 +234,7 @@ export default function Dashboard() {
                 <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden">
                   <div className="flex border-b border-neutral-200 px-4">
                     {['Following', 'Saved Compares', 'Recently Viewed'].map((t, i) => (
-                      <div key={t} className={`px-4 py-3 text-sm font-medium ${i === 0 ? 'text-indigo-400 border-b-2 border-indigo-500' : 'text-neutral-400'}`}>{t}</div>
+                      <div key={t} className={`px-4 py-3 text-sm font-medium ${i === 0 ? 'text-indigo-600 border-b-2 border-indigo-500' : 'text-neutral-400'}`}>{t}</div>
                     ))}
                   </div>
                   <div className="p-4 space-y-3">
@@ -265,7 +265,7 @@ export default function Dashboard() {
                 'Free forever, no credit card needed',
               ].map(f => (
                 <div key={f} className="flex items-start gap-2.5 text-sm text-neutral-500">
-                  <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-indigo-400" />
+                  <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-indigo-600" />
                   {f}
                 </div>
               ))}
@@ -493,7 +493,7 @@ export default function Dashboard() {
                 </div>
                 {liveCount > 0 && (
                   <div className="text-center">
-                    <p className="text-xl font-bold text-red-400 tabular-nums">
+                    <p className="text-xl font-bold text-red-600 tabular-nums">
                       <CountUp value={liveCount} format="comma" />
                     </p>
                     <p className="text-xs text-neutral-400 mt-0.5">Live now</p>
@@ -527,7 +527,7 @@ export default function Dashboard() {
               {liveCount > 0 ? (
                 <>
                   <div className="flex-1 text-center">
-                    <p className="text-base font-bold text-red-400">{liveCount}</p>
+                    <p className="text-base font-bold text-red-600">{liveCount}</p>
                     <p className="text-xs text-neutral-400">Live now</p>
                   </div>
                   <div className="w-px h-8 bg-neutral-100" />
@@ -559,11 +559,11 @@ export default function Dashboard() {
                           : 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-indigo-400' : ''}`} />
+                      <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-indigo-600' : ''}`} />
                       <span className="flex-1">{tab.label}</span>
                       {tab.count > 0 && (
                         <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0 ${
-                          isActive ? 'bg-indigo-500/30 text-indigo-300' : 'bg-neutral-200 text-neutral-500'
+                          isActive ? 'bg-indigo-500/30 text-indigo-600' : 'bg-neutral-200 text-neutral-500'
                         }`}>
                           {tab.count}
                         </span>
@@ -624,8 +624,8 @@ export default function Dashboard() {
                     <div className="mb-4 bg-indigo-950/50 border border-indigo-700/60 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          <Scale className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                          <span className="text-sm font-semibold text-indigo-300">Compare mode</span>
+                          <Scale className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                          <span className="text-sm font-semibold text-indigo-600">Compare mode</span>
                           <span className="text-xs text-indigo-500 font-medium">({selectedForCompare.length}/3)</span>
                         </div>
                         <button
@@ -635,7 +635,7 @@ export default function Dashboard() {
                           <X className="w-4 h-4" />
                         </button>
                       </div>
-                      <p className="text-xs text-indigo-400/70 mb-3">Tap creators from the list to select them</p>
+                      <p className="text-xs text-indigo-600/70 mb-3">Tap creators from the list to select them</p>
                       <Link
                         to={`/compare?creators=${selectedForCompare.map(id => {
                           const c = followedCreators.find(fc => fc.id === id);
@@ -720,7 +720,7 @@ export default function Dashboard() {
 
                         <button
                           onClick={handleBulkExport}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 hover:bg-indigo-950/60 text-indigo-400 border border-indigo-800/60 transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 hover:bg-indigo-950/60 text-indigo-600 border border-indigo-200 transition-colors"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span className="hidden sm:inline">Export CSV</span>
@@ -811,7 +811,7 @@ export default function Dashboard() {
                                   )}
                                 </div>
                                 {growth !== null && growth !== 0 ? (
-                                  <span className={`flex items-center justify-end text-xs font-medium ${growth > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                                  <span className={`flex items-center justify-end text-xs font-medium ${growth > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                                     {growth > 0 ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
                                     {growth > 0 ? '+' : ''}{formatNumber(growth)}
                                   </span>
@@ -904,14 +904,14 @@ export default function Dashboard() {
                             <div className="flex items-center gap-1 flex-shrink-0">
                               <button
                                 onClick={() => handleDeleteCompare(compare.id)}
-                                className="p-2 rounded-lg text-neutral-300 hover:text-red-400 hover:bg-red-950/20 transition-colors opacity-0 group-hover:opacity-100"
+                                className="p-2 rounded-lg text-neutral-300 hover:text-red-600 hover:bg-red-950/20 transition-colors opacity-0 group-hover:opacity-100"
                                 title="Delete"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                               <Link
                                 to={`/compare?creators=${compare.creators_param}`}
-                                className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors px-2"
+                                className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-600 transition-colors px-2"
                               >
                                 Open <ChevronRight className="w-4 h-4" />
                               </Link>
@@ -959,7 +959,7 @@ export default function Dashboard() {
                         ) : <div />}
                         <button
                           onClick={handleClearHistory}
-                          className="text-xs text-neutral-400 hover:text-red-400 transition-colors"
+                          className="text-xs text-neutral-400 hover:text-red-600 transition-colors"
                         >
                           Clear all
                         </button>
@@ -1019,7 +1019,7 @@ const CHIP_ACTIVE_STYLES = {
 
 function FilterChip({ active, onClick, label, count, icon, live, platform }) {
   const activeClass = live
-    ? 'bg-red-50 border-red-700 text-red-400'
+    ? 'bg-red-50 border-red-700 text-red-600'
     : platform && CHIP_ACTIVE_STYLES[platform]
       ? CHIP_ACTIVE_STYLES[platform]
       : 'bg-indigo-600 border-indigo-600 text-white shadow-lg';

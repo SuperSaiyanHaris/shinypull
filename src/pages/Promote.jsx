@@ -60,13 +60,13 @@ export default function Promote() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="text-center max-w-3xl mx-auto"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-semibold uppercase tracking-wider mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-700 text-xs font-semibold uppercase tracking-wider mb-6">
                 <Megaphone className="w-3.5 h-3.5" />
                 Featured Listings
               </div>
 
               <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-neutral-900 mb-5 tracking-tight leading-[1.1]">
-                Put your creator in front of <span className="text-amber-400">the people watching the data</span>
+                Put your creator in front of <span className="text-amber-700">the people watching the data</span>
               </h1>
 
               <p className="text-base sm:text-lg lg:text-xl text-neutral-500 mb-9 max-w-2xl mx-auto leading-relaxed">
@@ -125,10 +125,10 @@ export default function Promote() {
               transition={{ duration: 0.5 }}
               className="group relative overflow-hidden bg-white border border-neutral-200 hover:border-indigo-300 rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/10"
             >
-              <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
+              <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 bg-indigo-50 rounded-full blur-3xl group-hover:bg-indigo-100 transition-colors duration-500" />
               <div className="relative">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold rounded-full uppercase tracking-wider">Basic</span>
+                  <span className="px-2 py-0.5 bg-indigo-50 border border-indigo-500/20 text-indigo-600 text-[10px] font-bold rounded-full uppercase tracking-wider">Basic</span>
                 </div>
                 <p className="text-4xl font-extrabold text-neutral-900 mt-3">$49<span className="text-base font-normal text-neutral-400">/mo</span></p>
                 <p className="text-sm text-neutral-500 mt-4 mb-6">Placed starting at rank 15, then every 5 rows. Visible on the rankings page anyone hits looking for top creators.</p>
@@ -140,14 +140,14 @@ export default function Promote() {
                     'Cancel anytime',
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5 text-sm text-neutral-700">
-                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-indigo-400" />
+                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-indigo-600" />
                       {feature}
                     </li>
                   ))}
                 </ul>
                 <Link
                   to={ctaHref} onClick={handleCtaClick}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-400 hover:text-indigo-300 group-hover:gap-3 transition-all"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-600 group-hover:gap-3 transition-all"
                 >
                   Get a Basic slot <ArrowRight className="w-4 h-4" />
                 </Link>

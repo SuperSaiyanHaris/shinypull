@@ -68,20 +68,20 @@ export default function Contact() {
 
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-indigo-900/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center flex-shrink-0">
                       <Mail className="w-6 h-6 text-indigo-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-neutral-900 mb-1">Email</h3>
-                      <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-300">
+                      <a href="mailto:shinypull@proton.me" className="text-indigo-600 hover:text-indigo-600">
                         shinypull@proton.me
                       </a>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-emerald-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <MessageSquare className="w-6 h-6 text-emerald-400" />
+                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <MessageSquare className="w-6 h-6 text-emerald-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-neutral-900 mb-1">Response Time</h3>
@@ -95,14 +95,14 @@ export default function Contact() {
             <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-8">
               {status === 'success' ? (
                 <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle className="w-8 h-8 text-emerald-400" />
+                  <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="w-8 h-8 text-emerald-600" />
                   </div>
                   <h3 className="text-xl font-bold text-neutral-900 mb-2">Message Sent!</h3>
                   <p className="text-neutral-700">We'll get back to you soon.</p>
                   <button
                     onClick={() => setStatus('idle')}
-                    className="mt-4 text-indigo-600 hover:text-indigo-300 font-medium"
+                    className="mt-4 text-indigo-600 hover:text-indigo-600 font-medium"
                   >
                     Send another message
                   </button>
@@ -110,7 +110,7 @@ export default function Contact() {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {status === 'error' && (
-                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-800 rounded-xl text-red-700">
+                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700">
                       <AlertCircle className="w-5 h-5 flex-shrink-0" />
                       <span className="text-sm">{errorMessage}</span>
                     </div>

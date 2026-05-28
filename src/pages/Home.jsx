@@ -432,12 +432,12 @@ export default function Home() {
             className="relative overflow-hidden rounded-2xl bg-neutral-900 text-white p-8 sm:p-12"
           >
             {/* Subtle radial accent */}
-            <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-indigo-100 blur-3xl pointer-events-none" />
             <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
 
             <div className="relative grid lg:grid-cols-2 gap-8 items-center">
               <div>
-                <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-amber-400/15 border border-amber-400/30 rounded-full text-[11px] font-semibold uppercase tracking-wider text-amber-300 mb-5">
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-amber-400/15 border border-amber-400/30 rounded-full text-[11px] font-semibold uppercase tracking-wider text-amber-700 mb-5">
                   <Sparkles className="w-3 h-3" />
                   Featured Listings
                 </div>

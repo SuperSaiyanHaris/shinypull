@@ -411,7 +411,7 @@ export default function CreatorProfile() {
 
   const profileUrl = `${window.location.origin}/${platform}/${creator?.username || username}`;
   const shareUrl = `${window.location.origin}/s/${platform}/${creator?.username || username}`;
-  const embedCode = `<iframe src="${shareUrl}" width="520" height="400" frameborder="0" style="border-radius:16px;border:1px solid #1f2937" allowfullscreen></iframe>`;
+  const embedCode = `<iframe src="${shareUrl}" width="520" height="400" frameborder="0" style="border-radius:16px;border:1px solid #e5e5e5" allowfullscreen></iframe>`;
   // Share + embed are free for everyone — kept variable for minimal blast radius.
   const isMod = true;
 
@@ -806,7 +806,7 @@ export default function CreatorProfile() {
                 {/* Compare button */}
                 <button
                   onClick={() => navigate(`/compare?creators=${platform}:${username}`)}
-                  className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm shadow-lg border bg-gray-900 border-neutral-300 text-neutral-700 hover:border-violet-600/60 hover:text-violet-300 hover:bg-violet-950/20"
+                  className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm shadow-lg border bg-white border-neutral-200 text-neutral-700 hover:border-violet-300 hover:text-violet-700 hover:bg-violet-50"
                   title="Compare this creator"
                 >
                   <Scale className="w-4 h-4" />
@@ -819,8 +819,8 @@ export default function CreatorProfile() {
                     onClick={handleShareClick}
                     className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm shadow-lg border ${
                       showSharePanel
-                        ? 'bg-neutral-100 border-gray-600 text-neutral-900'
-                        : 'bg-gray-900 border-neutral-300 text-neutral-700 hover:border-gray-500 hover:text-neutral-900'
+                        ? 'bg-neutral-100 border-neutral-300 text-neutral-900'
+                        : 'bg-white border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:text-neutral-900'
                     }`}
                   >
                     <Share2 className="w-4 h-4" />
@@ -830,7 +830,7 @@ export default function CreatorProfile() {
 
                   {/* Share panel dropdown */}
                   {showSharePanel && (
-                    <div className="absolute top-full right-0 mt-2 w-[min(320px,calc(100vw-2rem))] bg-gray-900 border border-neutral-300 rounded-xl shadow-2xl p-4 z-30">
+                    <div className="absolute top-full right-0 mt-2 w-[min(320px,calc(100vw-2rem))] bg-white border border-neutral-200 rounded-xl shadow-2xl p-4 z-30">
 
                       {/* Profile URL — everyone */}
                       <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Profile URL</p>
@@ -899,7 +899,7 @@ export default function CreatorProfile() {
                           <button
                             onClick={handleCopyEmbed}
                             className={`flex-shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
-                              copiedEmbed ? 'bg-emerald-700 text-emerald-100' : 'bg-gray-700 hover:bg-gray-600 text-white'
+                              copiedEmbed ? 'bg-emerald-700 text-emerald-100' : 'bg-neutral-900 hover:bg-neutral-800 text-white'
                             }`}
                           >
                             {copiedEmbed ? 'Copied!' : 'Copy'}
@@ -923,7 +923,7 @@ export default function CreatorProfile() {
                   disabled={followLoading}
                   className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base shadow-lg ${
                     isFollowing
-                      ? 'bg-gray-900 text-neutral-700 hover:bg-neutral-50 border border-neutral-300'
+                      ? 'bg-white text-neutral-700 hover:bg-neutral-50 border border-neutral-200'
                       : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
@@ -1033,7 +1033,7 @@ export default function CreatorProfile() {
                           href={`https://www.youtube.com/channel/${creator.platformId}/about`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-neutral-700 hover:text-white transition-colors"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-neutral-900 transition-colors"
                         >
                           About
                         </a>
@@ -1041,7 +1041,7 @@ export default function CreatorProfile() {
                           href={`https://www.youtube.com/channel/${creator.platformId}/videos`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-neutral-700 hover:text-white transition-colors"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-neutral-900 transition-colors"
                         >
                           Videos
                         </a>
@@ -1049,7 +1049,7 @@ export default function CreatorProfile() {
                           href={`https://www.youtube.com/channel/${creator.platformId}/community`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-neutral-700 hover:text-white transition-colors"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-neutral-900 transition-colors"
                         >
                           Community
                         </a>
@@ -1063,7 +1063,7 @@ export default function CreatorProfile() {
                           href={`https://twitch.tv/${creator.username}/videos`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-neutral-700 hover:text-white transition-colors"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-neutral-900 transition-colors"
                         >
                           Videos
                         </a>
@@ -1071,7 +1071,7 @@ export default function CreatorProfile() {
                           href={`https://twitch.tv/${creator.username}/schedule`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-neutral-700 hover:text-white transition-colors"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-neutral-900 transition-colors"
                         >
                           Schedule
                         </a>
@@ -1079,7 +1079,7 @@ export default function CreatorProfile() {
                           href={`https://twitch.tv/${creator.username}/about`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-neutral-700 hover:text-white transition-colors"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-neutral-900 transition-colors"
                         >
                           About
                         </a>
@@ -1093,7 +1093,7 @@ export default function CreatorProfile() {
                           href={`https://www.last.fm/music/${encodeURIComponent(creator.displayName)}/+wiki`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-neutral-700 hover:text-white transition-colors"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-neutral-900 transition-colors"
                         >
                           Wiki
                         </a>
@@ -1101,7 +1101,7 @@ export default function CreatorProfile() {
                           href={`https://www.last.fm/music/${encodeURIComponent(creator.displayName)}/+similar`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 hover:bg-gray-600 text-neutral-700 hover:text-white transition-colors"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-neutral-900 transition-colors"
                         >
                           Similar Artists
                         </a>
@@ -1580,7 +1580,7 @@ export default function CreatorProfile() {
                     title={hasExport ? 'Export as CSV' : 'CSV export requires Sub or Mod plan'}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       hasExport
-                        ? 'bg-neutral-100 hover:bg-gray-700 text-neutral-700 hover:text-neutral-900 border border-neutral-300'
+                        ? 'bg-white hover:bg-neutral-50 text-neutral-700 hover:text-neutral-900 border border-neutral-200'
                         : 'bg-neutral-50 text-neutral-400 border border-neutral-200 cursor-pointer'
                     }`}
                   >
@@ -2082,7 +2082,7 @@ function MilestonePredictions({ currentCount, dailyGrowth, platform }) {
           >
             <div className="flex items-center gap-2 mb-2">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                index === 0 ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-neutral-500'
+                index === 0 ? 'bg-indigo-600 text-white' : 'bg-neutral-100 text-neutral-500'
               }`}>
                 <Target className="w-4 h-4" />
               </div>
@@ -2269,7 +2269,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-gray-900 border border-neutral-300 rounded-xl shadow-lg p-3">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-lg p-3">
           <p className="text-sm font-medium text-neutral-900 mb-1">
             {new Date(payload[0].payload.date + 'T12:00:00').toLocaleDateString('en-US', {
               weekday: 'short',
@@ -2302,7 +2302,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
               onClick={() => onMetricChange(m.value)}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 metric === m.value
-                  ? 'bg-gray-900 text-indigo-600 shadow-sm'
+                  ? 'bg-white text-neutral-900 shadow-sm border border-neutral-200'
                   : 'text-neutral-700 hover:text-neutral-900'
               }`}
             >
@@ -2319,7 +2319,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
                 r.locked
                   ? 'text-neutral-400 cursor-pointer hover:text-neutral-400'
                   : range === r.value
-                  ? 'bg-gray-900 text-indigo-600 shadow-sm'
+                  ? 'bg-white text-neutral-900 shadow-sm border border-neutral-200'
                   : 'text-neutral-700 hover:text-neutral-900'
               }`}
             >
@@ -2346,7 +2346,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
               dataKey="label"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#9ca3af', fontSize: 12 }}
+              tick={{ fill: '#737373', fontSize: 12 }}
               interval="preserveStartEnd"
               minTickGap={50}
             />
@@ -2354,7 +2354,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
               domain={[minValue - padding, maxValue + padding]}
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#9ca3af', fontSize: 12 }}
+              tick={{ fill: '#737373', fontSize: 12 }}
               tickFormatter={(value) => formatNumber(value)}
               width={60}
             />
@@ -2366,7 +2366,7 @@ function GrowthChart({ data, range, onRangeChange, metric, onMetricChange, platf
               strokeWidth={2}
               fill={`url(#${metric}Gradient)`}
               dot={false}
-              activeDot={{ r: 6, fill: currentMetric.color, stroke: '#1f2937', strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: currentMetric.color, stroke: '#ffffff', strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>

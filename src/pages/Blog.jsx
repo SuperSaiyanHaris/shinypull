@@ -8,16 +8,16 @@ const PAGE_SIZE = 9;
 
 // Each category gets its own color identity
 const CATEGORY_COLORS = {
-  'YouTube News':    { pill: 'bg-red-500/10 text-red-400 border border-red-500/20',       sidebar: 'bg-red-500/10 text-red-300',      dot: 'bg-red-500' },
-  'Streaming Gear':  { pill: 'bg-amber-500/10 text-amber-400 border border-amber-500/20', sidebar: 'bg-amber-500/10 text-amber-300',   dot: 'bg-amber-500' },
-  'Growth Tips':     { pill: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20', sidebar: 'bg-emerald-500/10 text-emerald-300', dot: 'bg-emerald-500' },
-  'Creator Economy': { pill: 'bg-sky-500/10 text-sky-400 border border-sky-500/20',       sidebar: 'bg-sky-500/10 text-sky-300',       dot: 'bg-sky-500' },
-  'TikTok':          { pill: 'bg-pink-500/10 text-pink-400 border border-pink-500/20',    sidebar: 'bg-pink-500/10 text-pink-300',     dot: 'bg-pink-500' },
-  'Twitch':          { pill: 'bg-purple-500/10 text-purple-400 border border-purple-500/20', sidebar: 'bg-purple-500/10 text-purple-300', dot: 'bg-purple-500' },
-  'Kick':            { pill: 'bg-green-500/10 text-green-400 border border-green-500/20', sidebar: 'bg-green-500/10 text-green-300',   dot: 'bg-green-500' },
+  'YouTube News':    { pill: 'bg-red-500/10 text-red-600 border border-red-500/20',       sidebar: 'bg-red-500/10 text-red-300',      dot: 'bg-red-500' },
+  'Streaming Gear':  { pill: 'bg-amber-500/10 text-amber-700 border border-amber-500/20', sidebar: 'bg-amber-500/10 text-amber-700',   dot: 'bg-amber-500' },
+  'Growth Tips':     { pill: 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20', sidebar: 'bg-emerald-500/10 text-emerald-300', dot: 'bg-emerald-500' },
+  'Creator Economy': { pill: 'bg-sky-500/10 text-sky-700 border border-sky-500/20',       sidebar: 'bg-sky-500/10 text-sky-300',       dot: 'bg-sky-500' },
+  'TikTok':          { pill: 'bg-pink-500/10 text-pink-600 border border-pink-500/20',    sidebar: 'bg-pink-500/10 text-pink-300',     dot: 'bg-pink-500' },
+  'Twitch':          { pill: 'bg-purple-500/10 text-purple-700 border border-purple-500/20', sidebar: 'bg-purple-500/10 text-purple-300', dot: 'bg-purple-500' },
+  'Kick':            { pill: 'bg-green-500/10 text-green-700 border border-green-500/20', sidebar: 'bg-green-500/10 text-green-300',   dot: 'bg-green-500' },
   'Bluesky':         { pill: 'bg-sky-400/10 text-sky-300 border border-sky-400/20',       sidebar: 'bg-sky-400/10 text-sky-200',       dot: 'bg-sky-400' },
 };
-const DEFAULT_COLORS = { pill: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20', sidebar: 'bg-indigo-500/10 text-indigo-300', dot: 'bg-indigo-500' };
+const DEFAULT_COLORS = { pill: 'bg-indigo-50 text-indigo-600 border border-indigo-500/20', sidebar: 'bg-indigo-50 text-indigo-600', dot: 'bg-indigo-500' };
 
 function getCatColors(category) {
   return CATEGORY_COLORS[category] || DEFAULT_COLORS;
@@ -273,7 +273,7 @@ export default function Blog() {
                               {featuredPost.category}
                             </span>
                             {isNewPost(featuredPost.published_at) && (
-                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
                                 New
                               </span>
                             )}
@@ -361,7 +361,7 @@ export default function Blog() {
 
                 {/* CTA */}
                 <div className="mt-16 group relative overflow-hidden bg-white border border-neutral-200 hover:border-indigo-500/40 rounded-2xl p-8 md:p-12 text-center transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10">
-                  <div className="pointer-events-none absolute -top-16 -left-16 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
+                  <div className="pointer-events-none absolute -top-16 -left-16 w-48 h-48 bg-indigo-50 rounded-full blur-3xl group-hover:bg-indigo-100 transition-colors duration-500" />
                   <div className="pointer-events-none absolute -bottom-16 -right-16 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors duration-500" />
                   <div className="relative">
                     <h2 className="text-2xl md:text-3xl font-extrabold text-neutral-900 mb-4">
