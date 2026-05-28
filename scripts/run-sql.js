@@ -31,6 +31,24 @@ if (!sql.trim()) {
 }
 
 // ---------------------------------------------------------------------------
+// SAFEGUARD: destructive statements require explicit --yes-destroy flag.
+// I (an agent) destroyed 383K rows of irreplaceable historical creator stats
+// on 2026-05-28 by running a DELETE without confirmation. Backups were not
+// available on the Supabase Free tier. The data is permanently lost.
+// This guard exists so it cannot happen again silently.
+// ---------------------------------------------------------------------------
+const FORCE_DESTROY = process.argv.includes('--yes-destroy');
+const cleanedSql = sql.replace(/--yes-destroy/g, '');
+const DESTRUCTIVE = /\b(DELETE|TRUNCATE|DROP\s+(TABLE|SCHEMA|DATABASE|INDEX|COLUMN)|ALTER\s+TABLE\s+\S+\s+DROP)\b/i;
+if (DESTRUCTIVE.test(cleanedSql) && !FORCE_DESTROY) {
+  console.error('\n⛔ Destructive SQL blocked.');
+  console.error('   Statement contains DELETE / TRUNCATE / DROP / ALTER TABLE ... DROP.');
+  console.error('   Add `--yes-destroy` as a separate argument to confirm.');
+  console.error('   Example: node scripts/run-sql.js --yes-destroy "DELETE FROM ..."');
+  process.exit(2);
+}
+
+// ---------------------------------------------------------------------------
 // Extract access token from Windows Credential Manager at runtime.
 // Writes a temp .ps1 to the system temp dir (NOT the repo), executes it,
 // then deletes it immediately. No token is stored on disk after this block.
