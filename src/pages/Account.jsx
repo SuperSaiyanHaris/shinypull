@@ -48,7 +48,6 @@ export default function Account() {
     const tab = searchParams.get('tab');
     return TABS.some(t => t.id === tab) ? tab : 'listings';
   });
-  const [managingBilling, setManagingBilling] = useState(false);
 
   // Display name
   const [displayName, setDisplayName] = useState('');
@@ -283,25 +282,6 @@ export default function Account() {
       showToast(err.message || 'Failed to update password.', 'error');
     } finally {
       setSavingPassword(false);
-    }
-  };
-
-  const handleManageBilling = async () => {
-    setManagingBilling(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      const res = await fetch('/api/stripe-portal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ returnUrl: window.location.href }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to open billing portal');
-      window.location.href = data.url;
-    } catch (err) {
-      showToast(err.message || 'Could not open billing portal.', 'error');
-      setManagingBilling(false);
     }
   };
 

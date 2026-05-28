@@ -88,12 +88,13 @@ export default function BlogAdmin() {
           return;
         }
 
-        const res = await fetch('/api/admin', {
+        const res = await fetch('/api/blog-admin', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`,
           },
+          body: JSON.stringify({ action: 'check' }),
         });
 
         if (res.status === 401) {

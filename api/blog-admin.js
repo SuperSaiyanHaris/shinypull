@@ -12,7 +12,7 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '')
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-async function verifyAdmin(req) {
+async function verifyAdmin(req, { requireAdmin = true } = {}) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return { error: 'Missing authorization header', status: 401 };
@@ -26,11 +26,12 @@ async function verifyAdmin(req) {
     return { error: 'Invalid or expired token', status: 401 };
   }
 
-  if (!ADMIN_EMAILS.includes(user.email.trim().toLowerCase())) {
+  const isAdmin = ADMIN_EMAILS.includes(user.email.trim().toLowerCase());
+  if (requireAdmin && !isAdmin) {
     return { error: 'Forbidden: Admin access required', status: 403 };
   }
 
-  return { user, supabase };
+  return { user, supabase, isAdmin };
 }
 
 export default async function handler(req, res) {
@@ -63,14 +64,23 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: 'Too many requests' });
   }
 
-  // Verify admin
+  const { action, id, data: postData } = req.body;
+
+  // "check" is the lightweight endpoint formerly served by /api/admin.
+  // It verifies the JWT but does NOT require admin — it simply reports whether the user IS an admin.
+  if (action === 'check') {
+    const auth = await verifyAdmin(req, { requireAdmin: false });
+    if (auth.error) return res.status(auth.status).json({ error: auth.error });
+    return res.status(200).json({ isAdmin: auth.isAdmin, email: auth.user.email });
+  }
+
+  // Everything else requires admin
   const auth = await verifyAdmin(req);
   if (auth.error) {
     return res.status(auth.status).json({ error: auth.error });
   }
 
   const { supabase } = auth;
-  const { action, id, data: postData } = req.body;
 
   try {
     switch (action) {
