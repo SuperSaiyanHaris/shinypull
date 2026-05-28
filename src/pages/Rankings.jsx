@@ -766,12 +766,23 @@ function PlatformRankings({ urlPlatform }) {
                     </div>
                   )}
 
-                  {/* 30-Day Growth — absolute + percentage */}
+                  {/* 30-Day Growth, absolute + percentage.
+                      growth_30d is in different units per platform (views for YouTube, followers for TikTok/Bluesky,
+                      watch hours for Twitch, paid subs for Kick). Pick the right base for the %, and skip the %
+                      when the result would be implausible (e.g. when units don't match). */}
                   <div className="hidden md:flex col-span-1 flex-col items-end justify-center">
                     {(() => {
                       const g = creator.growth30d;
-                      const subs = creator.subscribers;
-                      const pct = subs > 0 && typeof g === 'number' ? (g / Math.max(subs - g, 1)) * 100 : null;
+                      if (typeof g !== 'number') return null;
+                      // Choose base by platform: YouTube growth is views, Twitch is watch hours (no clean %),
+                      // every other platform tracks the same unit as the displayed "subscribers" field.
+                      let base = null;
+                      if (selectedPlatform === 'youtube') base = creator.totalViews;
+                      else if (selectedPlatform === 'twitch') base = null; // hide % — units differ from displayed count
+                      else base = creator.subscribers;
+                      const denom = typeof base === 'number' && base > Math.abs(g) ? base - g : null;
+                      const pct = denom && denom > 0 ? (g / denom) * 100 : null;
+                      const showPct = pct !== null && Math.abs(pct) < 1000;
                       const color = g > 0 ? 'text-emerald-400' : g < 0 ? 'text-red-400' : 'text-gray-500';
                       const arrow = g > 0 ? '▲' : g < 0 ? '▼' : '·';
                       return (
@@ -779,9 +790,9 @@ function PlatformRankings({ urlPlatform }) {
                           <span className={`font-semibold text-sm tabular-nums ${color}`}>
                             {g > 0 ? '+' : ''}{formatNumber(g)}
                           </span>
-                          {pct !== null && (
+                          {showPct && (
                             <span className={`text-[10px] tabular-nums ${color} opacity-80`}>
-                              {arrow} {Math.abs(pct).toFixed(pct >= 10 || pct <= -10 ? 0 : 1)}%
+                              {arrow} {Math.abs(pct).toFixed(Math.abs(pct) >= 10 ? 0 : 1)}%
                             </span>
                           )}
                         </>

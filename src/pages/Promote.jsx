@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 /**
- * /promote — Public landing page for Featured Listings.
+ * /promote, public landing page for Featured Listings.
  * Explains the product to potential B2B buyers without requiring auth.
  * "Get a featured listing" CTA → /account?tab=listings (auth gate downstream).
  */
@@ -30,7 +30,7 @@ export default function Promote() {
   return (
     <>
       <SEO
-        title="Featured Listings — Promote Your Creators on ShinyPull"
+        title="Featured Listings: Promote Your Creators on ShinyPull"
         description="Get your creator featured in our daily rankings. $49/mo for visibility across YouTube, TikTok, Twitch, Kick, Bluesky and Music rankings. Premium slots from $149/mo."
         keywords="creator promotion, sponsored ranking, featured listing, B2B creator marketing, talent promotion, agency tools"
       />
@@ -124,7 +124,7 @@ export default function Promote() {
                   {[
                     'Rank 15, 20, 25, 30... on your chosen platform',
                     'Shows on both desktop and mobile rankings',
-                    'Marked as "Sponsored" — clear and honest',
+                    'Marked as "Sponsored". Clear and honest.',
                     'Cancel anytime',
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5 text-sm text-gray-300">
@@ -160,9 +160,9 @@ export default function Promote() {
                 <p className="text-sm text-gray-300 mt-4 mb-6">Top-of-page placement between ranks 4-5 and 9-10. The first thing readers see when comparing top creators.</p>
                 <ul className="space-y-2.5 mb-7">
                   {[
-                    'Between rank 4-5 and 9-10 — top of fold visibility',
+                    'Between rank 4-5 and 9-10, top of fold visibility',
                     'Golden card treatment, ⭐ Premium label',
-                    'Maximum 2 slots per platform — scarce inventory',
+                    'Maximum 2 slots per platform. Scarce inventory.',
                     'Cancel anytime',
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5 text-sm text-gray-200">
@@ -226,19 +226,19 @@ export default function Promote() {
               },
               {
                 q: 'How is this different from a regular ad?',
-                a: 'Featured Listings appear inside our actual ranked tables, not in display banner slots. People are already reading those rows when they look up creators — so attention is built-in.',
+                a: 'Featured Listings appear inside our actual ranked tables, not in display banner slots. People are already reading those rows when they look up creators, so attention is built-in.',
               },
               {
                 q: 'Are featured slots labeled?',
-                a: 'Yes. Basic shows as "Sponsored" and Premium shows as "⭐ Premium". We don\'t hide that they\'re paid placements — clarity makes the format trustworthy.',
+                a: 'Yes. Basic shows as "Sponsored" and Premium shows as "⭐ Premium". We don\'t hide that they\'re paid placements. Clarity makes the format trustworthy.',
               },
               {
                 q: 'Can I cancel?',
-                a: 'Anytime, from the Listings tab in your account. Cancellation stops the next renewal — your placement stays active through the end of the current billing period.',
+                a: 'Anytime, from the Listings tab in your account. Cancellation stops the next renewal. Your placement stays active through the end of the current billing period.',
               },
               {
                 q: 'Do you offer agency or multi-creator deals?',
-                a: 'Email shinypull@proton.me — we can set up agency billing and multi-slot discounts for talent management firms.',
+                a: 'Email shinypull@proton.me. We can set up agency billing and multi-slot discounts for talent management firms.',
               },
             ].map((item) => (
               <div key={item.q} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
