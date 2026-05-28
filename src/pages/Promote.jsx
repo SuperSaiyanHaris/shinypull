@@ -25,7 +25,19 @@ export default function Promote() {
       .catch(() => {});
   }, []);
 
-  const ctaHref = isAuthenticated ? '/account?tab=listings' : '/account?tab=listings';
+  // CTA click handler: signed-in users go straight to the Listings tab.
+  // Signed-out users get the auth panel with a returnTo so they land in the right place.
+  const handleCtaClick = (e) => {
+    if (isAuthenticated) return; // let the Link navigate normally
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent('openAuthPanel', {
+      detail: {
+        message: 'Create a free account to set up your featured listing. Takes about 30 seconds.',
+        returnTo: '/account?tab=listings',
+      },
+    }));
+  };
+  const ctaHref = '/account?tab=listings';
 
   return (
     <>
@@ -63,7 +75,7 @@ export default function Promote() {
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link
-                  to={ctaHref}
+                  to={ctaHref} onClick={handleCtaClick}
                   className="inline-flex items-center gap-2 px-7 py-3.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5"
                 >
                   <Sparkles className="w-4 h-4" />
@@ -134,7 +146,7 @@ export default function Promote() {
                   ))}
                 </ul>
                 <Link
-                  to={ctaHref}
+                  to={ctaHref} onClick={handleCtaClick}
                   className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-400 hover:text-indigo-300 group-hover:gap-3 transition-all"
                 >
                   Get a Basic slot <ArrowRight className="w-4 h-4" />
@@ -172,7 +184,7 @@ export default function Promote() {
                   ))}
                 </ul>
                 <Link
-                  to={ctaHref}
+                  to={ctaHref} onClick={handleCtaClick}
                   className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-400 hover:text-amber-300 group-hover:gap-3 transition-all"
                 >
                   Get a Premium slot <ArrowRight className="w-4 h-4" />
@@ -255,7 +267,7 @@ export default function Promote() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-100 mb-3">Ready to get featured?</h2>
             <p className="text-base text-gray-400 mb-6 max-w-xl mx-auto">Most listings go live in under 60 seconds.</p>
             <Link
-              to={ctaHref}
+              to={ctaHref} onClick={handleCtaClick}
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5"
             >
               <Sparkles className="w-4 h-4" />

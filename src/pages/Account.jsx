@@ -223,7 +223,40 @@ export default function Account() {
     }
   };
 
-  if (!user) return null;
+  // Auth gate: signed-out visitors get a sign-in prompt instead of a blank page.
+  // The "Get featured" CTA on /promote lands here when signed out, so we MUST render something.
+  if (!user) {
+    return (
+      <>
+        <SEO title="Sign in to manage your account" description="Sign in to ShinyPull to manage featured listings and your account." />
+        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4">
+          <div className="max-w-md w-full bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
+            <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+              <Megaphone className="w-7 h-7 text-white" />
+            </div>
+            <h1 className="text-2xl font-extrabold text-gray-100 mb-2">Sign in to continue</h1>
+            <p className="text-sm text-gray-400 mb-6">
+              You need an account to manage featured listings, follow creators, and access your dashboard. Takes 10 seconds.
+            </p>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('openAuthPanel', {
+                detail: {
+                  message: 'Sign in or create a free account to manage featured listings.',
+                  returnTo: '/account?tab=listings',
+                },
+              }))}
+              className="inline-flex items-center gap-2 w-full justify-center px-6 py-3 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5"
+            >
+              Sign in / Sign up
+            </button>
+            <Link to="/promote" className="block mt-4 text-sm text-gray-500 hover:text-gray-300 transition-colors">
+              Back to Featured Listings overview
+            </Link>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   const memberSince = new Date(user.created_at).toLocaleDateString('en-US', {
     month: 'long', day: 'numeric', year: 'numeric',
