@@ -143,7 +143,7 @@ export default function Home() {
         {/* ============== CINEMATIC HERO ==============
             Full-bleed hero — section min-height ensures the bg image + left stack always have room.
             Hard bottom edge (no gradient fade) per project preference. */}
-        <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white min-h-[900px]">
+        <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white md:min-h-[900px]">
           {/* Full-bleed photo. Custom Google Flow generated background — platform analytics floating in space.
               Two crops: wide 16:9 for desktop, vertical 9:16 for mobile so the art doesn't crop awkwardly. */}
           <picture aria-hidden="true">
@@ -181,7 +181,7 @@ export default function Home() {
           )}
 
           {/* Center stage */}
-          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-16 pb-20 sm:pb-28">
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-16 pb-10 sm:pb-28">
 
             {/* Eyebrow badge */}
             <motion.div
