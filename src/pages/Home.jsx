@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Search, ArrowRight, ArrowUpRight, Calculator, Scale, TrendingUp, Trophy,
   Youtube, Twitch, BarChart3, BookOpen, Sparkles, Zap, LineChart, Star,
+  DollarSign, Users, User,
 } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
@@ -101,6 +102,14 @@ export default function Home() {
     }, 4000);
     return () => clearInterval(id);
   }, [topByPlatform.length]);
+
+  // Product preview carousel: rotates through 4 page mockups (rankings, profile, compare, earnings)
+  const [previewIdx, setPreviewIdx] = useState(0);
+  const PREVIEW_COUNT = 4;
+  useEffect(() => {
+    const id = setInterval(() => setPreviewIdx((i) => (i + 1) % PREVIEW_COUNT), 6000);
+    return () => clearInterval(id);
+  }, []);
 
   // Latest blog posts
   useEffect(() => {
@@ -403,86 +412,301 @@ export default function Home() {
               </h2>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-10%' }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="relative rounded-2xl bg-white border border-neutral-200 shadow-xl shadow-neutral-200/60 overflow-hidden"
-            >
-              {/* Mock browser chrome */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-200 bg-neutral-50">
-                <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                </div>
-                <div className="flex-1 max-w-md mx-auto bg-white border border-neutral-200 rounded-md px-3 py-1 text-[11px] text-neutral-500 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  shinypull.com/rankings/youtube
-                </div>
-                <div className="w-12" />
-              </div>
+            {/* Build the carousel previews. All four reuse the same browser shell; only chrome URL + inner content + CTA differ. */}
+            {(() => {
+              const fallbackNames = ['MrBeast', 'T-Series', 'Cocomelon', 'SET India', 'Vlad and Niki'];
+              const mr = topCreators[0];
+              const tseries = topCreators[1];
+              const cocomelon = topCreators[2];
+              const sampleSubs = mr?.subscribers || 482_000_000;
 
-              {/* Mock rankings table */}
-              <div className="p-4 sm:p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-amber-500" />
-                    <h3 className="text-sm font-bold text-neutral-900">Top YouTubers</h3>
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 border border-emerald-200 rounded text-[10px] font-semibold text-emerald-700">
-                      <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                      LIVE
-                    </span>
-                  </div>
-                  <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">Updated 2 min ago</span>
-                </div>
-
-                <div className="space-y-1">
-                  {(topCreators.length > 0 ? topCreators : Array(5).fill(null)).slice(0, 5).map((creator, i) => {
-                    const fallbackNames = ['MrBeast', 'T-Series', 'Cocomelon', 'SET India', 'Vlad and Niki'];
-                    const displayName = creator?.display_name || fallbackNames[i];
-                    const rowInner = (
-                      <div className="grid grid-cols-[28px_1fr_auto_auto] sm:grid-cols-[28px_1fr_100px_70px] items-center gap-3 sm:gap-4 px-3 py-2.5 rounded-lg hover:bg-neutral-50 transition-colors">
-                        <span className={`w-6 h-6 inline-flex items-center justify-center rounded text-xs font-bold ${
-                          i === 0 ? 'bg-amber-100 text-amber-700' :
-                          i === 1 ? 'bg-neutral-100 text-neutral-600' :
-                          i === 2 ? 'bg-orange-100 text-orange-700' :
-                          'bg-neutral-50 text-neutral-400'
-                        }`}>
-                          {i + 1}
+              const previews = [
+                // 1. RANKINGS
+                {
+                  url: 'shinypull.com/rankings/youtube',
+                  label: 'Rankings',
+                  ctaText: 'See full rankings',
+                  ctaLink: '/rankings/youtube',
+                  content: (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Trophy className="w-4 h-4 text-amber-500" />
+                          <h3 className="text-sm font-bold text-neutral-900">Top YouTubers</h3>
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 border border-emerald-200 rounded text-[10px] font-semibold text-emerald-700">
+                            <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                            LIVE
+                          </span>
+                        </div>
+                        <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">Updated 2 min ago</span>
+                      </div>
+                      <div className="space-y-1">
+                        {(topCreators.length > 0 ? topCreators : Array(5).fill(null)).slice(0, 5).map((creator, i) => {
+                          const displayName = creator?.display_name || fallbackNames[i];
+                          return (
+                            <div key={creator?.id || i} className="grid grid-cols-[28px_1fr_auto_auto] sm:grid-cols-[28px_1fr_100px_70px] items-center gap-3 sm:gap-4 px-3 py-2.5 rounded-lg">
+                              <span className={`w-6 h-6 inline-flex items-center justify-center rounded text-xs font-bold ${
+                                i === 0 ? 'bg-amber-100 text-amber-700' :
+                                i === 1 ? 'bg-neutral-100 text-neutral-600' :
+                                i === 2 ? 'bg-orange-100 text-orange-700' :
+                                'bg-neutral-50 text-neutral-400'
+                              }`}>{i + 1}</span>
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <CreatorAvatar src={creator?.profile_image} name={displayName} size="sm" />
+                                <p className="text-sm font-semibold text-neutral-900 truncate">{displayName}</p>
+                              </div>
+                              <div className="hidden sm:flex items-center justify-end">
+                                <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20]} width={80} height={20} trend="up" />
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-semibold text-neutral-900 tabular-nums">
+                                  {creator?.subscribers ? formatNumber(creator.subscribers) : '—'}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  ),
+                },
+                // 2. CREATOR PROFILE
+                {
+                  url: `shinypull.com/youtube/${mr?.username || 'mrbeast'}`,
+                  label: 'Profile',
+                  ctaText: `See ${mr?.display_name || 'MrBeast'}'s profile`,
+                  ctaLink: `/youtube/${mr?.username || 'mrbeast'}`,
+                  content: (
+                    <>
+                      <div className="flex items-center gap-3 sm:gap-4 mb-5">
+                        <CreatorAvatar src={mr?.profile_image} name={mr?.display_name || 'MrBeast'} size="lg" />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <h3 className="text-base sm:text-lg font-bold text-neutral-900 truncate">{mr?.display_name || 'MrBeast'}</h3>
+                            <Youtube className="w-4 h-4 text-red-600 flex-shrink-0" />
+                          </div>
+                          <p className="text-xs text-neutral-500">@{mr?.username || 'mrbeast'} · YouTube</p>
+                        </div>
+                        <span className="hidden sm:inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 border border-emerald-200 rounded-md text-[10px] font-semibold text-emerald-700">
+                          <TrendingUp className="w-3 h-3" />
+                          +1.2M / 30d
                         </span>
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <CreatorAvatar src={creator?.profile_image} name={displayName} size="sm" />
-                          <p className="text-sm font-semibold text-neutral-900 truncate">{displayName}</p>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
+                        <div className="p-2.5 sm:p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
+                          <p className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold">Subscribers</p>
+                          <p className="text-base sm:text-xl font-extrabold text-neutral-900 tabular-nums">{formatNumber(sampleSubs)}</p>
                         </div>
-                        <div className="hidden sm:flex items-center justify-end">
-                          <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20]} width={80} height={20} trend="up" />
+                        <div className="p-2.5 sm:p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
+                          <p className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold">Total Views</p>
+                          <p className="text-base sm:text-xl font-extrabold text-neutral-900 tabular-nums">{formatNumber(mr?.totalViews || 99_000_000_000)}</p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-neutral-900 tabular-nums">
-                            {creator?.subscribers ? formatNumber(creator.subscribers) : '—'}
-                          </p>
+                        <div className="p-2.5 sm:p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
+                          <p className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold">Videos</p>
+                          <p className="text-base sm:text-xl font-extrabold text-neutral-900 tabular-nums">{formatNumber(mr?.totalPosts || 850)}</p>
                         </div>
                       </div>
-                    );
-                    return creator?.platform && creator?.username ? (
-                      <Link key={creator.id} to={`/${creator.platform}/${creator.username}`}>{rowInner}</Link>
-                    ) : (
-                      <div key={creator?.id || i}>{rowInner}</div>
-                    );
-                  })}
-                </div>
+                      <div className="p-3 sm:p-4 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-lg">
+                        <p className="text-[10px] text-indigo-600 uppercase tracking-wider font-bold mb-2">30-day subscriber growth</p>
+                        <Sparkline data={[470, 472, 474, 475, 476, 477, 478, 479, 480, 481, 482]} width={500} height={48} trend="up" />
+                      </div>
+                    </>
+                  ),
+                },
+                // 3. COMPARE
+                {
+                  url: 'shinypull.com/compare',
+                  label: 'Compare',
+                  ctaText: 'Compare creators',
+                  ctaLink: '/compare',
+                  content: (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Scale className="w-4 h-4 text-violet-500" />
+                          <h3 className="text-sm font-bold text-neutral-900">Head-to-head</h3>
+                        </div>
+                        <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">Live</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                        {[mr, tseries].map((c, i) => {
+                          const name = c?.display_name || fallbackNames[i];
+                          const subs = c?.subscribers || (i === 0 ? 482_000_000 : 311_000_000);
+                          return (
+                            <div key={i} className={`p-3 sm:p-4 rounded-xl border ${i === 0 ? 'bg-indigo-50/60 border-indigo-200' : 'bg-amber-50/60 border-amber-200'}`}>
+                              <div className="flex items-center gap-2 mb-3">
+                                <CreatorAvatar src={c?.profile_image} name={name} size="sm" />
+                                <p className="text-sm font-bold text-neutral-900 truncate">{name}</p>
+                              </div>
+                              <p className="text-xl sm:text-2xl font-extrabold text-neutral-900 tabular-nums leading-none">
+                                {formatNumber(subs)}
+                              </p>
+                              <p className="text-[10px] text-neutral-500 uppercase tracking-wider mt-1">Subscribers</p>
+                              <div className="mt-3 pt-3 border-t border-neutral-200/60 space-y-1.5">
+                                <div className="flex justify-between text-xs">
+                                  <span className="text-neutral-500">Views</span>
+                                  <span className="font-semibold text-neutral-900 tabular-nums">{formatNumber(c?.totalViews || (i === 0 ? 99_000_000_000 : 280_000_000_000))}</span>
+                                </div>
+                                <div className="flex justify-between text-xs">
+                                  <span className="text-neutral-500">Videos</span>
+                                  <span className="font-semibold text-neutral-900 tabular-nums">{formatNumber(c?.totalPosts || (i === 0 ? 850 : 24_000))}</span>
+                                </div>
+                                <div className="flex justify-between text-xs">
+                                  <span className="text-neutral-500">30d growth</span>
+                                  <span className="font-semibold text-emerald-600 tabular-nums">+{i === 0 ? '1.2M' : '320K'}</span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-neutral-500">
+                        <Users className="w-3 h-3" />
+                        Stack up to 10 creators side-by-side
+                      </div>
+                    </>
+                  ),
+                },
+                // 4. EARNINGS CALCULATOR
+                {
+                  url: 'shinypull.com/youtube/money-calculator',
+                  label: 'Earnings',
+                  ctaText: 'Try the earnings calculator',
+                  ctaLink: '/youtube/money-calculator',
+                  content: (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Calculator className="w-4 h-4 text-emerald-500" />
+                          <h3 className="text-sm font-bold text-neutral-900">YouTube Earnings Estimate</h3>
+                        </div>
+                        <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">$0.50 - $4.00 CPM</span>
+                      </div>
+                      <div className="flex items-center gap-3 mb-4 p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
+                        <CreatorAvatar src={mr?.profile_image} name={mr?.display_name || 'MrBeast'} size="sm" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-neutral-900 truncate">{mr?.display_name || 'MrBeast'}</p>
+                          <p className="text-[11px] text-neutral-500 tabular-nums">{formatNumber(mr?.totalViews || 99_000_000_000)} total views</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                        {[
+                          { label: 'Per day',   low: '$2.4K',  high: '$19.6K', color: 'emerald' },
+                          { label: 'Per month', low: '$73K',   high: '$590K',  color: 'green' },
+                          { label: 'Per year',  low: '$880K',  high: '$7M',    color: 'teal' },
+                        ].map((row) => (
+                          <div key={row.label} className={`p-3 bg-${row.color}-50/60 border border-${row.color}-200 rounded-lg`}>
+                            <p className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold mb-1.5">{row.label}</p>
+                            <p className="text-sm sm:text-base font-extrabold text-neutral-900 tabular-nums leading-tight">{row.low}</p>
+                            <p className="text-[10px] text-neutral-500">to</p>
+                            <p className="text-sm sm:text-base font-extrabold text-neutral-900 tabular-nums leading-tight">{row.high}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-neutral-500">
+                        <DollarSign className="w-3 h-3" />
+                        Estimate based on industry CPM ranges
+                      </div>
+                    </>
+                  ),
+                },
+              ];
 
-                {/* Prominent CTA — clear next step for visitors */}
-                <Link
-                  to="/rankings/youtube"
-                  className="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  See full rankings <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </motion.div>
+              const active = previews[previewIdx];
+
+              return (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-10%' }}
+                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                    className="relative rounded-2xl bg-white border border-neutral-200 shadow-xl shadow-neutral-200/60 overflow-hidden"
+                  >
+                    {/* Browser chrome — URL updates per preview */}
+                    <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-200 bg-neutral-50">
+                      <div className="flex gap-1.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                      </div>
+                      <Link
+                        to={active.ctaLink}
+                        className="flex-1 max-w-md mx-auto bg-white border border-neutral-200 rounded-md px-3 py-1 text-[11px] text-neutral-500 flex items-center gap-1.5 hover:border-neutral-300 transition-colors"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={previewIdx}
+                            initial={{ opacity: 0, y: 4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.25 }}
+                            className="truncate"
+                          >
+                            {active.url}
+                          </motion.span>
+                        </AnimatePresence>
+                      </Link>
+                      <div className="w-12" />
+                    </div>
+
+                    {/* Content area — swaps with crossfade */}
+                    <div className="p-4 sm:p-6 min-h-[340px] sm:min-h-[360px]">
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={previewIdx}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        >
+                          {active.content}
+                        </motion.div>
+                      </AnimatePresence>
+
+                      {/* CTA — updates per preview */}
+                      <Link
+                        to={active.ctaLink}
+                        className="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md"
+                      >
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={previewIdx}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            {active.ctaText}
+                          </motion.span>
+                        </AnimatePresence>
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  </motion.div>
+
+                  {/* Tabs / dot navigation */}
+                  <div className="mt-5 flex items-center justify-center gap-2">
+                    {previews.map((p, i) => (
+                      <button
+                        key={p.label}
+                        type="button"
+                        onClick={() => setPreviewIdx(i)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          i === previewIdx
+                            ? 'bg-neutral-900 border-neutral-900 text-white'
+                            : 'bg-white border-neutral-200 text-neutral-500 hover:border-neutral-300 hover:text-neutral-700'
+                        }`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${i === previewIdx ? 'bg-emerald-400 animate-pulse' : 'bg-neutral-300'}`} />
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
 
             {/* Live stats strip under preview */}
             <motion.div
