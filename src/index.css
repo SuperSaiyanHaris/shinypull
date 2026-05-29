@@ -253,7 +253,7 @@ h1, h2, h3, h4 {
 
 .animate-slide-in-left { animation: slide-in-left 0.3s ease-out; }
 .animate-fade-in       { animation: fade-in 0.2s ease-out; }
-.animate-marquee       { animation: marquee-x 60s linear infinite; }
+.animate-marquee       { animation: marquee-x 120s linear infinite; }
 .animate-marquee:hover { animation-play-state: paused; }
 
 /* Edge-fade mask for marquee strips */

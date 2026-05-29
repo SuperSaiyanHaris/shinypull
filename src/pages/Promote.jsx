@@ -248,8 +248,8 @@ export default function Promote() {
                 a: 'Anytime, from the Listings tab in your account. Cancellation stops the next renewal. Your placement stays active through the end of the current billing period.',
               },
               {
-                q: 'Do you offer agency or multi-creator deals?',
-                a: 'Email shinypull@proton.me. We can set up agency billing and multi-slot discounts for talent management firms.',
+                q: 'What happens if all the slots are taken?',
+                a: 'Slots are first come, first served. Once Basic (5 slots) or Premium (3 slots) on a platform fills up, new sign-ups are queued. As soon as someone cancels or a listing expires, the next person in line is automatically promoted into the open slot. No manual waitlist, no negotiating. The queue adjusts itself.',
               },
             ].map((item) => (
               <div key={item.q} className="bg-white border border-neutral-200 rounded-xl p-5">

@@ -55,30 +55,52 @@ export default function Home() {
     }).catch(() => {});
   }, []);
 
-  // Top creators preview — fetch top 20 across multiple platforms, shuffle for marquee variety.
-  // First 5 (sorted by subs) used for product preview + featured card.
+  // Marquee = YouTube top 20 + Twitch top 20, shuffled. (User: only these two platforms in ticker.)
+  // topByPlatform = #1 creator on each of the 6 platforms — rotated through the floating card.
   const [marqueeCreators, setMarqueeCreators] = useState([]);
+  const [topByPlatform, setTopByPlatform] = useState([]);
+  const [topPlatformIdx, setTopPlatformIdx] = useState(0);
   useEffect(() => {
     Promise.all([
       getRankedCreators('youtube', 'subscribers', 20),
-      getRankedCreators('tiktok', 'subscribers', 20),
-      getRankedCreators('twitch', 'subscribers', 15),
-      getRankedCreators('kick', 'subscribers', 10),
-      getRankedCreators('bluesky', 'subscribers', 10),
-      getRankedCreators('music', 'subscribers', 15),
-    ]).then((sets) => {
-      const all = sets.flat().filter(c => c?.profile_image && c?.display_name);
-      // Fisher-Yates shuffle for marquee
-      const shuffled = [...all];
-      for (let i = shuffled.length - 1; i > 0; i--) {
+      getRankedCreators('twitch', 'subscribers', 20),
+      getRankedCreators('tiktok', 'subscribers', 1),
+      getRankedCreators('kick', 'subscribers', 1),
+      getRankedCreators('bluesky', 'subscribers', 1),
+      getRankedCreators('music', 'subscribers', 1),
+    ]).then(([yt, tw, tt, kk, bs, mu]) => {
+      // Marquee: YouTube + Twitch, shuffled
+      const pool = [...yt, ...tw].filter(c => c?.profile_image && c?.display_name);
+      for (let i = pool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        [pool[i], pool[j]] = [pool[j], pool[i]];
       }
-      setMarqueeCreators(shuffled.slice(0, 40));
-      // For product preview + #1 card, use YouTube top 5
-      setTopCreators(sets[0].slice(0, 5));
+      setMarqueeCreators(pool);
+
+      // #1 per platform for rotating bento card
+      const top1 = [
+        yt[0] && { ...yt[0], _platformLabel: '#1 YouTuber' },
+        tt[0] && { ...tt[0], _platformLabel: '#1 TikToker' },
+        tw[0] && { ...tw[0], _platformLabel: '#1 Twitch Streamer' },
+        kk[0] && { ...kk[0], _platformLabel: '#1 Kick Streamer' },
+        bs[0] && { ...bs[0], _platformLabel: '#1 on Bluesky' },
+        mu[0] && { ...mu[0], _platformLabel: '#1 Artist' },
+      ].filter(Boolean);
+      setTopByPlatform(top1);
+
+      // Product preview leaderboard still YouTube top 5
+      setTopCreators(yt.slice(0, 5));
     }).catch(() => {});
   }, []);
+
+  // Rotate the floating #1 card across platforms every 4s
+  useEffect(() => {
+    if (topByPlatform.length === 0) return;
+    const id = setInterval(() => {
+      setTopPlatformIdx((i) => (i + 1) % topByPlatform.length);
+    }, 4000);
+    return () => clearInterval(id);
+  }, [topByPlatform.length]);
 
   // Latest blog posts
   useEffect(() => {
@@ -122,16 +144,16 @@ export default function Home() {
             Editorial dark hero: photo bg + flat gradient + grain + randomized marquee + megafont + glass search.
             Bento cards live in OUTER gutters (min-[1700px]) so they never overlap centered content. */}
         <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white">
-          {/* Full-bleed photo. Editorial dark stage / concert lighting. */}
+          {/* Full-bleed photo. Analytics dashboard / data viz on dark screens — on brand. */}
           <img
-            src="https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=2400"
+            src="https://images.pexels.com/photos/7947541/pexels-photo-7947541.jpeg?auto=compress&cs=tinysrgb&w=2400"
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover opacity-35"
+            className="absolute inset-0 w-full h-full object-cover opacity-25"
           />
 
           {/* Single flat dark overlay — no orbs, no neon glows. */}
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#0a0a0f]/80 via-[#0a0a0f]/70 to-[#0a0a0f]" />
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#0a0a0f]/85 via-[#0a0a0f]/75 to-[#0a0a0f]" />
 
           {/* TOP MARQUEE — randomized top creators across platforms */}
           {marqueeCreators.length > 0 && (
@@ -239,7 +261,7 @@ export default function Home() {
               {/* Try chips */}
               <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
                 <span className="text-xs text-white/50">Try:</span>
-                {['mrbeast', 'ninja', 'pewdiepie', 'kaicenat', 'taylor-swift'].map((q) => (
+                {['mrbeast', 'ninja', 'pewdiepie', 'kaicenat', 'taylor swift'].map((q) => (
                   <button
                     key={q}
                     type="button"
@@ -274,57 +296,82 @@ export default function Home() {
 
           </div>
 
-          {/* LEFT GUTTER BENTO — #1 YouTuber live card. Only renders when there's room outside the centered content. */}
-          {topCreators[0] && (
+          {/* LEFT BENTO — #1 creator card, ROTATES across all 6 platforms every 4s.
+              Anchored just outside the centered content (max-w-6xl = 72rem), so it lives in the inner gutter, not at the viewport edge. */}
+          {topByPlatform.length > 0 && (
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.5 }}
-              className="hidden min-[1500px]:block absolute left-6 top-1/2 -translate-y-1/2 w-60"
+              className="hidden min-[1500px]:block absolute top-1/2 -translate-y-1/2 w-72"
+              style={{ left: 'max(1.5rem, calc(50% - 32rem - 18rem))' }}
             >
-              <Link
-                to={`/${topCreators[0].platform}/${topCreators[0].username}`}
-                className="group block bg-white/[0.06] backdrop-blur-xl border border-white/15 rounded-2xl p-4 shadow-2xl shadow-black/40 hover:bg-white/[0.10] hover:border-white/25 transition-all"
-              >
-                <div className="flex items-center gap-2.5 mb-3">
-                  <CreatorAvatar src={topCreators[0].profile_image} name={topCreators[0].display_name} size="sm" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] text-white/50 uppercase tracking-wider font-semibold">#1 YouTuber</p>
-                    <p className="text-sm font-bold text-white truncate">{topCreators[0].display_name}</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/15 border border-emerald-400/30 rounded text-[9px] font-bold text-emerald-300">
-                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-                    LIVE
-                  </span>
-                </div>
-                <p className="text-2xl font-black text-white tabular-nums leading-none">
-                  <CountUp value={topCreators[0].subscribers || 0} />
-                </p>
-                <p className="text-[11px] text-white/50 mt-1">subscribers</p>
-                <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20, 22, 24]} width={200} height={26} trend="up" />
-              </Link>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={topPlatformIdx}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <Link
+                    to={`/${topByPlatform[topPlatformIdx].platform}/${topByPlatform[topPlatformIdx].username}`}
+                    className="group block bg-white/[0.07] backdrop-blur-xl border border-white/15 rounded-2xl p-5 shadow-2xl shadow-black/50 hover:bg-white/[0.12] hover:border-white/25 transition-all"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <CreatorAvatar src={topByPlatform[topPlatformIdx].profile_image} name={topByPlatform[topPlatformIdx].display_name} size="md" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] text-white/50 uppercase tracking-wider font-bold">{topByPlatform[topPlatformIdx]._platformLabel}</p>
+                        <p className="text-base font-bold text-white truncate">{topByPlatform[topPlatformIdx].display_name}</p>
+                      </div>
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/15 border border-emerald-400/30 rounded text-[10px] font-bold text-emerald-300">
+                        <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                        LIVE
+                      </span>
+                    </div>
+                    <p className="text-3xl font-black text-white tabular-nums leading-none">
+                      <CountUp value={topByPlatform[topPlatformIdx].subscribers || 0} />
+                    </p>
+                    <p className="text-xs text-white/50 mt-1.5">subscribers</p>
+                    <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20, 22, 24]} width={248} height={32} trend="up" />
+                  </Link>
+                </motion.div>
+              </AnimatePresence>
+              {/* Platform indicator dots */}
+              <div className="flex justify-center gap-1.5 mt-3">
+                {topByPlatform.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-1 rounded-full transition-all ${i === topPlatformIdx ? 'w-6 bg-white' : 'w-1 bg-white/30'}`}
+                  />
+                ))}
+              </div>
             </motion.div>
           )}
 
-          {/* RIGHT GUTTER BENTO — Featured Listings B2B. Same min-[1500px] guard. */}
+          {/* RIGHT BENTO — Featured Listings B2B. Mirrored position, same size. */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.55 }}
-            className="hidden min-[1500px]:block absolute right-6 top-1/2 -translate-y-1/2 w-60"
+            className="hidden min-[1500px]:block absolute top-1/2 -translate-y-1/2 w-72"
+            style={{ right: 'max(1.5rem, calc(50% - 32rem - 18rem))' }}
           >
             <Link
               to="/promote"
-              className="group block bg-amber-500/[0.08] backdrop-blur-xl border border-amber-400/30 rounded-2xl p-4 shadow-2xl shadow-black/40 hover:bg-amber-500/[0.14] transition-all"
+              className="group block bg-amber-500/[0.09] backdrop-blur-xl border border-amber-400/30 rounded-2xl p-5 shadow-2xl shadow-black/50 hover:bg-amber-500/[0.15] transition-all"
             >
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-4 h-4 text-amber-300" />
                 <p className="text-[10px] uppercase tracking-wider font-bold text-amber-300">Featured Listings</p>
               </div>
-              <p className="text-sm font-bold text-white leading-snug">Get your creator in the rankings</p>
-              <p className="text-[11px] text-white/60 mt-2">From $49/mo. Cancel anytime.</p>
-              <span className="inline-flex items-center gap-1 mt-3 text-xs font-semibold text-amber-300 group-hover:gap-2 transition-all">
-                See plans <ArrowRight className="w-3 h-3" />
+              <p className="text-base font-bold text-white leading-snug">Get your creator in the rankings</p>
+              <p className="text-xs text-white/60 mt-2 leading-relaxed">
+                Sponsored slots inside our live ranking tables. First come, first served. Queue auto-promotes as slots open.
+              </p>
+              <p className="text-xs text-white/50 mt-3">From <span className="text-white font-semibold">$49/mo</span>. Cancel anytime.</p>
+              <span className="inline-flex items-center gap-1 mt-4 text-sm font-semibold text-amber-300 group-hover:gap-2 transition-all">
+                See plans <ArrowRight className="w-3.5 h-3.5" />
               </span>
             </Link>
           </motion.div>
