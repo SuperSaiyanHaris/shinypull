@@ -505,7 +505,7 @@ export default function Home() {
                       </div>
                       <div className="p-3 sm:p-4 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-lg">
                         <p className="text-[10px] text-indigo-600 uppercase tracking-wider font-bold mb-2">30-day subscriber growth</p>
-                        <Sparkline data={[470, 472, 474, 475, 476, 477, 478, 479, 480, 481, 482]} width={500} height={48} trend="up" />
+                        <Sparkline data={[470, 472, 474, 475, 476, 477, 478, 479, 480, 481, 482]} width={500} height={48} trend="up" fluid />
                       </div>
                     </>
                   ),

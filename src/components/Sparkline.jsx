@@ -17,6 +17,7 @@ export default function Sparkline({
   height = 24,
   strokeWidth = 1.5,
   className = '',
+  fluid = false, // When true, SVG fills container width; viewBox uses `width` as internal coord space
 }) {
   const path = useMemo(() => {
     if (!data || data.length < 2) return null;
@@ -66,10 +67,11 @@ export default function Sparkline({
 
   return (
     <svg
-      width={width}
+      width={fluid ? '100%' : width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      className={`${className} overflow-visible`}
+      preserveAspectRatio={fluid ? 'none' : 'xMidYMid meet'}
+      className={`${className} ${fluid ? 'block' : 'overflow-visible'}`}
       aria-hidden="true"
     >
       <path d={path.fillPath} fill={fill} />

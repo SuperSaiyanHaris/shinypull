@@ -14,6 +14,7 @@ ShinyPull is a social media analytics platform (similar to SocialBlade) that tra
 
 Our creator stats are the entire reason this site exists. Every chart and table users see is powered directly by the `creator_stats` table. A single corrupt row can trash a chart by causing wild swings (e.g., 630K → 0 → 630K). The rules below are non-negotiable:
 
+- **NEVER DELETE TABLE ROWS WITHOUT EXPLICIT USER CONSENT. EVER.** This is rule zero. On 2026-05-28 an agent (me) destroyed 383K rows of irreplaceable historical creator stats by running a "cleanup" DELETE without asking. Supabase Free tier has NO backups and NO PITR. The data is permanently gone. Never run `DELETE`, `TRUNCATE`, `DROP TABLE`, or `ALTER TABLE ... DROP` against any production table without first telling the user exactly what rows will be removed and getting a clear yes. `scripts/run-sql.js` blocks destructive statements unless `--yes-destroy` is passed as a separate argument. **Do not remove that safeguard.** If you think a table has junk in it, ASK FIRST and describe what you would remove.
 - **Never write 0 or null for subscriber/follower counts.** A 0 means the API call failed — it is NOT a real value. Always validate API responses before saving.
 - **Always check `response.ok` before reading API data.** Never do `data.total || 0` as a fallback — throw an error instead so the calling code can skip the write.
 - **`aggregateHoursWatched.js` and similar secondary scripts must use `.update()`, never `.upsert()`.** If the primary stats collection failed and no row exists for today, a secondary script must not create a row with NULL subscribers. Use `update` — if no row exists, nothing happens (correct behavior).
@@ -37,6 +38,26 @@ Our creator stats are the entire reason this site exists. Every chart and table 
 **TIMEZONE:**
 - All dates use America/New_York timezone via `getTodayLocal()` helper
 - This prevents future-date issues when UTC is ahead of local time
+
+**SECTION DIVIDERS — NO GRADIENT FADES:**
+- The user removed all gradient section dividers (`bg-gradient-to-b from-X to-Y` between sections) months ago and does NOT want them re-added. If a transition between light and dark sections feels harsh, the fix is to add a proper section header (eyebrow + title) above the next section, NOT a gradient fade.
+- Hard color edges between sections are intentional. They read as deliberate when content hierarchy is clear.
+
+**HOME HERO LAYOUT (current, working):**
+- Section: full-bleed dark `#0a0a0f`, `md:min-h-[900px]` on desktop, mobile sizes to content
+- Desktop only: `/hero-bg.jpeg` photo bg via `<img>` with `hidden md:block` + dark overlay
+- Mobile: solid `#0a0a0f` background, no image (the wide image cropped awkwardly on portrait viewports). `public/hero-bg-mobile.jpeg` is kept in repo as a backup option but currently unused.
+- Marquee at top: shuffled YouTube top 20 + Twitch top 20, 120s rotation, `mask-gradient` edge fade
+- Headline: 2 lines, `clamp(2.25rem, 6vw, 5rem)`, rotating last word in indigo→fuchsia→cyan gradient
+- Left bento stack (desktop, `min-[1280px]`): "Live across 6 platforms" pulse pill + rotating #1-per-platform card (cycles YT → TikTok → Twitch → Kick → Bluesky → Music every 4s) + Featured Listings B2B card. All three have continuous floating Y motion. Position via `style={{ left: 'max(2rem, calc(50% - 30rem - 19rem))' }}` and explicit `top-[14rem]`.
+- Each #1 card uses its platform-correct metric label (`subscribers` / `followers` / `paid subscribers` / `monthly listeners`).
+
+**HOME LIVE-PREVIEW CAROUSEL:**
+- 4 browser-mockup cards rotating every 9s: Rankings → Profile → Compare → Earnings
+- Same outer shell (chrome with traffic lights + URL bar), inner content swaps via `AnimatePresence`
+- Fixed `min-h-[420px] sm:min-h-[440px]` content area + bottom-pinned CTA so the page never reflows during rotation
+- URL bar and CTA both link to the actual page; pill tabs below allow manual selection
+- Sparklines inside fixed-height cards must use `fluid` prop on `<Sparkline>` so they fill width responsively
 
 **DESIGN STYLE - PREFERRED CARD PATTERN (apply this to all new sections and redesigns):**
 
@@ -291,7 +312,8 @@ Scripts use `dotenv` to load `.env` automatically.
 - **Daily Stats Collection:** Runs 3x daily (1 AM, 9 AM, 5 PM EST) — collects YouTube, Twitch, Kick, and Bluesky stats
 - **TikTok Profile Refresh:** Runs 4x daily (9 PM, 3 AM, 9 AM, 3 PM EST) — scrapes all TikTok creator profiles
 - **Creator Request Processor:** Runs 4x daily (every 6 hours) — processes pending TikTok creator requests
-- **Creator Discovery:** Runs 4x daily (every 6 hours) — discovers new creators across all platforms
+- **Creator Discovery:** Runs 4x daily via `.github/workflows/youtube-discovery.yml` (badly named — covers ALL platforms). Steps in order: YouTube → Kick → Twitch → TikTok (queues candidates from existing creators) → Bluesky → Music. Scripts: `discoverYouTubeCreators.js`, `discoverKickCreators.js` (MIN_VIEWERS=500 + MIN_SUBSCRIBERS=1 to skip junk accounts), `discoverTwitchCreators.js`, `discoverTikTokCreators.js`, `discoverBlueskyCreators.js` (searches 25 topic seeds via public AT Protocol, 10K+ followers), `discoverMusicArtists.js` (Last.fm chart pages 1-6 + 3 random genre tags per run, 10K+ listeners).
+- **GitHub Secret naming:** Twitch credentials in GH secrets are `VITE_TWITCH_CLIENT_ID` and `VITE_TWITCH_CLIENT_SECRET` (both prefixed). When wiring new workflow steps, double-check secret names against existing workflows or jobs will fail with "credentials not configured."
 - **Twitch Stream Monitor:** Runs every 3 hours (8x daily) — tracks live streams and hours watched
 - **Kick Stream Monitor:** Runs every 3 hours (8x daily, offset) — tracks live streams and hours watched
 
@@ -595,4 +617,4 @@ All tables have RLS enabled. Here are the current policies:
 
 ---
 
-*Last updated: 2026-02-28*
+*Last updated: 2026-05-29*
