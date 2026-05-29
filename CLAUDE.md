@@ -335,50 +335,17 @@ See `scripts/local/README.md` for usage.
 - Dates: Use `getTodayLocal()` for America/New_York timezone
 - Usernames: Store without @ prefix
 
-## Subscription System
+## Monetization Model (current)
 
-**Three tiers (streaming culture names):**
-| Tier | Price | Follows | Compare | History | Export | Ads |
-|------|-------|---------|---------|---------|--------|-----|
-| Lurker | Free | 5 | 2 | 30 days | No | Yes |
-| Sub | ~$6/mo | 100 | 5 | 365 days | Yes | No |
-| Mod | ~$20/mo | Unlimited | 10 | Full | Yes | No |
+**No subscription tiers anymore.** The Lurker/Sub/Mod system was deprecated. ShinyPull is free-to-use and monetized through:
 
-**Key files:**
-- `src/contexts/SubscriptionContext.jsx` — `SubscriptionProvider`, `useSubscription`, `TIER_LIMITS`, `TIER_DISPLAY`
-- `src/hooks/useSubscription.js` — re-export shortcut
-- `src/components/UpgradePanel.jsx` — slide-out upgrade panel (same pattern as AuthPanel)
-- `src/pages/Pricing.jsx` — SEO pricing page at `/pricing`
+1. **Featured Listings (B2B)** — paid sponsored slots in rankings tables via `/promote`. Stripe Checkout flow. Slots are first-come-first-served, queue auto-promotes as slots open. Table: `featured_listings`. Pricing: $49/mo Basic, $149/mo Premium.
+2. **Google AdSense** — display ads for anonymous traffic.
+3. **Blog affiliate products** — Amazon affiliate embeds via `{{product:slug}}` markdown in blog posts.
 
-**To open the upgrade panel:**
-```jsx
-window.dispatchEvent(new CustomEvent('openUpgradePanel', {
-  detail: { feature: 'compare' | 'follow' | 'history' | 'export' | 'saves' }
-}));
-```
-Or use the convenience helper: `const { openUpgradePanel } = useSubscription()`
+**Deleted (do NOT reintroduce without explicit user request):** `Pricing.jsx`, `SubscriptionContext.jsx`, `UpgradePanel.jsx`, `useSubscription` hook, tier gating logic in Compare/CreatorProfile, the `/pricing` route. The `subscription_tier`/`subscription_status` columns may still exist on `users` but aren't read anywhere.
 
-**Feature gates live in:**
-- `src/pages/Compare.jsx` — slot limit from `maxCompare`, blurred locked slot shown at limit
-- `src/pages/CreatorProfile.jsx` — follow count checked before adding, history range buttons show lock icon for gated ranges
-
-**Stripe integration:**
-- `api/stripe-checkout.js` — creates Checkout session (POST, requires Bearer token)
-- `api/stripe-portal.js` — creates Customer Portal session (POST, requires Bearer token)
-- `api/stripe-webhook.js` — handles subscription events, updates `users` table
-- Webhook URL to configure in Stripe dashboard: `https://shinypull.com/api/stripe-webhook`
-
-**Required env vars (add to `.env` and Vercel settings):**
-```
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_SUB_PRICE_ID=price_...
-STRIPE_MOD_PRICE_ID=price_...
-```
-
-**Database columns added to `users`:** `subscription_tier`, `subscription_status`, `stripe_customer_id`, `stripe_subscription_id`
-
-**New table: `featured_listings`** — B2B sponsored slots for rankings pages (implemented and live in Rankings UI)
+**Stripe is still wired for Featured Listings only** — `api/stripe-checkout.js`, `api/stripe-portal.js`, `api/stripe-webhook.js`. Required env vars: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`. Webhook URL: `https://shinypull.com/api/stripe-webhook`.
 
 ---
 
