@@ -151,7 +151,7 @@ export default function Home() {
             <img
               src="/hero-bg.jpeg"
               alt=""
-              className="absolute inset-0 w-full h-full object-cover opacity-90"
+              className="absolute inset-0 w-full h-full object-cover opacity-90 object-bottom md:object-center"
             />
           </picture>
 

@@ -4,10 +4,11 @@
  * Use text-pink-600 or similar for colored version
  * Use text-white for white version on colored backgrounds
  */
-export default function TikTokIcon({ className = 'w-5 h-5' }) {
+export default function TikTokIcon({ className = 'w-5 h-5', style, ...rest }) {
   return (
     <svg
       className={className}
+      style={style}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -15,6 +16,7 @@ export default function TikTokIcon({ className = 'w-5 h-5' }) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      {...rest}
     >
       <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
     </svg>
