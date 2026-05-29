@@ -141,9 +141,9 @@ export default function Home() {
       <main className="bg-[#fafafa] text-neutral-900">
 
         {/* ============== CINEMATIC HERO ==============
-            Editorial dark hero: photo bg + flat gradient + grain + randomized marquee + megafont + glass search.
-            Bento cards live in OUTER gutters (min-[1700px]) so they never overlap centered content. */}
-        <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white">
+            Full-bleed hero — section min-height ensures the bg image + left stack always have room.
+            Hard bottom edge (no gradient fade) per project preference. */}
+        <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white min-h-[820px]">
           {/* Full-bleed photo. Custom Google Flow generated background — platform analytics floating in space. */}
           <img
             src="/hero-bg.jpeg"
@@ -381,13 +381,10 @@ export default function Home() {
               </motion.div>
             </motion.div>
           )}
-
-          {/* Fade-out to the next light section */}
-          <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-b from-transparent to-[#fafafa] pointer-events-none" />
         </section>
 
         {/* ============== PRODUCT PREVIEW ============== */}
-        <section className="relative -mt-4 mb-16 sm:mb-24">
+        <section className="relative mt-16 sm:mt-20 mb-16 sm:mb-24">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
