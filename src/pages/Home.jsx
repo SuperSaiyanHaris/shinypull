@@ -19,12 +19,12 @@ import CountUp from '../components/CountUp';
 import Sparkline from '../components/Sparkline';
 
 const PLATFORMS = [
-  { id: 'youtube', name: 'YouTube', Icon: Youtube,     accent: '#ef4444' },
-  { id: 'tiktok',  name: 'TikTok',  Icon: TikTokIcon,  accent: '#ec4899' },
-  { id: 'twitch',  name: 'Twitch',  Icon: Twitch,      accent: '#a855f7' },
-  { id: 'kick',    name: 'Kick',    Icon: KickIcon,    accent: '#22c55e' },
-  { id: 'bluesky', name: 'Bluesky', Icon: BlueskyIcon, accent: '#0ea5e9' },
-  { id: 'music',   name: 'Music',   Icon: Music,       accent: '#f59e0b' },
+  { id: 'youtube', name: 'YouTube', Icon: Youtube,     accent: '#ef4444', tone: 'red',     gradient: 'from-red-500 to-rose-600',          shadow: 'shadow-red-500/25',     hoverShadow: 'group-hover:shadow-red-500/40',     blurb: 'Subscribers · views · earnings' },
+  { id: 'tiktok',  name: 'TikTok',  Icon: TikTokIcon,  accent: '#ec4899', tone: 'pink',    gradient: 'from-pink-500 to-rose-600',         shadow: 'shadow-pink-500/25',    hoverShadow: 'group-hover:shadow-pink-500/40',    blurb: 'Followers · likes · video count' },
+  { id: 'twitch',  name: 'Twitch',  Icon: Twitch,      accent: '#a855f7', tone: 'purple',  gradient: 'from-purple-500 to-violet-700',     shadow: 'shadow-purple-500/25',  hoverShadow: 'group-hover:shadow-purple-500/40',  blurb: 'Followers · hours watched · peak' },
+  { id: 'kick',    name: 'Kick',    Icon: KickIcon,    accent: '#22c55e', tone: 'green',   gradient: 'from-green-500 to-emerald-600',     shadow: 'shadow-green-500/25',   hoverShadow: 'group-hover:shadow-green-500/40',   blurb: 'Paid subs · hours watched' },
+  { id: 'bluesky', name: 'Bluesky', Icon: BlueskyIcon, accent: '#0ea5e9', tone: 'sky',     gradient: 'from-sky-500 to-cyan-600',          shadow: 'shadow-sky-500/25',     hoverShadow: 'group-hover:shadow-sky-500/40',     blurb: 'Followers · posts' },
+  { id: 'music',   name: 'Music',   Icon: Music,       accent: '#f59e0b', tone: 'amber',   gradient: 'from-amber-500 to-orange-600',      shadow: 'shadow-amber-500/25',   hoverShadow: 'group-hover:shadow-amber-500/40',   blurb: 'Listeners · plays' },
 ];
 
 const HEADLINE_ROTATIONS = ['YouTuber', 'TikToker', 'Streamer', 'Artist', 'Creator'];
@@ -133,8 +133,10 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.05 }}
               className="text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] max-w-4xl mx-auto"
             >
-              Analytics for every{' '}
-              <span className="relative inline-block">
+              {/* Force first line + rotating word to ALWAYS sit on separate lines.
+                  Otherwise a short word ('Artist') stays inline with 'every' and the page jumps. */}
+              <span className="block">Analytics for every</span>
+              <span className="relative block overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={wordIndex}
@@ -201,24 +203,43 @@ export default function Home() {
               </div>
             </motion.form>
 
-            {/* Platform marquee */}
+            {/* Platform tiles — tilted gradient cards. Each rotates straight + lifts on hover. */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-12 flex items-center justify-center gap-8 sm:gap-12 flex-wrap"
+              className="mt-14"
             >
-              <span className="text-xs uppercase tracking-widest text-neutral-400 font-semibold">Tracking</span>
-              {PLATFORMS.map(({ id, name, Icon, accent }) => (
-                <Link
-                  key={id}
-                  to={`/rankings/${id}`}
-                  className="group flex items-center gap-1.5 text-sm font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
-                >
-                  <Icon className="w-4 h-4 transition-colors" style={{ color: accent }} />
-                  {name}
-                </Link>
-              ))}
+              <p className="text-xs uppercase tracking-[0.25em] text-neutral-400 font-semibold text-center mb-5">
+                Tracking
+              </p>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 max-w-4xl mx-auto px-2">
+                {PLATFORMS.map(({ id, name, Icon, gradient, shadow, hoverShadow, blurb }, i) => {
+                  // Alternate tilt direction for the "diagonal wave" effect
+                  const baseTilt = i % 2 === 0 ? '-rotate-2' : 'rotate-2';
+                  return (
+                    <Link
+                      key={id}
+                      to={`/rankings/${id}`}
+                      className="group relative block"
+                    >
+                      <div
+                        className={`relative bg-gradient-to-br ${gradient} ${baseTilt} group-hover:rotate-0 group-hover:-translate-y-1.5 group-hover:scale-[1.04] transition-all duration-300 rounded-2xl p-4 sm:p-5 shadow-lg ${shadow} ${hoverShadow} overflow-hidden`}
+                      >
+                        {/* Decorative diagonal highlight */}
+                        <div className="absolute -top-12 -right-12 w-28 h-28 rounded-full bg-white/20 blur-2xl pointer-events-none" />
+                        <div className="absolute -bottom-10 -left-10 w-24 h-24 rounded-full bg-black/10 blur-2xl pointer-events-none" />
+
+                        <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-white mb-2 sm:mb-3 drop-shadow-sm" />
+                        <p className="text-sm sm:text-base font-extrabold text-white tracking-tight">{name}</p>
+                        <p className="hidden sm:block text-[10px] mt-1 text-white/80 leading-snug truncate" title={blurb}>
+                          {blurb}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </motion.div>
           </div>
         </section>
@@ -262,39 +283,47 @@ export default function Home() {
                 </div>
 
                 <div className="space-y-1">
-                  {(topCreators.length > 0 ? topCreators : Array(5).fill(null)).slice(0, 5).map((creator, i) => (
-                    <div key={creator?.id || i} className="grid grid-cols-[28px_1fr_auto_auto] sm:grid-cols-[28px_1fr_100px_70px] items-center gap-3 sm:gap-4 px-3 py-2.5 rounded-lg hover:bg-neutral-50 transition-colors">
-                      <span className={`w-6 h-6 inline-flex items-center justify-center rounded text-xs font-bold ${
-                        i === 0 ? 'bg-amber-100 text-amber-700' :
-                        i === 1 ? 'bg-neutral-100 text-neutral-600' :
-                        i === 2 ? 'bg-orange-100 text-orange-700' :
-                        'bg-neutral-50 text-neutral-400'
-                      }`}>
-                        {i + 1}
-                      </span>
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <CreatorAvatar src={creator?.profile_image} name={creator?.display_name || '?'} size="sm" />
-                        <p className="text-sm font-semibold text-neutral-900 truncate">
-                          {creator?.display_name || (i === 0 ? 'MrBeast' : i === 1 ? 'T-Series' : i === 2 ? 'Cocomelon' : i === 3 ? 'SET India' : 'Vlad and Niki')}
-                        </p>
+                  {(topCreators.length > 0 ? topCreators : Array(5).fill(null)).slice(0, 5).map((creator, i) => {
+                    const fallbackNames = ['MrBeast', 'T-Series', 'Cocomelon', 'SET India', 'Vlad and Niki'];
+                    const displayName = creator?.display_name || fallbackNames[i];
+                    const rowInner = (
+                      <div className="grid grid-cols-[28px_1fr_auto_auto] sm:grid-cols-[28px_1fr_100px_70px] items-center gap-3 sm:gap-4 px-3 py-2.5 rounded-lg hover:bg-neutral-50 transition-colors">
+                        <span className={`w-6 h-6 inline-flex items-center justify-center rounded text-xs font-bold ${
+                          i === 0 ? 'bg-amber-100 text-amber-700' :
+                          i === 1 ? 'bg-neutral-100 text-neutral-600' :
+                          i === 2 ? 'bg-orange-100 text-orange-700' :
+                          'bg-neutral-50 text-neutral-400'
+                        }`}>
+                          {i + 1}
+                        </span>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <CreatorAvatar src={creator?.profile_image} name={displayName} size="sm" />
+                          <p className="text-sm font-semibold text-neutral-900 truncate">{displayName}</p>
+                        </div>
+                        <div className="hidden sm:flex items-center justify-end">
+                          <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20]} width={80} height={20} trend="up" />
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-neutral-900 tabular-nums">
+                            {creator?.subscribers ? formatNumber(creator.subscribers) : '—'}
+                          </p>
+                        </div>
                       </div>
-                      <div className="hidden sm:flex items-center justify-end">
-                        <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20]} width={80} height={20} trend="up" />
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-neutral-900 tabular-nums">
-                          {creator?.subscribers ? formatNumber(creator.subscribers) : '—'}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                    return creator?.platform && creator?.username ? (
+                      <Link key={creator.id} to={`/${creator.platform}/${creator.username}`}>{rowInner}</Link>
+                    ) : (
+                      <div key={creator?.id || i}>{rowInner}</div>
+                    );
+                  })}
                 </div>
 
+                {/* Prominent CTA — clear next step for visitors */}
                 <Link
                   to="/rankings/youtube"
-                  className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:gap-2 transition-all"
+                  className="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  See full rankings <ArrowRight className="w-3 h-3" />
+                  See full rankings <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </motion.div>
