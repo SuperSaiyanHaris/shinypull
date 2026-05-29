@@ -153,16 +153,13 @@ export default function Home() {
             Full-bleed hero — section min-height ensures the bg image + left stack always have room.
             Hard bottom edge (no gradient fade) per project preference. */}
         <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white md:min-h-[900px]">
-          {/* Full-bleed photo. Custom Google Flow generated background — platform analytics floating in space.
-              Two crops: wide 16:9 for desktop, vertical 9:16 for mobile so the art doesn't crop awkwardly. */}
-          <picture aria-hidden="true">
-            <source media="(max-width: 767px)" srcSet="/hero-bg-mobile.jpeg" />
-            <img
-              src="/hero-bg.jpeg"
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover opacity-90 object-bottom md:object-center"
-            />
-          </picture>
+          {/* Desktop only: full-bleed photo bg. Mobile uses the solid #0a0a0f section bg for a cleaner look. */}
+          <img
+            src="/hero-bg.jpeg"
+            alt=""
+            aria-hidden="true"
+            className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-90"
+          />
 
           {/* Light dark overlay for text legibility without washing out the artwork. */}
           <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#0a0a0f]/40 via-[#0a0a0f]/35 to-[#0a0a0f]" />
