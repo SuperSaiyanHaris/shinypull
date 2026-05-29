@@ -421,6 +421,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://shinypull.com/twitch/rubius</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://shinypull.com/youtube/tseries</loc>
     <lastmod>2026-05-29</lastmod>
     <changefreq>daily</changefreq>
@@ -7916,12 +7922,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/twitch/tfue</loc>
-    <lastmod>2026-05-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/twitch/rubius</loc>
     <lastmod>2026-05-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>

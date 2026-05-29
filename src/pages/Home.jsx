@@ -197,17 +197,16 @@ export default function Home() {
               </Link>
             </motion.div>
 
-            {/* MEGAFONT headline */}
+            {/* Headline — condensed to 2 lines, lighter weight above the fold */}
             <motion.h1
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.05 }}
-              className="text-center font-black tracking-[-0.04em] leading-[0.92] text-white max-w-5xl mx-auto"
-              style={{ fontSize: 'clamp(2.75rem, 9vw, 7.5rem)' }}
+              className="text-center font-black tracking-[-0.035em] leading-[0.95] text-white max-w-4xl mx-auto"
+              style={{ fontSize: 'clamp(2.25rem, 6vw, 5rem)' }}
             >
-              <span className="block">Analytics</span>
-              <span className="block text-white/70 font-extrabold">for every</span>
-              <span className="relative block overflow-hidden">
+              <span className="block">Analytics for every</span>
+              <span className="relative block overflow-hidden mt-1">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={wordIndex}
@@ -223,21 +222,12 @@ export default function Home() {
               </span>
             </motion.h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-              className="mt-8 max-w-2xl mx-auto text-center text-base sm:text-lg text-white/70 leading-relaxed"
-            >
-              Live subscriber and follower counts, 30-day growth trends, and earnings estimates across YouTube, TikTok, Twitch, Kick, Bluesky, and Music. Updated daily. Free to use.
-            </motion.p>
-
             {/* Glass search */}
             <motion.form
               onSubmit={handleSearch}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.25 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
               className="mt-10 max-w-xl mx-auto"
             >
               <div className="relative flex items-center bg-white/[0.08] backdrop-blur-xl rounded-2xl border border-white/15 shadow-2xl shadow-black/40 focus-within:border-white/30 focus-within:bg-white/[0.12] transition-all duration-200 overflow-hidden">
@@ -296,85 +286,101 @@ export default function Home() {
 
           </div>
 
-          {/* LEFT BENTO — #1 creator card, ROTATES across all 6 platforms every 4s.
-              Anchored just outside the centered content (max-w-6xl = 72rem), so it lives in the inner gutter, not at the viewport edge. */}
+          {/* LEFT STACK — both cards live in the empty left side of the BG image.
+              Right side has the artwork (icons + chart panels) so we don't overlay it.
+              Stack: rotating #1-per-platform card + Featured Listings B2B card.
+              Connecting vertical spine + gentle floating idle motion ties them together. */}
           {topByPlatform.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.5 }}
-              className="hidden min-[1500px]:block absolute top-1/2 -translate-y-1/2 w-72"
-              style={{ left: 'max(1.5rem, calc(50% - 32rem - 18rem))' }}
+              transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="hidden min-[1280px]:flex absolute top-1/2 -translate-y-1/2 flex-col gap-4 w-[19rem]"
+              style={{ left: 'max(1.5rem, calc(50% - 30rem - 19rem))' }}
             >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={topPlatformIdx}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <Link
-                    to={`/${topByPlatform[topPlatformIdx].platform}/${topByPlatform[topPlatformIdx].username}`}
-                    className="group block bg-white/[0.07] backdrop-blur-xl border border-white/15 rounded-2xl p-5 shadow-2xl shadow-black/50 hover:bg-white/[0.12] hover:border-white/25 transition-all"
+              {/* Live activity ribbon — sets the tone for the stack */}
+              <motion.div
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                className="inline-flex items-center gap-2 self-start px-3 py-1.5 bg-emerald-500/10 border border-emerald-400/25 rounded-full backdrop-blur-md"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                </span>
+                <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-300">Live across 6 platforms</span>
+              </motion.div>
+
+              {/* Rotating #1 platform card */}
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={topPlatformIdx}
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    <div className="flex items-center gap-3 mb-4">
-                      <CreatorAvatar src={topByPlatform[topPlatformIdx].profile_image} name={topByPlatform[topPlatformIdx].display_name} size="md" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[10px] text-white/50 uppercase tracking-wider font-bold">{topByPlatform[topPlatformIdx]._platformLabel}</p>
-                        <p className="text-base font-bold text-white truncate">{topByPlatform[topPlatformIdx].display_name}</p>
+                    <Link
+                      to={`/${topByPlatform[topPlatformIdx].platform}/${topByPlatform[topPlatformIdx].username}`}
+                      className="group block bg-white/[0.07] backdrop-blur-xl border border-white/15 rounded-2xl p-5 shadow-2xl shadow-black/50 hover:bg-white/[0.12] hover:border-white/30 transition-all"
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <CreatorAvatar src={topByPlatform[topPlatformIdx].profile_image} name={topByPlatform[topPlatformIdx].display_name} size="md" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] text-white/50 uppercase tracking-wider font-bold">{topByPlatform[topPlatformIdx]._platformLabel}</p>
+                          <p className="text-base font-bold text-white truncate">{topByPlatform[topPlatformIdx].display_name}</p>
+                        </div>
                       </div>
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/15 border border-emerald-400/30 rounded text-[10px] font-bold text-emerald-300">
-                        <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-                        LIVE
-                      </span>
-                    </div>
-                    <p className="text-3xl font-black text-white tabular-nums leading-none">
-                      <CountUp value={topByPlatform[topPlatformIdx].subscribers || 0} />
-                    </p>
-                    <p className="text-xs text-white/50 mt-1.5">subscribers</p>
-                    <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20, 22, 24]} width={248} height={32} trend="up" />
-                  </Link>
-                </motion.div>
-              </AnimatePresence>
-              {/* Platform indicator dots */}
-              <div className="flex justify-center gap-1.5 mt-3">
-                {topByPlatform.map((_, i) => (
-                  <span
-                    key={i}
-                    className={`h-1 rounded-full transition-all ${i === topPlatformIdx ? 'w-6 bg-white' : 'w-1 bg-white/30'}`}
-                  />
-                ))}
-              </div>
+                      <p className="text-3xl font-black text-white tabular-nums leading-none">
+                        <CountUp value={topByPlatform[topPlatformIdx].subscribers || 0} />
+                      </p>
+                      <p className="text-xs text-white/50 mt-1.5">subscribers</p>
+                      <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20, 22, 24]} width={264} height={32} trend="up" />
+                    </Link>
+                  </motion.div>
+                </AnimatePresence>
+                {/* Platform indicator dots */}
+                <div className="flex justify-center gap-1.5 mt-3">
+                  {topByPlatform.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`h-1 rounded-full transition-all ${i === topPlatformIdx ? 'w-6 bg-white' : 'w-1 bg-white/30'}`}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Featured Listings B2B card */}
+              <motion.div
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+              >
+                <Link
+                  to="/promote"
+                  className="group block bg-amber-500/[0.09] backdrop-blur-xl border border-amber-400/30 rounded-2xl p-5 shadow-2xl shadow-black/50 hover:bg-amber-500/[0.16] hover:border-amber-400/50 transition-all"
+                >
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-amber-300">Featured Listings</p>
+                  </div>
+                  <p className="text-base font-bold text-white leading-snug">Get your creator in the rankings</p>
+                  <p className="text-xs text-white/55 mt-2 leading-relaxed">
+                    First come, first served. Queue auto-promotes as slots open.
+                  </p>
+                  <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-amber-400/15">
+                    <p className="text-xs text-white/50">From <span className="text-white font-semibold">$49/mo</span></p>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-300 group-hover:gap-2 transition-all">
+                      See plans <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </Link>
+              </motion.div>
             </motion.div>
           )}
-
-          {/* RIGHT BENTO — Featured Listings B2B. Mirrored position, same size. */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.55 }}
-            className="hidden min-[1500px]:block absolute top-1/2 -translate-y-1/2 w-72"
-            style={{ right: 'max(1.5rem, calc(50% - 32rem - 18rem))' }}
-          >
-            <Link
-              to="/promote"
-              className="group block bg-amber-500/[0.09] backdrop-blur-xl border border-amber-400/30 rounded-2xl p-5 shadow-2xl shadow-black/50 hover:bg-amber-500/[0.15] transition-all"
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-4 h-4 text-amber-300" />
-                <p className="text-[10px] uppercase tracking-wider font-bold text-amber-300">Featured Listings</p>
-              </div>
-              <p className="text-base font-bold text-white leading-snug">Get your creator in the rankings</p>
-              <p className="text-xs text-white/60 mt-2 leading-relaxed">
-                Sponsored slots inside our live ranking tables. First come, first served. Queue auto-promotes as slots open.
-              </p>
-              <p className="text-xs text-white/50 mt-3">From <span className="text-white font-semibold">$49/mo</span>. Cancel anytime.</p>
-              <span className="inline-flex items-center gap-1 mt-4 text-sm font-semibold text-amber-300 group-hover:gap-2 transition-all">
-                See plans <ArrowRight className="w-3.5 h-3.5" />
-              </span>
-            </Link>
-          </motion.div>
 
           {/* Fade-out to the next light section */}
           <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-b from-transparent to-[#fafafa] pointer-events-none" />
