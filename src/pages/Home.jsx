@@ -55,9 +55,29 @@ export default function Home() {
     }).catch(() => {});
   }, []);
 
-  // Top creators preview — for the hero product mock + below-fold leaderboard
+  // Top creators preview — fetch top 20 across multiple platforms, shuffle for marquee variety.
+  // First 5 (sorted by subs) used for product preview + featured card.
+  const [marqueeCreators, setMarqueeCreators] = useState([]);
   useEffect(() => {
-    getRankedCreators('youtube', 'subscribers', 5).then(setTopCreators).catch(() => {});
+    Promise.all([
+      getRankedCreators('youtube', 'subscribers', 20),
+      getRankedCreators('tiktok', 'subscribers', 20),
+      getRankedCreators('twitch', 'subscribers', 15),
+      getRankedCreators('kick', 'subscribers', 10),
+      getRankedCreators('bluesky', 'subscribers', 10),
+      getRankedCreators('music', 'subscribers', 15),
+    ]).then((sets) => {
+      const all = sets.flat().filter(c => c?.profile_image && c?.display_name);
+      // Fisher-Yates shuffle for marquee
+      const shuffled = [...all];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      setMarqueeCreators(shuffled.slice(0, 40));
+      // For product preview + #1 card, use YouTube top 5
+      setTopCreators(sets[0].slice(0, 5));
+    }).catch(() => {});
   }, []);
 
   // Latest blog posts
@@ -99,33 +119,28 @@ export default function Home() {
       <main className="bg-[#fafafa] text-neutral-900">
 
         {/* ============== CINEMATIC HERO ==============
-            Full-bleed photo bg + dark gradient + grain + marquee + megafont + glass search + floating bento cards. */}
-        <section className="relative isolate overflow-hidden grain-dark bg-[#06060a] text-white">
-          {/* Full-bleed cinematic photo. Pexels CDN, dark RGB-lit creator setup. */}
+            Editorial dark hero: photo bg + flat gradient + grain + randomized marquee + megafont + glass search.
+            Bento cards live in OUTER gutters (min-[1700px]) so they never overlap centered content. */}
+        <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white">
+          {/* Full-bleed photo. Editorial dark stage / concert lighting. */}
           <img
-            src="https://images.pexels.com/photos/4842498/pexels-photo-4842498.jpeg?auto=compress&cs=tinysrgb&w=2400"
+            src="https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=2400"
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover opacity-55"
+            className="absolute inset-0 w-full h-full object-cover opacity-35"
           />
 
-          {/* Dark gradient overlay (top→bottom + sides) for legibility */}
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#06060a]/70 via-[#06060a]/55 to-[#06060a]" />
-          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(6,6,10,0.85)_100%)]" />
+          {/* Single flat dark overlay — no orbs, no neon glows. */}
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#0a0a0f]/80 via-[#0a0a0f]/70 to-[#0a0a0f]" />
 
-          {/* Color washes for that RGB neon vibe */}
-          <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] rounded-full bg-indigo-600/20 blur-3xl pointer-events-none" />
-          <div className="absolute -top-20 right-0 w-[34rem] h-[34rem] rounded-full bg-fuchsia-500/15 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 w-[30rem] h-[30rem] rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
-
-          {/* TOP MARQUEE — auto-scrolling real creator avatars */}
-          {topCreators.length > 0 && (
+          {/* TOP MARQUEE — randomized top creators across platforms */}
+          {marqueeCreators.length > 0 && (
             <div className="relative pt-5 pb-1 overflow-hidden mask-gradient">
               <div
                 className="flex gap-4 sm:gap-6 animate-marquee whitespace-nowrap"
                 style={{ width: 'max-content' }}
               >
-                {[...topCreators, ...topCreators, ...topCreators, ...topCreators].map((c, i) => (
+                {[...marqueeCreators, ...marqueeCreators].map((c, i) => (
                   <Link
                     key={`${c.id}-${i}`}
                     to={`/${c.platform}/${c.username}`}
@@ -257,52 +272,62 @@ export default function Home() {
               ))}
             </motion.div>
 
-            {/* FLOATING LIVE BENTO — bottom right, real ticking data */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.5 }}
-              className="hidden lg:flex absolute bottom-10 right-8 flex-col gap-3 w-72 pointer-events-none"
-            >
-              {/* Top creator live card */}
-              {topCreators[0] && (
-                <Link
-                  to={`/${topCreators[0].platform}/${topCreators[0].username}`}
-                  className="pointer-events-auto group relative bg-white/[0.07] backdrop-blur-xl border border-white/15 rounded-2xl p-4 shadow-2xl shadow-black/40 hover:bg-white/[0.10] hover:border-white/25 transition-all"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <CreatorAvatar src={topCreators[0].profile_image} name={topCreators[0].display_name} size="sm" />
-                    <div className="min-w-0">
-                      <p className="text-xs text-white/50 uppercase tracking-wider font-semibold">#1 YouTuber</p>
-                      <p className="text-sm font-bold text-white truncate">{topCreators[0].display_name}</p>
-                    </div>
-                    <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/15 border border-emerald-400/30 rounded text-[10px] font-bold text-emerald-300">
-                      <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-                      LIVE
-                    </span>
-                  </div>
-                  <p className="text-2xl font-black text-white tabular-nums leading-none">
-                    <CountUp value={topCreators[0].subscribers || 0} />
-                  </p>
-                  <p className="text-xs text-white/50 mt-1">subscribers · ticking up</p>
-                  <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20, 22, 24]} width={240} height={28} trend="up" />
-                </Link>
-              )}
+          </div>
 
-              {/* Featured Listings pulse card */}
+          {/* LEFT GUTTER BENTO — #1 YouTuber live card. Only renders when there's room outside the centered content. */}
+          {topCreators[0] && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              className="hidden min-[1500px]:block absolute left-6 top-1/2 -translate-y-1/2 w-60"
+            >
               <Link
-                to="/promote"
-                className="pointer-events-auto group bg-amber-500/[0.10] backdrop-blur-xl border border-amber-400/30 rounded-2xl p-4 shadow-2xl shadow-black/40 hover:bg-amber-500/[0.16] transition-all"
+                to={`/${topCreators[0].platform}/${topCreators[0].username}`}
+                className="group block bg-white/[0.06] backdrop-blur-xl border border-white/15 rounded-2xl p-4 shadow-2xl shadow-black/40 hover:bg-white/[0.10] hover:border-white/25 transition-all"
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <p className="text-[10px] uppercase tracking-wider font-bold text-amber-300">Featured Listings</p>
+                <div className="flex items-center gap-2.5 mb-3">
+                  <CreatorAvatar src={topCreators[0].profile_image} name={topCreators[0].display_name} size="sm" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] text-white/50 uppercase tracking-wider font-semibold">#1 YouTuber</p>
+                    <p className="text-sm font-bold text-white truncate">{topCreators[0].display_name}</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/15 border border-emerald-400/30 rounded text-[9px] font-bold text-emerald-300">
+                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                    LIVE
+                  </span>
                 </div>
-                <p className="text-sm font-bold text-white">Get your creator in the rankings</p>
-                <p className="text-xs text-white/60 mt-1">From $49/mo · cancel anytime</p>
+                <p className="text-2xl font-black text-white tabular-nums leading-none">
+                  <CountUp value={topCreators[0].subscribers || 0} />
+                </p>
+                <p className="text-[11px] text-white/50 mt-1">subscribers</p>
+                <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20, 22, 24]} width={200} height={26} trend="up" />
               </Link>
             </motion.div>
-          </div>
+          )}
+
+          {/* RIGHT GUTTER BENTO — Featured Listings B2B. Same min-[1500px] guard. */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.55 }}
+            className="hidden min-[1500px]:block absolute right-6 top-1/2 -translate-y-1/2 w-60"
+          >
+            <Link
+              to="/promote"
+              className="group block bg-amber-500/[0.08] backdrop-blur-xl border border-amber-400/30 rounded-2xl p-4 shadow-2xl shadow-black/40 hover:bg-amber-500/[0.14] transition-all"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <p className="text-[10px] uppercase tracking-wider font-bold text-amber-300">Featured Listings</p>
+              </div>
+              <p className="text-sm font-bold text-white leading-snug">Get your creator in the rankings</p>
+              <p className="text-[11px] text-white/60 mt-2">From $49/mo. Cancel anytime.</p>
+              <span className="inline-flex items-center gap-1 mt-3 text-xs font-semibold text-amber-300 group-hover:gap-2 transition-all">
+                See plans <ArrowRight className="w-3 h-3" />
+              </span>
+            </Link>
+          </motion.div>
 
           {/* Fade-out to the next light section */}
           <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-b from-transparent to-[#fafafa] pointer-events-none" />
