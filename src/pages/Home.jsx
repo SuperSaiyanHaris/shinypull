@@ -77,14 +77,14 @@ export default function Home() {
       }
       setMarqueeCreators(pool);
 
-      // #1 per platform for rotating bento card
+      // #1 per platform for rotating bento card. Each platform uses its own metric.
       const top1 = [
-        yt[0] && { ...yt[0], _platformLabel: '#1 YouTuber' },
-        tt[0] && { ...tt[0], _platformLabel: '#1 TikToker' },
-        tw[0] && { ...tw[0], _platformLabel: '#1 Twitch Streamer' },
-        kk[0] && { ...kk[0], _platformLabel: '#1 Kick Streamer' },
-        bs[0] && { ...bs[0], _platformLabel: '#1 on Bluesky' },
-        mu[0] && { ...mu[0], _platformLabel: '#1 Artist' },
+        yt[0] && { ...yt[0], _platformLabel: '#1 YouTuber',         _metricLabel: 'subscribers' },
+        tt[0] && { ...tt[0], _platformLabel: '#1 TikToker',         _metricLabel: 'followers' },
+        tw[0] && { ...tw[0], _platformLabel: '#1 Twitch Streamer',  _metricLabel: 'followers' },
+        kk[0] && { ...kk[0], _platformLabel: '#1 Kick Streamer',    _metricLabel: 'paid subscribers' },
+        bs[0] && { ...bs[0], _platformLabel: '#1 on Bluesky',       _metricLabel: 'followers' },
+        mu[0] && { ...mu[0], _platformLabel: '#1 Artist',           _metricLabel: 'monthly listeners' },
       ].filter(Boolean);
       setTopByPlatform(top1);
 
@@ -143,7 +143,7 @@ export default function Home() {
         {/* ============== CINEMATIC HERO ==============
             Full-bleed hero — section min-height ensures the bg image + left stack always have room.
             Hard bottom edge (no gradient fade) per project preference. */}
-        <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white min-h-[820px]">
+        <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white min-h-[900px]">
           {/* Full-bleed photo. Custom Google Flow generated background — platform analytics floating in space. */}
           <img
             src="/hero-bg.jpeg"
@@ -295,8 +295,8 @@ export default function Home() {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="hidden min-[1280px]:flex absolute top-1/2 -translate-y-1/2 flex-col gap-4 w-[19rem]"
-              style={{ left: 'max(1.5rem, calc(50% - 30rem - 19rem))' }}
+              className="hidden min-[1280px]:flex absolute top-[14rem] flex-col gap-4 w-[19rem]"
+              style={{ left: 'max(2rem, calc(50% - 30rem - 19rem))' }}
             >
               {/* Live activity ribbon — sets the tone for the stack */}
               <motion.div
@@ -338,7 +338,7 @@ export default function Home() {
                       <p className="text-3xl font-black text-white tabular-nums leading-none">
                         <CountUp value={topByPlatform[topPlatformIdx].subscribers || 0} />
                       </p>
-                      <p className="text-xs text-white/50 mt-1.5">subscribers</p>
+                      <p className="text-xs text-white/50 mt-1.5">{topByPlatform[topPlatformIdx]._metricLabel}</p>
                       <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20, 22, 24]} width={264} height={32} trend="up" />
                     </Link>
                   </motion.div>
@@ -384,8 +384,25 @@ export default function Home() {
         </section>
 
         {/* ============== PRODUCT PREVIEW ============== */}
-        <section className="relative mt-16 sm:mt-20 mb-16 sm:mb-24">
+        <section className="relative mt-20 sm:mt-28 mb-16 sm:mb-24">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Section header so the dark→light transition reads as an intentional break */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-10%' }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-10 sm:mb-12"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600 mb-3">Live preview</p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-900">
+                Real rankings. Live data.
+              </h2>
+              <p className="mt-3 text-base text-neutral-600 max-w-xl mx-auto">
+                A peek at what every page looks like. Updated three times a day from official platform APIs.
+              </p>
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
