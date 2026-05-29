@@ -144,16 +144,16 @@ export default function Home() {
             Editorial dark hero: photo bg + flat gradient + grain + randomized marquee + megafont + glass search.
             Bento cards live in OUTER gutters (min-[1700px]) so they never overlap centered content. */}
         <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white">
-          {/* Full-bleed photo. Analytics dashboard / data viz on dark screens — on brand. */}
+          {/* Full-bleed photo. Custom Google Flow generated background — platform analytics floating in space. */}
           <img
-            src="https://images.pexels.com/photos/7947541/pexels-photo-7947541.jpeg?auto=compress&cs=tinysrgb&w=2400"
+            src="/hero-bg.jpeg"
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover opacity-25"
+            className="absolute inset-0 w-full h-full object-cover opacity-90"
           />
 
-          {/* Single flat dark overlay — no orbs, no neon glows. */}
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#0a0a0f]/85 via-[#0a0a0f]/75 to-[#0a0a0f]" />
+          {/* Light dark overlay for text legibility without washing out the artwork. */}
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#0a0a0f]/40 via-[#0a0a0f]/35 to-[#0a0a0f]" />
 
           {/* TOP MARQUEE — randomized top creators across platforms */}
           {marqueeCreators.length > 0 && (
