@@ -17,8 +17,11 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_S
 const KICK_CLIENT_ID = process.env.KICK_CLIENT_ID;
 const KICK_CLIENT_SECRET = process.env.KICK_CLIENT_SECRET;
 
-const MIN_VIEWERS = 100; // Only add streamers with 100+ concurrent viewers
-const MAX_STREAMERS_PER_RUN = 50; // Limit per run
+// Tightened thresholds (2026-05): prior 100-viewer floor pulled in 14-sub no-name accounts.
+// Real Kick streamers worth tracking have 500+ concurrent + at least 1 paid sub.
+const MIN_VIEWERS = 500;
+const MIN_SUBSCRIBERS = 1; // Reject channels with 0 paid subs
+const MAX_STREAMERS_PER_RUN = 50;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false },
@@ -245,10 +248,18 @@ async function discoverCreators() {
         category: channel.category?.name || null,
       };
 
+      const paidSubs = channel.active_subscribers_count || 0;
+
+      // Skip channels with zero paid subs. They flood the rankings with garbage
+      // (avg 14 subs across April/May 2026 sweeps was a data-quality problem).
+      if (paidSubs < MIN_SUBSCRIBERS) {
+        console.log(`   ⏭️  ${stream.slug} (only ${paidSubs} paid subs, below threshold)`);
+        continue;
+      }
+
       const creator = await addCreator(creatorData);
 
       if (creator) {
-        const paidSubs = channel.active_subscribers_count || 0;
         await addInitialStats(creator.id, paidSubs);
         added++;
         console.log(`   ✅ ${stream.slug} (${stream.viewer_count.toLocaleString()} viewers, ${paidSubs} paid subs)`);

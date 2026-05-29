@@ -1130,9 +1130,10 @@ export default function CreatorProfile() {
             <div className={`grid gap-2 sm:gap-4 mb-6 ${
               platform === 'tiktok' ? 'grid-cols-3'
               : platform === 'kick' ? (creator.category ? 'grid-cols-2' : 'grid-cols-1 max-w-md')
-              : platform === 'twitch' ? 'grid-cols-3'
+              : platform === 'twitch' && creator.category ? 'grid-cols-2 sm:grid-cols-3'
+              : platform === 'twitch' ? 'grid-cols-2'
               : platform === 'bluesky' ? 'grid-cols-2'
-              : platform === 'music' ? (creator.description ? 'grid-cols-3' : 'grid-cols-2')
+              : platform === 'music' ? (creator.description ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2')
               : 'grid-cols-2 lg:grid-cols-4'
             }`}>
               {/* Subscribers/Followers Card */}
@@ -1906,17 +1907,17 @@ function StatCard({ icon: Icon, label, value, sublabel }) {
     <div className={`group relative bg-white rounded-2xl border border-neutral-200 overflow-hidden transition-all duration-300 ${accent.border} hover:-translate-y-1 hover:shadow-2xl ${accent.shadow}`}>
       {/* Glow blob */}
       <div className={`pointer-events-none absolute -top-12 -right-12 w-32 h-32 ${accent.glow} rounded-full blur-3xl ${accent.glowHover} transition-colors duration-500`} />
-      <div className="relative p-4 sm:p-5">
-        <div className="flex items-center gap-2 mb-3">
+      <div className="relative p-3 sm:p-5">
+        <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
           {Icon && (
-            <div className={`w-8 h-8 bg-gradient-to-br ${accent.iconBg} rounded-lg flex items-center justify-center shadow-md ${accent.iconShadow} group-hover:scale-105 transition-transform duration-300`}>
-              <Icon className="w-4 h-4 text-white" />
+            <div className={`w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br ${accent.iconBg} rounded-md sm:rounded-lg flex items-center justify-center shadow-md ${accent.iconShadow} group-hover:scale-105 transition-transform duration-300 flex-shrink-0`}>
+              <Icon className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
             </div>
           )}
-          <p className="text-xs sm:text-sm text-neutral-500 font-semibold uppercase tracking-wider truncate">{label}</p>
+          <p className="text-[10px] sm:text-sm text-neutral-500 font-semibold uppercase tracking-wider leading-tight line-clamp-2 break-words">{label}</p>
         </div>
-        <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tabular-nums truncate">{value}</p>
-        {sublabel && <p className="text-xs text-neutral-400 mt-1.5 truncate">{sublabel}</p>}
+        <p className="text-lg sm:text-3xl font-extrabold text-neutral-900 tabular-nums truncate">{value}</p>
+        {sublabel && <p className="text-[10px] sm:text-xs text-neutral-400 mt-1 sm:mt-1.5 truncate">{sublabel}</p>}
       </div>
     </div>
   );

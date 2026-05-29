@@ -1,4 +1,4 @@
-name: Creator Discovery
+name: Creator Discovery (all platforms)
 
 on:
   schedule:
@@ -45,6 +45,33 @@ jobs:
           KICK_CLIENT_ID: ${{ secrets.KICK_CLIENT_ID }}
           KICK_CLIENT_SECRET: ${{ secrets.KICK_CLIENT_SECRET }}
         run: node scripts/discoverKickCreators.js
+
+      - name: Discover Twitch creators
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          VITE_TWITCH_CLIENT_ID: ${{ secrets.VITE_TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+        run: node scripts/discoverTwitchCreators.js
+
+      - name: Queue TikTok candidates from existing creators
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/discoverTikTokCreators.js 50
+
+      - name: Discover Bluesky creators
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/discoverBlueskyCreators.js
+
+      - name: Discover Music artists
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          LASTFM_CLIENT_ID: ${{ secrets.LASTFM_CLIENT_ID }}
+        run: node scripts/discoverMusicArtists.js
 
       - name: Report completion
         if: success()
