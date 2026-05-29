@@ -98,16 +98,50 @@ export default function Home() {
 
       <main className="bg-[#fafafa] text-neutral-900">
 
-        {/* ============== HERO ============== */}
-        <section className="relative overflow-hidden border-b border-neutral-200">
-          {/* Soft mesh gradient */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-32 -left-32 w-[40rem] h-[40rem] rounded-full bg-indigo-100/60 blur-3xl" />
-            <div className="absolute -top-20 right-0 w-[30rem] h-[30rem] rounded-full bg-purple-100/40 blur-3xl" />
-            <div className="absolute bottom-0 left-1/3 w-[30rem] h-[30rem] rounded-full bg-amber-50/60 blur-3xl" />
-          </div>
+        {/* ============== CINEMATIC HERO ==============
+            Full-bleed photo bg + dark gradient + grain + marquee + megafont + glass search + floating bento cards. */}
+        <section className="relative isolate overflow-hidden grain-dark bg-[#06060a] text-white">
+          {/* Full-bleed cinematic photo. Pexels CDN, dark RGB-lit creator setup. */}
+          <img
+            src="https://images.pexels.com/photos/4842498/pexels-photo-4842498.jpeg?auto=compress&cs=tinysrgb&w=2400"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover opacity-55"
+          />
 
-          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-12 sm:pb-20">
+          {/* Dark gradient overlay (top→bottom + sides) for legibility */}
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#06060a]/70 via-[#06060a]/55 to-[#06060a]" />
+          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(6,6,10,0.85)_100%)]" />
+
+          {/* Color washes for that RGB neon vibe */}
+          <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] rounded-full bg-indigo-600/20 blur-3xl pointer-events-none" />
+          <div className="absolute -top-20 right-0 w-[34rem] h-[34rem] rounded-full bg-fuchsia-500/15 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 w-[30rem] h-[30rem] rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
+
+          {/* TOP MARQUEE — auto-scrolling real creator avatars */}
+          {topCreators.length > 0 && (
+            <div className="relative pt-5 pb-1 overflow-hidden mask-gradient">
+              <div
+                className="flex gap-4 sm:gap-6 animate-marquee whitespace-nowrap"
+                style={{ width: 'max-content' }}
+              >
+                {[...topCreators, ...topCreators, ...topCreators, ...topCreators].map((c, i) => (
+                  <Link
+                    key={`${c.id}-${i}`}
+                    to={`/${c.platform}/${c.username}`}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/[0.06] border border-white/10 rounded-full backdrop-blur-md hover:bg-white/[0.12] transition-colors"
+                  >
+                    <CreatorAvatar src={c.profile_image} name={c.display_name} size="xs" />
+                    <span className="text-xs font-semibold text-white/90">{c.display_name}</span>
+                    <span className="text-[10px] text-white/50 tabular-nums">{formatNumber(c.subscribers)}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Center stage */}
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-16 pb-20 sm:pb-28">
 
             {/* Eyebrow badge */}
             <motion.div
@@ -118,24 +152,24 @@ export default function Home() {
             >
               <Link
                 to="/promote"
-                className="group inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-neutral-200 rounded-full text-xs font-medium text-neutral-600 hover:border-neutral-300 hover:bg-white shadow-sm transition-all"
+                className="group inline-flex items-center gap-2 px-3 py-1.5 bg-white/[0.07] border border-white/15 rounded-full text-xs font-medium text-white/80 backdrop-blur-md hover:bg-white/[0.12] transition-all"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span><span className="font-semibold text-neutral-900">Featured Listings</span> are live</span>
-                <ArrowRight className="w-3 h-3 text-neutral-400 group-hover:translate-x-0.5 transition-transform" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span><span className="font-semibold text-white">Featured Listings</span> are live</span>
+                <ArrowRight className="w-3 h-3 text-white/50 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </motion.div>
 
-            {/* Headline */}
+            {/* MEGAFONT headline */}
             <motion.h1
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.05 }}
-              className="text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] max-w-4xl mx-auto"
+              className="text-center font-black tracking-[-0.04em] leading-[0.92] text-white max-w-5xl mx-auto"
+              style={{ fontSize: 'clamp(2.75rem, 9vw, 7.5rem)' }}
             >
-              {/* Force first line + rotating word to ALWAYS sit on separate lines.
-                  Otherwise a short word ('Artist') stays inline with 'every' and the page jumps. */}
-              <span className="block">Analytics for every</span>
+              <span className="block">Analytics</span>
+              <span className="block text-white/70 font-extrabold">for every</span>
               <span className="relative block overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.span
@@ -143,8 +177,8 @@ export default function Home() {
                     initial={{ opacity: 0, y: '30%' }}
                     animate={{ opacity: 1, y: '0%' }}
                     exit={{ opacity: 0, y: '-30%' }}
-                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                    className="inline-block bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 bg-clip-text text-transparent"
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    className="inline-block bg-gradient-to-br from-indigo-300 via-fuchsia-300 to-cyan-300 bg-clip-text text-transparent"
                   >
                     {HEADLINE_ROTATIONS[wordIndex]}
                   </motion.span>
@@ -156,46 +190,46 @@ export default function Home() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="mt-6 max-w-2xl mx-auto text-center text-base sm:text-lg text-neutral-600 leading-relaxed"
+              className="mt-8 max-w-2xl mx-auto text-center text-base sm:text-lg text-white/70 leading-relaxed"
             >
               Live subscriber and follower counts, 30-day growth trends, and earnings estimates across YouTube, TikTok, Twitch, Kick, Bluesky, and Music. Updated daily. Free to use.
             </motion.p>
 
-            {/* Search */}
+            {/* Glass search */}
             <motion.form
               onSubmit={handleSearch}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.25 }}
-              className="mt-9 max-w-xl mx-auto"
+              className="mt-10 max-w-xl mx-auto"
             >
-              <div className="relative flex items-center bg-white rounded-2xl border border-neutral-200 shadow-sm focus-within:border-neutral-400 focus-within:shadow-md transition-all duration-200 overflow-hidden">
-                <Search className="absolute left-4 w-5 h-5 text-neutral-400 pointer-events-none" />
+              <div className="relative flex items-center bg-white/[0.08] backdrop-blur-xl rounded-2xl border border-white/15 shadow-2xl shadow-black/40 focus-within:border-white/30 focus-within:bg-white/[0.12] transition-all duration-200 overflow-hidden">
+                <Search className="absolute left-4 w-5 h-5 text-white/50 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search any creator: MrBeast, Ninja, Charli D'Amelio..."
-                  className="w-full pl-12 pr-32 py-4 bg-transparent text-neutral-900 placeholder-neutral-400 focus:outline-none text-base"
+                  className="w-full pl-12 pr-32 py-4 bg-transparent text-white placeholder-white/40 focus:outline-none text-base"
                 />
                 <button
                   type="submit"
-                  className="absolute right-1.5 inline-flex items-center gap-1.5 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white text-sm font-semibold rounded-xl transition-colors"
+                  className="absolute right-1.5 inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-neutral-900 hover:bg-white/90 text-sm font-semibold rounded-xl transition-colors"
                 >
                   Search
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Quick chips below input */}
-              <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
-                <span className="text-xs text-neutral-500">Try:</span>
+              {/* Try chips */}
+              <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
+                <span className="text-xs text-white/50">Try:</span>
                 {['mrbeast', 'ninja', 'pewdiepie', 'kaicenat', 'taylor-swift'].map((q) => (
                   <button
                     key={q}
                     type="button"
                     onClick={() => navigate(`/search?q=${encodeURIComponent(q)}`)}
-                    className="text-xs font-medium text-neutral-600 hover:text-indigo-600 bg-white border border-neutral-200 hover:border-indigo-300 rounded-full px-2.5 py-1 transition-all"
+                    className="text-xs font-medium text-white/70 hover:text-white bg-white/[0.06] border border-white/10 hover:border-white/25 hover:bg-white/[0.12] rounded-full px-2.5 py-1 transition-all backdrop-blur-md"
                   >
                     {q}
                   </button>
@@ -203,45 +237,75 @@ export default function Home() {
               </div>
             </motion.form>
 
-            {/* Platform tiles — tilted gradient cards. Each rotates straight + lifts on hover. */}
+            {/* Platform pills — compact glass row to keep links to each ranking */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-14"
+              transition={{ duration: 0.6, delay: 0.35 }}
+              className="mt-12 flex flex-wrap justify-center gap-2 sm:gap-3 max-w-3xl mx-auto"
             >
-              <p className="text-xs uppercase tracking-[0.25em] text-neutral-400 font-semibold text-center mb-5">
-                Tracking
-              </p>
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 max-w-4xl mx-auto px-2">
-                {PLATFORMS.map(({ id, name, Icon, gradient, shadow, hoverShadow, blurb }, i) => {
-                  // Alternate tilt direction for the "diagonal wave" effect
-                  const baseTilt = i % 2 === 0 ? '-rotate-2' : 'rotate-2';
-                  return (
-                    <Link
-                      key={id}
-                      to={`/rankings/${id}`}
-                      className="group relative block"
-                    >
-                      <div
-                        className={`relative bg-gradient-to-br ${gradient} ${baseTilt} group-hover:rotate-0 group-hover:-translate-y-1.5 group-hover:scale-[1.04] transition-all duration-300 rounded-2xl p-4 sm:p-5 shadow-lg ${shadow} ${hoverShadow} overflow-hidden`}
-                      >
-                        {/* Decorative diagonal highlight */}
-                        <div className="absolute -top-12 -right-12 w-28 h-28 rounded-full bg-white/20 blur-2xl pointer-events-none" />
-                        <div className="absolute -bottom-10 -left-10 w-24 h-24 rounded-full bg-black/10 blur-2xl pointer-events-none" />
+              {PLATFORMS.map(({ id, name, Icon, accent }) => (
+                <Link
+                  key={id}
+                  to={`/rankings/${id}`}
+                  className="group inline-flex items-center gap-2 px-3.5 py-2 bg-white/[0.06] border border-white/10 hover:border-white/30 hover:bg-white/[0.12] rounded-full backdrop-blur-md transition-all"
+                  style={{ '--accent': accent }}
+                >
+                  <Icon className="w-4 h-4 transition-colors" style={{ color: accent }} />
+                  <span className="text-sm font-semibold text-white/90 group-hover:text-white">{name}</span>
+                </Link>
+              ))}
+            </motion.div>
 
-                        <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-white mb-2 sm:mb-3 drop-shadow-sm" />
-                        <p className="text-sm sm:text-base font-extrabold text-white tracking-tight">{name}</p>
-                        <p className="hidden sm:block text-[10px] mt-1 text-white/80 leading-snug truncate" title={blurb}>
-                          {blurb}
-                        </p>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
+            {/* FLOATING LIVE BENTO — bottom right, real ticking data */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              className="hidden lg:flex absolute bottom-10 right-8 flex-col gap-3 w-72 pointer-events-none"
+            >
+              {/* Top creator live card */}
+              {topCreators[0] && (
+                <Link
+                  to={`/${topCreators[0].platform}/${topCreators[0].username}`}
+                  className="pointer-events-auto group relative bg-white/[0.07] backdrop-blur-xl border border-white/15 rounded-2xl p-4 shadow-2xl shadow-black/40 hover:bg-white/[0.10] hover:border-white/25 transition-all"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <CreatorAvatar src={topCreators[0].profile_image} name={topCreators[0].display_name} size="sm" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-white/50 uppercase tracking-wider font-semibold">#1 YouTuber</p>
+                      <p className="text-sm font-bold text-white truncate">{topCreators[0].display_name}</p>
+                    </div>
+                    <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/15 border border-emerald-400/30 rounded text-[10px] font-bold text-emerald-300">
+                      <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                      LIVE
+                    </span>
+                  </div>
+                  <p className="text-2xl font-black text-white tabular-nums leading-none">
+                    <CountUp value={topCreators[0].subscribers || 0} />
+                  </p>
+                  <p className="text-xs text-white/50 mt-1">subscribers · ticking up</p>
+                  <Sparkline data={[10, 12, 11, 14, 16, 18, 17, 20, 22, 24]} width={240} height={28} trend="up" />
+                </Link>
+              )}
+
+              {/* Featured Listings pulse card */}
+              <Link
+                to="/promote"
+                className="pointer-events-auto group bg-amber-500/[0.10] backdrop-blur-xl border border-amber-400/30 rounded-2xl p-4 shadow-2xl shadow-black/40 hover:bg-amber-500/[0.16] transition-all"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <p className="text-[10px] uppercase tracking-wider font-bold text-amber-300">Featured Listings</p>
+                </div>
+                <p className="text-sm font-bold text-white">Get your creator in the rankings</p>
+                <p className="text-xs text-white/60 mt-1">From $49/mo · cancel anytime</p>
+              </Link>
             </motion.div>
           </div>
+
+          {/* Fade-out to the next light section */}
+          <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-b from-transparent to-[#fafafa] pointer-events-none" />
         </section>
 
         {/* ============== PRODUCT PREVIEW ============== */}
