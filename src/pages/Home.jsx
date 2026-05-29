@@ -107,7 +107,7 @@ export default function Home() {
   const [previewIdx, setPreviewIdx] = useState(0);
   const PREVIEW_COUNT = 4;
   useEffect(() => {
-    const id = setInterval(() => setPreviewIdx((i) => (i + 1) % PREVIEW_COUNT), 6000);
+    const id = setInterval(() => setPreviewIdx((i) => (i + 1) % PREVIEW_COUNT), 9000);
     return () => clearInterval(id);
   }, []);
 
@@ -651,21 +651,23 @@ export default function Home() {
                       <div className="w-12" />
                     </div>
 
-                    {/* Content area — swaps with crossfade */}
-                    <div className="p-4 sm:p-6 min-h-[340px] sm:min-h-[360px]">
-                      <AnimatePresence mode="wait">
-                        <motion.div
-                          key={previewIdx}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -8 }}
-                          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                        >
-                          {active.content}
-                        </motion.div>
-                      </AnimatePresence>
+                    {/* Content area — fixed min-height set to the tallest preview (Rankings) so swaps don't reflow the page */}
+                    <div className="p-4 sm:p-6 min-h-[420px] sm:min-h-[440px] flex flex-col">
+                      <div className="flex-1">
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={previewIdx}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                          >
+                            {active.content}
+                          </motion.div>
+                        </AnimatePresence>
+                      </div>
 
-                      {/* CTA — updates per preview */}
+                      {/* CTA — pinned to bottom so it stays put across all previews */}
                       <Link
                         to={active.ctaLink}
                         className="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md"
