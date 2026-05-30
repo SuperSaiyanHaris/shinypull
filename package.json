@@ -15,6 +15,8 @@
     "seed:kick": "node scripts/seedTopKickCreators.js",
     "seed:bluesky": "node scripts/seedTopBlueskyCreators.js",
     "seed:music": "node scripts/seedTopMusicArtists.js",
+    "seed:mastodon": "node scripts/seedTopMastodonCreators.js",
+    "discover:mastodon": "node scripts/discoverMastodonCreators.js",
     "aggregate:hours-watched": "node scripts/aggregateHoursWatched.js",
     "seed:blog": "node scripts/seedBlogPosts.js",
     "delete:fake-data": "node scripts/deleteFakeData.js",

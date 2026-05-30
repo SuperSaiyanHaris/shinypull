@@ -4,6 +4,7 @@ import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, Arr
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
+import MastodonIcon from '../components/MastodonIcon';
 import { Music } from 'lucide-react';
 import { TableSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
@@ -22,7 +23,8 @@ const platforms = [
   { id: 'twitch',  name: 'Twitch',  icon: Twitch,   color: 'bg-purple-600', hoverColor: 'hover:bg-purple-500', lightBg: 'bg-purple-50',  textColor: 'text-purple-700', available: true },
   { id: 'kick',    name: 'Kick',    icon: KickIcon, color: 'bg-green-600',  hoverColor: 'hover:bg-green-500',  lightBg: 'bg-green-50',   textColor: 'text-green-700',  available: true },
   { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, color: 'bg-sky-500',  hoverColor: 'hover:bg-sky-400',    lightBg: 'bg-sky-50',     textColor: 'text-sky-700',    available: true },
-  { id: 'music',   name: 'Music',   icon: Music,    color: 'bg-amber-600',  hoverColor: 'hover:bg-amber-500',  lightBg: 'bg-amber-50',   textColor: 'text-amber-700',  available: true },
+  { id: 'music',   name: 'Music',   icon: Music,        color: 'bg-amber-600',  hoverColor: 'hover:bg-amber-500',  lightBg: 'bg-amber-50',   textColor: 'text-amber-700',  available: true },
+  { id: 'mastodon',name: 'Mastodon',icon: MastodonIcon, color: 'bg-violet-600', hoverColor: 'hover:bg-violet-500', lightBg: 'bg-violet-50',  textColor: 'text-violet-700', available: true },
 ];
 
 const topCounts = [50, 100, 500];

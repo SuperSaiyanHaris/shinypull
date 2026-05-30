@@ -257,6 +257,22 @@ saved_reports (id, user_id, name, config[jsonb], created_at, updated_at)
 - Profile URLs: `https://open.spotify.com/artist/{platformId}`
 - **Required env vars:** `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`
 
+**Mastodon:**
+- Federated. Username = full webfinger handle `user@instance.tld` (e.g. `Mastodon@mastodon.social`)
+- `platform_id` = `{instance}:{account.id}` for cross-instance uniqueness
+- No views metric (same shape as Bluesky: followers + posts only)
+- No auth required, no API key — uses public ActivityPub endpoints on each instance
+- Falls back to `mastodon.social/api/v2/search?resolve=true` if a direct instance lookup fails
+- Major instances list lives in `src/services/mastodonService.js#MAJOR_INSTANCES`
+- Service: `src/services/mastodonService.js`
+- Rate limit: 300 req/5min per instance (default); we pace at 100ms between requests in collectDailyStats.js
+- Custom `MastodonIcon` component using the official "M" mark
+- Color scheme: `violet-600` (`text-violet-700`, `bg-violet-50`, `border-violet-200`)
+- CSP `connect-src` enumerates the top instances we federate to — vercel.json
+- Profile URLs: `https://{instance}/@{user}` (e.g. `https://hachyderm.io/@mosseri`)
+- Discovery: `discoverMastodonCreators.js` pulls each instance's `/api/v1/directory?order=active` plus rotating hashtag searches via mastodon.social
+- Seed: `seedTopMastodonCreators.js` curates ~250 known accounts + sweeps top instance directories to reach 1K
+
 **Bluesky:**
 - Uses the AT Protocol public API — zero authentication required, no API key, no approval process
 - Base URL: `https://public.api.bsky.app/xrpc/`

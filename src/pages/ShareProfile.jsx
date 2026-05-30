@@ -4,6 +4,7 @@ import { Youtube, Twitch, TrendingUp, TrendingDown } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
+import MastodonIcon from '../components/MastodonIcon';
 import SEO from '../components/SEO';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import CreatorAvatar from '../components/CreatorAvatar';
@@ -16,22 +17,25 @@ const platformIcons = {
   kick: KickIcon,
   tiktok: TikTokIcon,
   bluesky: BlueskyIcon,
+  mastodon: MastodonIcon,
 };
 
 const platformColors = {
-  youtube: { bg: 'bg-red-600',    chart: '#ef4444' },
-  twitch:  { bg: 'bg-purple-600', chart: '#a855f7' },
-  kick:    { bg: 'bg-green-600',  chart: '#22c55e' },
-  tiktok:  { bg: 'bg-pink-600',   chart: '#ec4899' },
-  bluesky: { bg: 'bg-sky-500',    chart: '#0ea5e9' },
+  youtube:  { bg: 'bg-red-600',    chart: '#ef4444' },
+  twitch:   { bg: 'bg-purple-600', chart: '#a855f7' },
+  kick:     { bg: 'bg-green-600',  chart: '#22c55e' },
+  tiktok:   { bg: 'bg-pink-600',   chart: '#ec4899' },
+  bluesky:  { bg: 'bg-sky-500',    chart: '#0ea5e9' },
+  mastodon: { bg: 'bg-violet-600', chart: '#7c3aed' },
 };
 
 const platformConfig = {
-  youtube: { primary: 'Subscribers',  secondary: (s) => s.total_views  ? { label: 'Total Views',  value: s.total_views  } : null },
-  twitch:  { primary: 'Followers',    secondary: null },
-  kick:    { primary: 'Paid Subs',    secondary: null },
-  tiktok:  { primary: 'Followers',    secondary: (s) => s.total_views  ? { label: 'Total Likes',  value: s.total_views  } : null },
-  bluesky: { primary: 'Followers',    secondary: (s) => s.total_posts  ? { label: 'Posts',        value: s.total_posts  } : null },
+  youtube:  { primary: 'Subscribers',  secondary: (s) => s.total_views  ? { label: 'Total Views',  value: s.total_views  } : null },
+  twitch:   { primary: 'Followers',    secondary: null },
+  kick:     { primary: 'Paid Subs',    secondary: null },
+  tiktok:   { primary: 'Followers',    secondary: (s) => s.total_views  ? { label: 'Total Likes',  value: s.total_views  } : null },
+  bluesky:  { primary: 'Followers',    secondary: (s) => s.total_posts  ? { label: 'Posts',        value: s.total_posts  } : null },
+  mastodon: { primary: 'Followers',    secondary: (s) => s.total_posts  ? { label: 'Posts',        value: s.total_posts  } : null },
 };
 
 export default function ShareProfile() {

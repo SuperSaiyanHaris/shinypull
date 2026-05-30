@@ -4,6 +4,7 @@ import { Search as SearchIcon, Youtube, Twitch, User, AlertCircle, ArrowRight, C
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
+import MastodonIcon from '../components/MastodonIcon';
 import { CreatorRowSkeleton } from '../components/Skeleton';
 import FunErrorState from '../components/FunErrorState';
 import { searchChannels as searchYouTube } from '../services/youtubeService';
@@ -28,6 +29,7 @@ const platformIcons = {
   kick: KickIcon,
   bluesky: BlueskyIcon,
   music: Music,
+  mastodon: MastodonIcon,
 };
 
 const platformColors = {
@@ -37,6 +39,7 @@ const platformColors = {
   kick: { bg: 'bg-green-600', light: 'bg-green-50', text: 'text-green-400' },
   bluesky: { bg: 'bg-sky-500', light: 'bg-sky-50', text: 'text-sky-400' },
   music: { bg: 'bg-amber-600', light: 'bg-amber-50', text: 'text-amber-400' },
+  mastodon: { bg: 'bg-violet-600', light: 'bg-violet-50', text: 'text-violet-400' },
   instagram: { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-400' },
 };
 
@@ -47,6 +50,7 @@ const platforms = [
   { id: 'kick', name: 'Kick', icon: KickIcon, available: true },
   { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, available: true },
   { id: 'music', name: 'Music', icon: Music, available: true },
+  { id: 'mastodon', name: 'Mastodon', icon: MastodonIcon, available: true },
 ];
 
 // Relevance + popularity score for sorting search results.

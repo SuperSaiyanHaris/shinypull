@@ -6,6 +6,7 @@ import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
+import MastodonIcon from '../components/MastodonIcon';
 import { Music } from 'lucide-react';
 import { CompareCardSkeleton } from '../components/Skeleton';
 import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
@@ -44,6 +45,7 @@ const platformConfig = {
   kick: { icon: KickIcon, color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' },
   bluesky: { icon: BlueskyIcon, color: 'text-sky-700', bg: 'bg-sky-50', border: 'border-sky-200' },
   music: { icon: Music, color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
+  mastodon: { icon: MastodonIcon, color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200' },
 };
 
 export default function Compare() {
@@ -940,7 +942,8 @@ function SearchableSlot({ onSelect, onRemove }) {
           { id: 'twitch',   Icon: Twitch,      color: 'text-purple-700', bg: 'bg-purple-50', ring: 'ring-purple-700', label: 'Twitch' },
           { id: 'kick',     Icon: KickIcon,    color: 'text-green-700',  bg: 'bg-green-50',  ring: 'ring-green-700',  label: 'Kick' },
           { id: 'bluesky',  Icon: BlueskyIcon, color: 'text-sky-700',    bg: 'bg-sky-50',    ring: 'ring-sky-700',    label: 'Bluesky' },
-          { id: 'music',    Icon: Music,       color: 'text-amber-700',  bg: 'bg-amber-50',  ring: 'ring-amber-700',  label: 'Music' },
+          { id: 'music',    Icon: Music,        color: 'text-amber-700',  bg: 'bg-amber-50',  ring: 'ring-amber-700',  label: 'Music' },
+          { id: 'mastodon', Icon: MastodonIcon, color: 'text-violet-700', bg: 'bg-violet-50', ring: 'ring-violet-700', label: 'Mastodon' },
         ].map(({ id, Icon, color, bg, ring, label }) => (
           <button
             key={id}

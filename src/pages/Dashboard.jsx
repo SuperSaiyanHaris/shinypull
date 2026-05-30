@@ -8,6 +8,7 @@ import {
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
+import MastodonIcon from '../components/MastodonIcon';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import CreatorAvatar from '../components/CreatorAvatar';
@@ -28,18 +29,20 @@ const platformIcons = {
   twitch: Twitch,
   kick: KickIcon,
   bluesky: BlueskyIcon,
+  mastodon: MastodonIcon,
 };
 
 const platformColors = {
-  youtube: { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600', border: 'border-red-200' },
-  tiktok:  { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-600', border: 'border-pink-200' },
-  twitch:  { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
-  kick:    { bg: 'bg-green-600', light: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' },
-  bluesky: { bg: 'bg-sky-500', light: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
+  youtube:  { bg: 'bg-red-600', light: 'bg-red-50', text: 'text-red-600', border: 'border-red-200' },
+  tiktok:   { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-600', border: 'border-pink-200' },
+  twitch:   { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  kick:     { bg: 'bg-green-600', light: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' },
+  bluesky:  { bg: 'bg-sky-500', light: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
+  mastodon: { bg: 'bg-violet-600', light: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-200' },
 };
 
 const PLATFORM_LABELS = {
-  youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky',
+  youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky', mastodon: 'Mastodon',
 };
 
 const METRIC_LABEL = {
@@ -48,6 +51,7 @@ const METRIC_LABEL = {
   twitch: 'followers',
   kick: 'paid subs',
   bluesky: 'followers',
+  mastodon: 'followers',
 };
 
 export default function Dashboard() {
@@ -294,8 +298,8 @@ export default function Dashboard() {
       [],
     ];
 
-    const PLATFORM_ORDER = ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky'];
-    const PLATFORM_LABELS_LOCAL = { youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky' };
+    const PLATFORM_ORDER = ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'mastodon'];
+    const PLATFORM_LABELS_LOCAL = { youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky', mastodon: 'Mastodon' };
 
     for (const platform of PLATFORM_ORDER) {
       const creators = followedCreators.filter(c => c.platform === platform);
@@ -385,6 +389,20 @@ export default function Dashboard() {
             `https://shinypull.com/bluesky/${c.username}`,
           ]);
         }
+      } else if (platform === 'mastodon') {
+        lines.push(['Name', 'Handle', 'Followers', '1-Day Change', '7-Day Change', 'Posts', 'Profile URL']);
+        for (const c of creators) {
+          const { current: curr, previous: prev, weekAgo } = creatorStats[c.id] || {};
+          const fol = (s) => s?.followers ?? s?.subscribers ?? 0;
+          lines.push([
+            c.display_name || c.username, c.username,
+            fol(curr) || '',
+            curr && prev ? fmtDelta(fol(curr) - fol(prev)) : '',
+            curr && weekAgo && weekAgo !== curr ? fmtDelta(fol(curr) - fol(weekAgo)) : '',
+            curr?.total_posts ?? '',
+            `https://shinypull.com/mastodon/${c.username}`,
+          ]);
+        }
       }
 
       lines.push([]);
@@ -408,11 +426,12 @@ export default function Dashboard() {
   ).length;
 
   const platformCounts = {
-    youtube: followedCreators.filter(c => c.platform === 'youtube').length,
-    tiktok:  followedCreators.filter(c => c.platform === 'tiktok').length,
-    twitch:  followedCreators.filter(c => c.platform === 'twitch').length,
-    kick:    followedCreators.filter(c => c.platform === 'kick').length,
-    bluesky: followedCreators.filter(c => c.platform === 'bluesky').length,
+    youtube:  followedCreators.filter(c => c.platform === 'youtube').length,
+    tiktok:   followedCreators.filter(c => c.platform === 'tiktok').length,
+    twitch:   followedCreators.filter(c => c.platform === 'twitch').length,
+    kick:     followedCreators.filter(c => c.platform === 'kick').length,
+    bluesky:  followedCreators.filter(c => c.platform === 'bluesky').length,
+    mastodon: followedCreators.filter(c => c.platform === 'mastodon').length,
   };
 
   const filteredCreators = selectedPlatform === 'all'
@@ -631,7 +650,7 @@ export default function Dashboard() {
                         label="All"
                         count={followedCreators.length}
                       />
-                      {(['youtube', 'tiktok', 'twitch', 'kick', 'bluesky']).map(p => {
+                      {(['youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'mastodon']).map(p => {
                         if (!platformCounts[p]) return null;
                         const Icon = platformIcons[p];
                         return (
@@ -988,6 +1007,7 @@ const CHIP_ACTIVE_STYLES = {
   twitch: 'bg-purple-600 border-purple-600 text-white shadow-lg',
   kick: 'bg-green-600 border-green-600 text-white shadow-lg',
   bluesky: 'bg-sky-500 border-sky-500 text-white shadow-lg',
+  mastodon: 'bg-violet-600 border-violet-600 text-white shadow-lg',
 };
 
 function FilterChip({ active, onClick, label, count, icon, live, platform }) {

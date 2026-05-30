@@ -218,6 +218,24 @@ async function fetchBlueskyBatch(handles) {
   return statsMap;
 }
 
+// ========== MASTODON API HELPERS ==========
+// Federated, no auth. Each handle = `user@instance`. No batch endpoint, so we
+// fetch one at a time with light pacing. Grouped by instance to keep HTTP
+// connections warm and rate-limit pain isolated per server.
+async function fetchMastodonProfile(handle) {
+  const [username, instance] = (handle || '').split('@');
+  if (!username || !instance) throw new Error('Invalid handle');
+  const url = `https://${instance}/api/v1/accounts/lookup?acct=${encodeURIComponent(username)}`;
+  const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(8000) });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const account = await res.json();
+  return {
+    followers: account.followers_count ?? 0,
+    totalPosts: account.statuses_count ?? 0,
+  };
+}
+
 // ========== KICK API HELPERS ==========
 let kickAccessToken = null;
 
@@ -323,6 +341,7 @@ async function collectDailyStats() {
   const kickCreators = creators.filter((c) => c.platform === 'kick');
   const blueskyCreators = creators.filter((c) => c.platform === 'bluesky');
   const musicCreators = creators.filter((c) => c.platform === 'music');
+  const mastodonCreators = creators.filter((c) => c.platform === 'mastodon');
   // TikTok is handled by refreshTikTokProfiles.js via separate GitHub Actions workflow
 
   console.log(`Found ${creators.length} creators to update`);
@@ -330,7 +349,8 @@ async function collectDailyStats() {
   console.log(`   Twitch: ${twitchCreators.length}`);
   console.log(`   Kick: ${kickCreators.length}`);
   console.log(`   Bluesky: ${blueskyCreators.length}`);
-  console.log(`   Music: ${musicCreators.length}\n`);
+  console.log(`   Music: ${musicCreators.length}`);
+  console.log(`   Mastodon: ${mastodonCreators.length}\n`);
 
   let successCount = 0;
   let errorCount = 0;
@@ -533,6 +553,46 @@ async function collectDailyStats() {
       if (i < blueskyBatches.length - 1) {
         await new Promise((r) => setTimeout(r, 200));
       }
+    }
+  }
+
+  // ========== MASTODON (sequential per handle, ~10/sec, no batch API) ==========
+  // Mastodon is federated — each handle maps to a specific instance, so requests
+  // can't be batched. We rate-limit per request to stay polite (300/5min default
+  // per instance). Skip writes when followers=0 (data integrity rule).
+  if (mastodonCreators.length > 0) {
+    console.log('\n🐘 Processing Mastodon creators...');
+    console.log(`   ${mastodonCreators.length} accounts (sequential)\n`);
+
+    for (let i = 0; i < mastodonCreators.length; i++) {
+      const creator = mastodonCreators[i];
+      try {
+        const stats = await fetchMastodonProfile(creator.username);
+        if (stats && stats.followers > 0) {
+          statsToUpsert.push({
+            creator_id: creator.id,
+            recorded_at: today,
+            subscribers: stats.followers,
+            followers: stats.followers,
+            total_views: null,
+            total_posts: stats.totalPosts,
+          });
+          console.log(`   ✅ ${creator.display_name}: ${stats.followers.toLocaleString()} followers`);
+          successCount++;
+        } else if (stats && stats.followers === 0) {
+          console.log(`   ⚠️  ${creator.display_name}: Skipping — API returned 0 followers`);
+          errorCount++;
+        } else {
+          console.log(`   ❌ ${creator.display_name}: Profile not found`);
+          errorCount++;
+        }
+      } catch (error) {
+        console.error(`   ❌ ${creator.display_name}: ${error.message}`);
+        errorCount++;
+      }
+      // 100ms pacing = 10 req/s. With 1k+ creators spread across ~15 instances
+      // each instance sees well under its 300/5min budget.
+      await new Promise((r) => setTimeout(r, 100));
     }
   }
 
