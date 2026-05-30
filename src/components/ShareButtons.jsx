@@ -37,53 +37,49 @@ export default function ShareButtons({ url, title }) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm font-medium text-gray-300">Share:</span>
-      
-      <div className="flex items-center gap-2">
-        {/* X (formerly Twitter) */}
+      <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Share</span>
+      <div className="flex items-center gap-1.5">
         <a
           href={shareLinks.twitter}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-gray-100 transition-colors"
+          className="p-2 rounded-lg bg-white border border-neutral-200 text-neutral-600 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white transition-all"
           aria-label="Share on X"
+          title="Share on X"
         >
           <XIcon className="w-4 h-4" />
         </a>
-
-        {/* Facebook */}
         <a
           href={shareLinks.facebook}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-lg bg-gray-800 hover:bg-blue-900/30 text-gray-300 hover:text-blue-400 transition-colors"
+          className="p-2 rounded-lg bg-white border border-neutral-200 text-neutral-600 hover:border-blue-600 hover:bg-blue-600 hover:text-white transition-all"
           aria-label="Share on Facebook"
+          title="Share on Facebook"
         >
           <Facebook className="w-4 h-4" />
         </a>
-
-        {/* LinkedIn */}
         <a
           href={shareLinks.linkedin}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-lg bg-gray-800 hover:bg-blue-900/30 text-gray-300 hover:text-blue-400 transition-colors"
+          className="p-2 rounded-lg bg-white border border-neutral-200 text-neutral-600 hover:border-sky-700 hover:bg-sky-700 hover:text-white transition-all"
           aria-label="Share on LinkedIn"
+          title="Share on LinkedIn"
         >
           <Linkedin className="w-4 h-4" />
         </a>
-
-        {/* Copy Link */}
         <button
           onClick={handleCopyLink}
-          className="p-2 rounded-lg bg-gray-800 hover:bg-indigo-900/50 text-gray-300 hover:text-indigo-400 transition-colors relative"
-          aria-label="Copy link"
+          className={`p-2 rounded-lg border transition-all ${
+            copied
+              ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+              : 'bg-white border-neutral-200 text-neutral-600 hover:border-indigo-600 hover:bg-indigo-600 hover:text-white'
+          }`}
+          aria-label={copied ? 'Link copied' : 'Copy link'}
+          title={copied ? 'Copied!' : 'Copy link'}
         >
-          {copied ? (
-            <Check className="w-4 h-4 text-green-600" />
-          ) : (
-            <Link2 className="w-4 h-4" />
-          )}
+          {copied ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
         </button>
       </div>
     </div>
