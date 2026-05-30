@@ -676,12 +676,12 @@ export default function Compare() {
                       <ComparisonRow
                         label="Avg Views per Video"
                         icon={TrendingUp}
-                        tooltip="Not available for Twitch, Kick, Bluesky, or Music. For TikTok, calculated as total likes divided by videos."
+                        tooltip="Not available for Twitch, Kick, Bluesky, Mastodon, Rumble, or Music. For TikTok, calculated as total likes divided by videos."
                         values={filledCreators.map(c =>
-                          (c.platform === 'twitch' || c.platform === 'kick' || c.platform === 'bluesky' || c.platform === 'music') ? '—' :
+                          (c.platform === 'twitch' || c.platform === 'kick' || c.platform === 'bluesky' || c.platform === 'mastodon' || c.platform === 'rumble' || c.platform === 'music') ? '—' :
                           c.totalPosts > 0 ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—'
                         )}
-                        highlight={filledCreators.every(c => c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'bluesky' && c.platform !== 'music') ?
+                        highlight={filledCreators.every(c => c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'bluesky' && c.platform !== 'mastodon' && c.platform !== 'rumble' && c.platform !== 'music') ?
                           getWinner(filledCreators.map(c => c.totalPosts > 0 ? c.totalViews / c.totalPosts : 0)) : null}
                       />
                       {/* Growth Rates */}
@@ -834,7 +834,7 @@ function CreatorCard({ creator, onRemove, growthData }) {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-neutral-50 rounded-xl p-3">
-            <p className="text-xs text-neutral-700 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' ? 'Followers' : creator.platform === 'music' ? 'Listeners' : 'Subs'}</p>
+            <p className="text-xs text-neutral-700 mb-1">{creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' || creator.platform === 'mastodon' || creator.platform === 'rumble' ? 'Followers' : creator.platform === 'music' ? 'Listeners' : 'Subs'}</p>
             <p className="font-bold text-neutral-900">{formatNumber(creator.subscribers || creator.followers)}</p>
           </div>
           <div className="bg-neutral-50 rounded-xl p-3">
@@ -1017,7 +1017,7 @@ function SearchableSlot({ onSelect, onRemove }) {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-neutral-900 truncate">{result.displayName}</p>
                   <p className="text-xs text-neutral-700 truncate">
-                    {formatNumber(result.subscribers || result.followers)} {result.platform === 'twitch' || result.platform === 'bluesky' ? 'followers' : result.platform === 'music' ? 'listeners' : 'subs'}
+                    {formatNumber(result.subscribers || result.followers)} {result.platform === 'twitch' || result.platform === 'tiktok' || result.platform === 'bluesky' || result.platform === 'mastodon' || result.platform === 'rumble' ? 'followers' : result.platform === 'music' ? 'listeners' : 'subs'}
                   </p>
                 </div>
                 <div className={`p-1 rounded ${platformConfig[result.platform]?.bg}`}>
@@ -1155,9 +1155,9 @@ function MobileComparisonTable({ creators, growthData, getGrowthColor, formatEar
     },
     {
       label: 'Avg/Video',
-      tooltip: 'Not available for Twitch, Kick, or Bluesky. For TikTok, calculated as total likes divided by videos.',
-      nums: creators.map(c => (c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'bluesky' && c.totalPosts > 0) ? Math.round(c.totalViews / c.totalPosts) : null),
-      display: creators.map(c => [(c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'bluesky' && c.totalPosts > 0) ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—', null]),
+      tooltip: 'Not available for Twitch, Kick, Bluesky, Mastodon, or Rumble. For TikTok, calculated as total likes divided by videos.',
+      nums: creators.map(c => (c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'bluesky' && c.platform !== 'mastodon' && c.platform !== 'rumble' && c.totalPosts > 0) ? Math.round(c.totalViews / c.totalPosts) : null),
+      display: creators.map(c => [(c.platform !== 'twitch' && c.platform !== 'kick' && c.platform !== 'bluesky' && c.platform !== 'mastodon' && c.platform !== 'rumble' && c.totalPosts > 0) ? formatNumber(Math.round(c.totalViews / c.totalPosts)) : '—', null]),
     },
     {
       label: '7-Day',
@@ -1281,7 +1281,7 @@ function ComparisonRadarChart({ creators, growthData, loadingGrowth }) {
   const metrics = [
     { label: 'Followers',    getValue: (c) => c.subscribers || c.followers || 0 },
     { label: 'Views',        getValue: (c) => (c.platform === 'bluesky') ? 0 : (c.totalViews || 0) },
-    { label: 'Avg/Video',    getValue: (c) => (c.platform !== 'twitch' && c.platform !== 'bluesky' && c.platform !== 'music' && c.totalPosts > 0) ? c.totalViews / c.totalPosts : 0 },
+    { label: 'Avg/Video',    getValue: (c) => (c.platform !== 'twitch' && c.platform !== 'bluesky' && c.platform !== 'mastodon' && c.platform !== 'rumble' && c.platform !== 'music' && c.totalPosts > 0) ? c.totalViews / c.totalPosts : 0 },
     { label: '7-Day Growth', getValue: (c) => Math.max(0, growthData[c.platformId]?.growth7Day || 0) },
     { label: '30-Day Growth',getValue: (c) => Math.max(0, growthData[c.platformId]?.growth30Day || 0) },
   ];

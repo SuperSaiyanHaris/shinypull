@@ -249,41 +249,39 @@ export default function Search() {
         if (channels.length > 0) {
           void persistSearchResults(channels);
         }
-      } else if (platform === 'mastodon') {
-        // Mastodon search is DB-first because (a) federated search across
-        // every instance is impractical and (b) instance APIs now require
-        // auth for resolve=true cross-instance lookups. We have ~1000
-        // creators seeded — fuzzy DB match handles the vast majority of
-        // queries. Direct handle resolution (user@instance) is a future
-        // enhancement that would require an Edge Function proxy.
-        const rows = await searchCreators(searchQuery, 'mastodon');
-        channels = (rows || []).map((c) => ({
-          platform: 'mastodon',
-          platformId: c.platform_id,
-          username: c.username,
-          displayName: c.display_name,
-          profileImage: c.profile_image,
-          description: c.description,
-          subscribers: c.subscribers || 0,
-          followers: c.subscribers || 0,
-          totalPosts: c.total_posts || 0,
-        }));
-      } else if (platform === 'rumble') {
-        // Rumble live-search is blocked (Cloudflare 403s our proxy IPs).
-        // DB-only search against the seeded catalog — 107 channels and
-        // growing via the discovery script.
-        const rows = await searchCreators(searchQuery, 'rumble');
-        channels = (rows || []).map((c) => ({
-          platform: 'rumble',
-          platformId: c.platform_id,
-          username: c.username,
-          displayName: c.display_name,
-          profileImage: c.profile_image,
-          description: c.description,
-          subscribers: c.subscribers || 0,
-          followers: c.subscribers || 0,
-          totalPosts: c.total_posts || 0,
-        }));
+      } else if (platform === 'mastodon' || platform === 'rumble') {
+        // Both are DB-first (live Mastodon federated search requires auth,
+        // Rumble is Cloudflare-blocked from our IPs). The fuzzy search RPC
+        // returns rows from the `creators` table only — it doesn't include
+        // follower counts (those live in `creator_stats`). Hydrate each
+        // result with its latest stats row so the result cards show real
+        // follower numbers instead of 0.
+        const rows = await searchCreators(searchQuery, platform);
+        channels = await Promise.all(
+          (rows || []).map(async (c) => {
+            const { data: stats } = await supabase
+              .from('creator_stats')
+              .select('followers, total_posts')
+              .eq('creator_id', c.id)
+              .order('recorded_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            return {
+              platform,
+              platformId: c.platform_id,
+              username: c.username,
+              displayName: c.display_name,
+              profileImage: c.profile_image,
+              description: c.description,
+              // Both platforms measure followers, not subscribers. Populate
+              // both fields so the result-card renderer works regardless of
+              // which key it reads.
+              followers: stats?.followers || 0,
+              subscribers: stats?.followers || 0,
+              totalPosts: stats?.total_posts || 0,
+            };
+          })
+        );
       }
       channels.sort((a, b) => searchScore(b, searchQuery) - searchScore(a, searchQuery));
       setResults(channels.slice(0, 25));
@@ -590,8 +588,9 @@ export default function Search() {
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-neutral-900 text-base sm:text-lg">{formatNumber(creator.subscribers || creator.followers)}</p>
                         <p className="text-xs sm:text-sm text-neutral-700">
-                          {creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' ? 'followers' :
-                           creator.platform === 'kick' ? 'paid subs' : 'subscribers'}
+                          {creator.platform === 'twitch' || creator.platform === 'tiktok' || creator.platform === 'bluesky' || creator.platform === 'mastodon' || creator.platform === 'rumble' ? 'followers' :
+                           creator.platform === 'kick' ? 'paid subs' :
+                           creator.platform === 'music' ? 'listeners' : 'subscribers'}
                         </p>
                       </div>
                       <ArrowRight className="hidden sm:block w-5 h-5 text-neutral-400 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />

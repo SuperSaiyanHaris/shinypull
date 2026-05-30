@@ -232,7 +232,7 @@ function RankingsOverview() {
               {platforms.map((platform) => {
                 const Icon = platform.icon;
                 const creators = platformData[platform.id] || [];
-                const follLabel = platform.id === 'tiktok' || platform.id === 'twitch' || platform.id === 'bluesky' ? 'followers' : platform.id === 'music' ? 'listeners' : platform.id === 'kick' ? 'paid subs' : 'subscribers';
+                const follLabel = platform.id === 'tiktok' || platform.id === 'twitch' || platform.id === 'bluesky' || platform.id === 'mastodon' || platform.id === 'rumble' ? 'followers' : platform.id === 'music' ? 'listeners' : platform.id === 'kick' ? 'paid subs' : 'subscribers';
 
                 return (
                   <div key={platform.id} className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
