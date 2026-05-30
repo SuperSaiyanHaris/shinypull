@@ -257,6 +257,25 @@ saved_reports (id, user_id, name, config[jsonb], created_at, updated_at)
 - Profile URLs: `https://open.spotify.com/artist/{platformId}`
 - **Required env vars:** `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`
 
+**ADDING A NEW PLATFORM — completeness checklist:**
+Before declaring a new platform "done," run this from the repo root:
+```bash
+grep -rl "bluesky" src/ scripts/ api/ | xargs grep -L "$NEW_PLATFORM"
+```
+Substitute `bluesky` with whatever platform was most recently added (it's the canonical "you have to touch all these files" template). The output lists every file that mentions the template platform but not the new one. Walk the list. Common categories of misses:
+- `src/components/Footer.jsx` — `PLATFORM_LINKS` array + tagline string
+- `src/components/CommandPalette.jsx` — `PLATFORM_ICONS` map + `PLATFORM_LINKS` array
+- `src/components/BlogContent.jsx` — `PLATFORM_META` for `{{creators:...}}` blog embed
+- `src/pages/Rankings.jsx` — `noViews` check, `getSeoData` (title noun map, descriptions, keywords), `getH1Text`, `getSubheading`, follower label
+- `src/pages/Account.jsx` — `LISTING_PLATFORMS`, labels, pill colors
+- `src/pages/FAQ.jsx`, `About.jsx`, `Methodology.jsx`, `Promote.jsx`, `Support.jsx`, `BlogPost.jsx` — body copy strings
+- `api/og.jsx` — `PLATFORM_LABELS` + `PLATFORM_COLORS`
+- `api/update-creator.js` — `validPlatforms` array (lazy creator hydration breaks without this)
+- `api/stripe-checkout.js` — `VALID_PLATFORMS` set (Featured Listings can't be created without this)
+- `scripts/generateSitemap.js` — static `/rankings/{platform}` URL
+- `scripts/generateBlogDraft.js` — 3 prompt strings mentioning platforms + entity-blacklist regex
+- `index.html` — meta description, og:description, twitter:description, structured-data description
+
 **Mastodon:**
 - Federated. Username = full webfinger handle `user@instance.tld` (e.g. `Mastodon@mastodon.social`)
 - `platform_id` = `{instance}:{account.id}` for cross-instance uniqueness
