@@ -1,20 +1,16 @@
 /**
- * Vercel Serverless Function — Mastodon proxy.
+ * Edge runtime proxy for Mastodon (federated, ~30 instances across our seed).
  *
- * Mastodon is federated, so every creator we track lives on a different
- * instance (mastodon.social, hachyderm.io, journa.host, mstdn.social, …).
- * Maintaining an exhaustive list of those origins in CSP `connect-src` is
- * a losing game — new instances appear constantly. This endpoint proxies
- * the two API calls we need so the browser only ever talks to shinypull.com.
+ * Why Edge: Hobby Vercel allows 12 serverless functions max. We're at the cap,
+ * so this runs on Edge instead — Edge functions don't count against that limit
+ * and a simple HTTP fetch proxy doesn't need Node APIs.
  *
  *   GET /api/mastodon?handle=user@instance              → account lookup
  *   GET /api/mastodon?handle=user@instance&latest=1     → latest visible status
- *   GET /api/mastodon?handle=user@instance&full=1       → account + latest in one round trip
- *
- * Falls back to mastodon.social federated search if the instance lookup 404s.
+ *   GET /api/mastodon?handle=user@instance&full=1       → both in one round trip
  */
 
-import { checkRateLimit, getClientIdentifier } from './_ratelimit.js';
+export const config = { runtime: 'edge' };
 
 const TIMEOUT_MS = 8000;
 
@@ -67,75 +63,72 @@ function normalizeAccount(account, instance) {
   };
 }
 
-async function lookupAccount(username, instance) {
+async function jsonFetch(url) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
   try {
-    const url = `https://${instance}/api/v1/accounts/lookup?acct=${encodeURIComponent(username)}`;
-    const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(TIMEOUT_MS) });
-    if (res.status === 404) return { notFound: true };
-    if (!res.ok) return { error: `instance returned ${res.status}` };
-    const account = await res.json();
-    return { account, instance };
+    const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: ctrl.signal });
+    if (!res.ok) return { error: `HTTP ${res.status}`, status: res.status };
+    return { data: await res.json() };
   } catch (err) {
-    return { error: err.message };
+    return { error: err.message || 'fetch failed' };
+  } finally {
+    clearTimeout(t);
   }
+}
+
+async function lookupAccount(username, instance) {
+  const r = await jsonFetch(`https://${instance}/api/v1/accounts/lookup?acct=${encodeURIComponent(username)}`);
+  if (r.data) return { account: r.data, instance };
+  if (r.status === 404) return { notFound: true };
+  return { error: r.error };
 }
 
 async function federatedFallback(username, instance) {
-  // Some instances rate-limit anonymous lookups (401/429). mastodon.social
-  // federates almost every visible account and responds reliably.
-  try {
-    const url = `https://mastodon.social/api/v2/search?q=${encodeURIComponent(`${username}@${instance}`)}&type=accounts&limit=1&resolve=true`;
-    const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(TIMEOUT_MS) });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const account = data.accounts?.[0];
-    if (!account) return null;
-    const acctInstance = account.acct.includes('@') ? account.acct.split('@')[1] : instance;
-    return { account, instance: acctInstance };
-  } catch {
-    return null;
-  }
+  const r = await jsonFetch(`https://mastodon.social/api/v2/search?q=${encodeURIComponent(`${username}@${instance}`)}&type=accounts&limit=1&resolve=true`);
+  const account = r.data?.accounts?.[0];
+  if (!account) return null;
+  const acctInstance = account.acct.includes('@') ? account.acct.split('@')[1] : instance;
+  return { account, instance: acctInstance };
 }
 
 async function fetchLatestStatus(instance, accountId) {
-  try {
-    const url = `https://${instance}/api/v1/accounts/${accountId}/statuses?limit=1&exclude_replies=true&exclude_reblogs=true`;
-    const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(TIMEOUT_MS) });
-    if (!res.ok) return null;
-    const arr = await res.json();
-    const status = Array.isArray(arr) ? arr[0] : null;
-    if (!status) return null;
-    return {
-      url: status.url || status.uri,
-      title: stripHtml(status.content)?.substring(0, 200) || null,
-      publishedAt: status.created_at,
-      views: null,
-      favourites: status.favourites_count || 0,
-      reblogs: status.reblogs_count || 0,
-      replies: status.replies_count || 0,
-      thumbnail: status.media_attachments?.[0]?.preview_url || null,
-    };
-  } catch {
-    return null;
-  }
+  const r = await jsonFetch(`https://${instance}/api/v1/accounts/${accountId}/statuses?limit=1&exclude_replies=true&exclude_reblogs=true`);
+  const status = Array.isArray(r.data) ? r.data[0] : null;
+  if (!status) return null;
+  return {
+    url: status.url || status.uri,
+    title: stripHtml(status.content)?.substring(0, 200) || null,
+    publishedAt: status.created_at,
+    views: null,
+    favourites: status.favourites_count || 0,
+    reblogs: status.reblogs_count || 0,
+    replies: status.replies_count || 0,
+    thumbnail: status.media_attachments?.[0]?.preview_url || null,
+  };
 }
 
-export default async function handler(req, res) {
-  const clientId = getClientIdentifier(req);
-  const rate = checkRateLimit(clientId, 'mastodon', { limit: 60, windowMs: 60_000 });
-  if (!rate.allowed) {
-    res.setHeader('Retry-After', Math.ceil(rate.resetIn / 1000));
-    return res.status(429).json({ error: 'Rate limit exceeded' });
-  }
+function json(body, init = {}) {
+  return new Response(JSON.stringify(body), {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
+      ...(init.headers || {}),
+    },
+  });
+}
 
-  const handle = req.query.handle;
-  if (!handle) return res.status(400).json({ error: 'Missing handle parameter' });
+export default async function handler(req) {
+  const url = new URL(req.url);
+  const handle = url.searchParams.get('handle');
+  if (!handle) return json({ error: 'Missing handle parameter' }, { status: 400 });
 
   const { username, instance } = parseHandle(handle);
-  if (!username || !instance) return res.status(400).json({ error: 'Invalid handle format' });
+  if (!username || !instance) return json({ error: 'Invalid handle format' }, { status: 400 });
 
-  const wantLatest = req.query.latest === '1' || req.query.full === '1';
-  const onlyLatest = req.query.latest === '1' && req.query.full !== '1';
+  const wantLatest = url.searchParams.get('latest') === '1' || url.searchParams.get('full') === '1';
+  const onlyLatest = url.searchParams.get('latest') === '1' && url.searchParams.get('full') !== '1';
 
   try {
     let lookup = await lookupAccount(username, instance);
@@ -143,9 +136,7 @@ export default async function handler(req, res) {
       const fallback = await federatedFallback(username, instance);
       if (fallback) lookup = { account: fallback.account, instance: fallback.instance };
     }
-    if (!lookup.account) {
-      return res.status(404).json({ error: 'Account not found' });
-    }
+    if (!lookup.account) return json({ error: 'Account not found' }, { status: 404 });
 
     const profile = normalizeAccount(lookup.account, lookup.instance);
 
@@ -155,12 +146,9 @@ export default async function handler(req, res) {
       if (latest) profile.latestPost = latest;
     }
 
-    // Edge cache: 5 min fresh, 1 hr SWR.
-    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
-
-    if (onlyLatest) return res.status(200).json({ latestPost: latest });
-    return res.status(200).json(profile);
+    if (onlyLatest) return json({ latestPost: latest });
+    return json(profile);
   } catch (err) {
-    return res.status(502).json({ error: 'Failed to reach Mastodon instance', detail: err.message });
+    return json({ error: 'Failed to reach Mastodon instance', detail: err.message }, { status: 502 });
   }
 }
