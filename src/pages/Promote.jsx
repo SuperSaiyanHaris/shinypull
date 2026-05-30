@@ -22,6 +22,12 @@ export default function Promote() {
   const { isAuthenticated } = useAuth();
   const [stats, setStats] = useState({ creators: 0, dailyVisitors: 12000 });
   const [topCreators, setTopCreators] = useState([]);
+  // Sold-out flags per tier — true when every reserved slot across every
+  // platform is currently filled. Drives the disabled "Sold out" state on
+  // the Basic / Premium CTAs so users can't fall through to a checkout that
+  // would fail validation in /account.
+  const [premiumSoldOut, setPremiumSoldOut] = useState(false);
+  const [basicSoldOut, setBasicSoldOut] = useState(false);
 
   useEffect(() => {
     supabase.from('creators').select('*', { count: 'exact', head: true })
@@ -29,9 +35,24 @@ export default function Promote() {
       .catch(() => {});
     // Fetch top 5 YouTube creators for the FeaturedListingPreview component
     // so the mockup shows real names, not fallbacks.
-    getRankedCreators({ platform: 'youtube', rankType: 'subscribers', limit: 5 })
+    getRankedCreators('youtube', 'subscribers', 5)
       .then((rows) => setTopCreators(rows || []))
       .catch(() => {});
+    // Sold-out check — premium caps at 2 per platform (×8 = 16 total).
+    // Basic capacity is huge (~98 slots × 8 platforms ≈ 784) so basic is
+    // realistically never sold out, but we check anyway in case it does.
+    const now = new Date().toISOString();
+    const PREMIUM_TOTAL = PLATFORM_COUNT * 2;
+    const BASIC_TOTAL = PLATFORM_COUNT * 98; // Top 500 fits 98 basic slots/platform
+    Promise.all([
+      supabase.from('featured_listings').select('id', { count: 'exact', head: true })
+        .eq('placement_tier', 'premium').eq('status', 'active').gt('active_until', now),
+      supabase.from('featured_listings').select('id', { count: 'exact', head: true })
+        .eq('placement_tier', 'basic').eq('status', 'active').gt('active_until', now),
+    ]).then(([{ count: p }, { count: b }]) => {
+      setPremiumSoldOut((p || 0) >= PREMIUM_TOTAL);
+      setBasicSoldOut((b || 0) >= BASIC_TOTAL);
+    }).catch(() => {});
   }, []);
 
   // CTA click handler: signed-in users go straight to the Listings tab.
@@ -83,14 +104,24 @@ export default function Promote() {
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <Link
-                  to={ctaHref} onClick={handleCtaClick}
-                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Get featured
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+                {premiumSoldOut && basicSoldOut ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="inline-flex items-center gap-2 px-7 py-3.5 bg-neutral-200 text-neutral-500 font-bold rounded-xl cursor-not-allowed select-none"
+                  >
+                    Sold out — check back soon
+                  </button>
+                ) : (
+                  <Link
+                    to={ctaHref} onClick={handleCtaClick}
+                    className="inline-flex items-center gap-2 px-7 py-3.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Get featured
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
                 <Link
                   to="/rankings"
                   className="inline-flex items-center gap-2 px-7 py-3.5 bg-white hover:bg-neutral-100 border border-neutral-300 text-neutral-800 font-semibold rounded-xl transition-all duration-200"
@@ -153,12 +184,18 @@ export default function Promote() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  to={ctaHref} onClick={handleCtaClick}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-600 group-hover:gap-3 transition-all"
-                >
-                  Get a Basic slot <ArrowRight className="w-4 h-4" />
-                </Link>
+                {basicSoldOut ? (
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-400 cursor-not-allowed select-none">
+                    Sold out — check back soon
+                  </span>
+                ) : (
+                  <Link
+                    to={ctaHref} onClick={handleCtaClick}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-600 group-hover:gap-3 transition-all"
+                  >
+                    Get a Basic slot <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
               </div>
             </motion.div>
 
@@ -191,12 +228,18 @@ export default function Promote() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  to={ctaHref} onClick={handleCtaClick}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-700 hover:text-amber-800 group-hover:gap-3 transition-all"
-                >
-                  Get a Premium slot <ArrowRight className="w-4 h-4" />
-                </Link>
+                {premiumSoldOut ? (
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-400 cursor-not-allowed select-none">
+                    Sold out — check back soon
+                  </span>
+                ) : (
+                  <Link
+                    to={ctaHref} onClick={handleCtaClick}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-700 hover:text-amber-800 group-hover:gap-3 transition-all"
+                  >
+                    Get a Premium slot <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
               </div>
             </motion.div>
           </div>
@@ -238,8 +281,7 @@ export default function Promote() {
             <div className="mt-14 sm:mt-16">
               <div className="text-center mb-8">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-600 mb-2">Live preview</p>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-neutral-900">This is exactly what your slot looks like.</h3>
-                <p className="mt-2 text-sm text-neutral-500">Pulled live from the actual YouTube rankings table.</p>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-neutral-900">This is what your slot looks like.</h3>
               </div>
               <div className="max-w-3xl mx-auto">
                 <FeaturedListingPreview topCreators={topCreators} showCtas={false} />
@@ -270,8 +312,8 @@ export default function Promote() {
                 a: 'Anytime, from the Listings tab in your account. Cancellation stops the next renewal. Your placement stays active through the end of the current billing period.',
               },
               {
-                q: 'What happens if all the slots are taken?',
-                a: 'Slots are first come, first served. Once Basic (5 slots) or Premium (3 slots) on a platform fills up, new sign-ups are queued. As soon as someone cancels or a listing expires, the next person in line is automatically promoted into the open slot. No manual waitlist, no negotiating. The queue adjusts itself.',
+                q: 'What happens if a slot is taken?',
+                a: 'Slots are first come, first served. When the slot you want is full, checkout is disabled for that tier until an opening frees up. The moment someone above you cancels or their listing expires, every lower placement automatically moves up one position and the next available slot opens for purchase. No manual waitlist.',
               },
             ].map((item) => (
               <div key={item.q} className="bg-white border border-neutral-200 rounded-xl p-5">
@@ -286,15 +328,29 @@ export default function Promote() {
         <section className="border-t border-neutral-200">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mb-3">Ready to get featured?</h2>
-            <p className="text-base text-neutral-500 mb-6 max-w-xl mx-auto">Most listings go live in under 60 seconds.</p>
-            <Link
-              to={ctaHref} onClick={handleCtaClick}
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5"
-            >
-              <Sparkles className="w-4 h-4" />
-              Start now
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            <p className="text-base text-neutral-500 mb-6 max-w-xl mx-auto">
+              {premiumSoldOut && basicSoldOut
+                ? 'All slots are currently filled. Check back soon — the queue moves the moment a slot opens.'
+                : 'Most listings go live in under 60 seconds.'}
+            </p>
+            {premiumSoldOut && basicSoldOut ? (
+              <button
+                type="button"
+                disabled
+                className="inline-flex items-center gap-2 px-7 py-3.5 bg-neutral-200 text-neutral-500 font-bold rounded-xl cursor-not-allowed select-none"
+              >
+                Sold out — check back soon
+              </button>
+            ) : (
+              <Link
+                to={ctaHref} onClick={handleCtaClick}
+                className="inline-flex items-center gap-2 px-7 py-3.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:-translate-y-0.5"
+              >
+                <Sparkles className="w-4 h-4" />
+                Start now
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
         </section>
       </div>

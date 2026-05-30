@@ -249,6 +249,41 @@ export default function Search() {
         if (channels.length > 0) {
           void persistSearchResults(channels);
         }
+      } else if (platform === 'mastodon') {
+        // Mastodon search is DB-first because (a) federated search across
+        // every instance is impractical and (b) instance APIs now require
+        // auth for resolve=true cross-instance lookups. We have ~1000
+        // creators seeded — fuzzy DB match handles the vast majority of
+        // queries. Direct handle resolution (user@instance) is a future
+        // enhancement that would require an Edge Function proxy.
+        const rows = await searchCreators(searchQuery, 'mastodon');
+        channels = (rows || []).map((c) => ({
+          platform: 'mastodon',
+          platformId: c.platform_id,
+          username: c.username,
+          displayName: c.display_name,
+          profileImage: c.profile_image,
+          description: c.description,
+          subscribers: c.subscribers || 0,
+          followers: c.subscribers || 0,
+          totalPosts: c.total_posts || 0,
+        }));
+      } else if (platform === 'rumble') {
+        // Rumble live-search is blocked (Cloudflare 403s our proxy IPs).
+        // DB-only search against the seeded catalog — 107 channels and
+        // growing via the discovery script.
+        const rows = await searchCreators(searchQuery, 'rumble');
+        channels = (rows || []).map((c) => ({
+          platform: 'rumble',
+          platformId: c.platform_id,
+          username: c.username,
+          displayName: c.display_name,
+          profileImage: c.profile_image,
+          description: c.description,
+          subscribers: c.subscribers || 0,
+          followers: c.subscribers || 0,
+          totalPosts: c.total_posts || 0,
+        }));
       }
       channels.sort((a, b) => searchScore(b, searchQuery) - searchScore(a, searchQuery));
       setResults(channels.slice(0, 25));

@@ -475,9 +475,16 @@ function PlatformRankings({ urlPlatform }) {
     for (let k = 0; k < 2; k++) {
       premiumQueue.push(premiumListings[k] || null);
     }
-    // Basic slots: same shape, 3 slots
+    // Basic queue length = however many slots fit in the visible ranking range.
+    // Slots sit at organic indexes 14, 19, 24, 29, ... → one slot every 5 rows
+    // starting at index 14. For Top 50 that's 8 slots, Top 100 = 18, Top 500 = 98.
+    // This ensures ghost "Your Creator Here" promos appear in every reserved
+    // basic slot on every page-size variant, not just the first 3.
+    const totalBasicSlots = sortedRankings.length >= 15
+      ? Math.floor((sortedRankings.length - 14) / 5) + 1
+      : 0;
     const basicQueue = [];
-    for (let k = 0; k < 3; k++) {
+    for (let k = 0; k < totalBasicSlots; k++) {
       basicQueue.push(basicListings[k] || null);
     }
 
