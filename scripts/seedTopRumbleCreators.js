@@ -170,8 +170,10 @@ async function fetchCategoryHandles(category, page) {
   const url = `${BASE}/browse/${category}${page > 1 ? `?page=${page}` : ''}`;
   try {
     const res = await fetch(url, { headers: FETCH_HEADERS, signal: AbortSignal.timeout(20000) });
-    if (!res.ok) return [];
+    // Rumble's edge returns HTTP 410 for /browse pages but serves the full HTML body anyway.
+    // Don't gate on res.ok — just try to parse whatever came back.
     const html = await res.text();
+    if (!html || html.length < 1000) return [];
     const seen = new Set();
     const out = [];
     // Rumble appends `?e9s=src_v1_clr` tracking params to channel hrefs, so
