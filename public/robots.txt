@@ -3,8 +3,15 @@ Allow: /
 Disallow: /api/
 Disallow: /blog/admin
 Disallow: /dashboard
+Disallow: /account
+Disallow: /reports
+Disallow: /reset-password
 Disallow: /auth
 Disallow: /signin
 Disallow: /signup
+Disallow: /live/
+
+# Live counter pages are transient real-time views — not useful in search.
+# Middleware also injects noindex on these for the meta-tag level.
 
 Sitemap: https://shinypull.com/sitemap.xml

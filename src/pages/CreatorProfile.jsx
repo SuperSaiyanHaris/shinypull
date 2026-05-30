@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { followCreator, unfollowCreator, isFollowing as checkIsFollowing, getFollowedCreators } from '../services/followService';
 import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/SEO';
+import StructuredData, { createPersonSchema, createBreadcrumbSchema } from '../components/StructuredData';
 import { analytics } from '../lib/analytics';
 import { formatNumber } from '../lib/utils';
 import { addRecentlyViewed } from '../lib/recentlyViewed';
@@ -781,6 +782,15 @@ export default function CreatorProfile() {
     },
   };
 
+  // Breadcrumb schema — gives Google the "Home > Rankings > Platform > Creator" path
+  // for richer search result snippets.
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: 'Home',         url: 'https://shinypull.com' },
+    { name: 'Rankings',     url: 'https://shinypull.com/rankings' },
+    { name: platformName,   url: `https://shinypull.com/rankings/${platform}` },
+    { name: creator.displayName, url: `https://shinypull.com/${platform}/${creator.username}` },
+  ]);
+
   return (
     <>
       <SEO
@@ -790,6 +800,7 @@ export default function CreatorProfile() {
         image={`https://shinypull.com/api/og?platform=${platform}&username=${encodeURIComponent(creator.username || username)}`}
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(profileSchema).replace(/<\/script>/gi, '<\\/script>') }} />
+      <StructuredData schema={breadcrumbSchema} />
 
       <div className="min-h-screen bg-[#fafafa]">
         {/* Hero banner — uses the creator's channel art as background with gradient fade.

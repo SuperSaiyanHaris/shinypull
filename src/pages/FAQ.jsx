@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Music } from 'lucide-react';
 import SEO from '../components/SEO';
+import StructuredData from '../components/StructuredData';
 
 const faqs = [
   {
@@ -13,7 +14,7 @@ const faqs = [
       },
       {
         q: 'Is ShinyPull free?',
-        a: 'Yes, the core features are completely free. Anyone can search creators, view their stats, browse rankings, and compare up to two creators at once without an account. Paid plans (Sub and Mod) unlock higher limits and extra features like CSV export, longer history, and more comparison slots.',
+        a: 'Yes, ShinyPull is free. Anyone can search creators, view their stats, browse rankings, and compare creators without an account. The only paid product is Featured Listings for businesses who want a sponsored slot in our rankings tables.',
       },
       {
         q: 'What is the Trending page?',
@@ -133,12 +134,25 @@ function FAQItem({ q, a }) {
 }
 
 export default function FAQ() {
+  // FAQPage schema unlocks rich-result accordion in Google search results.
+  // Flatten the categorized list into the schema's mainEntity array.
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.flatMap(cat => cat.questions).map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
+  };
+
   return (
     <>
       <SEO
         title="FAQ"
         description="Frequently asked questions about ShinyPull. Learn how we track creator stats, how often data updates, and how to add a creator."
       />
+      <StructuredData schema={faqSchema} />
 
       <div className="min-h-screen bg-[#fafafa]">
         {/* Hero */}
