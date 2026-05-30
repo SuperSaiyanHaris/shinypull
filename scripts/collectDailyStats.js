@@ -706,6 +706,11 @@ async function collectDailyStats() {
             latest_post_url: null,
             latest_post_thumbnail: null,
             latest_post_views: null,
+            // Stamp freshness so rankings can filter out instances that died.
+            // Without this, dead-but-once-seeded accounts (e.g. defunct
+            // sportsbots.xyz, climatenews-xyz.fly.dev) keep their last good
+            // follower count and pollute the top-of-Mastodon leaderboard.
+            last_verified_at: new Date().toISOString(),
           });
           console.log(`   ✅ ${creator.display_name}: ${stats.followers.toLocaleString()} followers`);
           successCount++;

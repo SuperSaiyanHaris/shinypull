@@ -563,6 +563,12 @@ node scripts/run-sql.js "$(cat my-migration.sql)"
 
 **Known quirk — DELETE/UPDATE via run-sql.js silently no-ops.** The Supabase Management API `/database/query` endpoint returns `OK (no rows returned)` for `DELETE`/`UPDATE` statements but does NOT actually mutate the rows. An agent (me) hit this on 2026-05-30 trying to clean Rumble dupes: `--yes-destroy "DELETE ..."` reported success three times in a row while the rows persisted. **For row-level CRUD, use the Supabase JS client with the service role key in a small ad-hoc script.** Only use `run-sql.js` for DDL (CREATE / ALTER / DROP) and read-only queries. If you delete creator rows, remember to cascade through `rankings_cache`, `user_saved_creators`, `featured_listings`, `stream_sessions`, and `creator_stats` (none of these have ON DELETE CASCADE on the creator FK).
 
+**Also note — `CREATE OR REPLACE FUNCTION` via `run-sql.js` shell wrapping is unreliable.** When the function body contains `$function$` quoting or DELETE statements, the shell-encoded SQL passed through `run-sql.js` sometimes lands at the API as a partially executed payload (DDL succeeds with 201, but the new body isn't what you sent). When updating stored procedures, write the full SQL to a temp file and POST it directly to `https://api.supabase.com/v1/projects/{ref}/database/query` instead of using `run-sql.js`.
+
+**Mastodon rankings quirk — Flipboard + dead instances inflate the leaderboard.** Two pollution sources to filter:
+  1. **Flipboard.com ActivityPub bridge.** Flipboard publishes its internal magazines as Mastodon-compatible accounts but reports its native Flipboard userbase as `followers_count` — e.g. `thenewsdesk@flipboard.com` reports 233M, which is ~100× the entire Mastodon userbase. The ranking refresh function filters `username NOT LIKE '%@flipboard.com'`.
+  2. **Dead instances and 404'd accounts.** Once-seeded accounts on instances that died (e.g. `climatenews-xyz.fly.dev`) or accounts that got deleted retain their last-good follower count in `creator_stats` and pollute rankings forever. Fix: `creators.last_verified_at` is stamped only on a 200 response. Rankings require `last_verified_at >= NOW() - INTERVAL '14 days'` for Mastodon. Daily collection refreshes the timestamp.
+
 **Important notes:**
 - `npx supabase db dump`, `db pull`, and `db diff` all require Docker (not installed) — do NOT use them
 - `npx supabase projects list` and `projects api-keys` work fine (Management API only)
