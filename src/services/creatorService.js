@@ -92,13 +92,15 @@ const _creatorByUsernameCache = new Map();
 const CREATOR_PROFILE_TTL = 5 * 60 * 1000; // 5 minutes
 
 async function _fetchCreatorByUsername(platform, username) {
-  // Multiple creators can share a username (e.g. MrBeast / MrBeast Gaming).
-  // Return the most recently updated one (likely the main/active channel).
+  // Case-insensitive exact match. Most platforms store usernames lowercase, but
+  // Rumble preserves the original case (Bongino vs bongino are both valid URL
+  // forms for the same channel). ILIKE without wildcards behaves as exact
+  // case-insensitive equality.
   const { data, error } = await supabase
     .from('creators')
     .select('*')
     .eq('platform', platform)
-    .eq('username', username.toLowerCase())
+    .ilike('username', username)
     .order('updated_at', { ascending: false })
     .limit(1);
   if (error && error.code !== 'PGRST116') throw error;
