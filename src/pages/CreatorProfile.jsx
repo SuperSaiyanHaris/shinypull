@@ -1126,6 +1126,29 @@ export default function CreatorProfile() {
               )}
             </div>
 
+            {/* "Awaiting first data point" banner —
+                Some creators are added via the lazy-hydration flow when a user
+                visits a profile URL for a brand-new account with 0 subs. The
+                creator row exists but the data-integrity guard refuses to write
+                a stats row with 0 subscribers, so the stat cards would show "0"
+                everywhere. This banner is a friendlier explanation than a zero. */}
+            {statsHistory.length === 0 && (creator.subscribers || creator.followers || 0) === 0 && (
+              <div className="mb-6 relative overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl p-5 sm:p-6">
+                <div className="pointer-events-none absolute -top-10 -right-10 w-32 h-32 bg-indigo-200/40 rounded-full blur-3xl" />
+                <div className="relative flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/30">
+                    <Clock className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-base font-bold text-neutral-900 mb-1">We just added this creator to our tracker.</h3>
+                    <p className="text-sm text-neutral-700 leading-relaxed">
+                      Stats will appear once {platformDisplayNames[platform] || platform} reports the first data point. Daily snapshots start as soon as the account has any followers.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Stats Grid */}
             <div className={`grid gap-2 sm:gap-4 mb-6 ${
               platform === 'tiktok' ? 'grid-cols-3'
