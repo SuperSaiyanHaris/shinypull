@@ -39,6 +39,12 @@ Our creator stats are the entire reason this site exists. Every chart and table 
 - All dates use America/New_York timezone via `getTodayLocal()` helper
 - This prevents future-date issues when UTC is ahead of local time
 
+**RANKINGS CACHE REFRESH — per-platform, NOT bulk:**
+- `scripts/refreshRankingsCache.js` calls `refresh_rankings_cache_platform(p_platform text)` once per platform sequentially.
+- The OLD bulk function `refresh_rankings_cache()` looped all 6 platforms in one transaction and routinely hit PostgREST's 8s request timeout, silently failing every refresh. Don't go back to that pattern.
+- `service_role` has `statement_timeout` raised to 60s (set via `ALTER ROLE service_role SET statement_timeout = '60s'` on 2026-05-30). Required because YouTube (5.5K creators) and Twitch (13K) take 30-50s to refresh.
+- The script exits with code 1 if any platform fails — so failures are visible in the Actions tab instead of silent like before.
+
 **SECTION DIVIDERS — NO GRADIENT FADES:**
 - The user removed all gradient section dividers (`bg-gradient-to-b from-X to-Y` between sections) months ago and does NOT want them re-added. If a transition between light and dark sections feels harsh, the fix is to add a proper section header (eyebrow + title) above the next section, NOT a gradient fade.
 - Hard color edges between sections are intentional. They read as deliberate when content hierarchy is clear.

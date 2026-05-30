@@ -14,7 +14,8 @@ const LASTFM_API_KEY = process.env.LASTFM_CLIENT_ID;
 // Batch sizes
 const YOUTUBE_BATCH_SIZE = 50;  // YouTube allows up to 50 channel IDs per request
 const TWITCH_BATCH_SIZE = 100;  // Twitch allows up to 100 logins per request
-const TWITCH_FOLLOWER_DELAY_MS = 150;  // Sequential delay between follower requests (~6/s, under 800/min Twitch limit)
+const TWITCH_FOLLOWER_DELAY_MS = 80;   // 80ms = ~12.5/s, just under Twitch's 800/min app-token cap.
+                                        // (Was 150ms which left half the budget unused — runtime was 1h+.)
 const KICK_BATCH_SIZE = 50;    // Kick allows up to 50 slugs per request
 const BLUESKY_BATCH_SIZE = 25;  // AT Protocol getProfiles allows up to 25 actors per request
 

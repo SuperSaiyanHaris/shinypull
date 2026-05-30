@@ -628,7 +628,7 @@ export default function Compare() {
                         values={filledCreators.map(c => {
                           const PlatformIcon = platformConfig[c.platform]?.icon;
                           return (
-                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm ${platformConfig[c.platform]?.bg} ${platformConfig[c.platform]?.color}`}>
+                            <span key={c.platformId || c.platform} className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-sm ${platformConfig[c.platform]?.bg} ${platformConfig[c.platform]?.color}`}>
                               {PlatformIcon && <PlatformIcon className="w-4 h-4" />}
                               {c.platform}
                             </span>
@@ -690,7 +690,7 @@ export default function Compare() {
                           const diff = data?.diff7Day || 0;
                           const GrowthIcon = getGrowthIcon(percentage);
                           return (
-                            <span className={`inline-flex flex-col items-center gap-0.5 ${getGrowthColor(percentage)}`}>
+                            <span key={c.platformId || c.platform} className={`inline-flex flex-col items-center gap-0.5 ${getGrowthColor(percentage)}`}>
                               <span className="inline-flex items-center gap-1">
                                 <GrowthIcon className="w-3.5 h-3.5" />
                                 {diff !== 0 ? `${diff > 0 ? '+' : ''}${formatNumber(Math.abs(diff))}` : formatGrowth(percentage)}
@@ -710,7 +710,7 @@ export default function Compare() {
                           const diff = data?.diff30Day || 0;
                           const GrowthIcon = getGrowthIcon(percentage);
                           return (
-                            <span className={`inline-flex flex-col items-center gap-0.5 ${getGrowthColor(percentage)}`}>
+                            <span key={c.platformId || c.platform} className={`inline-flex flex-col items-center gap-0.5 ${getGrowthColor(percentage)}`}>
                               <span className="inline-flex items-center gap-1">
                                 <GrowthIcon className="w-3.5 h-3.5" />
                                 {diff !== 0 ? `${diff > 0 ? '+' : ''}${formatNumber(Math.abs(diff))}` : formatGrowth(percentage)}

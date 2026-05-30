@@ -26,7 +26,8 @@
     "discover:tiktok": "node scripts/discoverTikTokCreators.js",
     "refresh:tiktok": "node scripts/refreshTikTokProfiles.js",
     "refresh:rankings": "node scripts/refreshRankingsCache.js",
-    "generate:blog": "node scripts/generateBlogDraft.js"
+    "generate:blog": "node scripts/generateBlogDraft.js",
+    "lint": "eslint src/"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -43,13 +44,18 @@
     "recharts": "^2.15.4",
     "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
-    "stripe": "^20.4.0",
-    "vaul": "^1.1.2"
+    "stripe": "^20.4.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "dotenv": "^17.2.3",
+    "eslint": "^9.39.4",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.6.0",
     "pg": "^8.18.0",
     "postcss": "^8.5.13",
     "resend": "^6.9.2",

@@ -142,8 +142,11 @@ async function generateSitemap() {
       urls.push({
         url: `/${creator.platform}/${creator.username}`,
         lastmod: creator.updated_at,
-        changefreq: 'daily',
-        priority: 0.7,
+        // Profile pages change at most daily but for 24K URLs Google interprets
+        // "daily" as a crawl request we can't satisfy. "weekly" + priority 0.5
+        // signals these are long-tail and not high-priority for re-crawl.
+        changefreq: 'weekly',
+        priority: 0.5,
       });
     });
   }
