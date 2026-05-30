@@ -160,10 +160,20 @@ export default function Home() {
         {/* ============== CINEMATIC HERO ==============
             Full-bleed hero — section min-height ensures the bg image + left stack always have room.
             Hard bottom edge (no gradient fade) per project preference. */}
-        <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white md:min-h-[900px]">
-          {/* Desktop only: full-bleed photo bg. Mobile uses the solid #0a0a0f section bg for a cleaner look. */}
+        <section className="relative isolate overflow-hidden grain-dark bg-[#0a0a0f] text-white min-h-[720px] md:min-h-[900px]">
+          {/* Background photo — two crops served via show/hide so neither
+              orientation gets stretched. Mobile asset is a tall/portrait crop
+              matched to the section's min-height; desktop is the wide hero.
+              object-center keeps the focal point (the rising chart) inside
+              the visible viewport on both. */}
           <img
-            src="/hero-bg.jpeg"
+            src="/hero-bg-mobile2.jpeg"
+            alt=""
+            aria-hidden="true"
+            className="block md:hidden absolute inset-0 w-full h-full object-cover object-center opacity-90"
+          />
+          <img
+            src="/hero-bg2.jpeg"
             alt=""
             aria-hidden="true"
             className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-90"
