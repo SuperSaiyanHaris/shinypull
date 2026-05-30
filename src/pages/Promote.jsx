@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import FeaturedListingPreview from '../components/FeaturedListingPreview';
 import { getRankedCreators } from '../services/creatorService';
+import { PLATFORM_COUNT } from '../lib/constants';
 
 /**
  * /promote, public landing page for Featured Listings.
@@ -102,7 +103,7 @@ export default function Promote() {
               <div className="mt-12 grid grid-cols-3 max-w-2xl mx-auto rounded-2xl border border-neutral-200 bg-white/60 backdrop-blur-sm overflow-hidden">
                 {[
                   { label: 'Creators tracked', value: stats.creators, format: 'number' },
-                  { label: 'Platforms covered', value: 6, format: 'number' },
+                  { label: 'Platforms covered', value: PLATFORM_COUNT, format: 'number' },
                   { label: 'Pages per day', value: stats.dailyVisitors, format: 'number' },
                 ].map((s, i) => (
                   <div key={s.label} className={`p-4 sm:p-6 text-center ${i !== 2 ? 'border-r border-neutral-200' : ''}`}>
@@ -210,7 +211,7 @@ export default function Promote() {
             </div>
             <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {[
-                { Icon: Users,      title: 'Pick a creator',       body: 'Search any creator across our 8 platforms. If they\'re tracked here, they\'re eligible.', accent: 'from-indigo-500 to-purple-600', shadow: 'shadow-indigo-500/30' },
+                { Icon: Users,      title: 'Pick a creator',       body: `Search any creator across our ${PLATFORM_COUNT} platforms. If they're tracked here, they're eligible.`, accent: 'from-indigo-500 to-purple-600', shadow: 'shadow-indigo-500/30' },
                 { Icon: Megaphone,  title: 'Choose your slot',     body: 'Basic ($49) for steady visibility starting at rank 15. Premium ($149) for top-of-page placement.', accent: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/30' },
                 { Icon: TrendingUp, title: 'Live in minutes',      body: 'Stripe Checkout. Confirmation, then your creator appears on the live rankings page right away.', accent: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/30' },
               ].map((step, i) => (

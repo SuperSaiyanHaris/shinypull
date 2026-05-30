@@ -256,23 +256,51 @@ function RankingsOverview() {
                         const items = [];
 
                         const pushPremiumSlot = (slotKey, advertiser) => {
-                          if (!advertiser) return; // No empty placeholder rows — only render when sold
-                          const c = advertiser.creators;
-                          items.push(
-                            <Link
-                              key={slotKey}
-                              to={`/${c?.platform}/${c?.username}`}
-                              className="flex items-center gap-3 px-5 py-3 bg-amber-50 hover:bg-amber-100 border-y border-amber-200/60 transition-colors group"
-                            >
-                              <span className="inline-flex items-center justify-center gap-0.5 px-1.5 h-6 rounded-md text-[10px] font-bold flex-shrink-0 bg-amber-200 border border-amber-300 text-amber-900" title="Premium featured listing">
-                                <span className="text-[9px]">★</span>Ad
-                              </span>
-                              <CreatorAvatar src={c?.profile_image} name={c?.display_name} size="sm" rounded="rounded-lg" />
-                              <div className="min-w-0 flex-1">
-                                <p className="text-sm font-semibold text-neutral-900 truncate group-hover:text-amber-700 transition-colors">{c?.display_name}</p>
-                              </div>
-                            </Link>
-                          );
+                          if (advertiser) {
+                            // Sold slot — render the buyer's creator
+                            const c = advertiser.creators;
+                            items.push(
+                              <Link
+                                key={slotKey}
+                                to={`/${c?.platform}/${c?.username}`}
+                                className="flex items-center gap-3 px-5 py-3 bg-amber-50 hover:bg-amber-100 border-y border-amber-200/60 transition-colors group"
+                              >
+                                <span className="inline-flex items-center justify-center gap-0.5 px-1.5 h-6 rounded-md text-[10px] font-bold flex-shrink-0 bg-amber-200 border border-amber-300 text-amber-900" title="Premium featured listing">
+                                  <span className="text-[9px]">★</span>Ad
+                                </span>
+                                <CreatorAvatar src={c?.profile_image} name={c?.display_name} size="sm" rounded="rounded-lg" />
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-semibold text-neutral-900 truncate group-hover:text-amber-700 transition-colors">{c?.display_name}</p>
+                                </div>
+                              </Link>
+                            );
+                          } else {
+                            // Unsold slot — ghost "Your Creator Here" row that
+                            // promotes the product on every rankings page. Auto-
+                            // replaced the moment the slot sells (queue logic).
+                            items.push(
+                              <Link
+                                key={slotKey}
+                                to="/promote"
+                                className="flex items-center gap-3 px-5 py-3 bg-amber-50/60 hover:bg-amber-50 border-y border-dashed border-amber-300 transition-colors group relative overflow-hidden"
+                              >
+                                <div className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-amber-200/40 to-transparent animate-marquee" />
+                                <span className="inline-flex items-center justify-center gap-0.5 px-1.5 h-6 rounded-md text-[10px] font-bold flex-shrink-0 bg-amber-200 border border-amber-300 text-amber-900" title="Premium featured listing available">
+                                  <span className="text-[9px]">★</span>Ad
+                                </span>
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-xs font-extrabold flex-shrink-0 shadow shadow-amber-500/20">
+                                  ★
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-semibold text-neutral-900 truncate group-hover:text-amber-700 transition-colors">Your Creator Here</p>
+                                  <p className="text-[10px] text-amber-700 font-semibold uppercase tracking-wider">Premium slot available</p>
+                                </div>
+                                <span className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-amber-700 group-hover:gap-2 transition-all whitespace-nowrap">
+                                  Claim <ArrowRight className="w-3 h-3" />
+                                </span>
+                              </Link>
+                            );
+                          }
                         };
 
                         creators.forEach((creator, index) => {

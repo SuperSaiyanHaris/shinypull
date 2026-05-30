@@ -21,6 +21,7 @@ import CreatorAvatar from '../components/CreatorAvatar';
 import CountUp from '../components/CountUp';
 import Sparkline from '../components/Sparkline';
 import FeaturedListingPreview from '../components/FeaturedListingPreview';
+import { PLATFORM_COUNT } from '../lib/constants';
 
 const PLATFORMS = [
   { id: 'youtube', name: 'YouTube', Icon: Youtube,     accent: '#ef4444', tone: 'red',     gradient: 'from-red-500 to-rose-600',          shadow: 'shadow-red-500/25',     hoverShadow: 'group-hover:shadow-red-500/40',     blurb: 'Subscribers · views · earnings' },
@@ -62,7 +63,7 @@ export default function Home() {
   }, []);
 
   // Marquee = YouTube top 20 + Twitch top 20, shuffled. (User: only these two platforms in ticker.)
-  // topByPlatform = #1 creator on each of the 6 platforms — rotated through the floating card.
+  // topByPlatform = #1 creator on each platform we track — rotated through the floating card.
   const [marqueeCreators, setMarqueeCreators] = useState([]);
   const [topByPlatform, setTopByPlatform] = useState([]);
   const [topPlatformIdx, setTopPlatformIdx] = useState(0);
@@ -336,7 +337,7 @@ export default function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                 </span>
-                <span className="text-[11px] uppercase tracking-wider font-bold text-emerald-300">Live across 8 platforms</span>
+                <span className="text-[11px] uppercase tracking-wider font-bold text-emerald-300">Live across {PLATFORM_COUNT} platforms</span>
               </motion.div>
 
               {/* Rotating #1 platform card — enlarged */}
@@ -713,7 +714,7 @@ export default function Home() {
               {[
                 { label: 'Creators tracked',  value: liveStats.creators ?? 0 },
                 { label: 'Daily data points', value: liveStats.dataPoints ?? 0 },
-                { label: 'Platforms',         value: 8 },
+                { label: 'Platforms',         value: PLATFORM_COUNT },
               ].map((s, i) => (
                 <div key={s.label} className={`p-4 sm:p-5 text-center ${i !== 2 ? 'border-r border-neutral-200' : ''}`}>
                   <p className="text-xl sm:text-2xl font-extrabold text-neutral-900 tabular-nums">

@@ -116,10 +116,33 @@ export const BLOG_CATEGORIES = [
   'Rankings',
 ];
 
-// Platform identifiers
+// Platform identifiers — single source of truth.
+//
+// When adding a new platform, append its id here. Anywhere in the codebase
+// that displays a platform count should import PLATFORM_COUNT instead of
+// hardcoding 6/7/8/etc. Stale counts have shipped to production three times
+// because the number was hardcoded in two separate places.
+export const PLATFORM_IDS = [
+  'youtube',
+  'tiktok',
+  'twitch',
+  'kick',
+  'bluesky',
+  'music',
+  'mastodon',
+  'rumble',
+];
+
+export const PLATFORM_COUNT = PLATFORM_IDS.length;
+
+// Legacy enum (kept for backward compat — prefer PLATFORM_IDS for iteration)
 export const PLATFORMS = {
   YOUTUBE: 'youtube',
+  TIKTOK: 'tiktok',
   TWITCH: 'twitch',
   KICK: 'kick',
-  TIKTOK: 'tiktok',
+  BLUESKY: 'bluesky',
+  MUSIC: 'music',
+  MASTODON: 'mastodon',
+  RUMBLE: 'rumble',
 };

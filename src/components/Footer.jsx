@@ -46,7 +46,7 @@ export default function Footer() {
   return (
     <footer className="bg-white border-t border-neutral-200 mt-auto">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-10">
 
           {/* Brand */}
           <div className="col-span-2 md:col-span-2 md:pr-8">
@@ -86,10 +86,17 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Platforms */}
-          <div>
+          {/* Platforms — laid out in a 2-column grid (column-major flow) so the
+              list reads top-to-bottom in each column instead of a tall single
+              stack. col-span-2 of the outer 6-col grid gives the inner columns
+              breathing room. Adding a new platform automatically extends both
+              columns evenly via gridTemplateRows. */}
+          <div className="col-span-2 md:col-span-2">
             <h3 className="text-xs font-semibold mb-4 text-neutral-900 uppercase tracking-wider">Platforms</h3>
-            <ul className="space-y-2.5 text-sm">
+            <ul
+              className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm"
+              style={{ gridAutoFlow: 'column', gridTemplateRows: `repeat(${Math.ceil(PLATFORM_LINKS.length / 2)}, minmax(0, 1fr))` }}
+            >
               {PLATFORM_LINKS.map(([to, label, Icon]) => (
                 <li key={to}>
                   <Link to={to} className="inline-flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition-colors">
