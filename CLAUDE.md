@@ -561,6 +561,8 @@ node scripts/run-sql.js "$(cat my-migration.sql)"
 
 **NEVER write `.ps1` files to the repo** to extract the token manually. That's what `run-sql.js` is for. The repo has `*.ps1` in `.gitignore` as a safeguard.
 
+**Known quirk — DELETE/UPDATE via run-sql.js silently no-ops.** The Supabase Management API `/database/query` endpoint returns `OK (no rows returned)` for `DELETE`/`UPDATE` statements but does NOT actually mutate the rows. An agent (me) hit this on 2026-05-30 trying to clean Rumble dupes: `--yes-destroy "DELETE ..."` reported success three times in a row while the rows persisted. **For row-level CRUD, use the Supabase JS client with the service role key in a small ad-hoc script.** Only use `run-sql.js` for DDL (CREATE / ALTER / DROP) and read-only queries. If you delete creator rows, remember to cascade through `rankings_cache`, `user_saved_creators`, `featured_listings`, `stream_sessions`, and `creator_stats` (none of these have ON DELETE CASCADE on the creator FK).
+
 **Important notes:**
 - `npx supabase db dump`, `db pull`, and `db diff` all require Docker (not installed) — do NOT use them
 - `npx supabase projects list` and `projects api-keys` work fine (Management API only)
