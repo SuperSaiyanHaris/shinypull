@@ -15,7 +15,7 @@ ShinyPull is a social media analytics platform (similar to SocialBlade) that tra
 Our creator stats are the entire reason this site exists. Every chart and table users see is powered directly by the `creator_stats` table. A single corrupt row can trash a chart by causing wild swings (e.g., 630K → 0 → 630K). The rules below are non-negotiable:
 
 - **NEVER DELETE CREATORS OR ANY CREATOR-RELATED DATA. EVER.** This includes the `creators` table, `creator_stats`, `stream_sessions`, `viewer_samples`, `rankings_cache` row regenerations are fine but the underlying source tables are sacred. A creator with 0 followers, 0 stats, or no recent activity is NOT junk — it's a record we'll fill in when the API recovers, when the discovery script finds them again, or when a user submits a request. Small/inactive creators stay. If an agent ever proposes "cleaning up" small or inactive creators, the answer is no. Investigate WHY they're in that state instead. (Don't ever ask either — the answer is permanently no.)
-- **NEVER DELETE TABLE ROWS WITHOUT EXPLICIT USER CONSENT. EVER.** This is rule zero. On 2026-05-28 an agent (me) destroyed 383K rows of irreplaceable historical creator stats by running a "cleanup" DELETE without asking. Supabase Free tier has NO backups and NO PITR. The data is permanently gone. Never run `DELETE`, `TRUNCATE`, `DROP TABLE`, or `ALTER TABLE ... DROP` against any production table without first telling the user exactly what rows will be removed and getting a clear yes. `scripts/run-sql.js` blocks destructive statements unless `--yes-destroy` is passed as a separate argument. **Do not remove that safeguard.** If you think a table has junk in it, ASK FIRST and describe what you would remove.
+- **NEVER DELETE TABLE ROWS WITHOUT EXPLICIT USER CONSENT. EVER.** This is rule zero. On 2026-05-28 an agent (me) destroyed 383K rows of irreplaceable historical creator stats by running a "cleanup" DELETE without asking. (As of 2026-05-30 we're on Supabase **Pro** which provides daily automated backups with 7-day retention, but a same-day mistake is still recoverable only by restoring the whole DB and rolling back any legitimate work since the last backup. The rule stands.) Never run `DELETE`, `TRUNCATE`, `DROP TABLE`, or `ALTER TABLE ... DROP` against any production table without first telling the user exactly what rows will be removed and getting a clear yes. `scripts/run-sql.js` blocks destructive statements unless `--yes-destroy` is passed as a separate argument. **Do not remove that safeguard.** If you think a table has junk in it, ASK FIRST and describe what you would remove.
 - **Never write 0 or null for subscriber/follower counts.** A 0 means the API call failed — it is NOT a real value. Always validate API responses before saving.
 - **Always check `response.ok` before reading API data.** Never do `data.total || 0` as a fallback — throw an error instead so the calling code can skip the write.
 - **`aggregateHoursWatched.js` and similar secondary scripts must use `.update()`, never `.upsert()`.** If the primary stats collection failed and no row exists for today, a secondary script must not create a row with NULL subscribers. Use `update` — if no row exists, nothing happens (correct behavior).
@@ -358,6 +358,84 @@ SPOTIFY_CLIENT_SECRET=<key>
 ```
 
 Scripts use `dotenv` to load `.env` automatically.
+
+## Supabase Pro (active since 2026-05-30)
+
+We're on the **Pro** plan. The features below are now available — choose the right one before adding more Vercel functions or GitHub Actions workflows.
+
+### What's actually new vs Free
+
+| Capability | Free (old) | Pro (now) |
+|---|---|---|
+| Database storage | 500 MB | 8 GB |
+| File storage | 1 GB | 100 GB |
+| Egress | 5 GB/mo | 250 GB/mo |
+| Auto backups | none | daily, 7-day retention |
+| Point-in-time recovery | no | add-on available |
+| Realtime messages | 2M/mo | unlimited |
+| Edge Function invocations | 500K/mo | 2M/mo |
+| Project auto-pause | yes (1 wk idle) | never |
+
+### `pg_cron` + `pg_net` — already installed
+
+```sql
+SELECT cron.schedule(
+  'refresh-rankings-cache',
+  '15 */6 * * *',  -- every 6 hours, at minute 15
+  $$ SELECT public.refresh_rankings_cache() $$
+);
+```
+
+For HTTP calls (e.g. trigger a Supabase Edge Function on a schedule):
+```sql
+SELECT cron.schedule(
+  'sync-something',
+  '0 */4 * * *',
+  $$ SELECT net.http_post(
+       url := 'https://ziiqqbfcncjdewjkbvyq.supabase.co/functions/v1/my-edge-function',
+       headers := jsonb_build_object('Authorization', 'Bearer ' || current_setting('app.service_role_key')),
+       body := '{}'::jsonb
+     ) $$
+);
+```
+List jobs: `SELECT * FROM cron.job;`. Cancel: `SELECT cron.unschedule('jobname');`. Schedules use standard cron syntax. Jobs run in UTC.
+
+### When to use which runtime
+
+This is the decision tree for new scheduled work or new endpoints. Apply it before adding to either `api/` or `.github/workflows/`.
+
+**Pure DB work (SQL only, < 60s): use `pg_cron`.**
+Examples: `refresh_rankings_cache`, table-level aggregations, cleanup of expired `featured_listings`. No Node, no GitHub Actions overhead, no Vercel slot. Runs inside Postgres so it shares the same transaction guarantees as everything else.
+
+**HTTP proxy or scraper that returns JSON (< 50s, no npm deps Deno can't handle): use a Supabase Edge Function.**
+Edge Functions are Deno-based and **don't count against Vercel Hobby's 12-function cap**. This is the escape valve when we'd otherwise hit the cap and have to convert a Vercel function to Edge runtime as we did for `api/mastodon.js`. New scrapers (Rumble-style) and new platform proxies (Twitch/Kick/YouTube/Last.fm style) should go here unless they need a Node-only library. Deploy with `supabase functions deploy NAME`. Call as `https://ziiqqbfcncjdewjkbvyq.supabase.co/functions/v1/NAME`. Free invocation budget is 2M/mo on Pro.
+
+**Anything that needs `@vercel/og`, Stripe webhook raw-body verification, or @vercel/* SDKs: stay on Vercel.**
+Concretely: `api/og.jsx`, `api/stripe-webhook.js`. These will never move.
+
+**Long-running batch jobs (> 60s, heavy Node deps): stay on GitHub Actions.**
+The TikTok refresh, daily stats collection, stream monitors, and creator discovery all run for several minutes and depend on `@supabase/supabase-js` + a lot of `fetch`. Edge Functions cap each invocation at 60s (150s on Pro for newer regions), which makes them a bad fit. GitHub Actions on a public repo is free and effectively unlimited for us.
+
+**Polling user-generated state (creator requests, contact form submissions): use Database Webhooks instead.**
+Pro exposes Database Webhooks — `INSERT`/`UPDATE`/`DELETE` on a table can fire an Edge Function or HTTP endpoint immediately. Replace `process-creator-requests.yml` (currently polls every 6 hours) with a webhook on `creator_requests` → Edge Function. Faster response, no quota burn.
+
+### Vercel function cap budget
+
+Hobby plan = 12 Node serverless functions. Edge runtime functions also count. As of 2026-05-30 we have 14 files in `api/` (one is `_ratelimit.js` shared helper, and `api/mastodon.js` is forced to Edge runtime because we'd otherwise be over). If we add a 13th Node function the deploy fails silently — the GitHub deployment status flips to "failure" with only `Deployment has failed` as the message. **Before adding anything to `api/`, ask: can this be a Supabase Edge Function instead?** Almost always the answer is yes.
+
+Files that should migrate to Supabase Edge Functions next time they're touched:
+- `api/rumble.js` (HTML scraper proxy — Deno handles fetch fine)
+- `api/twitch.js`, `api/kick.js`, `api/youtube.js`, `api/lastfm.js` (all stateless API proxies)
+- `api/image-proxy.js` (pure pass-through)
+
+That migration frees 5 Vercel slots and removes the cap pressure for a long time.
+
+### Other Pro features worth knowing
+
+- **Supabase Vault** — encrypted secrets table. If we ever store per-creator API tokens (e.g. user-provided YouTube OAuth) we put them here, not in `users.*` columns.
+- **Storage with image transformations** — `?width=400&height=400&resize=cover` on storage URLs. Useful if we ever host custom assets (right now all avatars are hot-linked from the platform).
+- **Read replicas (Team+)** — not us yet, but listed for future awareness.
+- **Foreign Data Wrappers (`wrappers` ext)** — can query external APIs from SQL (Stripe, ClickHouse, etc.). Probably overkill but available.
 
 ## GitHub Actions
 
