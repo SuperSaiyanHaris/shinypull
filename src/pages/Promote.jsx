@@ -9,6 +9,8 @@ import { useAuth } from '../contexts/AuthContext';
 import CountUp from '../components/CountUp';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import FeaturedListingPreview from '../components/FeaturedListingPreview';
+import { getRankedCreators } from '../services/creatorService';
 
 /**
  * /promote, public landing page for Featured Listings.
@@ -18,10 +20,16 @@ import { supabase } from '../lib/supabase';
 export default function Promote() {
   const { isAuthenticated } = useAuth();
   const [stats, setStats] = useState({ creators: 0, dailyVisitors: 12000 });
+  const [topCreators, setTopCreators] = useState([]);
 
   useEffect(() => {
     supabase.from('creators').select('*', { count: 'exact', head: true })
       .then(r => setStats((s) => ({ ...s, creators: r.count || 0 })))
+      .catch(() => {});
+    // Fetch top 5 YouTube creators for the FeaturedListingPreview component
+    // so the mockup shows real names, not fallbacks.
+    getRankedCreators({ platform: 'youtube', rankType: 'subscribers', limit: 5 })
+      .then((rows) => setTopCreators(rows || []))
       .catch(() => {});
   }, []);
 
@@ -202,7 +210,7 @@ export default function Promote() {
             </div>
             <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {[
-                { Icon: Users,      title: 'Pick a creator',       body: 'Search any creator across our 6 platforms. If they\'re tracked here, they\'re eligible.', accent: 'from-indigo-500 to-purple-600', shadow: 'shadow-indigo-500/30' },
+                { Icon: Users,      title: 'Pick a creator',       body: 'Search any creator across our 8 platforms. If they\'re tracked here, they\'re eligible.', accent: 'from-indigo-500 to-purple-600', shadow: 'shadow-indigo-500/30' },
                 { Icon: Megaphone,  title: 'Choose your slot',     body: 'Basic ($49) for steady visibility starting at rank 15. Premium ($149) for top-of-page placement.', accent: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/30' },
                 { Icon: TrendingUp, title: 'Live in minutes',      body: 'Stripe Checkout. Confirmation, then your creator appears on the live rankings page right away.', accent: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/30' },
               ].map((step, i) => (
@@ -222,6 +230,19 @@ export default function Promote() {
                   <p className="text-sm text-neutral-500 leading-relaxed">{step.body}</p>
                 </motion.div>
               ))}
+            </div>
+
+            {/* What you get — same browser-mockup preview as the home page so
+                buyers see the exact slot they're paying for before checkout. */}
+            <div className="mt-14 sm:mt-16">
+              <div className="text-center mb-8">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-600 mb-2">Live preview</p>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-neutral-900">This is exactly what your slot looks like.</h3>
+                <p className="mt-2 text-sm text-neutral-500">Pulled live from the actual YouTube rankings table.</p>
+              </div>
+              <div className="max-w-3xl mx-auto">
+                <FeaturedListingPreview topCreators={topCreators} showCtas={false} />
+              </div>
             </div>
           </div>
         </section>

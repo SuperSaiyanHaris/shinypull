@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown, Megaphone } from 'lucide-react';
+import { Youtube, Twitch, TrendingUp, Users, Eye, Trophy, Info, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown, Megaphone, ArrowRight } from 'lucide-react';
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
@@ -428,53 +428,85 @@ function PlatformRankings({ urlPlatform }) {
     });
   }, [rankings, sortColumn, sortDirection]);
 
-  // Inject premium slots between ranks 4-5 and 9-10, basic slots from rank 15 every 5.
-  // Ghost placeholders fill empty premium slots to promote the product.
-  // If a slot-holder cancels, the next advertiser automatically moves up.
+  // Inject sponsored slots into the organic ranking list:
+  //   Premium: 2 slots reserved, between ranks 4-5 and 9-10
+  //   Basic:   3 slots reserved, every 5 rows starting at organic index 14
+  //
+  // When a slot is SOLD: render the buyer's creator with the Ad badge.
+  // When a slot is UNSOLD: render a ghost "Your Creator Here" row that links
+  //   to /promote. This advertises the product on every rankings page and
+  //   gets seamlessly replaced the moment someone buys (queue auto-promotes).
+  const PREMIUM_SLOT_PRICE = '$149/mo';
+  const BASIC_SLOT_PRICE = '$49/mo';
   const displayList = useMemo(() => {
     const premiumListings = sponsoredListings.filter(l => l.placement_tier === 'premium');
     const basicListings = sponsoredListings.filter(l => l.placement_tier !== 'premium');
 
+    // Build a flat queue of premium slot fills (real listing OR ghost) of length 2
+    const premiumQueue = [];
+    for (let k = 0; k < 2; k++) {
+      premiumQueue.push(premiumListings[k] || null);
+    }
+    // Basic slots: same shape, 3 slots
+    const basicQueue = [];
+    for (let k = 0; k < 3; k++) {
+      basicQueue.push(basicListings[k] || null);
+    }
+
+    const makeSponsored = (listing, isPremium, slotIndex) => {
+      if (listing) {
+        const c = listing.creators || {};
+        return {
+          ...c,
+          isSponsored: true,
+          isPremium,
+          listingId: listing.id,
+          display_name: c.display_name,
+          username: c.username,
+          profile_image: c.profile_image,
+          platform: c.platform,
+        };
+      }
+      // Ghost placeholder — same shape so the row renderer handles both
+      return {
+        isSponsored: true,
+        isPremium,
+        isGhost: true,
+        listingId: `ghost-${isPremium ? 'premium' : 'basic'}-${slotIndex}`,
+        display_name: 'Your Creator Here',
+        username: null,
+        profile_image: null,
+        platform: selectedPlatform,
+        slotPrice: isPremium ? PREMIUM_SLOT_PRICE : BASIC_SLOT_PRICE,
+      };
+    };
+
     const result = [];
     let premiumIdx = 0;
     let basicIdx = 0;
-    let nextBasicSlot = 14; // 0-indexed: inject before organic index 14 (between rank 14 and 15)
+    let nextBasicSlot = 14; // organic index where the first basic slot drops in
 
-    // Inject paid slots ONLY when sold. No ghost placeholders — empty rows in a
-    // ranked table read as broken or amateur. Active listings appear in their reserved slot.
     for (let i = 0; i < sortedRankings.length; i++) {
-      // Premium slot 1: between rank 4 and 5
-      if (i === 4 && premiumIdx < premiumListings.length) {
-        const listing = premiumListings[premiumIdx];
-        const c = listing.creators;
-        result.push({ ...c, isSponsored: true, isPremium: true, listingId: listing.id,
-          display_name: c?.display_name, username: c?.username,
-          profile_image: c?.profile_image, platform: c?.platform });
+      // Premium slot #1: between rank 4 and 5 (organic index 4)
+      if (i === 4 && premiumIdx < premiumQueue.length) {
+        result.push(makeSponsored(premiumQueue[premiumIdx], true, premiumIdx));
         premiumIdx++;
       }
-      // Premium slot 2: between rank 9 and 10
-      if (i === 9 && premiumIdx < premiumListings.length) {
-        const listing = premiumListings[premiumIdx];
-        const c = listing.creators;
-        result.push({ ...c, isSponsored: true, isPremium: true, listingId: listing.id,
-          display_name: c?.display_name, username: c?.username,
-          profile_image: c?.profile_image, platform: c?.platform });
+      // Premium slot #2: between rank 9 and 10
+      if (i === 9 && premiumIdx < premiumQueue.length) {
+        result.push(makeSponsored(premiumQueue[premiumIdx], true, premiumIdx));
         premiumIdx++;
       }
-      // Basic slots: starting at organic index 14, every 5 rows
-      if (basicIdx < basicListings.length && i === nextBasicSlot) {
-        const listing = basicListings[basicIdx];
-        const c = listing.creators;
-        result.push({ ...c, isSponsored: true, isPremium: false, listingId: listing.id,
-          display_name: c?.display_name, username: c?.username,
-          profile_image: c?.profile_image, platform: c?.platform });
+      // Basic slots: every 5 rows from organic index 14
+      if (basicIdx < basicQueue.length && i === nextBasicSlot) {
+        result.push(makeSponsored(basicQueue[basicIdx], false, basicIdx));
         basicIdx++;
         nextBasicSlot += 5;
       }
       result.push(sortedRankings[i]);
     }
     return result;
-  }, [sortedRankings, sponsoredListings]);
+  }, [sortedRankings, sponsoredListings, selectedPlatform]);
 
   const SortIcon = ({ column }) => {
     if (sortColumn !== column) return <ArrowUpDown className="w-3.5 h-3.5 text-neutral-700" />;
@@ -692,19 +724,30 @@ function PlatformRankings({ urlPlatform }) {
             {/* Rankings List */}
             {!loading && !error && displayList.map((creator, index) => {
               if (creator.isSponsored) {
-                // Real sponsored row — premium gets slightly brighter gold treatment
                 const isPremium = creator.isPremium;
+                const isGhost = creator.isGhost;
+                // Ghost slots link to /promote (CTA), real slots link to the
+                // creator's profile. Different visual treatment makes the
+                // available-slot read clearly without breaking the row layout.
+                const RowComponent = isGhost ? Link : Link;
+                const rowHref = isGhost ? '/promote' : `/${creator.platform}/${creator.username}`;
+                const rowClass = isGhost
+                  ? 'grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-dashed border-amber-300 bg-amber-50/60 hover:bg-amber-50 transition-colors group relative overflow-hidden'
+                  : isPremium
+                    ? 'grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-amber-200/60 bg-amber-50 hover:bg-amber-100 transition-colors group'
+                    : 'grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-amber-100 bg-amber-50/50 hover:bg-amber-50 transition-colors group';
                 return (
-                  <Link
+                  <RowComponent
                     key={`sponsored-${creator.listingId}`}
-                    to={`/${creator.platform}/${creator.username}`}
-                    className={`grid grid-cols-12 gap-4 px-6 py-4 items-center border-b transition-colors group ${
-                      isPremium
-                        ? 'border-amber-200/60 bg-amber-50 hover:bg-amber-100'
-                        : 'border-amber-100 bg-amber-50/50 hover:bg-amber-50'
-                    }`}
+                    to={rowHref}
+                    className={rowClass}
                   >
-                    {/* "Ad" badge in rank column (Premium gets a small star prefix to distinguish placement quality) */}
+                    {/* Ghost gets an animated shimmer to read as "this is the product, not a row" */}
+                    {isGhost && (
+                      <div className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-amber-200/40 to-transparent animate-marquee" />
+                    )}
+
+                    {/* "Ad" badge in rank column */}
                     <div className="col-span-2 md:col-span-1 flex items-center">
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold tracking-wide ${
@@ -719,24 +762,56 @@ function PlatformRankings({ urlPlatform }) {
                       </span>
                     </div>
 
-                    {/* Creator Info — no inline pill (Ad badge in rank column already conveys this) */}
+                    {/* Creator info OR ghost call-to-action */}
                     <div className={`col-span-10 flex items-center gap-3 min-w-0 ${selectedPlatform === 'kick' || selectedPlatform === 'bluesky' ? 'md:col-span-5' : 'md:col-span-4'}`}>
-                      <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="lg" />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold truncate text-neutral-900 group-hover:text-amber-700 transition-colors">
-                          {creator.display_name}
-                        </p>
-                      </div>
+                      {isGhost ? (
+                        <>
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-base font-extrabold flex-shrink-0 shadow-md shadow-amber-500/20">
+                            {isPremium ? '★' : '+'}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-neutral-900 group-hover:text-amber-700 transition-colors">
+                              Your Creator Here
+                            </p>
+                            <p className="text-[11px] text-amber-700 font-semibold uppercase tracking-wider">
+                              {isPremium ? 'Premium slot available' : 'Basic slot available'}
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <CreatorAvatar src={creator.profile_image} name={creator.display_name} size="lg" />
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold truncate text-neutral-900 group-hover:text-amber-700 transition-colors">
+                              {creator.display_name}
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
 
-                    {/* Empty stat columns to match layout */}
+                    {/* Empty stat columns to match layout — for ghosts, the last
+                        column shows the price + CTA chevron */}
                     <div className="hidden md:block col-span-2" />
                     <div className="hidden md:block col-span-2" />
                     {selectedPlatform !== 'kick' && selectedPlatform !== 'bluesky' && (
-                      <div className="hidden md:block col-span-2" />
+                      <div className="hidden md:flex col-span-2 items-center justify-end">
+                        {isGhost && (
+                          <span className="text-xs font-bold text-amber-700 tabular-nums">
+                            {creator.slotPrice}
+                          </span>
+                        )}
+                      </div>
                     )}
-                    <div className="hidden md:block col-span-1" />
-                  </Link>
+                    <div className="hidden md:flex col-span-1 items-center justify-end">
+                      {isGhost && (
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-700 group-hover:gap-2 transition-all whitespace-nowrap">
+                          Claim
+                          <ArrowRight className="w-3 h-3" />
+                        </span>
+                      )}
+                    </div>
+                  </RowComponent>
                 );
               }
 
