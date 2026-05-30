@@ -166,28 +166,31 @@ export function parseRumbleHandle(input, defaultKind = 'c') {
 }
 
 /**
- * Fetch a Rumble channel by slug or full input.
- * Falls back from /c/ to /user/ automatically if the first 404s.
+ * Fetch a Rumble channel by slug, prefixed id (`c:slug` / `user:slug`), or URL.
+ *
+ * Routes through `/api/rumble` instead of hitting rumble.com directly so that
+ * CORS doesn't reject the browser fetch (Rumble doesn't send
+ * `Access-Control-Allow-Origin`). The serverless proxy fetches the HTML, parses
+ * the data, and returns the normalized profile.
+ *
+ * For server-side scripts (collectDailyStats, seed, discovery) — those import
+ * parseChannelHtml directly and hit rumble.com via plain fetch; that works
+ * because there's no browser sandbox.
  */
 export async function getRumbleChannel(input) {
   const parsed = parseRumbleHandle(input);
   if (!parsed) return null;
 
-  // Try the parsed URL first
-  let res = await fetch(parsed.profileUrl, { headers: FETCH_HEADERS, signal: AbortSignal.timeout(15000) });
-  if (res.status === 404 && parsed.kind === 'c') {
-    // Try the /user/ fallback
-    const fallback = `${BASE}/user/${parsed.slug}`;
-    res = await fetch(fallback, { headers: FETCH_HEADERS, signal: AbortSignal.timeout(15000) });
-    if (res.ok) {
-      parsed.kind = 'user';
-      parsed.profileUrl = fallback;
-    }
-  }
-  if (!res.ok) return null;
+  const id = `${parsed.kind}:${parsed.slug}`;
+  const url = `/api/rumble?id=${encodeURIComponent(id)}`;
 
-  const html = await res.text();
-  return parseChannelHtml(html, parsed);
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -218,37 +221,18 @@ export async function browseCategoryChannels(category, page = 1) {
 }
 
 /**
- * Search Rumble for channels matching a query. Returns up to `limit` profiles.
- * Rumble's site search is video-focused but the result page does include some
- * channel hits — we extract those and skip the rest.
+ * Search Rumble for channels matching a query. Routes through `/api/rumble`
+ * with a `search` parameter (server-side handles the search HTML scrape).
+ *
+ * For now, search-based lookup is disabled in the browser path because doing
+ * N+1 fetches through our proxy is expensive. The Search page will fall back
+ * to its DB-only path for Rumble — which is fine because we have a seeded
+ * catalog.
  */
 export async function searchRumble(query, limit = 15) {
   if (!query || !query.trim()) return [];
-  const url = `${BASE}/search/channel?q=${encodeURIComponent(query)}`;
-  const res = await fetch(url, { headers: FETCH_HEADERS, signal: AbortSignal.timeout(20000) });
-  if (!res.ok) return [];
-  const html = await res.text();
-
-  const seen = new Set();
-  const handles = [];
-  // Rumble appends `?e9s=src_v1_clr` tracking params; match the slug only
-  const re = /href="\/(c|user)\/([^"/?#]+)/g;
-  let m;
-  while ((m = re.exec(html)) !== null && handles.length < limit) {
-    const key = `${m[1]}:${m[2]}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    handles.push({ kind: m[1], slug: m[2] });
-  }
-
-  // Fetch each profile in parallel (cap concurrency = 5 to be polite)
-  const results = [];
-  for (let i = 0; i < handles.length; i += 5) {
-    const slice = handles.slice(i, i + 5);
-    const batch = await Promise.all(slice.map(({ kind, slug }) =>
-      getRumbleChannel(`${kind}:${slug}`).catch(() => null)
-    ));
-    results.push(...batch.filter(Boolean));
-  }
-  return results;
+  // Intentionally empty browser path. Live discovery happens server-side via
+  // the daily discovery script and the on-demand /api/rumble lookup when a
+  // user navigates to a not-yet-tracked profile URL.
+  return [];
 }

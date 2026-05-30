@@ -94,23 +94,30 @@ function cleanText(html) {
     .replace(/\s+/g, ' ').trim().substring(0, 500);
 }
 
+// Rumble HTML mixes quoted/unquoted/single-quoted attributes — robust extractor
+function extractMeta(html, propertyName, propertyAttr = 'property') {
+  const escaped = propertyName.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  const re = new RegExp(
+    `<meta\\s+${propertyAttr}\\s*=\\s*["']?${escaped}["']?\\s+content\\s*=\\s*(?:"([^"]+)"|'([^']+)'|([^\\s>]+))`,
+    'i'
+  );
+  const m = html.match(re);
+  if (!m) return null;
+  return m[1] || m[2] || m[3] || null;
+}
+
 function parseChannelHtml(html, { slug, kind, profileUrl }) {
   if (!html) return null;
 
-  const titleMatch =
-    html.match(/<h1[^>]*class="[^"]*channel-header--title[^"]*"[^>]*>([^<]+)<\/h1>/i) ||
-    html.match(/<meta\s+property="og:title"\s+content="([^"]+)"/i);
-  const displayName = titleMatch ? cleanText(titleMatch[1]) : slug;
+  const h1Match = html.match(/<h1[^>]*class=["']?[^"'>]*channel-header--title[^"'>]*["']?[^>]*>([^<]+)<\/h1>/i);
+  const ogTitle = extractMeta(html, 'og:title');
+  const displayName = cleanText(h1Match ? h1Match[1] : ogTitle) || slug;
 
-  const avatarMatch =
-    html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i) ||
-    html.match(/class="channel-header--thumbnail"[^>]*src="([^"]+)"/i);
-  const profileImage = avatarMatch ? avatarMatch[1] : null;
+  const profileImage = extractMeta(html, 'og:image') || null;
 
-  const descMatch =
-    html.match(/<meta\s+name="description"\s+content="([^"]+)"/i) ||
-    html.match(/<meta\s+property="og:description"\s+content="([^"]+)"/i);
-  const description = descMatch ? cleanText(descMatch[1]) : null;
+  const description = cleanText(
+    extractMeta(html, 'description', 'name') || extractMeta(html, 'og:description')
+  );
 
   let followers = 0;
   const followerPatterns = [
