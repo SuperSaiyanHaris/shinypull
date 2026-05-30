@@ -4,6 +4,7 @@ import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
 import MastodonIcon from '../components/MastodonIcon';
+import RumbleIcon from '../components/RumbleIcon';
 import SEO from '../components/SEO';
 
 const platforms = [
@@ -104,6 +105,23 @@ const platforms = [
     ],
   },
   {
+    icon: RumbleIcon,
+    name: 'Rumble',
+    color: 'text-lime-600',
+    borderColor: 'border-lime-700',
+    bgColor: 'bg-lime-950/20',
+    iconBg: 'from-lime-500 to-green-600',
+    shadow: 'shadow-lime-500/20',
+    metrics: ['Follower count', 'Video count'],
+    source: 'Rumble public channel pages',
+    frequency: '3x daily',
+    notes: [
+      'Rumble has no public API, so we scrape the public channel pages at a polite ~1 request per second.',
+      'Both /c/ channels and /user/ accounts are supported. We store the kind in our internal identifier so we always hit the right URL.',
+      'Channel-level total view counts are not exposed by Rumble, so we track followers and video count only.',
+    ],
+  },
+  {
     icon: Music,
     name: 'Music',
     color: 'text-amber-400',
@@ -157,7 +175,7 @@ export default function Methodology() {
     <>
       <SEO
         title="Data Methodology"
-        description="Learn how ShinyPull collects and maintains creator statistics across YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, and Music (Last.fm)."
+        description="Learn how ShinyPull collects and maintains creator statistics across YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, Rumble, and Music (Last.fm)."
       />
 
       <div className="min-h-screen bg-[#fafafa]">

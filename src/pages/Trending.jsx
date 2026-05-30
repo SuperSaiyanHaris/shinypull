@@ -7,6 +7,7 @@ import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
 import MastodonIcon from '../components/MastodonIcon';
+import RumbleIcon from '../components/RumbleIcon';
 import { getRankedCreators } from '../services/creatorService';
 import { formatNumber } from '../lib/utils';
 import CreatorAvatar from '../components/CreatorAvatar';
@@ -19,6 +20,7 @@ const PLATFORMS = [
   { id: 'bluesky', name: 'Bluesky', icon: BlueskyIcon, textColor: 'text-sky-400', activeBg: 'bg-sky-50', activeBorder: 'border-sky-300', followerLabel: 'followers', growthLabel: 'followers gained', growthNote: null },
   { id: 'music', name: 'Music', icon: Music, textColor: 'text-amber-400', activeBg: 'bg-amber-50', activeBorder: 'border-amber-300', followerLabel: 'listeners', growthLabel: 'listeners gained', growthNote: 'Monthly listener growth via Last.fm. Reflects how many more unique listeners an artist reached this month vs. last.' },
   { id: 'mastodon', name: 'Mastodon', icon: MastodonIcon, textColor: 'text-violet-400', activeBg: 'bg-violet-50', activeBorder: 'border-violet-300', followerLabel: 'followers', growthLabel: 'followers gained', growthNote: null },
+  { id: 'rumble', name: 'Rumble', icon: RumbleIcon, textColor: 'text-lime-600', activeBg: 'bg-lime-50', activeBorder: 'border-lime-300', followerLabel: 'followers', growthLabel: 'followers gained', growthNote: null },
 ];
 
 export default function Trending() {

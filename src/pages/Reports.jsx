@@ -13,8 +13,8 @@ import { formatNumber } from '../lib/utils';
 
 /* ───────────── constants ───────────── */
 
-const PLATFORMS = ['all', 'youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'music', 'mastodon'];
-const PLATFORM_LABELS = { all: 'All Platforms', youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky', music: 'Music', mastodon: 'Mastodon' };
+const PLATFORMS = ['all', 'youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'music', 'mastodon', 'rumble'];
+const PLATFORM_LABELS = { all: 'All Platforms', youtube: 'YouTube', tiktok: 'TikTok', twitch: 'Twitch', kick: 'Kick', bluesky: 'Bluesky', music: 'Music', mastodon: 'Mastodon', rumble: 'Rumble' };
 const PLATFORM_COLORS = {
   youtube:  'bg-red-500',
   tiktok:   'bg-pink-500',
@@ -23,6 +23,7 @@ const PLATFORM_COLORS = {
   bluesky:  'bg-sky-500',
   music:    'bg-amber-500',
   mastodon: 'bg-violet-500',
+  rumble:   'bg-lime-500',
 };
 
 const DATE_RANGES = [
@@ -34,9 +35,9 @@ const DATE_RANGES = [
 ];
 
 const METRIC_OPTIONS = [
-  { id: 'subscribers',        label: 'Subscribers / Followers / Listeners',  platforms: ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'music', 'mastodon'] },
+  { id: 'subscribers',        label: 'Subscribers / Followers / Listeners',  platforms: ['youtube', 'tiktok', 'twitch', 'kick', 'bluesky', 'music', 'mastodon', 'rumble'] },
   { id: 'total_views',        label: 'Total Views / Likes / Plays',          platforms: ['youtube', 'tiktok', 'music'] },
-  { id: 'total_posts',        label: 'Videos / Posts',                       platforms: ['youtube', 'tiktok', 'bluesky', 'mastodon'] },
+  { id: 'total_posts',        label: 'Videos / Posts',                       platforms: ['youtube', 'tiktok', 'bluesky', 'mastodon', 'rumble'] },
   { id: 'hours_watched_day',  label: 'Hours Watched (Daily)',                platforms: ['twitch', 'kick'] },
   { id: 'peak_viewers_day',   label: 'Peak Viewers (Daily)',                 platforms: ['twitch', 'kick'] },
   { id: 'avg_viewers_day',    label: 'Avg Viewers (Daily)',                  platforms: ['twitch', 'kick'] },
@@ -350,6 +351,7 @@ export default function Reports() {
     kick:     ['Date', 'Followers', 'Hours Watched', 'Peak Viewers', 'Avg Viewers'],
     bluesky:  ['Date', 'Followers', 'Posts'],
     mastodon: ['Date', 'Followers', 'Posts'],
+    rumble:   ['Date', 'Followers', 'Videos'],
   };
 
   function getDetailRow(platform, row) {
@@ -360,6 +362,7 @@ export default function Reports() {
       case 'kick':     return [row.recorded_at, row.subscribers || '', row.hours_watched_day || '', row.peak_viewers_day || '', row.avg_viewers_day || ''];
       case 'bluesky':  return [row.recorded_at, row.subscribers || '', row.total_posts || ''];
       case 'mastodon': return [row.recorded_at, row.subscribers || '', row.total_posts || ''];
+      case 'rumble':   return [row.recorded_at, row.subscribers || '', row.total_posts || ''];
       default:         return [row.recorded_at, row.subscribers || '', row.total_views || '', row.total_posts || '', row.hours_watched_day || '', row.peak_viewers_day || '', row.avg_viewers_day || ''];
     }
   }

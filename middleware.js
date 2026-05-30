@@ -28,9 +28,10 @@ const PLATFORM_NAMES = {
   bluesky:  'Bluesky',
   music:    'Music',
   mastodon: 'Mastodon',
+  rumble:   'Rumble',
 };
 
-const ALL_PLATFORM_LIST = 'YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, and Music';
+const ALL_PLATFORM_LIST = 'YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, Rumble, and Music';
 
 function getMeta(pathname, searchParams) {
   // /rankings or /rankings/:platform

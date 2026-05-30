@@ -218,6 +218,72 @@ async function fetchBlueskyBatch(handles) {
   return statsMap;
 }
 
+// ========== RUMBLE HELPERS (HTML scrape, no API) ==========
+// Rumble channels live at `/c/{slug}` or `/user/{slug}`. We store the kind in
+// `platform_id` (`c:slug` / `user:slug`) so we know which URL to fetch. ~1 req/sec
+// to be polite — Rumble doesn't publish a rate limit but we're conservative.
+const RUMBLE_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9',
+  'Accept-Language': 'en-US,en;q=0.9',
+};
+
+function rumbleParseAbbreviated(str) {
+  if (!str) return 0;
+  const cleaned = String(str).replace(/,/g, '').trim();
+  const match = cleaned.match(/^(\d+(?:\.\d+)?)\s*([KMB])?$/i);
+  if (!match) {
+    const direct = parseInt(cleaned, 10);
+    return Number.isNaN(direct) ? 0 : direct;
+  }
+  const num = parseFloat(match[1]);
+  const suffix = (match[2] || '').toUpperCase();
+  if (suffix === 'K') return Math.round(num * 1_000);
+  if (suffix === 'M') return Math.round(num * 1_000_000);
+  if (suffix === 'B') return Math.round(num * 1_000_000_000);
+  return Math.round(num);
+}
+
+async function fetchRumbleChannel(platformId) {
+  // platformId is `c:slug` or `user:slug` (legacy rows might just be a slug — default to `c:`)
+  let kind = 'c';
+  let slug = platformId;
+  if (platformId && platformId.includes(':')) {
+    [kind, slug] = platformId.split(':');
+  }
+  const url = `https://rumble.com/${kind}/${slug}`;
+  const res = await fetch(url, { headers: RUMBLE_HEADERS, signal: AbortSignal.timeout(15000) });
+  if (!res.ok) return null;
+  const html = await res.text();
+
+  let followers = 0;
+  for (const re of [
+    /<span[^>]*data-test="follower-count"[^>]*>([\d.,KMB\s]+)<\/span>/i,
+    />\s*([\d.,]+\s*[KMB])\s*Followers\b/i,
+    />\s*([\d,]+)\s*Followers\b/i,
+  ]) {
+    const m = html.match(re);
+    if (m && m[1]) {
+      followers = rumbleParseAbbreviated(m[1]);
+      if (followers > 0) break;
+    }
+  }
+
+  let totalPosts = 0;
+  for (const re of [
+    /<span[^>]*data-test="video-count"[^>]*>([\d.,KMB\s]+)<\/span>/i,
+    />\s*([\d.,]+\s*[KMB]?)\s*videos?\b/i,
+  ]) {
+    const m = html.match(re);
+    if (m && m[1]) {
+      totalPosts = rumbleParseAbbreviated(m[1]);
+      if (totalPosts > 0) break;
+    }
+  }
+
+  return { followers, totalPosts };
+}
+
 // ========== MASTODON API HELPERS ==========
 // Federated, no auth. Each handle = `user@instance`. No batch endpoint, so we
 // fetch one at a time with light pacing. Grouped by instance to keep HTTP
@@ -342,6 +408,7 @@ async function collectDailyStats() {
   const blueskyCreators = creators.filter((c) => c.platform === 'bluesky');
   const musicCreators = creators.filter((c) => c.platform === 'music');
   const mastodonCreators = creators.filter((c) => c.platform === 'mastodon');
+  const rumbleCreators = creators.filter((c) => c.platform === 'rumble');
   // TikTok is handled by refreshTikTokProfiles.js via separate GitHub Actions workflow
 
   console.log(`Found ${creators.length} creators to update`);
@@ -350,7 +417,8 @@ async function collectDailyStats() {
   console.log(`   Kick: ${kickCreators.length}`);
   console.log(`   Bluesky: ${blueskyCreators.length}`);
   console.log(`   Music: ${musicCreators.length}`);
-  console.log(`   Mastodon: ${mastodonCreators.length}\n`);
+  console.log(`   Mastodon: ${mastodonCreators.length}`);
+  console.log(`   Rumble: ${rumbleCreators.length}\n`);
 
   let successCount = 0;
   let errorCount = 0;
@@ -593,6 +661,43 @@ async function collectDailyStats() {
       // 100ms pacing = 10 req/s. With 1k+ creators spread across ~15 instances
       // each instance sees well under its 300/5min budget.
       await new Promise((r) => setTimeout(r, 100));
+    }
+  }
+
+  // ========== RUMBLE (HTML scrape, sequential ~1 req/sec) ==========
+  // No public API. Each fetch is a full HTML page (~50-100KB). For 1K creators
+  // that's ~10-15 minutes at the polite delay. Skip writes when followers=0.
+  if (rumbleCreators.length > 0) {
+    console.log('\n🎬 Processing Rumble creators...');
+    console.log(`   ${rumbleCreators.length} channels (sequential)\n`);
+
+    for (const creator of rumbleCreators) {
+      try {
+        const stats = await fetchRumbleChannel(creator.platform_id);
+        if (stats && stats.followers > 0) {
+          statsToUpsert.push({
+            creator_id: creator.id,
+            recorded_at: today,
+            subscribers: stats.followers,
+            followers: stats.followers,
+            total_views: null,
+            total_posts: stats.totalPosts || null,
+          });
+          console.log(`   ✅ ${creator.display_name}: ${stats.followers.toLocaleString()} followers`);
+          successCount++;
+        } else if (stats && stats.followers === 0) {
+          console.log(`   ⚠️  ${creator.display_name}: Skipping — page returned 0 followers (parse miss or removed)`);
+          errorCount++;
+        } else {
+          console.log(`   ❌ ${creator.display_name}: Channel not found`);
+          errorCount++;
+        }
+      } catch (error) {
+        console.error(`   ❌ ${creator.display_name}: ${error.message}`);
+        errorCount++;
+      }
+      // 800ms pacing = ~1.25 req/s. For 1K creators that's ~13 min.
+      await new Promise((r) => setTimeout(r, 800));
     }
   }
 

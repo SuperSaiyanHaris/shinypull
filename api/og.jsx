@@ -18,6 +18,7 @@ const PLATFORM_LABELS = {
   bluesky:  'Bluesky',
   music:    'Music',
   mastodon: 'Mastodon',
+  rumble:   'Rumble',
 };
 
 const PLATFORM_COLORS = {
@@ -28,6 +29,7 @@ const PLATFORM_COLORS = {
   bluesky:  '#0ea5e9',
   music:    '#f59e0b',
   mastodon: '#7c3aed',
+  rumble:   '#65a30d',
 };
 
 function formatNumber(n) {

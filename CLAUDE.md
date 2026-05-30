@@ -276,6 +276,17 @@ Substitute `bluesky` with whatever platform was most recently added (it's the ca
 - `scripts/generateBlogDraft.js` — 3 prompt strings mentioning platforms + entity-blacklist regex
 - `index.html` — meta description, og:description, twitter:description, structured-data description
 
+**Rumble:**
+- YouTube alternative video platform. No public API — we scrape public channel pages.
+- `username` = the bare slug (e.g. `Bongino`). `platform_id` = `c:slug` (for `/c/...` channels) or `user:slug` (for `/user/...` accounts) to disambiguate.
+- We track followers + video count. Total views are NOT tracked (would require per-video scraping).
+- Service: `src/services/rumbleService.js`. `getRumbleChannel(input)` accepts a slug, prefixed id, or full URL and tries `/c/` first then falls back to `/user/`.
+- Collection paces at 800ms between requests (~1.25 req/s) — Rumble has no published rate limit so we're conservative.
+- No live counter (follower counts don't tick fast enough).
+- Color scheme: `lime-600` (`#65a30d`). Distinct from Kick's `green-600`.
+- Discovery + seed crawl `/browse/{category}` pages for channel links + a curated handle list. Seed targets 1K creators.
+- Profile URLs: `https://rumble.com/c/{slug}` or `https://rumble.com/user/{slug}` (CreatorProfile uses `platform_id` to pick the right one).
+
 **Mastodon:**
 - Federated. Username = full webfinger handle `user@instance.tld` (e.g. `Mastodon@mastodon.social`)
 - `platform_id` = `{instance}:{account.id}` for cross-instance uniqueness

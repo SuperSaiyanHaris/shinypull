@@ -4,6 +4,7 @@ import KickIcon from './KickIcon';
 import TikTokIcon from './TikTokIcon';
 import BlueskyIcon from './BlueskyIcon';
 import MastodonIcon from './MastodonIcon';
+import RumbleIcon from './RumbleIcon';
 
 const FEATURE_LINKS = [
   ['/search',                    'Creator Search'],
@@ -22,6 +23,7 @@ const PLATFORM_LINKS = [
   ['/rankings/bluesky',  'Bluesky',  BlueskyIcon],
   ['/rankings/music',    'Music',    Music],
   ['/rankings/mastodon', 'Mastodon', MastodonIcon],
+  ['/rankings/rumble',   'Rumble',   RumbleIcon],
 ];
 
 const COMPANY_LINKS = [
@@ -57,7 +59,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-neutral-600 leading-relaxed max-w-sm">
-              Creator analytics across YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, and Music. Updated daily.
+              Creator analytics across YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, Rumble, and Music. Updated daily.
             </p>
 
             {/* CTA — Get featured */}

@@ -7,6 +7,7 @@ import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
 import MastodonIcon from '../components/MastodonIcon';
+import RumbleIcon from '../components/RumbleIcon';
 import { Music } from 'lucide-react';
 import { CompareCardSkeleton } from '../components/Skeleton';
 import { searchChannels as searchYouTube, getChannelByUsername as getYouTubeChannel } from '../services/youtubeService';
@@ -46,6 +47,7 @@ const platformConfig = {
   bluesky: { icon: BlueskyIcon, color: 'text-sky-700', bg: 'bg-sky-50', border: 'border-sky-200' },
   music: { icon: Music, color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
   mastodon: { icon: MastodonIcon, color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200' },
+  rumble: { icon: RumbleIcon, color: 'text-lime-700', bg: 'bg-lime-50', border: 'border-lime-200' },
 };
 
 export default function Compare() {
@@ -944,6 +946,7 @@ function SearchableSlot({ onSelect, onRemove }) {
           { id: 'bluesky',  Icon: BlueskyIcon, color: 'text-sky-700',    bg: 'bg-sky-50',    ring: 'ring-sky-700',    label: 'Bluesky' },
           { id: 'music',    Icon: Music,        color: 'text-amber-700',  bg: 'bg-amber-50',  ring: 'ring-amber-700',  label: 'Music' },
           { id: 'mastodon', Icon: MastodonIcon, color: 'text-violet-700', bg: 'bg-violet-50', ring: 'ring-violet-700', label: 'Mastodon' },
+          { id: 'rumble',   Icon: RumbleIcon,   color: 'text-lime-700',   bg: 'bg-lime-50',   ring: 'ring-lime-700',   label: 'Rumble' },
         ].map(({ id, Icon, color, bg, ring, label }) => (
           <button
             key={id}
