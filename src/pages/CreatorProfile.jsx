@@ -222,10 +222,31 @@ export default function CreatorProfile() {
         // getMastodonProfile parses + dispatches to the right instance API.
         channelData = await getMastodonProfile(username);
       } else if (platform === 'rumble') {
-        // Rumble: prefer the DB row's platform_id (knows c: vs user:); fall back to bare slug.
+        // Rumble: DB-first, because Rumble's edge 403s Vercel datacenter IPs.
+        // Our daily collection (running from GitHub Actions IPs that don't get
+        // blocked) keeps the stats fresh. The /api/rumble proxy stays as a
+        // last-resort for creators not yet in the DB.
         const dbCreator = await getCreatorByUsername('rumble', username);
-        const input = dbCreator?.platform_id || username;
-        channelData = await getRumbleChannel(input);
+        if (dbCreator) {
+          channelData = {
+            platform: 'rumble',
+            platformId: dbCreator.platform_id,
+            username: dbCreator.username,
+            displayName: dbCreator.display_name,
+            profileImage: dbCreator.profile_image,
+            description: dbCreator.description,
+            country: dbCreator.country,
+            category: dbCreator.category,
+            // subscribers/followers/totalPosts are filled in from the latest
+            // creator_stats row by the page's standard merge logic below.
+            subscribers: null,
+            followers: null,
+            totalPosts: null,
+            totalViews: null,
+          };
+        } else {
+          channelData = await getRumbleChannel(username);
+        }
       } else if (platform === 'music') {
         // Music: username is a slug, platform_id is mbid or slug
         const navPlatformId = location.state?.platformId;
@@ -353,13 +374,16 @@ export default function CreatorProfile() {
             setDbCreatorId(dbCreator.id);
             setCreator(prev => ({ ...prev, dbCreatedAt: dbCreator.created_at }));
 
-            // Save stats first, then fetch history — must be sequential so the
-            // history query always sees the row we just wrote (race condition fix)
-            await saveCreatorStats(dbCreator.id, {
-              subscribers: channelData.subscribers || channelData.followers,
-              totalViews: channelData.totalViews,
-              totalPosts: channelData.totalPosts,
-            });
+            // Save stats first, then fetch history. Skip when channelData has
+            // null counts (Rumble synthesized-from-DB case) — the daily
+            // collection script keeps stats fresh from the right IP range.
+            if (channelData.subscribers || channelData.followers) {
+              await saveCreatorStats(dbCreator.id, {
+                subscribers: channelData.subscribers || channelData.followers,
+                totalViews: channelData.totalViews,
+                totalPosts: channelData.totalPosts,
+              });
+            }
 
             // Now fetch history + hours watched in parallel (both read-only)
             const readOps = [getCreatorStats(dbCreator.id, 90)];
@@ -371,7 +395,21 @@ export default function CreatorProfile() {
 
             // Update stats history (only if successful)
             if (results[0].status === 'fulfilled') {
-              setStatsHistory(results[0].value || []);
+              const history = results[0].value || [];
+              setStatsHistory(history);
+              // For platforms where we didn't live-fetch current stats (Rumble:
+              // edge 403s our IPs), populate the displayed counts from the
+              // most recent stats row.
+              if (history.length > 0 && !channelData.subscribers && !channelData.followers) {
+                const latest = history[0];
+                setCreator(prev => ({
+                  ...prev,
+                  subscribers: latest.subscribers || latest.followers || 0,
+                  followers: latest.followers || latest.subscribers || 0,
+                  totalPosts: latest.total_posts || 0,
+                  totalViews: latest.total_views || null,
+                }));
+              }
             }
 
             // Update hours watched data for Twitch/Kick (only if successful)
