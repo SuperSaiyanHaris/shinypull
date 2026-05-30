@@ -514,7 +514,7 @@ async function researchAgent(articles, postData) {
   // Extract proper nouns from all titles as an entity-level exclusion signal
   const entityBlacklist = [...new Set(
     allTitles.flatMap(t =>
-      (t.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*|YouTube|TikTok|Twitch|Kick|Instagram|Netflix|Meta|Spotify|Bluesky|MrBeast|BuzzFeed)\b/g) || [])
+      (t.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*|YouTube|TikTok|Twitch|Kick|Instagram|Netflix|Meta|Spotify|Bluesky|Mastodon|MrBeast|BuzzFeed)\b/g) || [])
     )
   )].slice(0, 80);
 
@@ -527,7 +527,7 @@ async function researchAgent(articles, postData) {
     ? `\nKEY ENTITIES already covered (people, companies, platforms, products). If a new article is primarily ABOUT one of these AND the subject overlaps with any of the last 10 posts, SKIP IT. We need genuinely new subject matter:\n${entityBlacklist.join(', ')}\n\nHARD subject-overlap block — if the article shares the same core subject (e.g. "AI and journalism", "X platform's algorithm change", "Y creator's controversy") as any of these recent posts, you must skip it and pick a different article:\n${recentTopicTitles.map(t => `- ${t}`).join('\n')}\n`
     : '';
 
-  const text = await callWithRetry(() => geminiGenerate(`You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky stats.
+  const text = await callWithRetry(() => geminiGenerate(`You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, and Music stats.
 
 Today's date: ${TODAY}. All articles below are from this week. Write as if you know it is ${THIS_YEAR}.
 
@@ -551,7 +551,7 @@ From the articles below, select the SINGLE most interesting and relevant topic. 
 - Monetization and creator economy shifts
 - Creator drama, controversies, or community moments with broader lessons
 - Streaming and creator industry trends
-- Platform feature launches (YouTube, TikTok, Twitch, Kick)
+- Platform feature launches (YouTube, TikTok, Twitch, Kick, Mastodon)
 - Creator growth, analytics, or business strategy
 - Viral moments that reveal something about the platform or creator business
 
@@ -697,7 +697,7 @@ async function validateEnrichmentUrls(enrichment) {
 async function enrichmentAgent(research) {
   console.log('📊 Enrichment Agent: gathering stats, tables, and sources...');
 
-  const enrichmentRaw = await callWithRetry(() => geminiGenerate(`You are a research enrichment specialist for ShinyPull, a creator analytics platform (YouTube, TikTok, Twitch, Kick, Bluesky stats).
+  const enrichmentRaw = await callWithRetry(() => geminiGenerate(`You are a research enrichment specialist for ShinyPull, a creator analytics platform (YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, and Music stats).
 
 Today's date: ${TODAY}. The post being written is current — it reflects events happening now in ${THIS_YEAR}.
 

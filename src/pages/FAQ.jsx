@@ -9,7 +9,7 @@ const faqs = [
     questions: [
       {
         q: 'What is ShinyPull?',
-        a: 'ShinyPull tracks public statistics for content creators and artists across YouTube, TikTok, Twitch, Kick, Bluesky, and Music (via Last.fm). We collect subscriber counts, follower counts, listener counts, view totals, and more every day, then present the data as charts and historical trends. Think of it as a stats tracker for the creator economy.',
+        a: 'ShinyPull tracks public statistics for content creators and artists across YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, and Music (via Last.fm). We collect subscriber counts, follower counts, listener counts, view totals, and more every day, then present the data as charts and historical trends. Think of it as a stats tracker for the creator economy.',
       },
       {
         q: 'Is ShinyPull free?',
@@ -17,7 +17,7 @@ const faqs = [
       },
       {
         q: 'What is the Trending page?',
-        a: 'The Trending page shows the fastest growing creators on each platform over the last 30 days. Each platform uses the metric that best reflects real growth: view count growth for YouTube (since subscriber counts are rounded by policy), follower growth for TikTok and Bluesky, hours watched growth for Twitch, and paid subscriber growth for Kick.',
+        a: 'The Trending page shows the fastest growing creators on each platform over the last 30 days. Each platform uses the metric that best reflects real growth: view count growth for YouTube (since subscriber counts are rounded by policy), follower growth for TikTok, Bluesky, and Mastodon, hours watched growth for Twitch, paid subscriber growth for Kick, and monthly listener growth for Music.',
       },
       {
         q: 'What makes ShinyPull different from other stats trackers?',
@@ -34,7 +34,7 @@ const faqs = [
     questions: [
       {
         q: 'How often is data updated?',
-        a: 'Creator stats are collected multiple times per day. YouTube, Twitch, Kick, Bluesky, and Music (Last.fm) run on an automated schedule three times daily. TikTok profiles refresh four times daily. Stream monitoring for Twitch and Kick runs every three hours to track live viewership.',
+        a: 'Creator stats are collected multiple times per day. YouTube, Twitch, Kick, Bluesky, Mastodon, and Music (Last.fm) run on an automated schedule three times daily. TikTok profiles refresh four times daily. Stream monitoring for Twitch and Kick runs every three hours to track live viewership.',
       },
       {
         q: 'Is the data accurate?',
@@ -42,7 +42,7 @@ const faqs = [
       },
       {
         q: 'Where does the data come from?',
-        a: 'All data is publicly available. We use the YouTube Data API, Twitch Helix API, Kick API, Bluesky AT Protocol API, and Last.fm API for those platforms. For TikTok, we collect publicly available profile statistics. We never access private account information.',
+        a: 'All data is publicly available. We use the YouTube Data API, Twitch Helix API, Kick API, Bluesky AT Protocol API, Mastodon ActivityPub API, and Last.fm API for those platforms. For TikTok, we collect publicly available profile statistics. We never access private account information.',
       },
       {
         q: 'Why does my favorite creator not show up?',
@@ -74,6 +74,10 @@ const faqs = [
         a: 'We track follower count and post count for Bluesky accounts. Bluesky does not have profile-level view counts, so we only show the metrics the platform provides.',
       },
       {
+        q: 'What does Mastodon track?',
+        a: 'We track follower count and post count for Mastodon accounts across the federation. Mastodon is decentralized, so handles include the instance (e.g. user@mastodon.social). We support the major instances and federate through mastodon.social for everything else. Mastodon has no profile-level view counts.',
+      },
+      {
         q: 'What does Music track?',
         a: 'The Music platform is powered by Last.fm data. We track monthly listeners (how many unique listeners an artist had in the last 30 days) and total play count (cumulative scrobbles across all Last.fm users). Artist genre tags are also shown. Last.fm deprecated artist profile images in 2019, so we show a fallback icon instead.',
       },
@@ -84,7 +88,7 @@ const faqs = [
     questions: [
       {
         q: 'How do I add a creator to ShinyPull?',
-        a: 'Search for the creator by username on our search page. For YouTube, Twitch, Kick, and Bluesky, the profile is fetched and added automatically when you search. For TikTok, you can submit a request if no result is found, and it will be processed within 24 hours.',
+        a: 'Search for the creator by username on our search page. For YouTube, Twitch, Kick, Bluesky, and Mastodon, the profile is fetched and added automatically when you search. For TikTok, you can submit a request if no result is found, and it will be processed within 24 hours.',
       },
       {
         q: 'How do I follow a creator?',

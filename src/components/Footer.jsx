@@ -3,6 +3,7 @@ import { BarChart3, Youtube, Twitch, Music } from 'lucide-react';
 import KickIcon from './KickIcon';
 import TikTokIcon from './TikTokIcon';
 import BlueskyIcon from './BlueskyIcon';
+import MastodonIcon from './MastodonIcon';
 
 const FEATURE_LINKS = [
   ['/search',                    'Creator Search'],
@@ -20,6 +21,7 @@ const PLATFORM_LINKS = [
   ['/rankings/kick',     'Kick',     KickIcon],
   ['/rankings/bluesky',  'Bluesky',  BlueskyIcon],
   ['/rankings/music',    'Music',    Music],
+  ['/rankings/mastodon', 'Mastodon', MastodonIcon],
 ];
 
 const COMPANY_LINKS = [
@@ -55,7 +57,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-neutral-600 leading-relaxed max-w-sm">
-              Creator analytics across YouTube, TikTok, Twitch, Kick, Bluesky, and Music. Updated daily.
+              Creator analytics across YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, and Music. Updated daily.
             </p>
 
             {/* CTA — Get featured */}

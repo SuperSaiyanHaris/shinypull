@@ -9,6 +9,7 @@ import {
 import KickIcon from './KickIcon';
 import TikTokIcon from './TikTokIcon';
 import BlueskyIcon from './BlueskyIcon';
+import MastodonIcon from './MastodonIcon';
 import CreatorAvatar from './CreatorAvatar';
 import { searchCreators } from '../services/creatorService';
 
@@ -19,6 +20,7 @@ const PLATFORM_ICONS = {
   kick: { Icon: KickIcon, color: 'text-green-400' },
   bluesky: { Icon: BlueskyIcon, color: 'text-sky-400' },
   music: { Icon: Music, color: 'text-amber-400' },
+  mastodon: { Icon: MastodonIcon, color: 'text-violet-500' },
 };
 
 const QUICK_LINKS = [
@@ -38,7 +40,8 @@ const PLATFORM_LINKS = [
   { label: 'Twitch rankings',   to: '/rankings/twitch',   Icon: Twitch,      color: 'text-purple-400' },
   { label: 'Kick rankings',     to: '/rankings/kick',     Icon: KickIcon,    color: 'text-green-400'  },
   { label: 'Bluesky rankings',  to: '/rankings/bluesky',  Icon: BlueskyIcon, color: 'text-sky-400'    },
-  { label: 'Music rankings',    to: '/rankings/music',    Icon: Music,       color: 'text-amber-400'  },
+  { label: 'Music rankings',    to: '/rankings/music',    Icon: Music,        color: 'text-amber-400'  },
+  { label: 'Mastodon rankings', to: '/rankings/mastodon', Icon: MastodonIcon, color: 'text-violet-500' },
 ];
 
 /**

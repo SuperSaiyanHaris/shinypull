@@ -3,6 +3,7 @@ import { Youtube, Twitch, Clock, Database, RefreshCw, ShieldCheck, Music } from 
 import KickIcon from '../components/KickIcon';
 import TikTokIcon from '../components/TikTokIcon';
 import BlueskyIcon from '../components/BlueskyIcon';
+import MastodonIcon from '../components/MastodonIcon';
 import SEO from '../components/SEO';
 
 const platforms = [
@@ -86,6 +87,23 @@ const platforms = [
     ],
   },
   {
+    icon: MastodonIcon,
+    name: 'Mastodon',
+    color: 'text-violet-400',
+    borderColor: 'border-violet-800',
+    bgColor: 'bg-violet-950/20',
+    iconBg: 'from-violet-500 to-purple-600',
+    shadow: 'shadow-violet-500/20',
+    metrics: ['Follower count', 'Post count'],
+    source: 'Mastodon ActivityPub (public)',
+    frequency: '3x daily',
+    notes: [
+      'Mastodon is federated. Each account belongs to a specific instance (e.g. mastodon.social, hachyderm.io), and handles include the instance: user@instance.tld.',
+      'We hit each instance\'s public API directly and fall back to mastodon.social federated search for less common instances. No authentication is needed.',
+      'No profile-level view counts exist on Mastodon, so we track followers and posts only.',
+    ],
+  },
+  {
     icon: Music,
     name: 'Music',
     color: 'text-amber-400',
@@ -139,7 +157,7 @@ export default function Methodology() {
     <>
       <SEO
         title="Data Methodology"
-        description="Learn how ShinyPull collects and maintains creator statistics across YouTube, TikTok, Twitch, Kick, Bluesky, and Music (Last.fm)."
+        description="Learn how ShinyPull collects and maintains creator statistics across YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, and Music (Last.fm)."
       />
 
       <div className="min-h-screen bg-[#fafafa]">

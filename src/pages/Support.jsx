@@ -37,7 +37,7 @@ const supportReasons = [
   {
     icon: Zap,
     title: 'API Costs',
-    description: 'Real data costs real money. YouTube, Twitch, Kick, TikTok, and Bluesky all have API costs.',
+    description: 'Real data costs real money. YouTube, Twitch, Kick, TikTok, Bluesky, Mastodon, and Music all have API costs.',
     color: 'from-amber-500 to-orange-500',
     shadow: 'shadow-amber-500/30',
   },

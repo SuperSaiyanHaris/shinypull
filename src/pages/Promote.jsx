@@ -43,7 +43,7 @@ export default function Promote() {
     <>
       <SEO
         title="Featured Listings: Promote Your Creators on ShinyPull"
-        description="Get your creator featured in our daily rankings. $49/mo for visibility across YouTube, TikTok, Twitch, Kick, Bluesky and Music rankings. Premium slots from $149/mo."
+        description="Get your creator featured in our daily rankings. $49/mo for visibility across YouTube, TikTok, Twitch, Kick, Bluesky, Mastodon, and Music rankings. Premium slots from $149/mo."
         keywords="creator promotion, sponsored ranking, featured listing, B2B creator marketing, talent promotion, agency tools"
       />
 
@@ -233,7 +233,7 @@ export default function Promote() {
             {[
               {
                 q: 'Can I feature someone who isn\'t in your database?',
-                a: 'For YouTube, Twitch, Kick, Bluesky, and Music: we add new creators continuously. If they aren\'t tracked yet, request them via the Search page. For TikTok, the Listings page has an instant-add flow that pulls their profile in seconds.',
+                a: 'For YouTube, Twitch, Kick, Bluesky, Mastodon, and Music: we add new creators continuously. If they aren\'t tracked yet, request them via the Search page. For TikTok, the Listings page has an instant-add flow that pulls their profile in seconds.',
               },
               {
                 q: 'How is this different from a regular ad?',

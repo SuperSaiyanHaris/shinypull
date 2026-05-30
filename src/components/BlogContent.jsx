@@ -11,6 +11,7 @@ import {
 import KickIcon from './KickIcon';
 import TikTokIcon from './TikTokIcon';
 import BlueskyIcon from './BlueskyIcon';
+import MastodonIcon from './MastodonIcon';
 import { getCategoryTheme } from '../lib/blogTheme';
 
 // Map category iconName -> lucide component
@@ -25,6 +26,7 @@ const PLATFORM_META = {
   tiktok:  { Icon: TikTokIcon, color: 'text-pink-600',   bg: 'bg-pink-50',   border: 'border-pink-200'   },
   kick:    { Icon: KickIcon,   color: 'text-green-600',  bg: 'bg-green-50',  border: 'border-green-200'  },
   bluesky: { Icon: BlueskyIcon,color: 'text-sky-600',    bg: 'bg-sky-50',    border: 'border-sky-200'    },
+  mastodon:{ Icon: MastodonIcon, color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200' },
 };
 
 function CreatorMentions({ creators }) {

@@ -17,6 +17,7 @@ const PLATFORM_LABELS = {
   kick:     'Kick',
   bluesky:  'Bluesky',
   music:    'Music',
+  mastodon: 'Mastodon',
 };
 
 const PLATFORM_COLORS = {
@@ -26,6 +27,7 @@ const PLATFORM_COLORS = {
   kick:     '#22c55e',
   bluesky:  '#0ea5e9',
   music:    '#f59e0b',
+  mastodon: '#7c3aed',
 };
 
 function formatNumber(n) {

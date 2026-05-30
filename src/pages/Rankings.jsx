@@ -37,11 +37,22 @@ function getSeoData(platform, rankType, topCount) {
 
   const metricLabel = rankType === 'views' ? 'Most Viewed' :
     rankType === 'growth' ? 'Fastest Growing' :
-    pid === 'tiktok' || pid === 'twitch' || pid === 'bluesky' ? 'Most Followed' :
+    pid === 'tiktok' || pid === 'twitch' || pid === 'bluesky' || pid === 'mastodon' ? 'Most Followed' :
     pid === 'music' ? 'Most Listeners' :
     pid === 'kick' ? 'Most Subscribed' : 'Most Subscribed';
 
-  const title = `${countLabel} ${p} ${rankType === 'growth' ? 'Fastest Growing' : rankType === 'views' ? 'Most Viewed' : pid === 'youtube' ? 'YouTubers' : p + ' Creators'} (2026) - Live Rankings`;
+  // Avoid duplicating the platform name in the title (e.g. "Top 50 Mastodon Mastodon Creators")
+  // by special-casing each platform's noun, with a generic fallback.
+  const platformNoun = {
+    youtube: 'YouTubers',
+    tiktok: 'TikTokers',
+    twitch: 'Twitch Streamers',
+    kick: 'Kick Streamers',
+    bluesky: 'Bluesky Accounts',
+    music: 'Music Artists',
+    mastodon: 'Mastodon Accounts',
+  }[pid] || `${p} Creators`;
+  const title = `${countLabel} ${rankType === 'growth' ? 'Fastest Growing ' : rankType === 'views' ? 'Most Viewed ' : ''}${platformNoun} (2026) - Live Rankings`;
 
   const descriptions = {
     youtube: `The ${countLabel.toLowerCase()} most subscribed YouTubers ranked by subscribers, views, and growth. Updated daily with live stats. See who has the most YouTube subscribers in 2026.`,
@@ -50,6 +61,7 @@ function getSeoData(platform, rankType, topCount) {
     kick: `${countLabel} Kick streamers ranked by paid subscribers and growth. Updated daily. See the top Kick streamers in 2026.`,
     bluesky: `${countLabel} most followed Bluesky accounts ranked by followers and growth. Updated daily. See who has the most Bluesky followers in 2026.`,
     music: `${countLabel} most listened music artists ranked by monthly listeners and total plays. Updated daily. See who has the most listeners in 2026.`,
+    mastodon: `${countLabel} most followed Mastodon accounts ranked by followers and posts. Updated daily across the fediverse. See who has the most Mastodon followers in 2026.`,
   };
 
   const keywords = {
@@ -59,6 +71,7 @@ function getSeoData(platform, rankType, topCount) {
     kick: `top kick streamers, top ${topCount} kick streamers, most subscribed kick, biggest kick channels 2026, kick rankings`,
     bluesky: `top bluesky accounts, top ${topCount} bluesky creators, most followed bluesky, biggest bluesky accounts 2026, bluesky rankings, bluesky statistics`,
     music: `top music artists, top ${topCount} artists, most listened artists, monthly listeners ranking, biggest music artists 2026, music artist rankings`,
+    mastodon: `top mastodon accounts, top ${topCount} mastodon, most followed mastodon, fediverse rankings, biggest mastodon accounts 2026, mastodon statistics`,
   };
 
   return {
@@ -77,6 +90,7 @@ function getH1Text(platform, topCount) {
     kick: `Top ${topCount} Kick Streamers`,
     bluesky: `Top ${topCount} Bluesky Accounts`,
     music: `Top ${topCount} Music Artists`,
+    mastodon: `Top ${topCount} Mastodon Accounts`,
   };
   return labels[pid] || `Top ${topCount} ${platform?.name} Creators`;
 }
@@ -90,6 +104,7 @@ function getSubheading(platform) {
     kick: 'Ranked by paid subscribers and growth. Updated daily.',
     bluesky: 'Ranked by followers and growth. Updated daily.',
     music: 'Ranked by monthly listeners and total plays. Updated daily.',
+    mastodon: 'Ranked by followers and posts across the fediverse. Updated daily.',
   };
   return subs[pid] || 'Ranked by stats and growth. Updated daily.';
 }
@@ -324,9 +339,9 @@ function PlatformRankings({ urlPlatform }) {
   const [sparklines, setSparklines] = useState({});
 
   const rankTypes = [
-    { id: 'subscribers', name: selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' ? 'Top Followers' : selectedPlatform === 'music' ? 'Top Listeners' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
+    { id: 'subscribers', name: selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' || selectedPlatform === 'mastodon' ? 'Top Followers' : selectedPlatform === 'music' ? 'Top Listeners' : selectedPlatform === 'kick' ? 'Top Paid Subs' : 'Top Subscribers', icon: Users },
     // Hide views for Kick, TikTok, Bluesky, and Music since APIs don't provide view data
-    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && selectedPlatform !== 'music' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
+    ...(selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && selectedPlatform !== 'music' && selectedPlatform !== 'mastodon' ? [{ id: 'views', name: 'Most Views', icon: Eye }] : []),
     { id: 'growth', name: 'Fastest Growing', icon: TrendingUp },
   ];
 
@@ -465,13 +480,13 @@ function PlatformRankings({ urlPlatform }) {
     if (!platformId) return;
     setSelectedPlatform(platformId);
     // Reset rank type if switching to a platform that doesn't support it
-    const noViews = platformId === 'kick' || platformId === 'tiktok' || platformId === 'bluesky' || platformId === 'music';
+    const noViews = platformId === 'kick' || platformId === 'tiktok' || platformId === 'bluesky' || platformId === 'music' || platformId === 'mastodon';
     if (selectedRankType === 'views' && noViews) setSelectedRankType('subscribers');
     navigate(`/rankings/${platformId}`);
     analytics.switchPlatform('rankings', platformId);
   };
 
-  const followerLabel = selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' ? 'Followers' : selectedPlatform === 'music' ? 'Listeners' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
+  const followerLabel = selectedPlatform === 'tiktok' || selectedPlatform === 'twitch' || selectedPlatform === 'bluesky' || selectedPlatform === 'mastodon' ? 'Followers' : selectedPlatform === 'music' ? 'Listeners' : selectedPlatform === 'kick' ? 'Paid Subs' : 'Subscribers';
   const currentPlatform = platforms.find(p => p.id === selectedPlatform);
   const seoData = getSeoData(currentPlatform, selectedRankType, topCount);
   const listSchema = createRankingListSchema(rankings, currentPlatform, topCount);
@@ -561,7 +576,7 @@ function PlatformRankings({ urlPlatform }) {
               {topCountOpen && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setTopCountOpen(false)} />
-                  <div className="absolute left-0 top-full mt-1 bg-gray-900 border border-neutral-300 rounded-xl shadow-lg z-40 min-w-[120px] overflow-hidden">
+                  <div className="absolute left-0 top-full mt-1 bg-white border border-neutral-200 rounded-xl shadow-lg z-40 min-w-[120px] overflow-hidden">
                     {topCounts.map(count => (
                       <button
                         key={count}
@@ -571,7 +586,7 @@ function PlatformRankings({ urlPlatform }) {
                         }}
                         className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors ${
                           topCount === count
-                            ? 'bg-indigo-950/50 text-indigo-300'
+                            ? 'bg-indigo-50 text-indigo-700'
                             : 'text-neutral-700 hover:bg-neutral-50'
                         }`}
                       >
@@ -607,7 +622,7 @@ function PlatformRankings({ urlPlatform }) {
                   <SortIcon column="views" />
                 </button>
               )}
-              {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
+              {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && selectedPlatform !== 'mastodon' && (
                 <button
                   onClick={() => handleSort('views')}
                   className="col-span-2 flex items-center justify-end gap-1 text-right hover:text-neutral-700 transition-colors cursor-pointer"
@@ -762,7 +777,7 @@ function PlatformRankings({ urlPlatform }) {
                       <span className="text-neutral-700 tabular-nums">{formatNumber(creator.totalViews)}</span>
                     </div>
                   )}
-                  {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && (
+                  {selectedPlatform !== 'kick' && selectedPlatform !== 'tiktok' && selectedPlatform !== 'bluesky' && selectedPlatform !== 'mastodon' && (
                     <div className="hidden md:block col-span-2 text-right">
                       <span className="text-neutral-700 tabular-nums">{formatNumber(creator.totalViews)}</span>
                     </div>
