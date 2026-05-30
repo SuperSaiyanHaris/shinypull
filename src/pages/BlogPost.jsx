@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, ArrowLeft, Loader2 } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import SEO from '../components/SEO';
 import StructuredData, { createBlogPostingSchema, createBreadcrumbSchema } from '../components/StructuredData';
 import Breadcrumbs from '../components/Breadcrumbs';
@@ -187,7 +187,7 @@ export default function BlogPost() {
                     to={`/blog/${related.slug}`}
                     className="group"
                   >
-                    <article className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
+                    <article className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden hover:shadow-lg hover:-translate-y-0.5 hover:border-neutral-300 transition-all duration-200">
                       <img
                         src={related.image}
                         alt={related.title}
@@ -195,10 +195,10 @@ export default function BlogPost() {
                         className="w-full h-40 object-cover"
                       />
                       <div className="p-6">
-                        <h3 className="font-bold text-neutral-900 group-hover:text-indigo-400 transition-colors mb-2">
+                        <h3 className="font-bold text-neutral-900 group-hover:text-indigo-600 transition-colors mb-2">
                           {related.title}
                         </h3>
-                        <p className="text-sm text-neutral-700">{related.read_time}</p>
+                        <p className="text-sm text-neutral-500">{related.read_time}</p>
                       </div>
                     </article>
                   </Link>
@@ -207,18 +207,25 @@ export default function BlogPost() {
             </div>
           )}
 
-          {/* CTA */}
-          <div className="mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-center text-white">
-            <h2 className="text-xl font-bold mb-3">Track Your Growth</h2>
-            <p className="text-indigo-200 mb-4">
-              Monitor your channel's statistics and compare with top creators
-            </p>
-            <Link
-              to="/search"
-              className="inline-block px-6 py-2 bg-white text-indigo-300 font-semibold rounded-lg hover:bg-indigo-950/50 transition-colors"
-            >
-              Search Creators
-            </Link>
+          {/* CTA — dark card pattern, accent for visual contrast on the white page */}
+          <div className="mb-12 relative overflow-hidden rounded-2xl bg-neutral-900 border border-neutral-800 p-8 sm:p-10 text-center">
+            <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-20 -left-20 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
+            <div className="relative">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 tracking-tight">
+                Track any creator's growth.
+              </h2>
+              <p className="text-neutral-300 mb-6 max-w-md mx-auto">
+                Daily subscriber and follower counts across YouTube, TikTok, Twitch, Kick, Bluesky, and Music.
+              </p>
+              <Link
+                to="/search"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-neutral-900 font-bold rounded-xl hover:bg-neutral-100 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+              >
+                Search creators
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </div>

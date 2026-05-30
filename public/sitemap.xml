@@ -2,115 +2,115 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://shinypull.com/</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>1</priority>
   </url>
   <url>
     <loc>https://shinypull.com/blog</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings/youtube</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings/twitch</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings/kick</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings/tiktok</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/rankings/bluesky</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/compare</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://shinypull.com/trending</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://shinypull.com/youtube/money-calculator</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://shinypull.com/search</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://shinypull.com/about</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://shinypull.com/contact</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://shinypull.com/support</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://shinypull.com/faq</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://shinypull.com/methodology</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://shinypull.com/privacy</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://shinypull.com/terms</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
@@ -419,6 +419,126 @@
     <lastmod>2026-02-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/balkankinderbeats</loc>
+    <lastmod>2026-05-30</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/twitch/kaicenat</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjaapp</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninja-topic</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjaszso2</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjawarriorleparcoursdesheros</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjakitchenus</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjakidzespanol3373</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjawemadeit.</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjarapsoficial</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjagamingxx</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/tmnt</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjakidz_tv_portugues</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjanerdofficial</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninjakidz</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/ninja</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/music/coldplay</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/bluesky/mosseri.bsky.social</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/kick/ibai</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shinypull.com/youtube/mrbeast</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://shinypull.com/tiktok/itshafu</loc>
@@ -6187,12 +6307,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/mrbeast</loc>
-    <lastmod>2026-05-29</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/kick/liviomateus</loc>
     <lastmod>2026-05-29</lastmod>
     <changefreq>daily</changefreq>
@@ -6314,18 +6428,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/youtube/pswscience</loc>
-    <lastmod>2026-05-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/music/coldplay</loc>
-    <lastmod>2026-05-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/balkankinderbeats</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -6686,12 +6788,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/youtube/fun-channel-animation</loc>
-    <lastmod>2026-05-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/twitch/kaicenat</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -17005,19 +17101,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/ninja-topic</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/youtube/ninja44officiel</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/ninjakitchenus</loc>
     <lastmod>2026-05-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -17029,25 +17113,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/ninjawemadeit.</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/ninjarapsoficial</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/youtube/motoninja</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/ninjagamingxx</loc>
     <lastmod>2026-05-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -17071,37 +17137,13 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/tmnt</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/youtube/ninjaflow</loc>
     <lastmod>2026-05-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/youtube/ninjakidz_tv_portugues</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/youtube/theninjafam</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/ninjakidz</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/youtube/ninja</loc>
     <lastmod>2026-05-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -101359,12 +101401,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://shinypull.com/bluesky/mosseri.bsky.social</loc>
-    <lastmod>2026-02-22</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://shinypull.com/bluesky/atproto.com</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>daily</changefreq>
@@ -138620,12 +138656,6 @@
   </url>
   <url>
     <loc>https://shinypull.com/kick/ice-poseidon</loc>
-    <lastmod>2026-02-10</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://shinypull.com/kick/ibai</loc>
     <lastmod>2026-02-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
