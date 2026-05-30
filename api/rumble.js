@@ -60,6 +60,36 @@ function extractMeta(html, propertyName, propertyAttr = 'property') {
   return m[1] || m[2] || m[3] || null;
 }
 
+/**
+ * Rumble doesn't expose total video count on the channel page (the count is
+ * loaded via client-side JS). The /videos tab is paginated server-side though
+ * so we can derive a true count by:
+ *   1. Pulling page 1 and finding the largest `?page=N` link in its paginator.
+ *   2. Fetching page N and counting `data-video-id` items.
+ *   3. Total = (N-1) * 50 + items_on_last_page (Rumble lists 50/page).
+ * The two extra fetches are only done when the caller explicitly asks for it.
+ */
+async function fetchRumbleVideoCount(kind, slug) {
+  try {
+    const firstRes = await fetch(`${BASE}/${kind}/${slug}/videos`, { headers: FETCH_HEADERS, signal: AbortSignal.timeout(15000) });
+    const firstHtml = await firstRes.text();
+    const pageMatches = [...firstHtml.matchAll(/[?&]page=(\d+)/g)].map(m => parseInt(m[1], 10)).filter(n => Number.isFinite(n));
+    const firstPageCount = (firstHtml.match(/data-video-id=/g) || []).length;
+    if (pageMatches.length === 0) return firstPageCount;
+    const lastPage = Math.max(...pageMatches);
+    if (lastPage <= 1) return firstPageCount;
+    const lastRes = await fetch(`${BASE}/${kind}/${slug}/videos?page=${lastPage}`, { headers: FETCH_HEADERS, signal: AbortSignal.timeout(15000) });
+    const lastHtml = await lastRes.text();
+    const lastCount = (lastHtml.match(/data-video-id=/g) || []).length;
+    // Walk further if last page itself links to a higher one (rare paginator overflow)
+    const lastPageMatches = [...lastHtml.matchAll(/[?&]page=(\d+)/g)].map(m => parseInt(m[1], 10)).filter(n => Number.isFinite(n));
+    const trueLast = lastPageMatches.length ? Math.max(lastPage, ...lastPageMatches) : lastPage;
+    return (trueLast - 1) * 50 + lastCount;
+  } catch {
+    return 0;
+  }
+}
+
 function parseChannelHtml(html, { slug, kind, profileUrl }) {
   if (!html) return null;
 

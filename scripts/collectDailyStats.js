@@ -244,6 +244,30 @@ function rumbleParseAbbreviated(str) {
   return Math.round(num);
 }
 
+// Rumble doesn't print a total video count on the channel page (loaded by JS).
+// The /videos tab is server-paginated 50/page so we can derive it by hitting
+// the first page, finding the largest linked page number, fetching that page,
+// and counting items on it: total = (lastPage - 1) * 50 + itemsOnLastPage.
+async function fetchRumbleVideoCount(kind, slug) {
+  try {
+    const r1 = await fetch(`https://rumble.com/${kind}/${slug}/videos`, { headers: RUMBLE_HEADERS, signal: AbortSignal.timeout(15000) });
+    const h1 = await r1.text();
+    const pages = [...h1.matchAll(/[?&]page=(\d+)/g)].map(m => parseInt(m[1], 10)).filter(Number.isFinite);
+    const firstCount = (h1.match(/data-video-id=/g) || []).length;
+    if (pages.length === 0) return firstCount;
+    const lastPage = Math.max(...pages);
+    if (lastPage <= 1) return firstCount;
+    const r2 = await fetch(`https://rumble.com/${kind}/${slug}/videos?page=${lastPage}`, { headers: RUMBLE_HEADERS, signal: AbortSignal.timeout(15000) });
+    const h2 = await r2.text();
+    const lastCount = (h2.match(/data-video-id=/g) || []).length;
+    const morePages = [...h2.matchAll(/[?&]page=(\d+)/g)].map(m => parseInt(m[1], 10)).filter(Number.isFinite);
+    const trueLast = morePages.length ? Math.max(lastPage, ...morePages) : lastPage;
+    return (trueLast - 1) * 50 + lastCount;
+  } catch {
+    return 0;
+  }
+}
+
 async function fetchRumbleChannel(platformId) {
   // platformId is `c:slug` or `user:slug` (legacy rows might just be a slug — default to `c:`)
   let kind = 'c';
@@ -269,17 +293,8 @@ async function fetchRumbleChannel(platformId) {
     }
   }
 
-  let totalPosts = 0;
-  for (const re of [
-    /<span[^>]*data-test="video-count"[^>]*>([\d.,KMB\s]+)<\/span>/i,
-    />\s*([\d.,]+\s*[KMB]?)\s*videos?\b/i,
-  ]) {
-    const m = html.match(re);
-    if (m && m[1]) {
-      totalPosts = rumbleParseAbbreviated(m[1]);
-      if (totalPosts > 0) break;
-    }
-  }
+  // Channel page doesn't expose a video count we can trust — derive via paginator
+  const totalPosts = await fetchRumbleVideoCount(kind, slug);
 
   // Banner + verified
   let bannerImage = null;

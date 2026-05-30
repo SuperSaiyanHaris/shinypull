@@ -219,15 +219,47 @@ export default function CreatorProfile() {
         channelData = await getBlueskyProfile(username);
       } else if (platform === 'mastodon') {
         // Mastodon username is the full webfinger handle, e.g. "user@hachyderm.io".
-        // getMastodonProfile parses + dispatches to the right instance API.
-        channelData = await getMastodonProfile(username);
-        // Fetch the latest visible status content to render the Latest Post card.
-        // Mastodon's account object only includes last_status_at (timestamp); the
-        // title/url/thumbnail require a second hop to /accounts/:id/statuses.
-        if (channelData?.platformId) {
-          const [instance, accountId] = channelData.platformId.split(':');
-          const latest = await getMastodonLatestStatus(instance, accountId);
-          if (latest) channelData.latestPost = latest;
+        // DB-first because (a) the federated network has ~30 instances we track —
+        // CSP can't enumerate them all, and (b) some instances rate-limit anon
+        // lookups with 401. Live `/api/mastodon` proxy is used as fallback only.
+        const dbCreator = await getCreatorByUsername('mastodon', username);
+        if (dbCreator) {
+          channelData = {
+            platform: 'mastodon',
+            platformId: dbCreator.platform_id,
+            username: dbCreator.username,
+            displayName: dbCreator.display_name,
+            profileImage: dbCreator.profile_image,
+            bannerImage: dbCreator.banner_image,
+            verified: dbCreator.verified,
+            description: dbCreator.description,
+            country: dbCreator.country,
+            category: dbCreator.category,
+            subscribers: null,
+            followers: null,
+            totalPosts: null,
+            totalViews: null,
+            latestPost: dbCreator.latest_post_at ? {
+              publishedAt: dbCreator.latest_post_at,
+              title: dbCreator.latest_post_title,
+              url: dbCreator.latest_post_url,
+              thumbnail: dbCreator.latest_post_thumbnail,
+            } : null,
+            profileUrl: (() => {
+              const [u, inst] = (dbCreator.username || '').split('@');
+              return inst ? `https://${inst}/@${u}` : null;
+            })(),
+          };
+          // Non-blocking: try to enrich latest post content. If the proxy errors
+          // we keep the cached timestamp from the DB.
+          try {
+            const fresh = await getMastodonLatestStatus(dbCreator.username);
+            if (fresh) channelData.latestPost = { ...(channelData.latestPost || {}), ...fresh };
+          } catch { /* swallow — never fail the whole page on this */ }
+        } else {
+          // Lazy hydration for an unknown handle — go straight to the proxy in
+          // full mode so we get profile + latest status in one round trip.
+          channelData = await getMastodonProfile(username, { latest: true });
         }
       } else if (platform === 'rumble') {
         // Rumble: DB-first, because Rumble's edge 403s Vercel datacenter IPs.

@@ -95,29 +95,16 @@ function normalizeProfile(account, instance) {
 }
 
 /**
- * Fetch the latest visible (public) status from a Mastodon account.
- * Used by the profile page to render a "Latest post" card. Returns null if
- * the account has no visible posts or the request fails.
+ * Fetch the latest visible (public) status for a handle via our proxy.
+ * Used by the profile page to enrich the "Latest post" card with content.
  */
-export async function getMastodonLatestStatus(instance, accountId) {
-  if (!instance || !accountId) return null;
+export async function getMastodonLatestStatus(handle) {
+  if (!handle) return null;
   try {
-    const url = `https://${instance}/api/v1/accounts/${accountId}/statuses?limit=1&exclude_replies=true&exclude_reblogs=true`;
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    const res = await fetch(`/api/mastodon?handle=${encodeURIComponent(handle)}&latest=1`, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) return null;
-    const arr = await res.json();
-    const status = Array.isArray(arr) ? arr[0] : null;
-    if (!status) return null;
-    return {
-      url: status.url || status.uri,
-      title: stripHtml(status.content)?.substring(0, 200) || null,
-      publishedAt: status.created_at,
-      views: null, // Mastodon doesn't expose per-post view counts
-      favourites: status.favourites_count || 0,
-      reblogs: status.reblogs_count || 0,
-      replies: status.replies_count || 0,
-      thumbnail: status.media_attachments?.[0]?.preview_url || null,
-    };
+    const data = await res.json();
+    return data?.latestPost || null;
   } catch {
     return null;
   }
@@ -126,37 +113,26 @@ export async function getMastodonLatestStatus(instance, accountId) {
 /**
  * Fetch a Mastodon profile by handle.
  * Accepts `user@instance`, `@user@instance`, or a profile URL.
+ *
+ * Routes through `/api/mastodon` because Mastodon is federated across
+ * hundreds of instances — enumerating each in CSP `connect-src` is unfeasible.
+ * The serverless proxy also retries via mastodon.social federated search when
+ * the home instance 401s/rate-limits anonymous lookups.
+ *
+ * Pass `{ latest: true }` to fetch the latest visible status in the same hop.
  */
-export async function getMastodonProfile(input) {
+export async function getMastodonProfile(input, { latest = false } = {}) {
   const { username, instance } = parseHandle(input);
   if (!username || !instance) return null;
-
-  // Primary: hit the instance's own lookup endpoint
+  const handle = `${username}@${instance}`;
+  const params = new URLSearchParams({ handle });
+  if (latest) params.set('full', '1');
   try {
-    const url = `https://${instance}/api/v1/accounts/lookup?acct=${encodeURIComponent(username)}`;
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (res.status === 404) return null;
-    if (!res.ok) throw new Error(`Mastodon API error ${res.status}`);
-    const account = await res.json();
-    return normalizeProfile(account, instance);
-  } catch (err) {
-    // Fallback: mastodon.social federated search (works for almost any handle visible to that instance)
-    if (instance !== 'mastodon.social') {
-      try {
-        const fallbackUrl = `https://mastodon.social/api/v2/search?q=${encodeURIComponent(`${username}@${instance}`)}&type=accounts&limit=1&resolve=true`;
-        const res = await fetch(fallbackUrl, { headers: { Accept: 'application/json' } });
-        if (res.ok) {
-          const data = await res.json();
-          const account = data.accounts?.[0];
-          if (account) {
-            // account.acct on a remote profile is `user@instance`
-            const acctInstance = account.acct.includes('@') ? account.acct.split('@')[1] : instance;
-            return normalizeProfile(account, acctInstance);
-          }
-        }
-      } catch {}
-    }
-    throw err;
+    const res = await fetch(`/api/mastodon?${params}`, { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
   }
 }
 
