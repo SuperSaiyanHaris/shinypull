@@ -1338,8 +1338,8 @@ export default function CreatorProfile() {
               </div>
             )}
 
-            {/* Growth Rate Cards - Other platforms */}
-            {platform !== 'twitch' && platform !== 'kick' && platform !== 'bluesky' && metrics && metrics.growthRates && statsHistory.length >= 7 && (
+            {/* Growth Rate Cards - Other platforms (Mastodon uses the Twitch/Kick/Bluesky branch above) */}
+            {platform !== 'twitch' && platform !== 'kick' && platform !== 'bluesky' && platform !== 'mastodon' && metrics && metrics.growthRates && statsHistory.length >= 7 && (
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <GrowthRateCard
                   label="7-Day Growth"
@@ -1354,8 +1354,8 @@ export default function CreatorProfile() {
               </div>
             )}
 
-            {/* Growth Summary - Non Twitch/Kick/Bluesky platforms */}
-            {platform !== 'twitch' && platform !== 'kick' && platform !== 'bluesky' && (creator.subscribers || creator.followers) && (
+            {/* Growth Summary - Non Twitch/Kick/Bluesky/Mastodon platforms (those use the SummaryCard rendered above) */}
+            {platform !== 'twitch' && platform !== 'kick' && platform !== 'bluesky' && platform !== 'mastodon' && (creator.subscribers || creator.followers) && (
               <div className={`grid gap-4 mb-6 ${
                 platform === 'youtube' ? 'grid-cols-2 lg:grid-cols-4'
                 : platform === 'tiktok' || platform === 'music' ? 'grid-cols-2'
@@ -1502,8 +1502,10 @@ export default function CreatorProfile() {
               </a>
             )}
 
-            {/* Live Counter Link - Hidden for TikTok and Bluesky (no real-time updates) */}
-            {platform !== 'tiktok' && platform !== 'bluesky' && (
+            {/* Live Counter Link - Hidden for TikTok, Bluesky, and Mastodon.
+                These platforms don't have a meaningful "ticking up in real time" experience —
+                follower counts change slowly. The counter exists for YT/Twitch/Kick where numbers move every second. */}
+            {platform !== 'tiktok' && platform !== 'bluesky' && platform !== 'mastodon' && (
               <Link
                 to={`/live/${platform}/${creator.username}`}
                 className="flex items-center justify-between bg-indigo-600 rounded-2xl p-4 sm:p-5 mb-6 text-white hover:bg-indigo-500 transition-all group"
