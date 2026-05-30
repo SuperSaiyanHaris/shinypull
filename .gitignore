@@ -53,3 +53,4 @@ tmpclaude-*
 
 # PowerShell scripts (may contain or expose credentials — never commit)
 *.ps1
+_*.html
