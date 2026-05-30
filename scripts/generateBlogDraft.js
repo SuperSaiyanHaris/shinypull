@@ -479,26 +479,37 @@ async function researchAgent(articles, postData) {
     ? `\nRECENT (last 30 days) — strongest exclusion. Any article about the same person, company, or event as these titles is off-limits:\n${recentTitles.map(t => `- ${t}`).join('\n')}\n`
     : '';
 
-  // Detect streaks — same category used 2+ times in the last 3 posts
-  const last3 = recentCategories.slice(0, 3);
-  const streakCategory = last3.length >= 2 && last3[0] === last3[1] ? last3[0] : null;
-  const hardBlock = streakCategory && last3[0] === last3[1] && last3[1] === last3[2]
-    ? streakCategory  // 3 in a row = hard block
-    : null;
+  // STRICT category rotation: every new post MUST be a different category from
+  // the previous post AND must avoid any category used in the last 3 posts.
+  // Past leniency (warn-at-2, block-at-3) let the model run 7 Industry News
+  // posts in a row in May 2026. No more.
+  const ALL_CATEGORIES = [
+    'Creator Economy', 'Industry News', 'Platform Updates', 'Analytics',
+    'Tips & Strategy', 'Growth Tips', 'Industry Insights', 'Streaming Gear',
+    'Tutorials', 'YouTube News', 'Twitch Trends', 'Creator Spotlight', 'Rankings',
+  ];
+  const forbiddenCategories = [...new Set(recentCategories.slice(0, 3))]; // last 3 posts' categories
+  const allowedCategories = ALL_CATEGORIES.filter(c => !forbiddenCategories.includes(c));
+  // Prioritize categories that haven't been used in the last 7 posts at all
+  const lastSeven = new Set(recentCategories.slice(0, 7));
+  const freshCategories = allowedCategories.filter(c => !lastSeven.has(c));
+  const priorityList = freshCategories.length > 0 ? freshCategories : allowedCategories;
 
   const categoryHint = [
     saturatedCategories.length > 0
-      ? `OVER-REPRESENTED all-time (> 20% of total posts — deprioritize): ${saturatedCategories.join(', ')}`
+      ? `OVER-REPRESENTED all-time (>20% of total posts — deprioritize): ${saturatedCategories.join(', ')}`
       : '',
-    streakCategory && !hardBlock
-      ? `RECENT STREAK WARNING: the last 2 posts were both "${streakCategory}". Pick a different category this time unless the story is genuinely exceptional.`
+    forbiddenCategories.length > 0
+      ? `STRICTLY FORBIDDEN — the last ${forbiddenCategories.length} posts already used these. Picking one will be auto-rejected: ${forbiddenCategories.join(', ')}`
       : '',
-    hardBlock
-      ? `HARD CATEGORY BLOCK: the last 3 posts in a row were all "${hardBlock}". You MUST pick a different category. No exceptions.`
+    `ALLOWED categories (pick exactly one for "suggestedCategory"): ${allowedCategories.join(', ')}`,
+    freshCategories.length > 0
+      ? `STRONGLY PREFERRED — these haven't appeared in the last 7 posts and we want variety: ${freshCategories.join(', ')}`
       : '',
+    `If no article in the list fits any allowed category, you may bend an angle to fit. Do NOT pick a forbidden category.`,
   ].filter(Boolean).join('\n');
 
-  const categoryBlock = categoryHint ? `\n${categoryHint}\n` : '';
+  const categoryBlock = `\n${categoryHint}\n`;
 
   // Extract proper nouns from all titles as an entity-level exclusion signal
   const entityBlacklist = [...new Set(
@@ -507,8 +518,13 @@ async function researchAgent(articles, postData) {
     )
   )].slice(0, 80);
 
+  // Build a hard "recent topics" blocklist from the last 10 posts. Any selected
+  // article that overlaps in subject matter with these is auto-rejected by the
+  // model. This prevents back-to-back posts about "AI vs creators," "NYT vs AI,"
+  // etc. that we saw in late May 2026.
+  const recentTopicTitles = (allTitles.slice(0, 10) || []);
   const entityBlock = entityBlacklist.length > 0
-    ? `\nKEY ENTITIES already covered (people, companies, platforms, products — if a new article is primarily ABOUT one of these and we already covered a story about them, skip it unless it is a genuinely separate event at least 60 days apart):\n${entityBlacklist.join(', ')}\n`
+    ? `\nKEY ENTITIES already covered (people, companies, platforms, products). If a new article is primarily ABOUT one of these AND the subject overlaps with any of the last 10 posts, SKIP IT. We need genuinely new subject matter:\n${entityBlacklist.join(', ')}\n\nHARD subject-overlap block — if the article shares the same core subject (e.g. "AI and journalism", "X platform's algorithm change", "Y creator's controversy") as any of these recent posts, you must skip it and pick a different article:\n${recentTopicTitles.map(t => `- ${t}`).join('\n')}\n`
     : '';
 
   const text = await callWithRetry(() => geminiGenerate(`You are a research editor for ShinyPull, a creator analytics platform tracking YouTube, TikTok, Twitch, Kick, and Bluesky stats.
@@ -551,7 +567,7 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
   "angle": "what unique angle to take for our creator-focused audience (1-2 sentences)",
   "keyFacts": ["fact 1", "fact 2", "fact 3"],
   "suggestedTitle": "specific, fresh title under 70 chars — must NOT match any forbidden formula above",
-  "suggestedCategory": "one of: Creator Economy, Industry News, Platform Updates, Analytics, Tips & Strategy, Growth Tips, Industry Insights, Streaming Gear, Tutorials, YouTube News, Twitch Trends, Creator Spotlight, Rankings"
+  "suggestedCategory": "MUST be one of these ALLOWED categories — picking anything else will be auto-rejected: ${allowedCategories.join(', ')}"
 }`, 4096));
 
   const research = safeParseJSON(text, {
@@ -560,9 +576,20 @@ Respond with ONLY valid JSON (no markdown fences, no explanation):
     angle: 'General creator economy news',
     keyFacts: [],
     suggestedTitle: articles[0]?.title?.substring(0, 70) || 'Creator News',
-    suggestedCategory: 'Industry News',
+    suggestedCategory: allowedCategories[0] || 'Creator Economy',
   });
-  console.log(`✅ Research: "${research.suggestedTitle}"`);
+
+  // ENFORCE category rotation. If the model ignored the constraint and picked a
+  // forbidden category, reassign to the highest-priority allowed one. This is
+  // the last line of defense — without it Gemini will gravitate to "Industry
+  // News" because most RSS articles fit there.
+  if (forbiddenCategories.includes(research.suggestedCategory)) {
+    const fallback = priorityList[0] || allowedCategories[0] || 'Creator Economy';
+    console.log(`⚠️  Model picked forbidden category "${research.suggestedCategory}". Overriding → "${fallback}"`);
+    research.suggestedCategory = fallback;
+  }
+
+  console.log(`✅ Research: "${research.suggestedTitle}" [${research.suggestedCategory}]`);
   return research;
 }
 
