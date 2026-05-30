@@ -174,7 +174,9 @@ async function fetchCategoryHandles(category, page) {
     const html = await res.text();
     const seen = new Set();
     const out = [];
-    const re = /href="\/(c|user)\/([^"/?#]+)"/g;
+    // Rumble appends `?e9s=src_v1_clr` tracking params to channel hrefs, so
+    // the slug is followed by ? or " — match either as a terminator.
+    const re = /href="\/(c|user)\/([^"/?#]+)/g;
     let m;
     while ((m = re.exec(html)) !== null) {
       const key = `${m[1]}:${m[2]}`;

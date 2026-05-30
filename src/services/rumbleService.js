@@ -204,7 +204,8 @@ export async function browseCategoryChannels(category, page = 1) {
   // Pull all href="/c/foo" and href="/user/bar" occurrences. Dedupe.
   const seen = new Set();
   const out = [];
-  const re = /href="\/(c|user)\/([^"/?#]+)"/g;
+  // Rumble appends `?e9s=src_v1_clr` tracking params; match the slug only
+  const re = /href="\/(c|user)\/([^"/?#]+)/g;
   let m;
   while ((m = re.exec(html)) !== null) {
     const key = `${m[1]}:${m[2]}`;
@@ -229,7 +230,8 @@ export async function searchRumble(query, limit = 15) {
 
   const seen = new Set();
   const handles = [];
-  const re = /href="\/(c|user)\/([^"/?#]+)"/g;
+  // Rumble appends `?e9s=src_v1_clr` tracking params; match the slug only
+  const re = /href="\/(c|user)\/([^"/?#]+)/g;
   let m;
   while ((m = re.exec(html)) !== null && handles.length < limit) {
     const key = `${m[1]}:${m[2]}`;
