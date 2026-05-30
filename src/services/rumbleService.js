@@ -117,12 +117,44 @@ export function parseChannelHtml(html, { slug, kind, profileUrl }) {
     }
   }
 
+  // Banner image at the top of the channel
+  let bannerImage = null;
+  const bannerMatch = html.match(/class=["']?channel-header--backsplash-img["']?[^>]*src=["']([^"']+)["']/i);
+  if (bannerMatch) bannerImage = bannerMatch[1];
+
+  // Verified badge presence
+  const verified = /channel-header--verified|verification-badge-icon/i.test(html);
+
+  // Latest video (first thumbnail in the grid)
+  let latestPost = null;
+  const videoBlockMatch = html.match(/<div\s+class=["']videostream[^"']*["'][\s\S]*?data-video-id=["'](\d+)["'][\s\S]*?<\/address>/i);
+  if (videoBlockMatch) {
+    const block = videoBlockMatch[0];
+    const linkMatch = block.match(/href=["'](\/v[^"'?]+\.html)/i);
+    const titleAttrMatch = block.match(/<h3[^>]*title=["']([^"']+)["']/i)
+      || block.match(/<h3[^>]*>\s*([^<]+?)\s*<\/h3>/i);
+    const dateMatch = block.match(/<time[^>]*datetime=["']([^"']+)["']/i);
+    const viewsMatch = block.match(/data-views=["'](\d+)["']/i);
+    const thumbMatch = block.match(/class=["']thumbnail__image[^"']*["']\s+[^>]*src=["']([^"']+)["']/i);
+    if (linkMatch && titleAttrMatch) {
+      latestPost = {
+        url: `${BASE}${linkMatch[1]}`,
+        title: cleanText(titleAttrMatch[1]),
+        publishedAt: dateMatch ? dateMatch[1] : null,
+        views: viewsMatch ? parseInt(viewsMatch[1], 10) : null,
+        thumbnail: thumbMatch ? thumbMatch[1] : null,
+      };
+    }
+  }
+
   return {
     platform: 'rumble',
     platformId: `${kind}:${slug}`,
     username: slug,
     displayName,
     profileImage,
+    bannerImage,
+    verified,
     description,
     country: null,
     category: null,
@@ -130,6 +162,7 @@ export function parseChannelHtml(html, { slug, kind, profileUrl }) {
     followers,
     totalPosts,
     totalViews: null, // Aggregating per-video view counts would require N extra requests; skip for v1
+    latestPost,
     profileUrl,
   };
 }

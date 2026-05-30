@@ -281,7 +281,35 @@ async function fetchRumbleChannel(platformId) {
     }
   }
 
-  return { followers, totalPosts };
+  // Banner + verified
+  let bannerImage = null;
+  const bannerMatch = html.match(/class=["']?channel-header--backsplash-img["']?[^>]*src=["']([^"']+)["']/i);
+  if (bannerMatch) bannerImage = bannerMatch[1];
+  const verified = /channel-header--verified|verification-badge-icon/i.test(html);
+
+  // Latest video
+  let latestPost = null;
+  const videoBlockMatch = html.match(/<div\s+class=["']videostream[^"']*["'][\s\S]*?data-video-id=["'](\d+)["'][\s\S]*?<\/address>/i);
+  if (videoBlockMatch) {
+    const block = videoBlockMatch[0];
+    const linkMatch = block.match(/href=["'](\/v[^"'?]+\.html)/i);
+    const titleAttrMatch = block.match(/<h3[^>]*title=["']([^"']+)["']/i)
+      || block.match(/<h3[^>]*>\s*([^<]+?)\s*<\/h3>/i);
+    const dateMatch = block.match(/<time[^>]*datetime=["']([^"']+)["']/i);
+    const viewsMatch = block.match(/data-views=["'](\d+)["']/i);
+    const thumbMatch = block.match(/class=["']thumbnail__image[^"']*["']\s+[^>]*src=["']([^"']+)["']/i);
+    if (linkMatch && titleAttrMatch) {
+      latestPost = {
+        url: `https://rumble.com${linkMatch[1]}`,
+        title: (titleAttrMatch[1] || '').replace(/&amp;/g, '&').replace(/&#39;/g, "'").trim().substring(0, 500),
+        publishedAt: dateMatch ? dateMatch[1] : null,
+        views: viewsMatch ? parseInt(viewsMatch[1], 10) : null,
+        thumbnail: thumbMatch ? thumbMatch[1] : null,
+      };
+    }
+  }
+
+  return { followers, totalPosts, bannerImage, verified, latestPost };
 }
 
 // ========== MASTODON API HELPERS ==========
@@ -296,9 +324,15 @@ async function fetchMastodonProfile(handle) {
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const account = await res.json();
+  const headerMissing = !account.header || account.header.endsWith('/headers/original/missing.png');
   return {
     followers: account.followers_count ?? 0,
     totalPosts: account.statuses_count ?? 0,
+    bannerImage: headerMissing ? null : account.header,
+    verified: Array.isArray(account.fields) && account.fields.some(f => f.verified_at),
+    // Use last_status_at directly — full status content is on-demand only
+    latestPost: account.last_status_at ? { publishedAt: account.last_status_at } : null,
+    accountId: account.id,
   };
 }
 
@@ -423,6 +457,9 @@ async function collectDailyStats() {
   let successCount = 0;
   let errorCount = 0;
   const statsToUpsert = [];
+  // Per-creator metadata updates (latest post, banner, verified) — separate
+  // from creator_stats because these are mutable "current state" fields.
+  const creatorUpdates = [];
 
   // ========== YOUTUBE (batch by 50) ==========
   if (youtubeCreators.length > 0 && YOUTUBE_API_KEY) {
@@ -645,6 +682,16 @@ async function collectDailyStats() {
             total_views: null,
             total_posts: stats.totalPosts,
           });
+          creatorUpdates.push({
+            id: creator.id,
+            banner_image: stats.bannerImage,
+            verified: !!stats.verified,
+            latest_post_at: stats.latestPost?.publishedAt || null,
+            latest_post_title: null,
+            latest_post_url: null,
+            latest_post_thumbnail: null,
+            latest_post_views: null,
+          });
           console.log(`   ✅ ${creator.display_name}: ${stats.followers.toLocaleString()} followers`);
           successCount++;
         } else if (stats && stats.followers === 0) {
@@ -682,6 +729,16 @@ async function collectDailyStats() {
             followers: stats.followers,
             total_views: null,
             total_posts: stats.totalPosts || null,
+          });
+          creatorUpdates.push({
+            id: creator.id,
+            banner_image: stats.bannerImage,
+            verified: !!stats.verified,
+            latest_post_at: stats.latestPost?.publishedAt || null,
+            latest_post_title: stats.latestPost?.title || null,
+            latest_post_url: stats.latestPost?.url || null,
+            latest_post_thumbnail: stats.latestPost?.thumbnail || null,
+            latest_post_views: stats.latestPost?.views || null,
           });
           console.log(`   ✅ ${creator.display_name}: ${stats.followers.toLocaleString()} followers`);
           successCount++;
@@ -748,6 +805,27 @@ async function collectDailyStats() {
       }
     }
     console.log('   ✅ Database updated');
+  }
+
+  // ========== UPDATE CREATOR METADATA (latest post, banner, verified) ==========
+  // Done as one-by-one updates because PostgREST's upsert clobbers fields we
+  // didn't intend to touch (e.g. country/category/description). We only want
+  // to refresh the columns we just learned about.
+  if (creatorUpdates.length > 0) {
+    console.log(`\n🧾 Updating creator metadata for ${creatorUpdates.length} rows...`);
+    let metaOk = 0;
+    for (const upd of creatorUpdates) {
+      const { id, ...fields } = upd;
+      // Skip if every field is null/false — nothing to update
+      const hasAny = Object.values(fields).some((v) => v !== null && v !== false);
+      if (!hasAny) continue;
+      const { error: updateErr } = await supabase
+        .from('creators')
+        .update({ ...fields, updated_at: new Date().toISOString() })
+        .eq('id', id);
+      if (!updateErr) metaOk++;
+    }
+    console.log(`   ✅ Updated ${metaOk}/${creatorUpdates.length} creator rows`);
   }
 
   // ========== SUMMARY ==========

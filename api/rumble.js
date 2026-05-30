@@ -71,10 +71,41 @@ function parseChannelHtml(html, { slug, kind, profileUrl }) {
   // Avatar: og:image is the most reliable source
   const profileImage = extractMeta(html, 'og:image') || null;
 
+  // Banner: channel-header--backsplash-img (full-width banner at top)
+  let bannerImage = null;
+  const bannerMatch = html.match(/class=["']?channel-header--backsplash-img["']?[^>]*src=["']([^"']+)["']/i)
+    || html.match(/<img[^>]*class=["']channel-header--backsplash-img["'][^>]*src=["']([^"']+)["']/i);
+  if (bannerMatch) bannerImage = bannerMatch[1];
+
+  // Verified: presence of the verification-badge-icon SVG in the channel header block
+  const verified = /channel-header--verified|verification-badge-icon/i.test(html);
+
   // Description: prefer name=description, fall back to og:description
   const description = cleanText(
     extractMeta(html, 'description', 'name') || extractMeta(html, 'og:description')
   );
+
+  // Latest video: first .videostream block in the thumbnail__grid
+  let latestPost = null;
+  const videoBlockMatch = html.match(/<div\s+class=["']videostream[^"']*["'][\s\S]*?data-video-id=["'](\d+)["'][\s\S]*?<\/address>/i);
+  if (videoBlockMatch) {
+    const block = videoBlockMatch[0];
+    const linkMatch = block.match(/href=["'](\/v[^"'?]+\.html)/i);
+    const titleAttrMatch = block.match(/<h3[^>]*title=["']([^"']+)["']/i)
+      || block.match(/<h3[^>]*>\s*([^<]+?)\s*<\/h3>/i);
+    const dateMatch = block.match(/<time[^>]*datetime=["']([^"']+)["']/i);
+    const viewsMatch = block.match(/data-views=["'](\d+)["']/i);
+    const thumbMatch = block.match(/class=["']thumbnail__image[^"']*["']\s+[^>]*src=["']([^"']+)["']/i);
+    if (linkMatch && titleAttrMatch) {
+      latestPost = {
+        url: `${BASE}${linkMatch[1]}`,
+        title: cleanText(titleAttrMatch[1]),
+        publishedAt: dateMatch ? dateMatch[1] : null,
+        views: viewsMatch ? parseInt(viewsMatch[1], 10) : null,
+        thumbnail: thumbMatch ? thumbMatch[1] : null,
+      };
+    }
+  }
 
   let followers = 0;
   for (const re of [
@@ -108,6 +139,8 @@ function parseChannelHtml(html, { slug, kind, profileUrl }) {
     username: slug,
     displayName,
     profileImage,
+    bannerImage,
+    verified,
     description,
     country: null,
     category: null,
@@ -115,6 +148,7 @@ function parseChannelHtml(html, { slug, kind, profileUrl }) {
     followers,
     totalPosts,
     totalViews: null,
+    latestPost,
     profileUrl,
   };
 }

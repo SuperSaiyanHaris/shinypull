@@ -75,6 +75,8 @@ function normalizeProfile(account, instance) {
     username: `${account.username}@${instance}`,
     displayName: account.display_name || account.username,
     profileImage: account.avatar || account.avatar_static || null,
+    bannerImage: account.header && !account.header.endsWith('/headers/original/missing.png') ? account.header : null,
+    verified: Array.isArray(account.fields) && account.fields.some(f => f.verified_at),
     description: stripHtml(account.note),
     country: null,
     category: null,
@@ -83,10 +85,42 @@ function normalizeProfile(account, instance) {
     totalPosts: account.statuses_count || 0,
     totalViews: null,
     createdAt: account.created_at || null,
+    // Mastodon natively exposes the latest activity timestamp on the account.
+    // Full content is fetched on-demand by `getMastodonLatestStatus`.
+    latestPost: account.last_status_at ? { publishedAt: account.last_status_at } : null,
     instance,
     rawHandle: `@${account.username}@${instance}`,
     profileUrl: account.url || `https://${instance}/@${account.username}`,
   };
+}
+
+/**
+ * Fetch the latest visible (public) status from a Mastodon account.
+ * Used by the profile page to render a "Latest post" card. Returns null if
+ * the account has no visible posts or the request fails.
+ */
+export async function getMastodonLatestStatus(instance, accountId) {
+  if (!instance || !accountId) return null;
+  try {
+    const url = `https://${instance}/api/v1/accounts/${accountId}/statuses?limit=1&exclude_replies=true&exclude_reblogs=true`;
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) return null;
+    const arr = await res.json();
+    const status = Array.isArray(arr) ? arr[0] : null;
+    if (!status) return null;
+    return {
+      url: status.url || status.uri,
+      title: stripHtml(status.content)?.substring(0, 200) || null,
+      publishedAt: status.created_at,
+      views: null, // Mastodon doesn't expose per-post view counts
+      favourites: status.favourites_count || 0,
+      reblogs: status.reblogs_count || 0,
+      replies: status.replies_count || 0,
+      thumbnail: status.media_attachments?.[0]?.preview_url || null,
+    };
+  } catch {
+    return null;
+  }
 }
 
 /**

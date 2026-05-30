@@ -12,7 +12,7 @@ import { getChannelByUsername as getYouTubeChannel, getChannelById as getYouTube
 import { getChannelByUsername as getTwitchChannel, getLiveStreams as getTwitchLiveStreams } from '../services/twitchService';
 import { getChannelByUsername as getKickChannel, getLiveStreams as getKickLiveStreams } from '../services/kickService';
 import { getBlueskyProfile } from '../services/blueskyService';
-import { getMastodonProfile } from '../services/mastodonService';
+import { getMastodonProfile, getMastodonLatestStatus } from '../services/mastodonService';
 import { getRumbleChannel } from '../services/rumbleService';
 import { getArtistByMbid, getArtistByName, getArtistTopTracks, getArtistTopAlbums } from '../services/musicService';
 import { Music } from 'lucide-react';
@@ -25,7 +25,7 @@ import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/SEO';
 import StructuredData, { createPersonSchema, createBreadcrumbSchema } from '../components/StructuredData';
 import { analytics } from '../lib/analytics';
-import { formatNumber } from '../lib/utils';
+import { formatNumber, formatRelativeTime } from '../lib/utils';
 import { addRecentlyViewed } from '../lib/recentlyViewed';
 import logger from '../lib/logger';
 import { supabase } from '../lib/supabase';
@@ -221,6 +221,14 @@ export default function CreatorProfile() {
         // Mastodon username is the full webfinger handle, e.g. "user@hachyderm.io".
         // getMastodonProfile parses + dispatches to the right instance API.
         channelData = await getMastodonProfile(username);
+        // Fetch the latest visible status content to render the Latest Post card.
+        // Mastodon's account object only includes last_status_at (timestamp); the
+        // title/url/thumbnail require a second hop to /accounts/:id/statuses.
+        if (channelData?.platformId) {
+          const [instance, accountId] = channelData.platformId.split(':');
+          const latest = await getMastodonLatestStatus(instance, accountId);
+          if (latest) channelData.latestPost = latest;
+        }
       } else if (platform === 'rumble') {
         // Rumble: DB-first, because Rumble's edge 403s Vercel datacenter IPs.
         // Our daily collection (running from GitHub Actions IPs that don't get
@@ -234,6 +242,8 @@ export default function CreatorProfile() {
             username: dbCreator.username,
             displayName: dbCreator.display_name,
             profileImage: dbCreator.profile_image,
+            bannerImage: dbCreator.banner_image,
+            verified: dbCreator.verified,
             description: dbCreator.description,
             country: dbCreator.country,
             category: dbCreator.category,
@@ -243,6 +253,13 @@ export default function CreatorProfile() {
             followers: null,
             totalPosts: null,
             totalViews: null,
+            latestPost: dbCreator.latest_post_at ? {
+              publishedAt: dbCreator.latest_post_at,
+              title: dbCreator.latest_post_title,
+              url: dbCreator.latest_post_url,
+              thumbnail: dbCreator.latest_post_thumbnail,
+              views: dbCreator.latest_post_views,
+            } : null,
           };
         } else {
           channelData = await getRumbleChannel(username);
@@ -1396,6 +1413,57 @@ export default function CreatorProfile() {
                 />
               )}
             </div>
+
+            {/* Latest Post Card — Rumble + Mastodon */}
+            {(platform === 'rumble' || platform === 'mastodon') && creator.latestPost?.publishedAt && (
+              <a
+                href={creator.latestPost.url || creator.profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`group block mb-6 bg-white border rounded-2xl p-4 sm:p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+                  platform === 'rumble'
+                    ? 'border-lime-200 hover:border-lime-400 hover:shadow-lime-100'
+                    : 'border-violet-200 hover:border-violet-400 hover:shadow-violet-100'
+                }`}
+              >
+                <div className="flex gap-4">
+                  {creator.latestPost.thumbnail && (
+                    <div className="flex-shrink-0 w-32 sm:w-44 aspect-video rounded-lg overflow-hidden bg-neutral-100">
+                      <img
+                        src={creator.latestPost.thumbnail}
+                        alt=""
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${
+                      platform === 'rumble' ? 'text-lime-700' : 'text-violet-700'
+                    }`}>
+                      Latest {platform === 'rumble' ? 'Video' : 'Post'}
+                    </div>
+                    {creator.latestPost.title && (
+                      <h3 className="text-base sm:text-lg font-bold text-neutral-900 leading-snug line-clamp-2 group-hover:underline">
+                        {creator.latestPost.title}
+                      </h3>
+                    )}
+                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500">
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" />
+                        {formatRelativeTime(creator.latestPost.publishedAt)}
+                      </span>
+                      {creator.latestPost.views != null && (
+                        <span className="inline-flex items-center gap-1">
+                          <Eye className="w-3.5 h-3.5" />
+                          {formatNumber(creator.latestPost.views)} views
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </a>
+            )}
 
             {/* Growth Rate Cards + Summary - Combined row for Twitch/Kick/Bluesky */}
             {(platform === 'twitch' || platform === 'kick' || platform === 'bluesky' || platform === 'mastodon' || platform === 'rumble') && metrics && metrics.growthRates && statsHistory.length >= 7 && (
