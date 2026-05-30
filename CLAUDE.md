@@ -41,10 +41,15 @@ Our creator stats are the entire reason this site exists. Every chart and table 
 - This prevents future-date issues when UTC is ahead of local time
 
 **RANKINGS CACHE REFRESH — per-platform, NOT bulk:**
-- `scripts/refreshRankingsCache.js` calls `refresh_rankings_cache_platform(p_platform text)` once per platform sequentially.
+- `scripts/refreshRankingsCache.js` calls `refresh_rankings_cache_platform(p_platform text)` once per platform sequentially. Runs at the end of `daily-stats-collection.yml` so the cache reflects the freshly collected numbers.
 - The OLD bulk function `refresh_rankings_cache()` looped all 6 platforms in one transaction and routinely hit PostgREST's 8s request timeout, silently failing every refresh. Don't go back to that pattern.
 - `service_role` has `statement_timeout` raised to 60s (set via `ALTER ROLE service_role SET statement_timeout = '60s'` on 2026-05-30). Required because YouTube (5.5K creators) and Twitch (13K) take 30-50s to refresh.
 - The script exits with code 1 if any platform fails — so failures are visible in the Actions tab instead of silent like before.
+- **Between daily collections, `pg_cron` keeps the cache warm** (Pro plan, scheduled 2026-05-30):
+  - `refresh-rankings-fast-platforms` — `17 * * * *` (hourly) — runs Mastodon, Rumble, Bluesky, Kick, Music, TikTok via the wrapper `refresh_rankings_cache_fast_platforms()`. Fast platforms refresh in 1-5s each so doing all six hourly is cheap.
+  - `refresh-rankings-heavy-platforms` — `37 */3 * * *` (every 3 hrs) — runs YouTube + Twitch separately because they take 30-50s. Less frequent because their data only moves every 8 hours during the daily collection cycle anyway.
+- **What this fixes:** previously a newly approved Featured Listing or a freshly discovered creator stat could take up to 8 hours to appear in the visible rankings (waiting for the next `daily-stats-collection.yml` run). Now it surfaces within an hour for small platforms, 3 hours for YouTube/Twitch.
+- `pg_cron` runs inside Postgres, no PostgREST involvement, no statement-timeout pressure beyond the function's own `SET LOCAL statement_timeout = '180s'`. To inspect: `SELECT * FROM cron.job;`. To pause: `SELECT cron.unschedule('refresh-rankings-fast-platforms');`.
 
 **SECTION DIVIDERS — NO GRADIENT FADES:**
 - The user removed all gradient section dividers (`bg-gradient-to-b from-X to-Y` between sections) months ago and does NOT want them re-added. If a transition between light and dark sections feels harsh, the fix is to add a proper section header (eyebrow + title) above the next section, NOT a gradient fade.
