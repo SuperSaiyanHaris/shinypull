@@ -166,6 +166,29 @@ async function fetchChannel(kind, slug) {
   }
 }
 
+async function fetchPathHandles(path) {
+  // Generic page fetcher — same 410-tolerant pattern as fetchCategoryHandles
+  const url = `${BASE}${path}`;
+  try {
+    const res = await fetch(url, { headers: FETCH_HEADERS, signal: AbortSignal.timeout(20000) });
+    const html = await res.text();
+    if (!html || html.length < 1000) return [];
+    const seen = new Set();
+    const out = [];
+    const re = /href="\/(c|user)\/([^"/?#]+)/g;
+    let m;
+    while ((m = re.exec(html)) !== null) {
+      const key = `${m[1]}:${m[2]}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ kind: m[1], slug: m[2] });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
 async function fetchCategoryHandles(category, page) {
   const url = `${BASE}/browse/${category}${page > 1 ? `?page=${page}` : ''}`;
   try {
@@ -261,17 +284,32 @@ async function main() {
   }
   console.log(`   ${candidates.size} queued\n`);
 
-  // ----- Phase 2: browse categories -----
-  console.log(`🌐 Phase 2: browse ${CATEGORIES.length} categories × 3 pages`);
+  // ----- Phase 2a: editor-picks page (Rumble's curated picks — ~70 channels) -----
+  console.log(`📌 Phase 2a: editor-picks`);
+  const picksHandles = await fetchPathHandles('/editor-picks');
+  for (const h of picksHandles) {
+    const platformId = `${h.kind}:${h.slug}`;
+    if (existing.has(platformId) || candidates.has(platformId)) continue;
+    candidates.set(platformId, h);
+  }
+  await sleep(FETCH_DELAY_MS);
+  console.log(`   total collected: ${candidates.size}\n`);
+
+  // ----- Phase 2b: browse categories, paginated -----
+  console.log(`🌐 Phase 2b: browse ${CATEGORIES.length} categories × 8 pages`);
   for (const cat of CATEGORIES) {
-    for (let page = 1; page <= 3; page++) {
+    for (let page = 1; page <= 8; page++) {
       const handles = await fetchCategoryHandles(cat, page);
+      let added = 0;
       for (const h of handles) {
         const platformId = `${h.kind}:${h.slug}`;
         if (existing.has(platformId) || candidates.has(platformId)) continue;
         candidates.set(platformId, h);
+        added++;
       }
       await sleep(FETCH_DELAY_MS);
+      // Stop early if we get no new channels on this page (saturated)
+      if (added === 0 && page > 2) break;
     }
     console.log(`   ${cat}: collected so far ${candidates.size}`);
   }
